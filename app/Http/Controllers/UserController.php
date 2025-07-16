@@ -36,7 +36,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,user',
+            'role' => 'required|in:admin,student,counselor',
         ]);
 
         if ($validator->fails()) {
@@ -90,8 +90,9 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:admin,user',
-            'is_active' => 'boolean',
+            'role' => 'required|in:admin,student,counselor',
+            'is_active' => 'nullable|boolean',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -106,14 +107,30 @@ class UserController extends Controller
             'email' => $user->email,
             'role' => $user->role,
             'is_active' => $user->is_active,
+            'avatar' => $user->avatar,
         ];
 
-        $user->update([
+        $updateData = [
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role,
             'is_active' => $request->has('is_active'),
-        ]);
+        ];
+
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            if ($file->isValid()) {
+                $avatarName = $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $destinationDir = storage_path('app/public/avatars');
+                if (!file_exists($destinationDir)) {
+                    mkdir($destinationDir, 0777, true);
+                }
+                $file->move($destinationDir, $avatarName);
+                $updateData['avatar'] = $avatarName;
+            }
+        }
+
+        $user->update($updateData);
 
         // Log activity
         UserActivity::log(auth()->id(), 'update_user', "Updated user: {$user->name}", [

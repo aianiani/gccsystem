@@ -9,7 +9,7 @@
                 <li class="breadcrumb-item active">Create User</li>
             </ol>
         </nav>
-        <h1 class="h3 mb-0">
+        <h1 class="h3 mb-0" style="color:var(--primary-black)">
             <i class="bi bi-person-plus me-2"></i>Create New User
         </h1>
         <p class="text-muted">Add a new user to the system</p>
@@ -68,7 +68,8 @@
                         <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
                         <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                             <option value="">Select Role</option>
-                            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
+                            <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
+                            <option value="counselor" {{ old('role') == 'counselor' ? 'selected' : '' }}>Counselor</option>
                             <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         </select>
                         @error('role')

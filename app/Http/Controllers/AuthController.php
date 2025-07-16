@@ -128,7 +128,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Default role
+            'role' => 'student', // Always set to student
         ]);
 
         // Send email verification
@@ -330,5 +330,33 @@ class AuthController extends Controller
             return redirect()->intended(route('dashboard'))->with('success', '2FA verification successful. Welcome!');
         }
         return back()->withErrors(['code' => 'Invalid or expired 2FA code.'])->withInput();
+    }
+
+    /**
+     * Resend the 2FA code to the user in session.
+     */
+    public function resendTwoFactorCode(Request $request)
+    {
+        $userId = $request->session()->get('2fa:user:id');
+        if (!$userId) {
+            return redirect()->route('login')->with('error', '2FA session expired. Please log in again.');
+        }
+        $user = User::find($userId);
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not found. Please log in again.');
+        }
+        // Generate new 2FA code
+        $code = random_int(100000, 999999);
+        DB::table('two_factor_codes')->updateOrInsert(
+            ['user_id' => $user->id],
+            [
+                'code' => $code,
+                'created_at' => now(),
+            ]
+        );
+        // Send code via email
+        Mail::to($user->email)->send(new \App\Mail\TwoFactorCodeMail($code, $user->name));
+        \App\Models\UserActivity::log($user->id, '2fa_resent', '2FA code resent to user email');
+        return redirect()->route('2fa.form')->with('info', 'A new 2FA code has been sent to your email.');
     }
 }

@@ -3,7 +3,7 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-12">
-        <h1 class="h3 mb-0">
+        <h1 class="h3 mb-0" style="color:var(--primary-black)">
             <i class="bi bi-person-circle me-2"></i>My Profile
         </h1>
         <p class="text-muted">View and manage your account information</p>
@@ -30,9 +30,9 @@
                             </span>
                         @enderror
                     </div>
-                    <button type="submit" class="btn btn-outline-primary btn-sm w-100">Upload Avatar</button>
+                    <button type="submit" class="btn btn-outline w-100">Upload Avatar</button>
                 </form>
-                <h5>{{ $user->name }}</h5>
+                <h5 style="color:var(--primary-black)">{{ $user->name }}</h5>
                 <p class="text-muted">{{ $user->email }}</p>
                 
                 <div class="row text-start">
@@ -189,7 +189,6 @@
                             </div>
                         @endforeach
                     </div>
-                    
                     <div class="d-flex justify-content-center mt-3">
                         {{ $activities->links() }}
                     </div>

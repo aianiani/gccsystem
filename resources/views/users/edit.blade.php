@@ -10,7 +10,7 @@
                 <li class="breadcrumb-item active">Edit</li>
             </ol>
         </nav>
-        <h1 class="h3 mb-0">
+        <h1 class="h3 mb-0" style="color:var(--primary-black)">
             <i class="bi bi-pencil me-2"></i>Edit User
         </h1>
         <p class="text-muted">Update user information and settings</p>
@@ -24,7 +24,23 @@
                 <h5 class="mb-0">User Information</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ route('users.update', $user) }}">
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {!! session('error') !!}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                <form method="POST" action="{{ route('users.update', $user) }}" id="edit-user-form" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     
@@ -53,7 +69,8 @@
                             <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
                             <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                                 <option value="">Select Role</option>
-                                <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User</option>
+                                <option value="student" {{ old('role', $user->role) == 'student' ? 'selected' : '' }}>Student</option>
+                                <option value="counselor" {{ old('role', $user->role) == 'counselor' ? 'selected' : '' }}>Counselor</option>
                                 <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
                             </select>
                             @error('role')
@@ -64,7 +81,7 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Status</label>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1"
                                        {{ old('is_active', $user->is_active) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_active">
                                     Active Account
@@ -74,11 +91,27 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="avatar" class="form-label">Profile Avatar</label>
+                            <input type="file" class="form-control @error('avatar') is-invalid @enderror" id="avatar" name="avatar" accept="image/*">
+                            @error('avatar')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            @if($user->avatar)
+                                <div class="mt-2">
+                                    <img src="{{ $user->avatar_url }}" alt="Current Avatar" class="rounded-circle" width="60" height="60">
+                                    <span class="text-muted small ms-2">Current Avatar</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
                     <div class="d-flex justify-content-between">
                         <a href="{{ route('users.show', $user) }}" class="btn btn-secondary">
                             <i class="bi bi-arrow-left me-2"></i>Cancel
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="edit-user-btn">
                             <i class="bi bi-check-lg me-2"></i>Update User
                         </button>
                     </div>
@@ -87,4 +120,24 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById('edit-user-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to update this user information?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('edit-user-form').submit();
+            }
+        });
+    });
+</script>
 @endsection 

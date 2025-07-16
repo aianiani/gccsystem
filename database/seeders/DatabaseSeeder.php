@@ -17,19 +17,30 @@ class DatabaseSeeder extends Seeder
         // Create admin user
         User::create([
             'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
+            'email' => 'aianmark1715@gmail.com',
+            'password' => bcrypt('admin123'),
             'role' => 'admin',
             'is_active' => true,
+            'email_verified_at' => now(), // <-- This line marks as verified
         ]);
 
         // Create regular user
         User::create([
-            'name' => 'Test User',
-            'email' => 'user@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'user',
+            'name' => 'Test Student',
+            'email' => 'naikram117@gmail.com',
+            'password' => bcrypt('student123'),
+            'role' => 'student', // changed from 'user' to 'student'
             'is_active' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'name' => 'Test Student',
+            'email' => 'yanikram11@gmail.com',
+            'password' => bcrypt('counselor123'),
+            'role' => 'counselor', // changed from 'user' to 'student'
+            'is_active' => true,
+            'email_verified_at' => now(),
         ]);
 
         // Create additional test users

@@ -3,10 +3,10 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-12">
-        <h1 class="display-4 fw-bold mb-2" style="color:var(--text-primary)">
+        <h1 class="display-4 fw-bold mb-2" style="color:var(--primary-black)">
             <i class="bi bi-activity me-2"></i>Activity Logs
         </h1>
-        <p class="fs-5 mb-0" style="color:var(--text-secondary)">Monitor all user activities across the system</p>
+        <p class="fs-5 mb-0" style="color:var(--dark-gray)">Monitor all user activities across the system</p>
     </div>
 </div>
 
@@ -29,6 +29,7 @@
                             <th>Action</th>
                             <th>Description</th>
                             <th>IP Address</th>
+                            <th>Browser</th>
                             <th>Date & Time</th>
                         </tr>
                     </thead>
@@ -43,8 +44,8 @@
                                             <i class="bi bi-person-circle fs-5 me-2 text-primary"></i>
                                         @endif
                                         <div>
-                                            <div class="fw-bold">{{ $activity->user->name }}</div>
-                                            <small class="text-muted">{{ $activity->user->email }}</small>
+                                            <div class="fw-bold">{{ $activity->user->name ?? 'Unknown' }}</div>
+                                            <small class="text-muted">{{ $activity->user->email ?? 'Unknown' }}</small>
                                         </div>
                                     </div>
                                 </td>
@@ -62,6 +63,9 @@
                                     <small class="text-muted">{{ $activity->ip_address ?? 'N/A' }}</small>
                                 </td>
                                 <td>
+                                    <small class="text-muted">{{ getBrowserName($activity->user_agent) }}</small>
+                                </td>
+                                <td>
                                     <div>
                                         <div>{{ $activity->created_at->format('M d, Y') }}</div>
                                         <small class="text-muted">{{ $activity->created_at->format('H:i:s') }}</small>
@@ -73,7 +77,7 @@
                 </table>
             </div>
             <div class="d-flex justify-content-center py-4">
-                {{ $activities->links() }}
+                {{ $activities->links('vendor.pagination.bootstrap-5') }}
             </div>
         @else
             <div class="text-center py-5">
@@ -100,5 +104,16 @@ function getActivityBadgeColor($action) {
         'toggle_user_status' => 'warning',
         default => 'secondary'
     };
+}
+function getBrowserName($userAgent) {
+    if (!$userAgent) return 'Unknown';
+    if (stripos($userAgent, 'Brave') !== false || $userAgent === 'Brave') return 'Brave';
+    if (stripos($userAgent, 'Edg') !== false) return 'Microsoft Edge';
+    if (stripos($userAgent, 'OPR') !== false || stripos($userAgent, 'Opera') !== false) return 'Opera';
+    if (stripos($userAgent, 'Chrome') !== false && stripos($userAgent, 'Edg') === false && stripos($userAgent, 'OPR') === false) return 'Google Chrome';
+    if (stripos($userAgent, 'Safari') !== false && stripos($userAgent, 'Chrome') === false) return 'Safari';
+    if (stripos($userAgent, 'Firefox') !== false) return 'Mozilla Firefox';
+    if (stripos($userAgent, 'MSIE') !== false || stripos($userAgent, 'Trident') !== false) return 'Internet Explorer';
+    return 'Other';
 }
 @endphp 

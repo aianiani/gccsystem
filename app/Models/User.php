@@ -68,6 +68,22 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Check if user is a student
+     */
+    public function isStudent(): bool
+    {
+        return $this->role === 'student';
+    }
+
+    /**
+     * Check if user is a counselor
+     */
+    public function isCounselor(): bool
+    {
+        return $this->role === 'counselor';
+    }
+
+    /**
      * Get user activities
      */
     public function activities()

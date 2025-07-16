@@ -87,24 +87,24 @@
                                         {{ $user->isActive() ? 'Active' : 'Inactive' }}
                                     </span>
                                 </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi bi-calendar text-muted me-2"></i>
-                                        {{ $user->created_at->format('M d, Y') }}
+                                <td class="align-middle" style="min-width: 150px;">
+                                    <div class="d-flex align-items-center gap-2 flex-nowrap">
+                                        <i class="bi bi-calendar text-muted" style="font-size: 1.1rem;"></i>
+                                        <span style="white-space: nowrap;">{{ $user->created_at->format('M d, Y') }}</span>
                                     </div>
                                 </td>
-                                <td class="text-end pe-4">
-                                    <div class="btn-group" role="group">
+                                <td class="text-end pe-2 align-middle">
+                                    <div class="d-flex align-items-center justify-content-end gap-1 flex-nowrap">
                                         <a href="{{ route('users.show', $user) }}" 
-                                           class="btn btn-outline-primary btn-sm"
+                                           class="btn btn-outline-primary btn-sm p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center action-btn"
                                            data-bs-toggle="tooltip"
-                                           title="View user details and activity history">
+                                           title="View">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         <a href="{{ route('users.edit', $user) }}" 
-                                           class="btn btn-outline-warning btn-sm"
+                                           class="btn btn-outline-warning btn-sm p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center action-btn"
                                            data-bs-toggle="tooltip"
-                                           title="Edit user information and settings">
+                                           title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         @if($user->id !== auth()->id())
@@ -112,11 +112,9 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit" 
-                                                        class="btn btn-outline-{{ $user->isActive() ? 'warning' : 'success' }} btn-sm btn-toggle-status"
-                                                        data-user-name="{{ $user->name }}"
-                                                        data-current-status="{{ $user->isActive() ? 'active' : 'inactive' }}"
+                                                        class="btn btn-outline-{{ $user->isActive() ? 'warning' : 'success' }} btn-sm p-1 rounded-circle shadow-sm btn-toggle-status d-flex align-items-center justify-content-center action-btn"
                                                         data-bs-toggle="tooltip"
-                                                        title="{{ $user->isActive() ? 'Deactivate user account' : 'Activate user account' }}">
+                                                        title="{{ $user->isActive() ? 'Deactivate' : 'Activate' }}">
                                                     <i class="bi bi-{{ $user->isActive() ? 'pause' : 'play' }}"></i>
                                                 </button>
                                             </form>
@@ -124,11 +122,9 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        class="btn btn-outline-danger btn-sm btn-delete-user"
-                                                        data-user-name="{{ $user->name }}"
-                                                        data-user-email="{{ $user->email }}"
+                                                        class="btn btn-outline-danger btn-sm p-1 rounded-circle shadow-sm btn-delete-user d-flex align-items-center justify-content-center action-btn"
                                                         data-bs-toggle="tooltip"
-                                                        title="Permanently delete user account">
+                                                        title="Delete">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -142,7 +138,7 @@
             </div>
             
             <div class="d-flex justify-content-center py-4">
-                {{ $users->links() }}
+                {{ $users->links('vendor.pagination.bootstrap-5') }}
             </div>
         @else
             <div class="text-center py-5">
@@ -159,13 +155,26 @@
     </div>
 </div>
 
-<!-- Loading indicator for pagination -->
-<div id="page-loading" class="text-center py-4" style="display: none;">
-    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-3" style="width: 60px; height: 60px;">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-    <p class="text-muted">Loading users...</p>
-</div>
+<style>
+.action-btn {
+    transition: box-shadow 0.2s, background 0.2s, color 0.2s;
+}
+.action-btn:hover, .action-btn:focus {
+    background: rgba(99, 102, 241, 0.08) !important;
+    box-shadow: 0 2px 8px 0 rgba(99,102,241,0.12) !important;
+    color: var(--primary-color) !important;
+}
+.btn-outline-danger.action-btn:hover, .btn-outline-danger.action-btn:focus {
+    background: rgba(239, 68, 68, 0.08) !important;
+    color: #ef4444 !important;
+}
+.btn-outline-warning.action-btn:hover, .btn-outline-warning.action-btn:focus {
+    background: rgba(245, 158, 11, 0.08) !important;
+    color: #f59e0b !important;
+}
+.btn-outline-success.action-btn:hover, .btn-outline-success.action-btn:focus {
+    background: rgba(16, 185, 129, 0.08) !important;
+    color: #10b981 !important;
+}
+</style>
 @endsection 

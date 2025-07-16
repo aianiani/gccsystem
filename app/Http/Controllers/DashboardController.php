@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\UserActivity;
 use Illuminate\Http\Request;
+use App\Models\Announcement;
 
 class DashboardController extends Controller
 {
@@ -15,7 +16,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $recentActivities = $user->activities()->latest()->take(5)->get();
-        
+        $recentAnnouncements = Announcement::orderBy('created_at', 'desc')->take(3)->get();
         $stats = [
             'total_users' => User::count(),
             'active_users' => User::where('is_active', true)->count(),
@@ -23,7 +24,7 @@ class DashboardController extends Controller
             'total_activities' => UserActivity::count(),
         ];
 
-        return view('dashboard', compact('user', 'recentActivities', 'stats'));
+        return view('dashboard', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
     }
 
     /**
