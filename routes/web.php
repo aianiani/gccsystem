@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
         Route::get('appointments', [App\Http\Controllers\AppointmentController::class, 'index'])->name('appointments.index');
         Route::get('appointments/create', [App\Http\Controllers\AppointmentController::class, 'create'])->name('appointments.create');
         Route::post('appointments', [App\Http\Controllers\AppointmentController::class, 'store'])->name('appointments.store');
+        Route::get('/appointments/available-slots/{counselor}', [App\Http\Controllers\AppointmentController::class, 'availableSlots'])->name('appointments.availableSlots');
     });
 
     // Counselor-only routes
@@ -86,3 +87,30 @@ Route::post('password/reset', [App\Http\Controllers\AuthController::class, 'rese
 Route::get('2fa', [App\Http\Controllers\AuthController::class, 'showTwoFactorForm'])->name('2fa.form');
 Route::post('2fa', [App\Http\Controllers\AuthController::class, 'verifyTwoFactorCode'])->name('2fa.verify');
 Route::post('2fa/resend', [App\Http\Controllers\AuthController::class, 'resendTwoFactorCode'])->name('2fa.resend');
+
+Route::get('/chat', function () {
+    return view('chat');
+})->name('chat');
+
+Route::get('/resources', function () {
+    return view('resources');
+})->name('resources');
+
+Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(function () {
+    Route::resource('messages', App\Http\Controllers\Counselor\MessageController::class)
+        ->names('counselor.messages')
+        ->only(['index', 'show', 'create', 'store']);
+    Route::resource('assessments', App\Http\Controllers\Counselor\AssessmentController::class)
+        ->names('counselor.assessments')
+        ->only(['index', 'show', 'create', 'store']);
+    Route::get('priority-cases', [App\Http\Controllers\Counselor\PriorityCaseController::class, 'index'])
+        ->name('counselor.priority-cases.index');
+    Route::get('feedback', [App\Http\Controllers\Counselor\FeedbackController::class, 'index'])
+        ->name('counselor.feedback.index');
+    Route::resource('appointments', App\Http\Controllers\Counselor\AppointmentController::class)
+        ->names('counselor.appointments');
+    Route::get('availability', [App\Http\Controllers\CounselorAvailabilityController::class, 'index'])->name('counselor.availability.index');
+    Route::get('availabilities', [App\Http\Controllers\AvailabilityController::class, 'index']);
+    Route::post('availabilities', [App\Http\Controllers\AvailabilityController::class, 'store']);
+});
+

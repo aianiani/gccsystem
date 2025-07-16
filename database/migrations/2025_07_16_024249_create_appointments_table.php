@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('student_id');
             $table->unsignedBigInteger('counselor_id');
             $table->timestamp('scheduled_at');
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->timestamps();
 
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('student_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('counselor_id')->references('id')->on('users')->onDelete('cascade');
         });

@@ -24,7 +24,17 @@ class DashboardController extends Controller
             'total_activities' => UserActivity::count(),
         ];
 
-        return view('dashboard', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
+        // Render dashboard view based on user role
+        switch ($user->role) {
+            case 'admin':
+                return view('dashboard_admin', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
+            case 'counselor':
+                return view('dashboard_counselor', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
+            case 'student':
+                return view('dashboard_student', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
+            default:
+                return view('dashboard', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
+        }
     }
 
     /**

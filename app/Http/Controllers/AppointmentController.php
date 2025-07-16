@@ -30,7 +30,26 @@ class AppointmentController extends Controller
             'scheduled_at' => 'required|date|after:now',
             'notes' => 'nullable|string',
         ]);
-        Appointment::create([
+
+        // Check if the counselor is available at the requested time
+        $availability = \DB::table('availabilities')
+            ->where('user_id', $request->counselor_id)
+            ->where('start', '<=', $request->scheduled_at)
+            ->where('end', '>', $request->scheduled_at)
+            ->first();
+        if (!$availability) {
+            return redirect()->back()->withErrors(['scheduled_at' => 'The counselor is not available at the selected time.']);
+        }
+
+        // Check if the slot is already booked
+        $alreadyBooked = \App\Models\Appointment::where('counselor_id', $request->counselor_id)
+            ->where('scheduled_at', $request->scheduled_at)
+            ->exists();
+        if ($alreadyBooked) {
+            return redirect()->back()->withErrors(['scheduled_at' => 'This slot is already booked.']);
+        }
+
+        \App\Models\Appointment::create([
             'student_id' => auth()->id(),
             'counselor_id' => $request->counselor_id,
             'scheduled_at' => $request->scheduled_at,
@@ -38,5 +57,32 @@ class AppointmentController extends Controller
             'status' => 'pending',
         ]);
         return redirect()->route('appointments.index')->with('success', 'Appointment booked successfully!');
+    }
+
+    // Return available slots for a given counselor as JSON
+    public function availableSlots(Request $request, $counselor_id)
+    {
+        // Get all availabilities for the counselor
+        $availabilities = \DB::table('availabilities')
+            ->where('user_id', $counselor_id)
+            ->get();
+
+        // Get all booked appointment times for the counselor
+        $booked = \App\Models\Appointment::where('counselor_id', $counselor_id)
+            ->pluck('scheduled_at')->toArray();
+
+        $slots = [];
+        foreach ($availabilities as $availability) {
+            $start = strtotime($availability->start);
+            $end = strtotime($availability->end);
+            // 30-minute slots
+            for ($time = $start; $time < $end; $time += 1800) {
+                $slot = date('Y-m-d\TH:i', $time);
+                if (!in_array($slot, $booked)) {
+                    $slots[] = $slot;
+                }
+            }
+        }
+        return response()->json($slots);
     }
 }

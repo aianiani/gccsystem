@@ -17,7 +17,6 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrustProxies::class,
         \Fruitcake\Cors\HandleCors::class,
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
@@ -53,7 +52,8 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,      // <--- ADD THIS LINE BACK
+        'counselor' => \App\Http\Middleware\RoleMiddleware::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];
 } 

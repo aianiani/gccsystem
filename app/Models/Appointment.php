@@ -6,6 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
+    protected $fillable = [
+        'student_id',
+        'counselor_id',
+        'scheduled_at',
+        'notes',
+        'status',
+    ];
+
     public function student()
     {
         return $this->belongsTo(User::class, 'student_id');

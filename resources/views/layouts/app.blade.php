@@ -11,6 +11,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -153,14 +155,7 @@
     </style>
 </head>
 <body>
-@if(auth()->check())
-    <form action="{{ route('logout') }}" method="POST" style="position: fixed; top: 18px; right: 32px; z-index: 2000;">
-        @csrf
-        <button type="submit" class="btn btn-danger rounded-pill px-4 shadow">
-            <i class="bi bi-box-arrow-right me-1"></i>Logout
-        </button>
-    </form>
-@endif
+
     @auth
         @if(auth()->user()->isAdmin())
             <div class="d-flex" style="min-height: 100vh;">
@@ -278,63 +273,6 @@
                 });
             </script>
         @else
-            <!-- Non-admin layout (navbar as before) -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-                <div class="container">
-                    <a class="navbar-brand university-brand d-flex align-items-center gap-2" href="/">
-                        <img src="/images/cmu-logo.png" alt="CMU Logo" style="height: 32px;">
-                        <span>CMU Guidance and Counseling Center</span>
-                    </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav me-auto">
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                                    <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                                </a>
-                            </li>
-                            @if(auth()->user()->isStudent())
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('announcements.*') ? 'active' : '' }}" href="{{ route('announcements.index') }}">
-                                        <i class="bi bi-megaphone me-1"></i>Announcements
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('appointments.*') ? 'active' : '' }}" href="{{ route('appointments.index') }}">
-                                        <i class="bi bi-calendar-check me-1"></i>Appointments
-                                    </a>
-                                </li>
-                            @elseif(auth()->user()->isCounselor())
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('announcements.*') ? 'active' : '' }}" href="{{ route('announcements.index') }}">
-                                        <i class="bi bi-megaphone me-1"></i>Announcements
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('counselor.appointments.*') ? 'active' : '' }}" href="{{ route('counselor.appointments.index') }}">
-                                        <i class="bi bi-calendar-check me-1"></i>Appointments
-                                    </a>
-                                </li>
-                            @endif
-                        </ul>
-                        <ul class="navbar-nav align-items-center">
-                            <li class="nav-item me-2">
-                                <span class="fw-semibold">{{ auth()->user()->name }}</span>
-                            </li>
-                            <li class="nav-item">
-                                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-danger rounded-pill px-4 ms-2">
-                                        <i class="bi bi-box-arrow-right me-1"></i>Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
             <main class="fade-in">
                 <div class="container py-4">
                     @yield('content')

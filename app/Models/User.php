@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Appointment;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -92,6 +93,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the user's appointments
+     */
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    /**
      * Get the user's avatar URL or a default placeholder
      */
     public function getAvatarUrlAttribute()
@@ -110,5 +119,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new \App\Notifications\EmailVerificationNotification);
+    }
+
+    public function assessments()
+    {
+        return $this->hasMany(\App\Models\Assessment::class);
     }
 }

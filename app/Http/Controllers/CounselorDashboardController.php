@@ -20,4 +20,13 @@ class CounselorDashboardController extends Controller
         $appointment = Appointment::where('counselor_id', auth()->id())->with('student')->findOrFail($id);
         return view('counselor.appointments.show', compact('appointment'));
     }
+
+    // Toggle counselor availability (AJAX)
+    public function toggleAvailability(Request $request)
+    {
+        $user = auth()->user();
+        $user->is_available = $request->input('available') == '1';
+        $user->save();
+        return response()->json(['success' => true, 'is_available' => $user->is_available]);
+    }
 }

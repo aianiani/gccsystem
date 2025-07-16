@@ -1,15 +1,109 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="row mb-4">
+<style>
+    :root {
+        --forest-green: #228B22;
+        --forest-green-light: #32CD32;
+        --forest-green-dark: #006400;
+        --yellow-maize: #FFDB58;
+        --yellow-maize-light: #FFF8DC;
+        --yellow-maize-dark: #DAA520;
+        --white: #FFFFFF;
+        --light-gray: #F8F9FA;
+        --text-dark: #2C3E50;
+        --success: #28a745;
+        --warning: #ffc107;
+        --danger: #dc3545;
+        --info: #17a2b8;
+    }
+    body, .card {
+        background-color: var(--light-gray) !important;
+        color: var(--text-dark);
+    }
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+    .card-header {
+        background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.2rem;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--forest-green-dark) 0%, var(--forest-green) 100%);
+        transform: translateY(-1px);
+    }
+    .btn-warning {
+        background: linear-gradient(135deg, var(--yellow-maize) 0%, var(--yellow-maize-dark) 100%);
+        border: none;
+        border-radius: 10px;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+    .btn-outline {
+        border: 2px solid var(--forest-green);
+        color: var(--forest-green);
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    .btn-outline:hover {
+        background: var(--forest-green);
+        border-color: var(--forest-green);
+        color: white;
+    }
+    .form-label {
+        font-weight: 500;
+        color: var(--forest-green-dark);
+    }
+    .rounded-avatar {
+        border-radius: 50%;
+        border: 3px solid var(--forest-green);
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+    .badge.bg-danger, .badge.bg-success, .badge.bg-secondary {
+        font-size: 0.95em;
+        padding: 0.5em 0.8em;
+        border-radius: 8px;
+    }
+    .btn-yellow-maize {
+        background: linear-gradient(135deg, var(--yellow-maize) 0%, var(--yellow-maize-dark) 100%) !important;
+        color: var(--text-dark) !important;
+        border: none !important;
+        font-weight: 600;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        transition: background 0.2s, color 0.2s;
+    }
+    .btn-yellow-maize:hover {
+        background: linear-gradient(135deg, var(--yellow-maize-dark) 0%, var(--yellow-maize) 100%) !important;
+        color: var(--forest-green-dark) !important;
+    }
+</style>
+<div class="row mb-4 position-relative">
     <div class="col-12">
-        <h1 class="h3 mb-0" style="color:var(--primary-black)">
+        <a href="{{ route('dashboard') }}" class="btn btn-yellow-maize position-absolute top-0 end-0 mt-1 me-2" style="background: linear-gradient(135deg, var(--yellow-maize) 0%, var(--yellow-maize-dark) 100%); color: var(--text-dark); border: none; font-weight: 600;">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1 class="h3 mb-0" style="color:var(--forest-green)">
             <i class="bi bi-person-circle me-2"></i>My Profile
         </h1>
         <p class="text-muted">View and manage your account information</p>
     </div>
 </div>
-
 <div class="row">
     <div class="col-md-4">
         <div class="card mb-4">
@@ -19,7 +113,7 @@
                 </h5>
             </div>
             <div class="card-body text-center">
-                <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle mb-3" width="100" height="100">
+                <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-avatar mb-3">
                 <form method="POST" action="{{ route('profile.avatar') }}" enctype="multipart/form-data" class="mb-3">
                     @csrf
                     <div class="mb-2">
@@ -32,51 +126,34 @@
                     </div>
                     <button type="submit" class="btn btn-outline w-100">Upload Avatar</button>
                 </form>
-                <h5 style="color:var(--primary-black)">{{ $user->name }}</h5>
+                <h5 style="color:var(--forest-green)">{{ $user->name }}</h5>
                 <p class="text-muted">{{ $user->email }}</p>
-                
-                <div class="row text-start">
-                    <div class="col-6">
-                        <strong>Role:</strong>
-                    </div>
+                <div class="row text-start mb-2">
+                    <div class="col-6"><strong>Role:</strong></div>
                     <div class="col-6">
                         <span class="badge bg-{{ $user->isAdmin() ? 'danger' : 'secondary' }}">
                             {{ ucfirst($user->role) }}
                         </span>
                     </div>
                 </div>
-                
-                <div class="row text-start">
-                    <div class="col-6">
-                        <strong>Status:</strong>
-                    </div>
+                <div class="row text-start mb-2">
+                    <div class="col-6"><strong>Status:</strong></div>
                     <div class="col-6">
                         <span class="badge bg-{{ $user->isActive() ? 'success' : 'danger' }}">
                             {{ $user->isActive() ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
                 </div>
-                
-                <div class="row text-start">
-                    <div class="col-6">
-                        <strong>Member Since:</strong>
-                    </div>
-                    <div class="col-6">
-                        {{ $user->created_at->format('M d, Y') }}
-                    </div>
+                <div class="row text-start mb-2">
+                    <div class="col-6"><strong>Member Since:</strong></div>
+                    <div class="col-6">{{ $user->created_at->format('M d, Y') }}</div>
                 </div>
-                
-                <div class="row text-start">
-                    <div class="col-6">
-                        <strong>Last Login:</strong>
-                    </div>
-                    <div class="col-6">
-                        {{ $user->updated_at->format('M d, Y') }}
-                    </div>
+                <div class="row text-start mb-2">
+                    <div class="col-6"><strong>Last Login:</strong></div>
+                    <div class="col-6">{{ $user->updated_at->format('M d, Y') }}</div>
                 </div>
             </div>
         </div>
-        
         @if($user->isAdmin())
             <div class="card">
                 <div class="card-header">
@@ -97,7 +174,6 @@
             </div>
         @endif
     </div>
-    
     <div class="col-md-8">
         <div class="card mb-4">
             <div class="card-header">
