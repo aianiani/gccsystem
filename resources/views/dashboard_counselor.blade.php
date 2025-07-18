@@ -507,11 +507,178 @@
     }
 </style>
 
+<!-- Notification Bell Dropdown at Top Right -->
+<style>
+    .notification-bell {
+        background: transparent;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        position: relative;
+        transition: color 0.2s;
+    }
+    .notification-bell .bi-bell {
+        color: var(--forest-green);
+        font-size: 2.2rem;
+        transition: color 0.2s;
+    }
+    .notification-bell.pulse .bi-bell {
+        animation: bell-pulse 1.2s infinite;
+    }
+    .notification-bell:hover .bi-bell {
+        color: var(--yellow-maize);
+    }
+    @keyframes bell-pulse {
+        0% { filter: drop-shadow(0 0 0 var(--yellow-maize)); }
+        70% { filter: drop-shadow(0 0 8px var(--yellow-maize)); }
+        100% { filter: drop-shadow(0 0 0 var(--yellow-maize)); }
+    }
+    .notification-bell-badge {
+        background: var(--yellow-maize);
+        color: var(--forest-green);
+        font-weight: bold;
+        font-size: 0.9rem;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 8px rgba(244, 208, 63, 0.25);
+        padding: 0.2em 0.7em;
+        border-radius: 999px;
+        top: 0;
+        right: 0;
+    }
+    .notification-dropdown-menu {
+        min-width: 340px;
+        max-width: 95vw;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px var(--shadow-sm), 0 20px 40px var(--shadow-md), 0 0 0 1px rgba(0,0,0,0.02);
+        border: none;
+        padding: 0.5rem 0;
+        margin-top: 0.5rem;
+        background: var(--gray-100);
+    }
+    .notification-dropdown-header {
+        background: var(--forest-green-lighter);
+        color: var(--forest-green);
+        font-weight: 700;
+        border-radius: 16px 16px 0 0;
+        padding: 1rem 1.5rem;
+        font-size: 1.08rem;
+        border-bottom: 1px solid var(--gray-100);
+        font-family: inherit;
+    }
+    .notification-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        background: transparent;
+        transition: background 0.18s;
+        border-bottom: 1px solid var(--gray-50);
+        font-family: inherit;
+    }
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+    .notification-item:hover {
+        background: var(--yellow-maize-light);
+    }
+    .notification-item .btn-link {
+        color: var(--danger);
+        font-size: 1.1rem;
+        margin-left: 0.5rem;
+    }
+    .notification-empty {
+        padding: 1.2rem 1.5rem;
+        color: var(--gray-600);
+        text-align: center;
+        font-size: 1rem;
+        font-family: inherit;
+    }
+    @media (max-width: 500px) {
+        .notification-dropdown-menu {
+            min-width: 90vw;
+            padding: 0.25rem 0;
+        }
+        .notification-dropdown-header {
+            font-size: 1rem;
+            padding: 0.7rem 1rem;
+        }
+        .notification-item, .notification-empty {
+            padding: 0.7rem 1rem;
+        }
+    }
+</style>
+@php
+    $unreadCount = auth()->user()->unreadNotifications()->count();
+    $recentNotifications = auth()->user()->unreadNotifications()->take(5)->get();
+@endphp
+<div class="dropdown me-3" style="position: fixed; top: 1.5rem; right: 2.5rem; z-index: 2000;">
+    <button class="btn notification-bell position-relative p-0{{ $unreadCount > 0 ? ' pulse' : '' }}" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-bell fs-4" style="color: var(--yellow-maize);"></i>
+        @if($unreadCount > 0)
+            <span class="position-absolute top-0 start-100 translate-middle badge notification-bell-badge" style="background: var(--yellow-maize); color: var(--forest-green); font-weight: bold; font-size: 0.85rem; border: 2px solid #fff;">
+                {{ $unreadCount }}
+            </span>
+        @endif
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" style="min-width: 320px;">
+        <li class="dropdown-header fw-bold">Notifications</li>
+        @forelse($recentNotifications as $notification)
+            <li class="px-3 py-2 border-bottom small d-flex align-items-center gap-2">
+                @if(isset($notification->data['appointment_id']))
+                    <i class="bi bi-calendar-event text-primary"></i>
+                @else
+                    <i class="bi bi-info-circle text-info"></i>
+                @endif
+                <div class="flex-grow-1">
+                    {{ $notification->data['message'] ?? 'You have a new notification.' }}
+                    @if(isset($notification->data['appointment_id']))
+                        <a href="{{ route('counselor.appointments.show', $notification->data['appointment_id']) }}" class="ms-2 fw-bold">View</a>
+                    @endif
+                </div>
+                <form method="POST" action="{{ route('notifications.markAsRead', $notification->id) }}">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Mark as read"><i class="bi bi-x-circle"></i></button>
+                </form>
+            </li>
+        @empty
+            <li class="px-3 py-2 text-muted small">No new notifications</li>
+        @endforelse
+    </ul>
+</div>
+
 @include('counselor.sidebar')
 <!-- Main Content -->
 <div class="main-content">
     <div class="container-fluid py-4">
-        <div class="dashboard-header">
+        {{-- Notification Section --}}
+        @php
+            $unreadNotifications = auth()->user()->unreadNotifications()->take(5)->get();
+        @endphp
+        @if($unreadNotifications->count())
+            <div class="mb-4">
+                @foreach($unreadNotifications as $notification)
+                    <div class="alert alert-info alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+                        @if(isset($notification->data['appointment_id']))
+                            <i class="bi bi-calendar-event fs-5"></i>
+                        @else
+                            <i class="bi bi-info-circle fs-5"></i>
+                        @endif
+                        <div>
+                            {{ $notification->data['message'] ?? 'You have a new notification.' }}
+                            @if(isset($notification->data['appointment_id']))
+                                <a href="{{ route('counselor.appointments.show', $notification->data['appointment_id']) }}" class="ms-2 fw-bold">View</a>
+                            @endif
+                        </div>
+                        <form method="POST" action="{{ route('notifications.markAsRead', $notification->id) }}" class="ms-auto">
+                            @csrf
+                            <button type="submit" class="btn-close" aria-label="Close"></button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+        <div class="dashboard-header position-relative">
             <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
                 <div class="flex-grow-1">
                     <h1 class="mb-2 fw-bold d-flex align-items-center" style="gap: 0.75rem;">
@@ -531,162 +698,115 @@
                         <small class="text-white-50 ms-2">CMU Counseling Services</small>
                     </div>
                 </div>
-                <div class="profile-card p-3 d-flex flex-column align-items-center justify-content-center text-center" style="background: #fff; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); min-width: 240px; max-width: 320px;">
-                    <div class="position-relative mb-2">
-                        <img src="{{ auth()->user()->avatar_url }}" 
-                             alt="Avatar" 
-                             class="rounded-circle border border-3 shadow-sm" 
-                             width="80" 
-                             height="80" 
-                             style="border-color: var(--yellow-maize) !important;">
-                        <div class="position-absolute bottom-0 end-0 bg-success rounded-circle" 
-                             style="width: 18px; height: 18px; border: 2px solid white;"></div>
+                <div class="d-flex flex-column align-items-end gap-2 position-relative" style="min-width: 240px; max-width: 320px;">
+                    <div class="profile-card p-3 d-flex flex-column align-items-center justify-content-center text-center" style="background: #fff; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); min-width: 240px; max-width: 320px;">
+                        <div class="position-relative mb-2">
+                            <img src="{{ auth()->user()->avatar_url }}" 
+                                 alt="Avatar" 
+                                 class="rounded-circle border border-3 shadow-sm" 
+                                 width="80" 
+                                 height="80" 
+                                 style="border-color: var(--yellow-maize) !important;">
+                            <div class="position-absolute bottom-0 end-0 bg-success rounded-circle" 
+                                 style="width: 18px; height: 18px; border: 2px solid white;"></div>
+                        </div>
+                        <h5 class="fw-bold mb-1" style="color: var(--forest-green);">
+                            {{ auth()->user()->name }}
+                        </h5>
+                        <div class="text-muted mb-2 small">{{ auth()->user()->email }}</div>
+                        <span class="badge-counselor mb-2">
+                            <i class="bi bi-shield-check me-1"></i>Counselor
+                        </span>
+                        <a href="{{ route('profile') }}" class="btn-edit mt-2">
+                            <i class="bi bi-pencil me-2"></i>Edit Profile
+                        </a>
                     </div>
-                    <h5 class="fw-bold mb-1" style="color: var(--forest-green);">
-                        {{ auth()->user()->name }}
-                    </h5>
-                    <div class="text-muted mb-2 small">{{ auth()->user()->email }}</div>
-                    <span class="badge-counselor mb-2">
-                        <i class="bi bi-shield-check me-1"></i>Counselor
-                    </span>
-                    <a href="{{ route('profile') }}" class="btn-edit mt-2">
-                        <i class="bi bi-pencil me-2"></i>Edit Profile
-                    </a>
                 </div>
             </div>
         </div>
 
         <div class="row g-4 align-items-stretch mb-4">
-            <div class="col-lg-7">
-                <!-- Today's Appointments -->
+            <div class="col-lg-12">
+                <!-- All Appointments -->
                 <div class="info-card mb-4 h-100">
                     <div class="info-card-header">
                         <div>
-                            <i class="bi bi-calendar-event me-2"></i>Today's Appointments
+                            <i class="bi bi-calendar-event me-2"></i>All Appointments
                         </div>
                         <a href="{{ route('counselor.appointments.index') }}" class="btn-view btn-small">
                             View All
                         </a>
                     </div>
                     <div class="info-card-body">
-                        @php 
-                            $todayAppointments = \App\Models\Appointment::where('counselor_id', auth()->id())
-                                ->whereDate('scheduled_at', today())
-                                ->with('student')
-                                ->orderBy('scheduled_at')
-                                ->take(3)
-                                ->get(); 
-                        @endphp
-                        @if($todayAppointments->count())
-                            @foreach($todayAppointments as $appointment)
-                                <div class="appointment-item {{ $appointment->scheduled_at->isPast() ? 'urgent' : 'upcoming' }}">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <div class="me-3">
-                                                <i class="bi bi-clock text-muted"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0 fw-semibold" style="color: var(--forest-green);">
-                                                    {{ $appointment->student->name }}
-                                                </h6>
-                                                <small class="text-muted">
-                                                    {{ $appointment->scheduled_at->format('g:i A') }} - {{ $appointment->type }}
-                                                </small>
-                                            </div>
+                        @forelse($allAppointments as $appointment)
+                            @php
+                                $start = $appointment->scheduled_at;
+                                $end = $start->copy()->addMinutes(30);
+                                $autoCreated = false;
+                                $sessionNumber = null;
+                                $originSession = null;
+                                if($appointment->notes && preg_match('/^(\d+)(st|nd|rd|th) Session - Auto created from session note #(\d+)/', $appointment->notes, $matches)) {
+                                    $autoCreated = true;
+                                    $sessionNumber = $matches[1];
+                                    $originSession = $matches[3];
+                                }
+                                $statusColor = $appointment->status === 'completed' ? 'var(--success)' : ($appointment->status === 'pending' ? 'var(--warning)' : 'var(--forest-green)');
+                            @endphp
+                            <div class="appointment-item mb-3 p-3 d-flex align-items-center justify-content-between" style="background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(44,62,80,0.07); border-left: 6px solid {{ $statusColor }};">
+                                <div class="d-flex align-items-center gap-3">
+                                    @if($appointment->student && $appointment->student->avatar_url)
+                                        <img src="{{ $appointment->student->avatar_url }}" alt="Avatar" class="rounded-circle me-2" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--forest-green-light);">
+                                    @else
+                                        <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: var(--yellow-maize-light); color: var(--forest-green); font-weight: bold; font-size: 1.2rem; border: 2px solid var(--forest-green-light);">
+                                            {{ strtoupper(substr($appointment->student->name ?? 'S', 0, 1)) }}
                                         </div>
-                                        <div class="d-flex gap-2">
-                                            <a href="{{ route('counselor.appointments.show', $appointment->id) }}" class="btn-view btn-small">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            @if(!$appointment->session_notes()->exists())
-                                                <a href="{{ route('counselor.session_notes.create', $appointment->id) }}" class="btn-edit btn-small">
-                                                    <i class="bi bi-journal-plus"></i>
-                                                </a>
+                                    @endif
+                                    <div>
+                                        <div class="fw-bold" style="color: var(--forest-green); font-size: 1.1rem;">{{ $appointment->student->name }}</div>
+                                        <div class="text-muted small mb-1"><i class="bi bi-envelope me-1"></i>{{ $appointment->student->email }}</div>
+                                        <div class="mb-1">
+                                            <span class="badge {{ $appointment->status === 'completed' ? 'bg-success' : ($appointment->status === 'pending' ? 'bg-warning text-dark' : 'bg-primary') }}">
+                                                {{ ucfirst($appointment->status) }}
+                                            </span>
+                                            @if($autoCreated && $sessionNumber)
+                                                <span class="badge bg-secondary ms-2">Session {{ $sessionNumber }}</span>
                                             @endif
                                         </div>
+                                        <div class="mb-1">
+                                            <i class="bi bi-calendar-event me-1"></i>
+                                            <span class="text-muted">{{ $start->format('F j, Y') }}</span>
+                                            <i class="bi bi-clock ms-3 me-1"></i>
+                                            <span class="text-muted">{{ $start->format('g:i A') }} – {{ $end->format('g:i A') }}</span>
+                                        </div>
+                                        @if($autoCreated && $originSession)
+                                            <div class="text-info small mb-1"><i class="bi bi-arrow-right-circle me-1"></i>Auto-created as next session from Session {{ $originSession }}</div>
+                                        @endif
+                                        @if($appointment->notes)
+                                            <div class="text-muted small"><i class="bi bi-journal-text me-1"></i>{{ Str::limit(strip_tags($appointment->notes), 80) }}</div>
+                                        @endif
                                     </div>
                                 </div>
-                            @endforeach
-                        @else
+                                <div class="d-flex gap-2 align-items-center">
+                                    <a href="{{ route('counselor.appointments.show', $appointment->id) }}" class="btn-view btn-small" title="View Appointment">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    @if(!$appointment->sessionNotes()->exists())
+                                        <a href="{{ route('counselor.session_notes.create', $appointment->id) }}" class="btn-edit btn-small" title="Add Session Note">
+                                            <i class="bi bi-journal-plus"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
                             <div class="empty-state">
                                 <i class="bi bi-calendar-x"></i>
-                                <p class="mb-0">No appointments scheduled for today.</p>
+                                <p class="mb-0">No appointments found.</p>
                             </div>
-                        @endif
+                        @endforelse
                     </div>
                 </div>
             </div>
-            <div class="col-lg-5">
-                <!-- Stats Grid -->
-                <div class="stats-grid h-100">
-                    <div class="stats-card priority">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-exclamation-triangle text-danger me-2"></i>
-                            <h6 class="mb-0" style="color: var(--forest-green);">High Priority Cases</h6>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Students needing immediate attention</span>
-                            <span class="fs-4 fw-bold text-danger">
-                                {{ \App\Models\User::where('role', 'student')
-                                    ->whereHas('assessments', function($q) {
-                                        $q->where('risk_level', 'high');
-                                    })
-                                    ->whereHas('appointments', function($q) {
-                                        $q->where('counselor_id', auth()->id());
-                                    })
-                                    ->count() }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="stats-card success">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-calendar-check text-success me-2"></i>
-                            <h6 class="mb-0" style="color: var(--forest-green);">Today's Appointments</h6>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Scheduled sessions</span>
-                            <span class="fs-4 fw-bold text-success">
-                                {{ \App\Models\Appointment::where('counselor_id', auth()->id())
-                                    ->whereDate('scheduled_at', today())
-                                    ->count() }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="stats-card info">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-chat-dots text-info me-2"></i>
-                            <h6 class="mb-0" style="color: var(--forest-green);">Unread Messages</h6>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">New student messages</span>
-                            <span class="fs-4 fw-bold text-info">
-                                {{ \App\Models\Message::where('recipient_id', auth()->id())
-                                    ->where('is_read', false)
-                                    ->count() }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="stats-card warning">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-star text-warning me-2"></i>
-                            <h6 class="mb-0" style="color: var(--forest-green);">Pending Feedback</h6>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Session reviews to view</span>
-                            <span class="fs-4 fw-bold text-warning">
-                                {{ \App\Models\SessionFeedback::whereHas('appointment', function($q) {
-                                        $q->where('counselor_id', auth()->id());
-                                    })
-                                    ->where('reviewed_by_counselor', false)
-                                    ->count() }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {{-- Removed Today's Appointments card as requested --}}
         </div>
 <!-- Announcements Card -->
 <div class="row mb-4">
@@ -741,9 +861,9 @@
                                 <div>
                                     <i class="bi bi-exclamation-triangle me-2"></i>Priority Students
                                 </div>
-                                <a href="{{ route('counselor.priority-cases.index') }}" class="btn-view btn-small">
-                                    View All
-                                </a>
+                                {{-- <a href="{{ route('counselor.priority-cases.index') }}" class="btn-view btn-small"> --}}
+                                {{-- View All --}}
+                                {{-- </a> --}}
                             </div>
                             <div class="info-card-body">
                                 @php 
@@ -754,6 +874,10 @@
                                         })
                                         ->whereHas('appointments', function($q) {
                                             $q->where('counselor_id', auth()->id()); 
+                                        })
+                                        ->whereHas('appointments', function($q) {
+                                            $q->where('counselor_id', auth()->id());
+                                            $q->whereColumn('users.id', 'appointments.student_id');
                                         })
                                         ->with(['assessments' => function($q) {
                                             $q->latest()->first();
@@ -809,9 +933,9 @@
                                 <div>
                                     <i class="bi bi-chat-dots me-2"></i>Recent Messages
                                 </div>
-                                <a href="{{ route('counselor.messages.index') }}" class="btn-view btn-small">
-                                    View All
-                                </a>
+                                {{-- <a href="{{ route('counselor.messages.index') }}" class="btn-view btn-small"> --}}
+                                {{-- View All --}}
+                                {{-- </a> --}}
                             </div>
                             <div class="info-card-body">
                                 @php 
@@ -843,7 +967,7 @@
                                                         {{ $message->created_at->diffForHumans() }}
                                                     </small>
                                                     <div class="mt-1">
-                                                        <a href="{{ route('counselor.messages.show', $message->id) }}" class="btn-view btn-small">
+                                                        <a href="{{ route('chat.index', $message->sender->id) }}" class="btn-view btn-small">
                                                             <i class="bi bi-reply"></i>
                                                         </a>
                                                     </div>
@@ -868,9 +992,9 @@
                         <div>
                             <i class="bi bi-star me-2"></i>Recent Session Feedback
                         </div>
-                        <a href="{{ route('counselor.feedback.index') }}" class="btn-view btn-small">
-                            View All
-                        </a>
+                        {{-- <a href="{{ route('counselor.feedback.index') }}" class="btn-view btn-small"> --}}
+                        {{-- View All --}}
+                        {{-- </a> --}}
                     </div>
                     <div class="info-card-body">
                         @php 
@@ -942,9 +1066,9 @@
                         <p class="mb-0">A student assessment indicates immediate attention may be required.</p>
                     </div>
                     <div class="d-grid gap-2">
-                        <a href="{{ route('counselor.priority-cases.index') }}" class="btn btn-danger">
-                            <i class="bi bi-eye me-2"></i>View Priority Cases
-                        </a>
+                        {{-- <a href="{{ route('counselor.priority-cases.index') }}" class="btn btn-danger"> --}}
+                        {{-- <i class="bi bi-eye me-2"></i>View Priority Cases --}}
+                        {{-- </a> --}}
                         <a href="{{ route('counselor.appointments.create') }}" class="btn btn-warning">
                             <i class="bi bi-calendar-plus me-2"></i>Schedule Urgent Appointment
                         </a>

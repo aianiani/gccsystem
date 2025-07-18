@@ -9,19 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('student_id');
             $table->unsignedBigInteger('counselor_id');
-            $table->timestamp('scheduled_at');
-            $table->enum('status', ['pending', 'approved', 'completed', 'cancelled'])->default('pending');
+            $table->dateTime('scheduled_at');
+            $table->dateTime('previous_scheduled_at')->nullable();
             $table->text('notes')->nullable();
+            $table->enum('status', [
+                'pending', 'accepted', 'declined', 'completed', 'cancelled', 'rescheduled_pending'
+            ]);
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('student_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('counselor_id')->references('id')->on('users')->onDelete('cascade');
         });

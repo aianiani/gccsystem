@@ -11,7 +11,10 @@ class Assessment extends Model
 
     protected $fillable = [
         'user_id',
-        // Add other fields as needed, e.g. 'risk_level', 'score', 'type', etc.
+        'risk_level',
+        'score',
+        'type',
+        'notes',
     ];
 
     // Relationship to User

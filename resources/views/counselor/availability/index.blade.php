@@ -264,8 +264,8 @@
                     calendar.addEvent({
                         id: ev.id,
                         title: ev.title,
-                        start: ev.start,
-                        end: ev.end,
+                        start: ev.start ? new Date(ev.start) : null,
+                        end: ev.end ? new Date(ev.end) : null,
                         color: '#2d5016'
                     });
                 });
@@ -352,22 +352,31 @@
                         timer: 1800,
                         showConfirmButton: false
                     });
-                    // Clear all events and reload from backend
-                    calendar.getEvents().forEach(ev => ev.remove());
+                    // Reload events from backend
                     fetch('/counselor/availabilities')
                         .then(res => res.json())
                         .then(data => {
+                            console.log('Reloaded availability data:', data);
+                            
+                            // Clear existing events first
                             calendar.getEvents().forEach(ev => ev.remove());
+                            
+                            // Add events from backend
                             data.forEach(ev => {
+                                console.log('Adding event:', ev);
                                 calendar.addEvent({
                                     id: ev.id,
                                     title: ev.title,
-                                    start: ev.start,
-                                    end: ev.end,
+                                    start: ev.start ? new Date(ev.start) : null,
+                                    end: ev.end ? new Date(ev.end) : null,
                                     color: '#2d5016'
                                 });
                             });
                             renderAvailabilityList(data);
+                        })
+                        .catch(error => {
+                            console.error('Error reloading events:', error);
+                            showToast('Error reloading events', 'error');
                         });
                 } else if (data) {
                     showToast('Failed to save availability!', 'error');
@@ -378,7 +387,7 @@
         document.getElementById('resetAvailabilityBtn').addEventListener('click', function() {
             Swal.fire({
                 title: 'Reset All Availability?',
-                text: 'This will remove all your availability slots.',
+                text: 'This will remove all your availability slots permanently.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
@@ -388,19 +397,68 @@
                 color: '#2d5016',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    calendar.getEvents().forEach(ev => ev.remove());
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Reset!',
-                        text: 'All availability slots have been removed.',
-                        confirmButtonColor: '#2d5016',
-                        background: '#fafcf8',
-                        color: '#2d5016',
-                        timer: 1500,
-                        showConfirmButton: false
+                    // Get CSRF token
+                    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+                    const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : null;
+                    
+                    if (!csrfToken) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'CSRF Token Missing',
+                            text: 'Could not find CSRF token. Please refresh the page or contact support.',
+                            confirmButtonColor: '#2d5016',
+                            background: '#fafcf8',
+                            color: '#2d5016',
+                        });
+                        return;
+                    }
+                    
+                    // Delete all availabilities from database
+                    fetch('/counselor/availabilities', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(async res => {
+                        if (!res.ok) {
+                            let msg = 'Failed to reset availability!';
+                            if (res.status === 419) msg = 'Session expired or CSRF error. Please refresh and try again.';
+                            const data = await res.json().catch(() => ({}));
+                            throw new Error(data.message || msg);
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        // Clear calendar events
+                        calendar.getEvents().forEach(ev => ev.remove());
+                        
+                        // Hide the availability list
+                        document.getElementById('availabilityListSection').style.display = 'none';
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Reset Complete!',
+                            text: 'All availability slots have been permanently removed.',
+                            confirmButtonColor: '#2d5016',
+                            background: '#fafcf8',
+                            color: '#2d5016',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.message || 'Failed to reset availability!',
+                            confirmButtonColor: '#2d5016',
+                            background: '#fafcf8',
+                            color: '#2d5016',
+                        });
                     });
-                    // Also hide the list
-                    document.getElementById('availabilityListSection').style.display = 'none';
                 }
             });
         });

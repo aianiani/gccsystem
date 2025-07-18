@@ -15,7 +15,9 @@
         "vite": "^6.2.4"
     },
     "dependencies": {
+        "@popperjs/core": "^2.11.8",
         "bootstrap": "^5.3.2",
-        "@popperjs/core": "^2.11.8"
+        "laravel-echo": "^2.1.6",
+        "pusher-js": "^8.4.0"
     }
 }

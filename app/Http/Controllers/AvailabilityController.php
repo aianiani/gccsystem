@@ -12,7 +12,15 @@ class AvailabilityController extends Controller
     public function index()
     {
         $availabilities = Availability::where('user_id', Auth::id())->get();
-        return response()->json($availabilities);
+        // Output as stored, no timezone conversion
+        return response()->json($availabilities->map(function($a) {
+            return [
+                'id' => $a->id,
+                'title' => $a->title,
+                'start' => $a->start ? $a->start->toIso8601String() : null,
+                'end' => $a->end ? $a->end->toIso8601String() : null,
+            ];
+        }));
     }
 
     // Replace all availabilities for the user with the provided list
@@ -32,10 +40,19 @@ class AvailabilityController extends Controller
             Availability::create([
                 'user_id' => $user->id,
                 'title' => $slot['title'],
-                'start' => $slot['start'],
-                'end' => $slot['end'],
+                // Interpret the incoming time as Asia/Manila local time (do not convert from UTC)
+                'start' => \Carbon\Carbon::parse($slot['start'])->timezone('Asia/Manila'),
+                'end' => \Carbon\Carbon::parse($slot['end'])->timezone('Asia/Manila'),
             ]);
         }
         return response()->json(['success' => true]);
+    }
+
+    // Delete all availabilities for the logged-in counselor
+    public function destroy()
+    {
+        $user = Auth::user();
+        Availability::where('user_id', $user->id)->delete();
+        return response()->json(['success' => true, 'message' => 'All availability slots have been deleted.']);
     }
 } 

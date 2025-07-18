@@ -24,14 +24,24 @@ class DashboardController extends Controller
             'total_activities' => UserActivity::count(),
         ];
 
-        // Render dashboard view based on user role
         switch ($user->role) {
             case 'admin':
                 return view('dashboard_admin', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
             case 'counselor':
-                return view('dashboard_counselor', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
+                $allAppointments = \App\Models\Appointment::where('counselor_id', $user->id)
+                    ->with('student')
+                    ->orderBy('scheduled_at', 'desc')
+                    ->get();
+                return view('dashboard_counselor', compact('user', 'recentActivities', 'stats', 'recentAnnouncements', 'allAppointments'));
             case 'student':
-                return view('dashboard_student', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
+                $upcomingAppointments = \App\Models\Appointment::where('student_id', $user->id)
+                    ->where('scheduled_at', '>=', now())
+                    ->whereIn('status', ['pending', 'accepted'])
+                    ->orderBy('scheduled_at')
+                    ->with('counselor')
+                    ->take(3)
+                    ->get();
+                return view('dashboard_student', compact('user', 'recentActivities', 'stats', 'recentAnnouncements', 'upcomingAppointments'));
             default:
                 return view('dashboard', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
         }

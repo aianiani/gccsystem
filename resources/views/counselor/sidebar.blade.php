@@ -10,20 +10,21 @@
             <span>Dashboard</span>
         </a>
         <a href="{{ route('counselor.appointments.index') }}" class="menu-item {{ request()->routeIs('counselor.appointments.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i>
+            <i class="bi bi-calendar-check me-2"></i>
             <span>Appointments</span>
-            <span class="appointment-count" id="sidebarAppointmentCount">
-                {{ \App\Models\Appointment::where('counselor_id', auth()->id())->whereDate('scheduled_at', '>=', today())->count() }}
-            </span>
+        </a>
+        <a href="{{ route('chat.selectStudent') }}" class="menu-item {{ request()->routeIs('chat.selectStudent') ? 'active' : '' }}">
+            <i class="bi bi-chat-dots me-2"></i>
+            <span>Chat with Student</span>
         </a>
         <a href="{{ route('counselor.availability.index') }}" class="menu-item {{ request()->routeIs('counselor.availability.*') ? 'active' : '' }}">
             <i class="fas fa-clock"></i>
             <span>Availability</span>
         </a>
-        <a href="{{ route('counselor.messages.index') }}" class="menu-item {{ request()->routeIs('counselor.messages.*') ? 'active' : '' }}">
+        {{-- <a href="{{ route('counselor.messages.index') }}" class="menu-item {{ request()->routeIs('counselor.messages.*') ? 'active' : '' }}">
             <i class="fas fa-envelope"></i>
             <span>Messages</span>
-        </a>
+        </a> --}}
         <a href="{{ route('announcements.index') }}" class="menu-item {{ request()->routeIs('announcements.*') ? 'active' : '' }}">
             <i class="fas fa-bullhorn"></i>
             <span>Announcements</span>
@@ -32,19 +33,27 @@
             <i class="fas fa-users"></i>
             <span>Students</span>
         </a>
+        {{-- <a href="{{ route('counselor.feedback.index') }}" class="menu-item {{ request()->routeIs('counselor.feedback.*') ? 'active' : '' }}">
+            <i class="fas fa-comments"></i>
+            <span>Feedback</span>
+        </a> --}}
         <div class="menu-category"><i class="fas fa-comments"></i> Counseling</div>
-        <a href="{{ route('counselor.session_notes.create', 0) }}" class="menu-item {{ request()->routeIs('counselor.session_notes.*') ? 'active' : '' }}">
+        <a href="{{ route('counselor.session_notes.index') }}" class="menu-item {{ request()->routeIs('counselor.session_notes.*') ? 'active' : '' }}">
             <i class="fas fa-file-alt"></i>
-            <span>Case Notes</span>
+            <span>Session Notes</span>
         </a>
+        {{-- <a href="{{ route('counselor.assessments.index') }}" class="menu-item {{ request()->routeIs('counselor.assessments.*') ? 'active' : '' }}">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Assessments</span>
+        </a> --}}
         <a href="{{ route('counselor.assessments.index') }}" class="menu-item {{ request()->routeIs('counselor.assessments.*') ? 'active' : '' }}">
             <i class="fas fa-clipboard-list"></i>
             <span>Assessments</span>
         </a>
-        <a href="{{ route('counselor.priority-cases.index') }}" class="menu-item {{ request()->routeIs('counselor.priority-cases.*') ? 'active' : '' }}">
+        {{-- <a href="{{ route('counselor.priority-cases.index') }}" class="menu-item {{ request()->routeIs('counselor.priority-cases.*') ? 'active' : '' }}">
             <i class="fas fa-exclamation-triangle"></i>
             <span>Priority Cases</span>
-        </a>
+        </a> --}}
         <a href="#" class="menu-item">
             <i class="fas fa-chart-bar"></i>
             <span>Reports</span>

@@ -10,8 +10,15 @@ class CounselorDashboardController extends Controller
     // Show all appointments assigned to the authenticated counselor
     public function index()
     {
-        $appointments = Appointment::where('counselor_id', auth()->id())->with('student')->orderBy('scheduled_at', 'desc')->get();
-        return view('counselor.appointments.index', compact('appointments'));
+        $appointments = Appointment::where('counselor_id', auth()->id())
+            ->with('student')
+            ->orderBy('scheduled_at', 'desc')
+            ->paginate(10);
+        $allAppointments = Appointment::where('counselor_id', auth()->id())
+            ->with('student')
+            ->orderBy('scheduled_at', 'desc')
+            ->get();
+        return view('counselor.appointments.index', compact('appointments', 'allAppointments'));
     }
 
     // Show details for a specific appointment

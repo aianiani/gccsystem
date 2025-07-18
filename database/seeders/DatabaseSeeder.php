@@ -24,21 +24,22 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(), // <-- This line marks as verified
         ]);
 
-        // Create regular user
-        User::create([
-            'name' => 'Test Student',
-            'email' => 'naikram117@gmail.com',
-            'password' => bcrypt('student123'),
-            'role' => 'student', // changed from 'user' to 'student'
+        // Create a counselor
+        $counselor = User::create([
+            'name' => 'Test Counselor',
+            'email' => 'yanikram11@gmail.com',
+            'password' => bcrypt('counselor123'),
+            'role' => 'counselor',
             'is_active' => true,
             'email_verified_at' => now(),
         ]);
 
-        User::create([
+        // Create a student
+        $student = User::create([
             'name' => 'Test Student',
-            'email' => 'yanikram11@gmail.com',
-            'password' => bcrypt('counselor123'),
-            'role' => 'counselor', // changed from 'user' to 'student'
+            'email' => 'naikram117@gmail.com',
+            'password' => bcrypt('student123'),
+            'role' => 'student',
             'is_active' => true,
             'email_verified_at' => now(),
         ]);
