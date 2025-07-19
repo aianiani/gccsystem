@@ -165,12 +165,10 @@
                             @error('avatar')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            @if($user->avatar)
-                                <div class="mt-2">
-                                    <img src="{{ $user->avatar_url }}" alt="Current Avatar" class="rounded-avatar">
-                                    <span class="text-muted small ms-2">Current Avatar</span>
-                                </div>
-                            @endif
+                            <div class="mt-2">
+                                <img src="{{ $user->avatar_url }}" alt="Current Avatar" class="rounded-avatar">
+                                <span class="text-muted small ms-2">Current Avatar</span>
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex justify-content-between mt-4">

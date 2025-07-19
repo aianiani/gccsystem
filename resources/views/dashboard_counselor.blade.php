@@ -704,7 +704,7 @@
                             <img src="{{ auth()->user()->avatar_url }}" 
                                  alt="Avatar" 
                                  class="rounded-circle border border-3 shadow-sm" 
-                                 width="80" 
+                                 width="100" 
                                  height="80" 
                                  style="border-color: var(--yellow-maize) !important;">
                             <div class="position-absolute bottom-0 end-0 bg-success rounded-circle" 
@@ -720,6 +720,160 @@
                         <a href="{{ route('profile') }}" class="btn-edit mt-2">
                             <i class="bi bi-pencil me-2"></i>Edit Profile
                         </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards and Quick Actions Row -->
+        @php
+            $counselorId = auth()->id();
+            
+            // Today's appointments
+            $todayAppointments = \App\Models\Appointment::where('counselor_id', $counselorId)
+                ->whereDate('scheduled_at', today())
+                ->count();
+            
+            // Pending appointments
+            $pendingAppointments = \App\Models\Appointment::where('counselor_id', $counselorId)
+                ->where('status', 'pending')
+                ->count();
+            
+            // Completed sessions this month
+            $completedThisMonth = \App\Models\Appointment::where('counselor_id', $counselorId)
+                ->where('status', 'completed')
+                ->whereMonth('scheduled_at', now()->month)
+                ->whereYear('scheduled_at', now()->year)
+                ->count();
+            
+            // Active students (with appointments in last 30 days)
+            $activeStudents = \App\Models\Appointment::where('counselor_id', $counselorId)
+                ->where('scheduled_at', '>=', now()->subDays(30))
+                ->distinct('student_id')
+                ->count('student_id');
+            
+            // High-risk cases
+            $highRiskCases = \App\Models\User::where('role', 'student')
+                ->whereHas('assessments', function($q) {
+                    $q->where('risk_level', 'high');
+                })
+                ->whereHas('appointments', function($q) use ($counselorId) {
+                    $q->where('counselor_id', $counselorId);
+                })
+                ->count();
+        @endphp
+
+        <div class="row mb-4">
+            <!-- Statistics Cards Column -->
+            <div class="col-lg-8">
+                <div class="stats-grid">
+                    <!-- Today's Appointments -->
+                    <div class="stats-card info">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $todayAppointments }}</h3>
+                                <p class="mb-0 text-muted">Today's Appointments</p>
+                                <a href="{{ route('admin.logs.appointments') }}" class="btn btn-sm btn-outline-info mt-2">
+                                    <i class="bi bi-arrow-right me-1"></i>View All Appointments
+                                </a>
+                            </div>
+                            <div class="text-info" style="font-size: 2.5rem;">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Appointments -->
+                    <div class="stats-card warning">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $pendingAppointments }}</h3>
+                                <p class="mb-0 text-muted">Pending Appointments</p>
+                                <a href="{{ route('admin.logs.appointments') }}?status=pending" class="btn btn-sm btn-outline-warning mt-2">
+                                    <i class="bi bi-arrow-right me-1"></i>View Pending
+                                </a>
+                            </div>
+                            <div class="text-warning" style="font-size: 2.5rem;">
+                                <i class="bi bi-clock"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Sessions This Month -->
+                    <div class="stats-card success">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $completedThisMonth }}</h3>
+                                <p class="mb-0 text-muted">Completed This Month</p>
+                                <a href="{{ route('admin.logs.session-notes') }}" class="btn btn-sm btn-outline-success mt-2">
+                                    <i class="bi bi-arrow-right me-1"></i>View Session Notes
+                                </a>
+                            </div>
+                            <div class="text-success" style="font-size: 2.5rem;">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Students -->
+                    <div class="stats-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $activeStudents }}</h3>
+                                <p class="mb-0 text-muted">Active Students</p>
+                                <a href="{{ route('admin.logs.users') }}?role=student&status=active" class="btn btn-sm btn-outline-primary mt-2">
+                                    <i class="bi bi-arrow-right me-1"></i>View Students
+                                </a>
+                            </div>
+                            <div class="text-primary" style="font-size: 2.5rem;">
+                                <i class="bi bi-people"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- High-Risk Cases -->
+                    <div class="stats-card priority">
+                        <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $highRiskCases }}</h3>
+                            <p class="mb-0 text-muted">High-Risk Cases</p>
+                            <a href="{{ route('admin.logs.assessments') }}?risk_level=high" class="btn btn-sm btn-outline-danger mt-2">
+                                <i class="bi bi-arrow-right me-1"></i>View Assessments
+                            </a>
+                        </div>
+                        <div class="text-danger" style="font-size: 2.5rem;">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Column -->
+            <div class="col-lg-4">
+                <div class="info-card h-100">
+                    <div class="info-card-header">
+                        <i class="bi bi-lightning me-2"></i>Quick Actions
+                    </div>
+                    <div class="info-card-body">
+                        <div class="d-flex flex-column gap-3">
+                            <a href="{{ route('counselor.appointments.index') }}" class="action-btn w-100">
+                                <i class="bi bi-calendar-event me-2"></i>
+                                View All Appointments
+                            </a>
+                            <a href="{{ route('counselor.session_notes.index') }}" class="action-btn w-100">
+                                <i class="bi bi-journal-text me-2"></i>
+                                Session Notes
+                            </a>
+                            <a href="{{ route('counselor.assessments.index') }}" class="action-btn w-100">
+                                <i class="bi bi-clipboard-data me-2"></i>
+                                Student Assessments
+                            </a>
+                            <a href="{{ route('counselor.availability.index') }}" class="action-btn w-100">
+                                <i class="bi bi-clock me-2"></i>
+                                Set Availability
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -754,13 +908,7 @@
                             @endphp
                             <div class="appointment-item mb-3 p-3 d-flex align-items-center justify-content-between" style="background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(44,62,80,0.07); border-left: 6px solid {{ $statusColor }};">
                                 <div class="d-flex align-items-center gap-3">
-                                    @if($appointment->student && $appointment->student->avatar_url)
-                                        <img src="{{ $appointment->student->avatar_url }}" alt="Avatar" class="rounded-circle me-2" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--forest-green-light);">
-                                    @else
-                                        <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: var(--yellow-maize-light); color: var(--forest-green); font-weight: bold; font-size: 1.2rem; border: 2px solid var(--forest-green-light);">
-                                            {{ strtoupper(substr($appointment->student->name ?? 'S', 0, 1)) }}
-                                        </div>
-                                    @endif
+                                    <img src="{{ $appointment->student->avatar_url }}" alt="Avatar" class="rounded-circle me-2" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--forest-green-light);">
                                     <div>
                                         <div class="fw-bold" style="color: var(--forest-green); font-size: 1.1rem;">{{ $appointment->student->name }}</div>
                                         <div class="text-muted small mb-1"><i class="bi bi-envelope me-1"></i>{{ $appointment->student->email }}</div>
@@ -967,7 +1115,7 @@
                                                         {{ $message->created_at->diffForHumans() }}
                                                     </small>
                                                     <div class="mt-1">
-                                                        <a href="{{ route('chat.index', $message->sender->id) }}" class="btn-view btn-small">
+                                                        <a href="{{ route('chat.selectStudent') }}" class="btn-view btn-small">
                                                             <i class="bi bi-reply"></i>
                                                         </a>
                                                     </div>

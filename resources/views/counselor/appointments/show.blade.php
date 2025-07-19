@@ -106,7 +106,7 @@
             <div class="appointment-card">
                 <div class="row mb-4">
                     <div class="col-md-3 text-center">
-                        <img src="{{ $appointment->student->avatar_url ?? asset('images/logo.jpg') }}" alt="Avatar" class="rounded-circle border shadow-sm mb-2 appointment-avatar" width="80" height="80">
+                        <img src="{{ $appointment->student->avatar_url }}" alt="Avatar" class="rounded-circle border shadow-sm mb-2 appointment-avatar" width="80" height="80">
                         <div class="fw-bold">{{ $appointment->student->name ?? 'N/A' }}</div>
                         <div class="text-muted small">{{ $appointment->student->email ?? '' }}</div>
                     </div>

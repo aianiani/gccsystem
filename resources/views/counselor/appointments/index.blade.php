@@ -138,7 +138,10 @@
                     <div class="appointment-card">
                         <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <div class="d-flex align-items-center gap-3">
-                                <i class="bi bi-person-circle" style="font-size: 2rem; color: #2d5016;"></i>
+                                <img src="{{ $appointment->student->avatar_url }}" 
+                                     alt="{{ $appointment->student->name }}" 
+                                     class="rounded-circle" 
+                                     style="width: 48px; height: 48px; object-fit: cover; border: 2px solid #2d5016;">
                                 <div>
                                     <h5 class="mb-1 fw-bold" style="color: #2d5016;">{{ $appointment->student->name ?? 'N/A' }}</h5>
                                     <div class="text-muted small">

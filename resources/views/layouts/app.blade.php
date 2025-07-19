@@ -173,19 +173,15 @@
     @auth
         @if(auth()->user()->isAdmin())
             <!-- Admin Top Navbar -->
-            <nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-bottom: none; border-radius: 0; margin-bottom: 0;">
+            <nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-bottom: none; border-radius: 0; margin-bottom: 0; position: fixed; top: 0; right: 0; left: 250px; z-index: 1030; transition: left 0.2s;">
                 <div class="container-fluid" style="padding-left: 0;">
                     <button id="sidebarToggle" class="btn btn-link text-white me-3" style="font-size: 1.5rem;" type="button">
                         <i class="bi bi-list"></i>
                     </button>
-                    <span class="navbar-brand fw-bold" style="color: var(--yellow-maize); font-size: 1.3rem;"><i class="bi bi-people-fill me-2"></i>Admin Panel</span>
+                    <div class="navbar-brand d-flex align-items-center" style="color: var(--yellow-maize); font-size: 1.3rem;">
+                        <span class="fw-bold">CMU Guidance and Counseling Center</span>
+                    </div>
                     <div class="d-flex align-items-center ms-auto">
-                        <!-- Notification Bell -->
-                        <a href="#" class="nav-link position-relative" title="Notifications">
-                            <i class="bi bi-bell" style="font-size: 1.6rem;"></i>
-                            <!-- Optionally, add a badge for unread notifications -->
-                            <!-- <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span> -->
-                        </a>
                         <div class="dropdown">
                             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="adminNavbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <img src="{{ auth()->user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}" alt="" width="32" height="32" class="rounded-circle me-2">
@@ -207,39 +203,46 @@
             </nav>
             <div class="d-flex" style="min-height: 100vh;">
                 <!-- Sidebar -->
-                <nav id="adminSidebar" class="d-flex flex-column flex-shrink-0 p-3" style="width: 250px; min-height: 100vh; background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%); color: #fff; transition: width 0.2s; border-right: none; border-radius: 0; margin-top: 0;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <!-- Removed: Admin Panel name and icon -->
+                <div id="adminSidebar" class="sidebar">
+                    <div class="sidebar-header">
+                        <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto;">
+                        <h3>CMU Guidance</h3>
+                        <p>Admin Portal</p>
                     </div>
-                    <hr>
-                    <ul class="nav nav-pills flex-column mb-auto">
-                        <li>
-                            <a href="{{ route('profile') }}" class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}" style="background: {{ request()->routeIs('profile') ? 'var(--yellow-maize)' : 'transparent' }}; color: {{ request()->routeIs('profile') ? 'var(--forest-green)' : '#fff' }}; border-radius: 12px; margin-bottom: 0.5rem;">
-                                <i class="bi bi-person me-2"></i><span class="sidebar-label">Profile</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" style="background: {{ request()->routeIs('dashboard') ? 'var(--yellow-maize)' : 'transparent' }}; color: {{ request()->routeIs('dashboard') ? 'var(--forest-green)' : '#fff' }}; border-radius: 12px; margin-bottom: 0.5rem;">
-                                <i class="bi bi-speedometer2 me-2"></i><span class="sidebar-label">Dashboard</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" style="background: {{ request()->routeIs('users.*') ? 'var(--yellow-maize)' : 'transparent' }}; color: {{ request()->routeIs('users.*') ? 'var(--forest-green)' : '#fff' }}; border-radius: 12px; margin-bottom: 0.5rem;">
-                                <i class="bi bi-people me-2"></i><span class="sidebar-label">Users</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('announcements.index') }}" class="nav-link {{ request()->routeIs('announcements.*') ? 'active' : '' }}" style="background: {{ request()->routeIs('announcements.*') ? 'var(--yellow-maize)' : 'transparent' }}; color: {{ request()->routeIs('announcements.*') ? 'var(--forest-green)' : '#fff' }}; border-radius: 12px; margin-bottom: 0.5rem;">
-                                <i class="bi bi-megaphone me-2"></i><span class="sidebar-label">Announcements</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('activities') }}" class="nav-link {{ request()->routeIs('activities') ? 'active' : '' }}" style="background: {{ request()->routeIs('activities') ? 'var(--yellow-maize)' : 'transparent' }}; color: {{ request()->routeIs('activities') ? 'var(--forest-green)' : '#fff' }}; border-radius: 12px; margin-bottom: 0.5rem;">
-                                <i class="bi bi-activity me-2"></i><span class="sidebar-label">Activity Logs</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                    <div class="sidebar-menu">
+                        <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="sidebar-label">Dashboard</span>
+                        </a>
+                        <a href="{{ route('profile') }}" class="menu-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+                            <i class="fas fa-user"></i>
+                            <span class="sidebar-label">Profile</span>
+                        </a>
+                        <a href="{{ route('users.index') }}" class="menu-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                            <i class="fas fa-users"></i>
+                            <span class="sidebar-label">Users</span>
+                        </a>
+                        <a href="{{ route('announcements.index') }}" class="menu-item {{ request()->routeIs('announcements.*') ? 'active' : '' }}">
+                            <i class="fas fa-bullhorn"></i>
+                            <span class="sidebar-label">Announcements</span>
+                        </a>
+                        <a href="{{ route('activities') }}" class="menu-item {{ request()->routeIs('activities') ? 'active' : '' }}">
+                            <i class="fas fa-chart-line"></i>
+                            <span class="sidebar-label">Activity Logs</span>
+                        </a>
+                        <a href="{{ route('admin.logs') }}" class="menu-item {{ request()->routeIs('admin.logs') ? 'active' : '' }}">
+                            <i class="fas fa-database"></i>
+                            <span class="sidebar-label">System Logs</span>
+                        </a>
+                        <form action="{{ route('logout') }}" method="POST" style="width: 100%;">
+                            @csrf
+                            <button type="submit" class="menu-item" id="logoutButton" style="width: 100%; border: none; background: none;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span class="sidebar-label">Logout</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
                 <!-- Main Content -->
                 <div class="flex-grow-1" id="mainContent">
                     <main class="fade-in">
@@ -250,61 +253,128 @@
                 </div>
             </div>
             <style>
-                #adminSidebar {
+                /* Admin Sidebar Styles - Matching Counselor Sidebar */
+                #adminSidebar.sidebar {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    height: 100vh;
+                    width: 250px;
+                    background: #2d5016;
+                    color: #fff;
+                    z-index: 1040;
+                    display: flex;
+                    flex-direction: column;
+                    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+                    overflow-y: auto;
                     transition: width 0.2s, padding 0.2s;
                 }
-                #adminSidebar.collapsed {
-                    width: 60px !important;
-                    padding-left: 0.5rem !important;
-                    padding-right: 0.5rem !important;
+                #adminSidebar.sidebar .sidebar-header {
+                    text-align: center;
+                    padding: 2rem 1rem 1rem 1rem;
+                    border-bottom: 1px solid #4a7c59;
                 }
-                #adminSidebar .nav-link {
+                #adminSidebar.sidebar .sidebar-header h3 {
+                    margin: 0.5rem 0 0.25rem 0;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    color: #f4d03f;
+                }
+                #adminSidebar.sidebar .sidebar-header p {
+                    margin: 0;
+                    font-size: 0.95rem;
+                    color: #fff;
+                    opacity: 0.7;
+                }
+                #adminSidebar.sidebar .sidebar-menu {
+                    flex: 1;
+                    padding: 1.5rem 0.5rem 0 0.5rem;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+                #adminSidebar.sidebar .menu-item {
                     display: flex;
                     align-items: center;
-                    gap: 0.5rem;
-                    justify-content: flex-start;
-                    transition: justify-content 0.2s, padding 0.2s;
+                    gap: 1rem;
+                    padding: 0.75rem 1rem;
+                    border-radius: 8px;
+                    color: #fff;
+                    text-decoration: none;
+                    font-weight: 500;
+                    transition: background 0.2s, color 0.2s;
+                    position: relative;
                 }
-                #adminSidebar.collapsed .nav-link {
-                    justify-content: center;
-                    padding-left: 0.25rem;
-                    padding-right: 0.25rem;
+                #adminSidebar.sidebar .menu-item.active, #adminSidebar.sidebar .menu-item:hover {
+                    background: #4a7c59;
+                    color: #f4d03f;
                 }
-                #adminSidebar .nav-link i {
-                    font-size: 1.25rem;
-                    transition: font-size 0.2s;
+                #adminSidebar.sidebar #logoutButton {
+                    margin-top: 2rem;
+                    background: #dc3545;
+                    color: #fff;
+                    border-radius: 8px;
+                    text-align: center;
+                    padding: 0.75rem 1rem;
+                    font-weight: 600;
+                    transition: background 0.2s;
                 }
-                #adminSidebar.collapsed .nav-link i {
-                    font-size: 1.5rem;
+                #adminSidebar.sidebar #logoutButton:hover {
+                    background: #b52a37;
+                    color: #fff;
                 }
-                #adminSidebar .sidebar-label {
-                    transition: opacity 0.2s, width 0.2s;
-                    white-space: nowrap;
+                
+                /* Collapsible Functionality */
+                #adminSidebar.collapsed {
+                    width: 90px !important;
+                }
+                #adminSidebar.collapsed .sidebar-header h3,
+                #adminSidebar.collapsed .sidebar-header p {
+                    display: none !important;
                 }
                 #adminSidebar.collapsed .sidebar-label {
-                    opacity: 0;
-                    width: 0;
-                    overflow: hidden;
                     display: none !important;
                 }
-                #adminSidebar .badge {
-                    transition: opacity 0.2s;
+                #adminSidebar.collapsed .menu-item {
+                    justify-content: center !important;
+                    padding: 0.75rem 0.25rem !important;
                 }
-                #adminSidebar.collapsed .badge {
-                    opacity: 0;
-                    display: none !important;
-                }
-                #adminSidebar .dropdown, #adminSidebar .dropdown-menu, #adminSidebar .dropdown-toggle {
-                    width: 100%;
-                }
-                #adminSidebar.collapsed .sidebar-label {
-                    display: none !important;
-                }
+                
                 #mainContent.sidebar-collapsed {
-                    margin-left: 60px !important;
+                    margin-left: 100px !important;
                 }
+                
+                /* Navbar positioning for collapsed state */
+                .navbar.collapsed {
+                    left: 60px !important;
+                }
+                
+                /* Ensure navbar is properly positioned */
+                .navbar {
+                    height: 70px;
+                    padding: 0 1rem;
+                }
+                
+                /* Ensure main content has proper margin */
+                #mainContent {
+                    margin-left: 250px !important;
+                    margin-top: 70px !important;
+                    transition: margin-left 0.2s;
+                }
+                
                 @media (max-width: 991.98px) {
-                    #adminSidebar {
+                    #adminSidebar.sidebar {
+                        width: 200px;
+                    }
+                    #mainContent {
+                        margin-left: 200px;
+                    }
+                    #mainContent.sidebar-collapsed {
+                        margin-left: 60px !important;
+                    }
+                }
+                @media (max-width: 767.98px) {
+                    #adminSidebar.sidebar {
                         position: fixed;
                         z-index: 1040;
                         height: 100vh;
@@ -313,7 +383,7 @@
                         transition: transform 0.2s, width 0.2s;
                         transform: translateX(-100%);
                     }
-                    #adminSidebar.show {
+                    #adminSidebar.sidebar.show {
                         transform: translateX(0);
                     }
                     #mainContent {
@@ -326,80 +396,383 @@
                     const sidebar = document.getElementById('adminSidebar');
                     const mainContent = document.getElementById('mainContent');
                     const toggleBtn = document.getElementById('sidebarToggle');
+                    
+                    console.log('Sidebar:', sidebar);
+                    console.log('MainContent:', mainContent);
+                    console.log('ToggleBtn:', toggleBtn);
+                    
                     // Add tooltips to icons when sidebar is collapsed
                     function updateTooltips() {
-                        const navLinks = sidebar.querySelectorAll('.nav-link');
-                        navLinks.forEach(link => {
-                            const label = link.querySelector('.sidebar-label');
+                        const menuItems = sidebar.querySelectorAll('.menu-item');
+                        menuItems.forEach(item => {
+                            const label = item.querySelector('.sidebar-label');
                             if (sidebar.classList.contains('collapsed')) {
-                                if (label) link.setAttribute('title', label.textContent.trim());
+                                if (label) item.setAttribute('title', label.textContent.trim());
                             } else {
-                                link.removeAttribute('title');
+                                item.removeAttribute('title');
                             }
                         });
                     }
+                    
                     if (toggleBtn && sidebar && mainContent) {
                         toggleBtn.addEventListener('click', function() {
+                            console.log('Toggle button clicked!');
                             sidebar.classList.toggle('collapsed');
                             mainContent.classList.toggle('sidebar-collapsed');
+                            document.querySelector('.navbar').classList.toggle('collapsed');
+                            console.log('Sidebar classes:', sidebar.className);
+                            console.log('MainContent classes:', mainContent.className);
                             updateTooltips();
                         });
                         updateTooltips();
+                    } else {
+                        console.log('Missing elements:', { toggleBtn: !!toggleBtn, sidebar: !!sidebar, mainContent: !!mainContent });
                     }
                 });
             </script>
         @else
-            @if(auth()->user()->role === 'student')
-            <!-- Notification Bell for students only -->
-            <div style="position: fixed; top: 24px; right: 36px; z-index: 1050;">
-                <div class="dropdown">
-                    <a href="#" id="notifBell" class="nav-link position-relative" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
-                        <i class="bi bi-bell" style="font-size: 1.7rem; color: #2d5016;"></i>
-                        <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notifBell" id="notifDropdownMenu" style="min-width: 320px; max-width: 95vw; max-height: 350px; overflow-y: auto;">
-                        <li class="dropdown-header">Notifications</li>
-                        <li id="notifLoading" class="dropdown-item text-center text-muted">Loading...</li>
-                    </ul>
+            @if(auth()->user()->role === 'student' && request()->routeIs('dashboard'))
+                <!-- Enhanced Notification Bell for students - Dashboard Only -->
+                <style>
+                    .notification-bell-container {
+                        position: fixed;
+                        top: 1.5rem;
+                        right: 2.5rem;
+                        z-index: 1050;
+                    }
+                    
+                    .notification-bell {
+                        background: var(--forest-green, #2d5016);
+                        border: none;
+                        border-radius: 50%;
+                        width: 50px;
+                        height: 50px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+                    }
+                    
+                    .notification-bell:hover {
+                        transform: scale(1.1);
+                        box-shadow: 0 6px 16px rgba(45, 80, 22, 0.4);
+                    }
+                    
+                    .notification-bell .bi-bell {
+                        font-size: 1.5rem;
+                        color: var(--yellow-maize, #f4d03f);
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .notification-bell.pulse .bi-bell {
+                        animation: pulse 2s infinite;
+                    }
+                    
+                    @keyframes pulse {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.1); }
+                        100% { transform: scale(1); }
+                    }
+                    
+                    .notification-badge {
+                        position: absolute;
+                        top: -8px;
+                        right: -8px;
+                        background: #dc3545;
+                        color: #fff;
+                        border-radius: 50%;
+                        width: 20px;
+                        height: 20px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 0.75rem;
+                        font-weight: bold;
+                        border: 2px solid #fff;
+                        animation: bounce 1s infinite;
+                    }
+                    
+                    @keyframes bounce {
+                        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+                        40% { transform: translateY(-3px); }
+                        60% { transform: translateY(-2px); }
+                    }
+                    
+                    .notification-dropdown {
+                        min-width: 350px;
+                        max-width: 95vw;
+                        max-height: 400px;
+                        overflow-y: auto;
+                        border: none;
+                        border-radius: 12px;
+                        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                    }
+                    
+                    .notification-header {
+                        background: var(--forest-green-lighter, #e8f5e8);
+                        color: var(--forest-green, #2d5016);
+                        font-weight: 600;
+                        padding: 1rem 1.25rem;
+                        border-bottom: 1px solid #dee2e6;
+                        border-radius: 12px 12px 0 0;
+                    }
+                    
+                    .notification-item {
+                        padding: 1rem 1.25rem;
+                        border-bottom: 1px solid #f8f9fa;
+                        transition: all 0.2s ease;
+                        display: flex;
+                        align-items: flex-start;
+                        gap: 0.75rem;
+                    }
+                    
+                    .notification-item:hover {
+                        background: var(--forest-green-lighter, #e8f5e8);
+                    }
+                    
+                    .notification-item:last-child {
+                        border-bottom: none;
+                    }
+                    
+                    .notification-item.unread {
+                        background: var(--yellow-maize-light, #fef9e7);
+                        border-left: 4px solid var(--yellow-maize, #f4d03f);
+                    }
+                    
+                    .notification-icon {
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                        margin-top: 2px;
+                    }
+                    
+                    .notification-icon.appointment {
+                        background: #e3f2fd;
+                        color: #1976d2;
+                    }
+                    
+                    .notification-icon.message {
+                        background: #e8f5e8;
+                        color: #388e3c;
+                    }
+                    
+                    .notification-icon.general {
+                        background: #fff3e0;
+                        color: #f57c00;
+                    }
+                    
+                    .notification-content {
+                        flex-grow: 1;
+                        min-width: 0;
+                    }
+                    
+                    .notification-message {
+                        font-size: 0.9rem;
+                        line-height: 1.4;
+                        margin-bottom: 0.25rem;
+                    }
+                    
+                    .notification-time {
+                        font-size: 0.8rem;
+                        color: #6c757d;
+                    }
+                    
+                    .notification-actions {
+                        display: flex;
+                        gap: 0.5rem;
+                        margin-top: 0.5rem;
+                    }
+                    
+                    .notification-link {
+                        color: var(--forest-green, #2d5016);
+                        text-decoration: none;
+                        font-size: 0.85rem;
+                        font-weight: 500;
+                        padding: 0.25rem 0.5rem;
+                        border-radius: 4px;
+                        background: rgba(45, 80, 22, 0.1);
+                        transition: all 0.2s ease;
+                    }
+                    
+                    .notification-link:hover {
+                        background: rgba(45, 80, 22, 0.2);
+                        color: var(--forest-green, #2d5016);
+                    }
+                    
+                    .mark-read-btn {
+                        background: none;
+                        border: none;
+                        color: #dc3545;
+                        padding: 0.25rem;
+                        border-radius: 4px;
+                        transition: all 0.2s ease;
+                        cursor: pointer;
+                    }
+                    
+                    .mark-read-btn:hover {
+                        background: rgba(220, 53, 69, 0.1);
+                        transform: scale(1.1);
+                    }
+                    
+                    .notification-empty {
+                        text-align: center;
+                        padding: 2rem;
+                        color: #6c757d;
+                    }
+                    
+                    .notification-empty i {
+                        font-size: 2rem;
+                        margin-bottom: 0.5rem;
+                        opacity: 0.5;
+                    }
+                </style>
+                
+                <div class="notification-bell-container">
+                    <div class="dropdown">
+                        <button class="btn notification-bell" type="button" id="notifBell" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                            <i class="bi bi-bell"></i>
+                            <span id="notifBadge" class="notification-badge" style="display:none;">0</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notifBell" id="notifDropdownMenu">
+                            <li class="notification-header">
+                                <i class="bi bi-bell me-2"></i>Notifications
+                            </li>
+                            <li id="notifLoading" class="notification-item text-center text-muted">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Loading...
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                function fetchNotifications() {
-                    fetch('/notifications')
-                        .then(res => res.json())
-                        .then(data => {
-                            const notifDropdown = document.getElementById('notifDropdownMenu');
-                            notifDropdown.querySelectorAll('li:not(.dropdown-header)').forEach(e => e.remove());
-                            if (data.notifications.length === 0) {
-                                const empty = document.createElement('li');
-                                empty.className = 'dropdown-item text-center text-muted';
-                                empty.textContent = 'No notifications';
-                                notifDropdown.appendChild(empty);
-                            } else {
-                                data.notifications.forEach(n => {
-                                    const li = document.createElement('li');
-                                    li.className = 'dropdown-item' + (n.read_at ? '' : ' fw-bold');
-                                    let messageHtml = `${n.data.message || n.type} <br><small class='text-muted'>${n.created_at}</small>`;
-                                    if (n.data.url) {
-                                        messageHtml += ` <a href='${n.data.url}' style='font-size:0.95em; color:#198754; text-decoration:underline; margin-left:8px;' target='_blank'>view</a>`;
-                                    }
-                                    li.innerHTML = messageHtml;
-                                    notifDropdown.appendChild(li);
-                                });
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    function getNotificationIcon(type, data) {
+                        if (data && data.appointment_id) {
+                            return '<i class="bi bi-calendar-event"></i>';
+                        } else if (type.includes('Message')) {
+                            return '<i class="bi bi-chat-dots"></i>';
+                        } else {
+                            return '<i class="bi bi-info-circle"></i>';
+                        }
+                    }
+                    
+                    function getNotificationType(type, data) {
+                        if (data && data.appointment_id) {
+                            return 'appointment';
+                        } else if (type.includes('Message')) {
+                            return 'message';
+                        } else {
+                            return 'general';
+                        }
+                    }
+                    
+                    function getNotificationUrl(data) {
+                        if (data && data.appointment_id) {
+                            return '/appointments';
+                        } else if (data && data.url) {
+                            return data.url;
+                        }
+                        return null;
+                    }
+                    
+                    function fetchNotifications() {
+                        fetch('/notifications')
+                            .then(res => res.json())
+                            .then(data => {
+                                const notifDropdown = document.getElementById('notifDropdownMenu');
+                                notifDropdown.querySelectorAll('li:not(.notification-header)').forEach(e => e.remove());
+                                
+                                if (data.notifications.length === 0) {
+                                    const empty = document.createElement('li');
+                                    empty.className = 'notification-item notification-empty';
+                                    empty.innerHTML = '<i class="bi bi-bell"></i><p class="mb-0">No notifications</p>';
+                                    notifDropdown.appendChild(empty);
+                                } else {
+                                    data.notifications.forEach(n => {
+                                        const li = document.createElement('li');
+                                        li.className = 'notification-item' + (n.read_at ? '' : ' unread');
+                                        
+                                        const iconType = getNotificationType(n.type, n.data);
+                                        const icon = getNotificationIcon(n.type, n.data);
+                                        const url = getNotificationUrl(n.data);
+                                        
+                                        let actionsHtml = '';
+                                        if (url) {
+                                            actionsHtml += `<a href="${url}" class="notification-link">View</a>`;
+                                        }
+                                        if (!n.read_at) {
+                                            actionsHtml += `<button class="mark-read-btn" onclick="markAsRead('${n.id}')" title="Mark as read"><i class="bi bi-x-circle"></i></button>`;
+                                        }
+                                        
+                                        li.innerHTML = `
+                                            <div class="notification-icon ${iconType}">
+                                                ${icon}
+                                            </div>
+                                            <div class="notification-content">
+                                                <div class="notification-message">${n.data.message || n.type}</div>
+                                                <div class="notification-time">${n.created_at}</div>
+                                                ${actionsHtml ? `<div class="notification-actions">${actionsHtml}</div>` : ''}
+                                            </div>
+                                        `;
+                                        notifDropdown.appendChild(li);
+                                    });
+                                }
+                                
+                                const badge = document.getElementById('notifBadge');
+                                const bell = document.getElementById('notifBell');
+                                
+                                if (data.unread_count > 0) {
+                                    badge.style.display = 'flex';
+                                    badge.textContent = data.unread_count;
+                                    bell.classList.add('pulse');
+                                } else {
+                                    badge.style.display = 'none';
+                                    bell.classList.remove('pulse');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching notifications:', error);
+                                const notifDropdown = document.getElementById('notifDropdownMenu');
+                                notifDropdown.querySelectorAll('li:not(.notification-header)').forEach(e => e.remove());
+                                
+                                const errorLi = document.createElement('li');
+                                errorLi.className = 'notification-item notification-empty';
+                                errorLi.innerHTML = '<i class="bi bi-exclamation-triangle"></i><p class="mb-0">Error loading notifications</p>';
+                                notifDropdown.appendChild(errorLi);
+                            });
+                    }
+                    
+                    function markAsRead(notificationId) {
+                        fetch(`/notifications/${notificationId}/mark-as-read`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Content-Type': 'application/json',
                             }
-                            const badge = document.getElementById('notifBadge');
-                            if (data.unread_count > 0) {
-                                badge.style.display = 'inline-block';
-                                badge.textContent = data.unread_count;
-                            } else {
-                                badge.style.display = 'none';
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                fetchNotifications(); // Refresh notifications
                             }
+                        })
+                        .catch(error => {
+                            console.error('Error marking notification as read:', error);
                         });
-                }
-                document.getElementById('notifBell').addEventListener('click', fetchNotifications);
-            });
-            </script>
+                    }
+                    
+                    // Add global function for mark as read
+                    window.markAsRead = markAsRead;
+                    
+                    document.getElementById('notifBell').addEventListener('click', fetchNotifications);
+                    
+                    // Auto-refresh notifications every 30 seconds
+                    setInterval(fetchNotifications, 30000);
+                });
+                </script>
             @endif
             <main class="fade-in">
                 <div class="container py-4">
@@ -477,9 +850,12 @@
                 localStorage.setItem('darkMode', '0');
             }
         }
-        document.getElementById('darkModeToggle').onclick = function() {
-            setDarkMode(!document.body.classList.contains('dark-mode'));
-        };
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        if (darkModeToggle) {
+            darkModeToggle.onclick = function() {
+                setDarkMode(!document.body.classList.contains('dark-mode'));
+            };
+        }
         // On load, set dark mode if preferred
         if (localStorage.getItem('darkMode') === '1' ||
             (localStorage.getItem('darkMode') === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -501,6 +877,6 @@
         }
     });
     </script>
-    <script src="https://js.puter.com/v2/"></script>
+    <!-- Removed problematic external script -->
 </body>
 </html> 

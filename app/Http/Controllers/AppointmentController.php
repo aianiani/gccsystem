@@ -280,4 +280,21 @@ class AppointmentController extends Controller
         $appointment->delete();
         return redirect()->back()->with('success', 'Appointment deleted successfully.');
     }
+
+    // Show completed appointments with session notes for students
+    public function completedWithNotes()
+    {
+        if (auth()->user()->role !== 'student') {
+            return redirect()->back()->with('error', 'Access denied.');
+        }
+
+        $completedAppointments = Appointment::where('student_id', auth()->id())
+            ->where('status', 'completed')
+            ->whereHas('sessionNotes')
+            ->with(['counselor', 'sessionNotes'])
+            ->orderBy('scheduled_at', 'desc')
+            ->get();
+
+        return view('appointments.completed-with-notes', compact('completedAppointments'));
+    }
 }

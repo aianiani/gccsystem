@@ -52,9 +52,12 @@ class AppointmentBookedNotification extends Notification
      */
     public function toArray($notifiable)
     {
+        $student = $this->appointment->student;
+        $start = $this->appointment->scheduled_at->format('M d, Y');
+        $time = $this->appointment->scheduled_at->format('g:i A');
         return [
-            'message' => 'Your appointment has been booked.',
-            'url' => route('appointments.index'),
+            'message' => "A new appointment has been booked by {$student->name} on {$start} at {$time}.",
+            'url' => url('/counselor/appointments/' . $this->appointment->id),
         ];
     }
 } 

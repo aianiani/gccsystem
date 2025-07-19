@@ -10,21 +10,36 @@ class CounselorDashboardController extends Controller
     // Show all appointments assigned to the authenticated counselor
     public function index()
     {
-        $appointments = Appointment::where('counselor_id', auth()->id())
-            ->with('student')
-            ->orderBy('scheduled_at', 'desc')
-            ->paginate(10);
-        $allAppointments = Appointment::where('counselor_id', auth()->id())
-            ->with('student')
-            ->orderBy('scheduled_at', 'desc')
-            ->get();
+        // Allow admins to view all appointments, counselors can only view their own
+        if (auth()->user()->isAdmin()) {
+            $appointments = Appointment::with('student', 'counselor')
+                ->orderBy('scheduled_at', 'desc')
+                ->paginate(10);
+            $allAppointments = Appointment::with('student', 'counselor')
+                ->orderBy('scheduled_at', 'desc')
+                ->get();
+        } else {
+            $appointments = Appointment::where('counselor_id', auth()->id())
+                ->with('student')
+                ->orderBy('scheduled_at', 'desc')
+                ->paginate(10);
+            $allAppointments = Appointment::where('counselor_id', auth()->id())
+                ->with('student')
+                ->orderBy('scheduled_at', 'desc')
+                ->get();
+        }
         return view('counselor.appointments.index', compact('appointments', 'allAppointments'));
     }
 
     // Show details for a specific appointment
     public function show($id)
     {
-        $appointment = Appointment::where('counselor_id', auth()->id())->with('student')->findOrFail($id);
+        // Allow admins to view any appointment, counselors can only view their own
+        if (auth()->user()->isAdmin()) {
+            $appointment = Appointment::with('student', 'counselor')->findOrFail($id);
+        } else {
+            $appointment = Appointment::where('counselor_id', auth()->id())->with('student')->findOrFail($id);
+        }
         return view('counselor.appointments.show', compact('appointment'));
     }
 

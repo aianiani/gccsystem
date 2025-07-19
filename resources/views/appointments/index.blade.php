@@ -29,7 +29,10 @@
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-header d-flex align-items-center gap-2" style="background: var(--primary-light); color: var(--primary);">
-                            <i class="bi bi-person-circle fs-3"></i>
+                            <img src="{{ $appointment->counselor->avatar_url }}" 
+                                 alt="{{ $appointment->counselor->name }}" 
+                                 class="rounded-circle" 
+                                 style="width: 40px; height: 40px; object-fit: cover; border: 2px solid var(--primary);">
                             <span class="fw-bold">{{ $appointment->counselor->name ?? 'N/A' }}</span>
                             @php
                                 // Get the session note for this appointment (if any)

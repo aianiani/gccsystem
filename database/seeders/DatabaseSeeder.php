@@ -21,7 +21,9 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('admin123'),
             'role' => 'admin',
             'is_active' => true,
-            'email_verified_at' => now(), // <-- This line marks as verified
+            'email_verified_at' => now(),
+            'registration_status' => 'approved',
+            'approved_at' => now(),
         ]);
 
         // Create a counselor
@@ -32,6 +34,8 @@ class DatabaseSeeder extends Seeder
             'role' => 'counselor',
             'is_active' => true,
             'email_verified_at' => now(),
+            'registration_status' => 'approved',
+            'approved_at' => now(),
         ]);
 
         // Create a student
@@ -42,6 +46,8 @@ class DatabaseSeeder extends Seeder
             'role' => 'student',
             'is_active' => true,
             'email_verified_at' => now(),
+            'registration_status' => 'approved',
+            'approved_at' => now(),
         ]);
 
         // Create additional test users

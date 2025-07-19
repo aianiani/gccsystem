@@ -48,11 +48,20 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             
+            // Check if user is active and approved (for students)
             if (!$user->isActive()) {
                 Auth::logout();
                 \App\Models\UserActivity::log($user->id, 'login_failed', 'Login attempt for deactivated account');
                 return redirect()->route('login')
                     ->with('error', 'Your account has been deactivated. Please contact an administrator for assistance.');
+            }
+
+            // For students, check if registration is approved
+            if ($user->role === 'student' && !$user->isApproved()) {
+                Auth::logout();
+                \App\Models\UserActivity::log($user->id, 'login_failed', 'Login attempt for unapproved student registration');
+                return redirect()->route('login')
+                    ->with('error', 'Your registration is pending approval. You will be notified via email once your account is approved by an administrator.');
             }
 
             // Check if email is verified
@@ -129,6 +138,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'student', // Always set to student
+            'is_active' => false, // Set as inactive until approved
+            'registration_status' => 'pending', // Set as pending approval
         ]);
 
         // Send email verification
@@ -138,7 +149,7 @@ class AuthController extends Controller
         UserActivity::log($user->id, 'register', 'User registered successfully');
 
         return redirect()->route('login')
-            ->with('success', "Welcome to our platform, {$user->name}! We've sent you an email verification link. Please check your email and click the verification link to activate your account.");
+            ->with('success', "Welcome to our platform, {$user->name}! We've sent you an email verification link. Please check your email and click the verification link. After email verification, your registration will be reviewed by an administrator. You will be notified once your account is approved.");
     }
 
     /**

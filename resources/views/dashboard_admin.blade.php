@@ -140,53 +140,128 @@
         <span class="text-white">Today is <strong>{{ now()->format('l, F j, Y') }}</strong></span>
     </div>
     <div class="row g-4 mb-4 align-items-stretch">
-        <div class="col-md-4 d-flex flex-column align-items-center justify-content-start">
-            <div class="admin-profile-card w-100 d-flex flex-column align-items-center">
-                <img src="{{ auth()->user()->avatar_url }}" alt="Avatar" class="rounded-circle mb-3" width="90" height="90">
-                <h5 class="fw-bold mb-1 mt-2" style="color: var(--forest-green);">{{ auth()->user()->name }}</h5>
-                <div class="text-muted mb-2">{{ auth()->user()->email }}</div>
-                <div class="mb-2">
-                    <span class="badge" style="background: var(--forest-green); color: #fff;">Admin</span>
-                </div>
-                <a href="{{ route('profile') }}" class="admin-action-btn outline mt-2 w-100">
-                    <i class="bi bi-pencil me-1"></i>Edit Profile
-                </a>
-            </div>
-        </div>
-        <div class="col-md-8">
+        <div class="col-12">
             <div class="row g-3 mb-3 align-items-stretch">
-                <div class="col-6 col-lg-4 d-flex">
+                <div class="col-6 col-lg-3 d-flex">
                     <a href="{{ route('users.index') }}" class="admin-action-btn w-100 primary align-self-stretch d-flex align-items-center justify-content-center"><i class="bi bi-people me-2"></i>Manage Users</a>
                 </div>
-                <div class="col-6 col-lg-4 d-flex">
+                <div class="col-6 col-lg-3 d-flex">
                     <a href="{{ route('announcements.index') }}" class="admin-action-btn w-100 align-self-stretch d-flex align-items-center justify-content-center"><i class="bi bi-megaphone me-2"></i>Manage Announcements</a>
                 </div>
-                <div class="col-12 col-lg-4 mt-2 mt-lg-0 d-flex">
+                <div class="col-6 col-lg-3 d-flex">
                     <a href="{{ route('activities') }}" class="admin-action-btn w-100 outline align-self-stretch d-flex align-items-center justify-content-center"><i class="bi bi-activity me-2"></i>Activity Logs</a>
+                </div>
+                <div class="col-6 col-lg-3 d-flex">
+                    <a href="{{ route('admin.logs') }}" class="admin-action-btn w-100 outline align-self-stretch d-flex align-items-center justify-content-center"><i class="bi bi-journal-text me-2"></i>View All Logs</a>
                 </div>
             </div>
             <div class="row g-3 align-items-stretch">
-                <div class="col-6 col-lg-4 d-flex">
+                <div class="col-6 col-lg-3 d-flex">
                     <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
                         <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\User::count() }}</div>
                         <div class="text-muted">Total Users</div>
+                        <div class="small text-muted mt-1">
+                            {{ \App\Models\User::where('role', 'student')->count() }} Students • 
+                            {{ \App\Models\User::where('role', 'counselor')->count() }} Counselors
+                        </div>
+                        <a href="{{ route('admin.logs.users') }}" class="btn btn-sm btn-outline-primary mt-2">
+                            <i class="bi bi-arrow-right me-1"></i>View All Users
+                        </a>
                     </div>
                 </div>
-                <div class="col-6 col-lg-4 d-flex">
+                <div class="col-6 col-lg-3 d-flex">
                     <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
                         <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\Appointment::count() }}</div>
                         <div class="text-muted">Total Appointments</div>
+                        <div class="small text-muted mt-1">
+                            {{ \App\Models\Appointment::where('status', 'pending')->count() }} Pending • 
+                            {{ \App\Models\Appointment::where('status', 'completed')->count() }} Completed
+                        </div>
+                        <a href="{{ route('admin.logs.appointments') }}" class="btn btn-sm btn-outline-success mt-2">
+                            <i class="bi bi-arrow-right me-1"></i>View All Appointments
+                        </a>
                     </div>
                 </div>
-                <div class="col-12 col-lg-4 d-flex">
+                <div class="col-6 col-lg-3 d-flex">
+                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\Assessment::count() }}</div>
+                        <div class="text-muted">Total Assessments</div>
+                        <div class="small text-muted mt-1">
+                            {{ \App\Models\Assessment::where('status', 'completed')->count() }} Completed • 
+                            {{ \App\Models\Assessment::where('status', 'pending')->count() }} Pending
+                        </div>
+                        <a href="{{ route('admin.logs.assessments') }}" class="btn btn-sm btn-outline-danger mt-2">
+                            <i class="bi bi-arrow-right me-1"></i>View All Assessments
+                        </a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 d-flex">
                     <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
                         <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\Announcement::count() }}</div>
                         <div class="text-muted">Total Announcements</div>
+                        <div class="small text-muted mt-1">
+                            {{ \App\Models\Announcement::where('is_active', true)->count() }} Active • 
+                            {{ \App\Models\Announcement::where('is_active', false)->count() }} Inactive
+                        </div>
+                        <a href="{{ route('announcements.index') }}" class="btn btn-sm btn-outline-warning mt-2">
+                            <i class="bi bi-arrow-right me-1"></i>Manage Announcements
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Stats Row -->
+            <div class="row g-3 align-items-stretch mt-3">
+                <div class="col-6 col-lg-3 d-flex">
+                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\SessionNote::count() }}</div>
+                        <div class="text-muted">Session Notes</div>
+                        <div class="small text-muted mt-1">
+                            {{ \App\Models\SessionNote::where('created_at', '>=', now()->subDays(30))->count() }} This Month
+                        </div>
+                        <a href="{{ route('admin.logs.session-notes') }}" class="btn btn-sm btn-outline-info mt-2">
+                            <i class="bi bi-arrow-right me-1"></i>View Session Notes
+                        </a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 d-flex">
+                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\SessionFeedback::count() }}</div>
+                        <div class="text-muted">Session Feedbacks Logs</div>
+                        <div class="small text-muted mt-1">
+                            {{ \App\Models\SessionFeedback::where('created_at', '>=', now()->subDays(30))->count() }} This Month
+                        </div>
+                        <a href="{{ route('admin.logs.session-feedbacks') }}" class="btn btn-sm btn-outline-warning mt-2">
+                            <i class="bi bi-arrow-right me-1"></i>View Session Feedbacks
+                        </a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 d-flex">
+                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\UserActivity::count() }}</div>
+                        <div class="text-muted">System Activities</div>
+                        <div class="small text-muted mt-1">
+                            {{ \App\Models\UserActivity::where('created_at', '>=', now()->subDays(7))->count() }} This Week
+                        </div>
+                        <a href="{{ route('activities') }}" class="btn btn-sm btn-outline-dark mt-2">
+                            <i class="bi bi-arrow-right me-1"></i>View Activities
+                        </a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 d-flex">
+                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\User::where('is_active', true)->count() }}</div>
+                        <div class="text-muted">Active Users</div>
+                        <div class="small text-muted mt-1">
+                            {{ round((\App\Models\User::where('is_active', true)->count() / \App\Models\User::count()) * 100) }}% of Total
+                        </div>
+                        <a href="{{ route('users.index') }}" class="btn btn-sm btn-outline-primary mt-2">
+                            <i class="bi bi-arrow-right me-1"></i>View Active Users
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     <div class="admin-activity-card card shadow-sm mt-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Recent Activity</h5>

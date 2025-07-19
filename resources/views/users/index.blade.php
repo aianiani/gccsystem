@@ -49,11 +49,7 @@
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center">
                                         <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle me-3 shadow" style="width: 45px; height: 45px;">
-                                            @if($user->avatar)
-                                                <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle" width="36" height="36">
-                                            @else
-                                                <i class="bi bi-person text-primary fs-5"></i>
-                                            @endif
+                                            <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle" width="36" height="36">
                                         </div>
                                         <div>
                                             <div class="fw-semibold">{{ $user->name }}</div>

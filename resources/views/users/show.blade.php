@@ -13,13 +13,7 @@
                 </nav>
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                     <div class="d-flex align-items-center gap-3">
-                        @if($user->avatar)
-                            <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle shadow-sm" width="60" height="60">
-                        @else
-                            <div class="d-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 60px; height: 60px;">
-                                <i class="bi bi-person" style="color:var(--primary-black);font-size:2rem;"></i>
-                            </div>
-                        @endif
+                        <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle shadow-sm" width="60" height="60">
                         <div>
                             <h1 class="fw-bold mb-1" style="font-size:2rem; color:var(--primary-black)">{{ $user->name }}</h1>
                             <p class="mb-0 text-secondary" style="font-size:1.1rem;">User details and activity history</p>
@@ -45,11 +39,7 @@
                 </h5>
             </div>
             <div class="card-body text-center">
-                @if($user->avatar)
-                    <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle shadow-sm mb-3" width="80" height="80">
-                @else
-                    <i class="bi bi-person-circle fs-1 text-primary mb-3"></i>
-                @endif
+                <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle shadow-sm mb-3" width="80" height="80">
                 <h5>{{ $user->name }}</h5>
                 <p class="text-muted">{{ $user->email }}</p>
                 

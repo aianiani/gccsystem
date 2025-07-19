@@ -47,6 +47,47 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', UserController::class);
         Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::get('/activities', [DashboardController::class, 'activities'])->name('activities');
+        Route::get('/admin/logs', function () {
+    return view('admin.logs');
+})->name('admin.logs');
+
+// Individual log sections
+Route::get('/admin/logs/users', function () {
+    return view('admin.logs.users');
+})->name('admin.logs.users');
+
+Route::get('/admin/logs/appointments', function () {
+    return view('admin.logs.appointments');
+})->name('admin.logs.appointments');
+
+Route::get('/admin/logs/session-notes', function () {
+    return view('admin.logs.session-notes');
+})->name('admin.logs.session-notes');
+
+Route::get('/admin/logs/session-feedbacks', function () {
+    return view('admin.logs.session-feedbacks');
+})->name('admin.logs.session-feedbacks');
+
+Route::get('/admin/logs/assessments', function () {
+    return view('admin.logs.assessments');
+})->name('admin.logs.assessments');
+
+Route::get('/admin/logs/messages', function () {
+    return view('admin.logs.messages');
+})->name('admin.logs.messages');
+
+Route::get('/admin/logs/activities', function () {
+    return view('admin.logs.activities');
+})->name('admin.logs.activities');
+
+// Registration Approval Routes
+Route::prefix('admin/registration-approvals')->name('admin.registration-approvals.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'index'])->name('index');
+    Route::get('/{user}', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'show'])->name('show');
+    Route::post('/{user}/approve', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'approve'])->name('approve');
+    Route::post('/{user}/reject', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'reject'])->name('reject');
+    Route::get('/statistics', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'statistics'])->name('statistics');
+});
         // Only admins can create, edit, update, delete announcements
         Route::get('announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
         Route::post('announcements', [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
@@ -69,7 +110,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/appointments/available-slots/{counselor}', [App\Http\Controllers\AppointmentController::class, 'availableSlots'])->name('appointments.availableSlots');
         // Accept/Decline rescheduled appointment
         Route::patch('appointments/{id}/accept-reschedule', [App\Http\Controllers\AppointmentController::class, 'acceptReschedule'])->name('appointments.acceptReschedule');
-        Route::patch('appointments/{id}/decline-reschedule', [App\Http\Controllers\AppointmentController::class, 'declineReschedule'])->name('appointments.declineReschedule');
+Route::patch('appointments/{id}/decline-reschedule', [App\Http\Controllers\AppointmentController::class, 'declineReschedule'])->name('appointments.declineReschedule');
+Route::get('appointments/completed-with-notes', [App\Http\Controllers\AppointmentController::class, 'completedWithNotes'])->name('appointments.completedWithNotes');
+Route::get('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackController::class, 'create'])->name('session-feedback.create');
+Route::post('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackController::class, 'store'])->name('session-feedback.store');
         // Assessments route for students
         Route::get('assessments', [App\Http\Controllers\AssessmentController::class, 'index'])->name('assessments.index');
         Route::post('assessments/dass21', [App\Http\Controllers\AssessmentController::class, 'submitDass21'])->name('assessments.dass21.submit');
@@ -77,8 +121,8 @@ Route::middleware('auth')->group(function () {
         Route::post('assessments/wellness', [App\Http\Controllers\AssessmentController::class, 'submitWellnessCheck'])->name('assessments.wellness.submit');
     });
 
-    // Counselor-only routes
-    Route::middleware('role:counselor')->group(function () {
+    // Counselor and Admin routes
+    Route::middleware('role:counselor,admin')->group(function () {
         Route::get('counselor/appointments', [App\Http\Controllers\CounselorDashboardController::class, 'index'])->name('counselor.appointments.index');
         Route::get('counselor/appointments/{id}', [App\Http\Controllers\CounselorDashboardController::class, 'show'])->name('counselor.appointments.show');
         Route::get('counselor/appointments/create', [App\Http\Controllers\AppointmentController::class, 'create'])->name('counselor.appointments.create');
@@ -129,17 +173,14 @@ Route::get('/resources', function () {
 })->name('resources');
 
 Route::middleware(['auth'])->group(function () {
-    // Place this FIRST!
+    // Place these FIRST!
     Route::get('/chat/counselors', [App\Http\Controllers\MessageController::class, 'selectCounselor'])->name('chat.selectCounselor');
+    Route::get('/chat/students', [App\Http\Controllers\MessageController::class, 'selectStudent'])->name('chat.selectStudent');
     // Then the dynamic user chat routes
     Route::get('/chat/{user}', [App\Http\Controllers\MessageController::class, 'index'])->name('chat.index');
     Route::post('/chat/{user}', [App\Http\Controllers\MessageController::class, 'store'])->name('chat.store');
     Route::get('/chat/{user}/fetch', [App\Http\Controllers\MessageController::class, 'fetch'])->name('chat.fetch');
-    Route::post('/chat/typing', [App\Http\Controllers\MessageController::class, 'typing']);
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/chat/students', [App\Http\Controllers\MessageController::class, 'selectStudent'])->name('chat.selectStudent');
+    Route::get('/chat/{user}/messages', [App\Http\Controllers\MessageController::class, 'messages'])->name('chat.messages');
 });
 
 Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(function () {
@@ -152,7 +193,8 @@ Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(functi
     // Route::get('priority-cases', [App\Http\Controllers\Counselor\PriorityCaseController::class, 'index'])
     //     ->name('counselor.priority-cases.index');
     // Route::get('feedback', [App\Http\Controllers\Counselor\FeedbackController::class, 'index'])
-    //     ->name('counselor.feedback.index');
+//     ->name('counselor.feedback.index');
+Route::get('feedback/{id}', [App\Http\Controllers\SessionFeedbackController::class, 'show'])->name('counselor.feedback.show');
     Route::get('availability', [App\Http\Controllers\CounselorAvailabilityController::class, 'index'])->name('counselor.availability.index');
     Route::get('availabilities', [App\Http\Controllers\AvailabilityController::class, 'index']);
     Route::post('availabilities', [App\Http\Controllers\AvailabilityController::class, 'store']);
@@ -169,4 +211,12 @@ Route::middleware('admin')->get('test-admin', function() {
 
 Route::get('/counselor/assessments/{assessment}/export', [App\Http\Controllers\AssessmentController::class, 'exportPdf'])->name('counselor.assessments.export');
 Route::post('/counselor/assessments/{assessment}/save-notes', [App\Http\Controllers\AssessmentController::class, 'saveNotes'])->name('counselor.assessments.saveNotes');
+
+// Admin Logs Export & Reset
+Route::middleware(['auth', 'admin'])->prefix('admin/logs')->name('admin.logs.')->group(function () {
+    Route::get('export/{format}', [App\Http\Controllers\AdminLogsController::class, 'export'])->name('export');
+    Route::post('reset', [App\Http\Controllers\AdminLogsController::class, 'reset'])->name('reset');
+});
+
+Route::post('admin/logs/{type}/reset', [AdminLogsController::class, 'reset'])->name('admin.logs.reset');
 

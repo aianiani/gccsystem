@@ -1,6 +1,6 @@
 <div class="sidebar">
     <div class="sidebar-header">
-        <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo">
+        <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto;">
         <h3>CMU Guidance</h3>
         <p>Counselor Portal</p>
     </div>
