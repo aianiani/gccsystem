@@ -100,34 +100,53 @@
             .custom-sidebar {
                 width: 200px;
             }
-            .main-content {
+            .main-dashboard-content {
                 margin-left: 200px;
             }
         }
         @media (max-width: 767.98px) {
+            /* Off-canvas behavior on mobile */
             .custom-sidebar {
-                position: static;
-                width: 100%;
-                height: auto;
-                flex-direction: row;
-                padding: 0.5rem 0;
-            }
-            .custom-sidebar .sidebar-logo {
-                display: none;
-            }
-            .custom-sidebar .sidebar-nav {
-                flex-direction: row;
-                gap: 0.25rem;
+                position: fixed;
+                z-index: 1040;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                width: 240px;
+                transform: translateX(-100%);
+                transition: transform 0.2s ease;
+                flex-direction: column;
                 padding: 0;
             }
-            .custom-sidebar .sidebar-link {
-                flex: 1;
-                justify-content: center;
-                padding: 0.5rem 0.25rem;
-                font-size: 0.95rem;
+            .custom-sidebar.show {
+                transform: translateX(0);
             }
-            .main-content {
+            .custom-sidebar .sidebar-logo { display: block; }
+            .custom-sidebar .sidebar-nav {
+                flex-direction: column;
+                gap: 0.25rem;
+                padding: 1rem 0.5rem 1rem 0.5rem;
+            }
+            .custom-sidebar .sidebar-link {
+                justify-content: flex-start;
+                padding: 0.6rem 0.75rem;
+                font-size: 1rem;
+            }
+            .main-dashboard-content {
                 margin-left: 0;
+            }
+            /* Toggle button */
+            #studentSidebarToggle {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1100;
+                background: var(--forest-green);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                padding: 0.5rem 0.75rem;
+                box-shadow: var(--shadow-sm);
             }
         }
         
@@ -472,6 +491,10 @@
 
 
     <div class="d-flex">
+        <!-- Mobile Sidebar Toggle -->
+        <button id="studentSidebarToggle" class="d-md-none">
+            <i class="bi bi-list"></i>
+        </button>
         <!-- Sidebar -->
         <div class="custom-sidebar">
             <div class="sidebar-logo mb-4">
@@ -739,6 +762,27 @@
             tooltipTriggerList.forEach(function (tooltipTriggerEl) {
                 new bootstrap.Tooltip(tooltipTriggerEl);
             });
+            // Sidebar toggle for mobile
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('studentSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
         });
     </script>
 @endsection

@@ -17,7 +17,7 @@ This guide explains how to set up email verification using Mailtrap for testing.
 Create a `.env` file in your project root with the following Mailtrap configuration:
 
 ```env
-APP_NAME="User Management App"
+APP_NAME="GCC System"
 APP_ENV=local
 APP_KEY=base64:your_generated_key
 APP_DEBUG=true
@@ -33,7 +33,7 @@ MAIL_USERNAME=aianmark1715@gmail.com
 MAIL_PASSWORD=uxbw syub lpcr ojyi
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=aianmark1715@gmail.com
-MAIL_FROM_NAME="User Management App"
+MAIL_FROM_NAME="GCC System"
 
 ### 2. Mailtrap Setup
 

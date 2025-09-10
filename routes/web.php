@@ -6,13 +6,18 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// Homepage route for guests
+// Homepage route (visible to guests and authenticated users)
 Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->route('dashboard');
-    }
-    return view('home');
+    $announcements = \App\Models\Announcement::latest()->take(3)->get();
+    return view('home', compact('announcements'));
 })->name('home');
+
+// Public Announcements routes (viewable by guests)
+Route::get('announcements', [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
+// Constrain the wildcard so it doesn't capture "create" or other non-ID paths
+Route::get('announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'show'])
+    ->whereNumber('announcement')
+    ->name('announcements.show');
 
 // Guest routes
 Route::middleware('guest')->group(function () {
@@ -37,10 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
-    // Announcements: allow all authenticated users to view
-    Route::get('announcements', [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
-    Route::get('announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
-    Route::get('announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'show'])->name('announcements.show');
+    // (Announcements index/show are public above)
 
     // Admin routes
     Route::middleware('admin')->group(function () {
@@ -218,5 +220,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin/logs')->name('admin.logs.')-
     Route::post('reset', [App\Http\Controllers\AdminLogsController::class, 'reset'])->name('reset');
 });
 
-Route::post('admin/logs/{type}/reset', [AdminLogsController::class, 'reset'])->name('admin.logs.reset');
+Route::post('admin/logs/{type}/reset', [App\Http\Controllers\AdminLogsController::class, 'reset'])->name('admin.logs.reset');
 

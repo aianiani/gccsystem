@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'User Management App') }}</title>
+    <title>{{ config('app.name', 'GCC System') }}</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -112,6 +112,10 @@
             padding: 0.5em 1.2em;
             box-shadow: 0 2px 8px rgba(44,62,80,0.08);
         }
+        /* Prevent brand and user menu overlap in navbar */
+        .navbar .container-fluid { display: flex; align-items: center; gap: .5rem; }
+        .navbar .navbar-brand { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .navbar .ms-auto { flex-shrink: 0; }
         .form-control, .form-select {
             border-radius: var(--input-radius);
             border: 1.5px solid var(--gray-100);
@@ -372,6 +376,13 @@
                     #mainContent.sidebar-collapsed {
                         margin-left: 60px !important;
                     }
+                    /* Align navbar with narrower sidebar on tablets */
+                    .navbar {
+                        left: 200px;
+                    }
+                    .navbar.collapsed {
+                        left: 60px !important;
+                    }
                 }
                 @media (max-width: 767.98px) {
                     #adminSidebar.sidebar {
@@ -389,6 +400,14 @@
                     #mainContent {
                         margin-left: 0 !important;
                     }
+                    /* Ensure navbar spans full width on mobile */
+                    .navbar {
+                        left: 0 !important;
+                        right: 0;
+                    }
+                    /* Smaller brand and better truncation on phones */
+                    .navbar .navbar-brand { font-size: 1rem; max-width: 65vw; }
+                    #adminNavbarDropdown strong { font-size: .95rem; }
                 }
             </style>
             <script>
@@ -417,12 +436,30 @@
                     if (toggleBtn && sidebar && mainContent) {
                         toggleBtn.addEventListener('click', function() {
                             console.log('Toggle button clicked!');
-                            sidebar.classList.toggle('collapsed');
-                            mainContent.classList.toggle('sidebar-collapsed');
-                            document.querySelector('.navbar').classList.toggle('collapsed');
+                            if (window.innerWidth < 768) {
+                                sidebar.classList.toggle('show');
+                            } else {
+                                sidebar.classList.toggle('collapsed');
+                                mainContent.classList.toggle('sidebar-collapsed');
+                                const nav = document.querySelector('.navbar');
+                                if (nav) nav.classList.toggle('collapsed');
+                                updateTooltips();
+                            }
                             console.log('Sidebar classes:', sidebar.className);
                             console.log('MainContent classes:', mainContent.className);
-                            updateTooltips();
+                        });
+                        document.addEventListener('click', function(e) {
+                            if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                                const clickInside = sidebar.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target));
+                                if (!clickInside) {
+                                    sidebar.classList.remove('show');
+                                }
+                            }
+                        });
+                        document.addEventListener('keydown', function(e) {
+                            if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                                sidebar.classList.remove('show');
+                            }
                         });
                         updateTooltips();
                     } else {
@@ -836,6 +873,47 @@
                     timer: 2000,
                     timerProgressBar: true,
                 });
+            @endif
+        });
+    </script>
+    @auth
+    <!-- Global Two-Factor Authentication Modal -->
+    <div class="modal fade" id="twoFactorGlobalModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header" style="border-bottom: none;">
+                    <h5 class="modal-title" style="color: var(--forest-green);">Two-Factor Authentication</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    <p class="small text-muted">Enter the 6-digit code sent to your email/phone.</p>
+                    <form method="POST" action="{{ route('2fa.verify') }}">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label">Authentication Code</label>
+                            <input type="text" name="code" maxlength="6" class="form-control" required inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Verify</button>
+                    </form>
+                    <div class="d-flex justify-content-between align-items-center mt-3 small">
+                        <form method="POST" action="{{ route('2fa.resend') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-link p-0" style="color: var(--forest-green); text-decoration: none;">Resend code</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endauth
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(request()->routeIs('2fa.form'))
+                var modalEl = document.getElementById('twoFactorGlobalModal');
+                if (modalEl) {
+                    var m = new bootstrap.Modal(modalEl);
+                    m.show();
+                }
             @endif
         });
     </script>

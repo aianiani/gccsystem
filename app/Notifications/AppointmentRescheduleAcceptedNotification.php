@@ -64,9 +64,12 @@ class AppointmentRescheduleAcceptedNotification extends Notification
      */
     public function toArray($notifiable)
     {
+        $student = $this->appointment->student;
+        $newDate = $this->appointment->scheduled_at->format('F j, Y');
+        $newTime = $this->appointment->scheduled_at->format('g:i A');
         return [
-            'message' => 'Your appointment reschedule has been accepted.',
-            'url' => route('appointments.index'),
+            'message' => 'The rescheduled date of ' . $this->oldDateTime . ' has been accepted by ' . ($student ? $student->name : 'the student') . '. New scheduled appointment: ' . $newDate . ' at ' . $newTime . '.',
+            'url' => url('/counselor/appointments/' . $this->appointment->id),
         ];
     }
 } 

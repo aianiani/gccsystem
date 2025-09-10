@@ -41,7 +41,7 @@ This project aims to develop a comprehensive web-based system to enhance service
 1. **Clone the repository:**
    ```bash
    git clone <repository-url>
-   cd user-management-app
+   cd gccsystem
    ```
 2. **Install dependencies:**
    ```bash

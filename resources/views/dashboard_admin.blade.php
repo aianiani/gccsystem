@@ -129,6 +129,22 @@
     .admin-activity-card .card-body {
         padding: 2rem;
     }
+    @media (max-width: 991.98px) {
+        .admin-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1.25rem 1rem;
+        }
+        .admin-header .title { font-size: 1.3rem; }
+        .admin-header .badge { font-size: 1rem; padding: 0.5em 0.9em; }
+    }
+    @media (max-width: 575.98px) {
+        .admin-action-btn { padding: 0.8rem 1rem; }
+        .admin-stats-card { padding: 1rem; }
+        .admin-activity-card .card-header { padding: 1rem; }
+        .admin-activity-card .card-body { padding: 1rem; }
+    }
 </style>
 <div class="container py-4">
     <div class="admin-header mb-4">

@@ -72,7 +72,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">User Management App</div>
+            <div class="logo">GCC System</div>
             <h1 class="title">Verify Your Email Address</h1>
         </div>
         
@@ -97,7 +97,7 @@
         
         <div class="footer">
             <p>This email was sent to you because you registered for an account on our platform.</p>
-            <p>&copy; {{ date('Y') }} User Management App. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} GCC System. All rights reserved.</p>
         </div>
     </div>
 </body>

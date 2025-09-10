@@ -22,10 +22,10 @@
         }
 
         :root {
-            --primary-green: #2d5a3d;
-            --accent-green: #4CAF50;
-            --light-green: #e8f5e8;
-            --accent-orange: #ff9800;
+            --primary-green: #228B22; /* Forest Green */
+            --accent-green: #2e7d32; /* Complementary Green */
+            --light-green: #eaf5ea;  /* Light Green Tint */
+            --accent-orange: #FFCB05; /* Maize Yellow */
             --text-dark: #2c3e50;
             --text-light: #6c757d;
             --bg-light: #f8f9fa;
@@ -54,6 +54,33 @@
             box-shadow: 0 2px 20px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             padding: 1rem 0;
+            transform: translateY(0);
+            opacity: 1;
+            transition: transform 0.25s ease, opacity 0.25s ease, background 0.3s ease, box-shadow 0.3s ease;
+            z-index: 1042;
+        }
+
+        /* Hide-on-scroll behavior */
+        .navbar.nav-hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        /* Hover-to-reveal navbar */
+        .navbar-reveal-zone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 12px;
+            z-index: 1041;
+        }
+
+        .navbar:hover,
+        .navbar:focus-within,
+        .navbar-reveal-zone:hover + .navbar {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .navbar-brand {
@@ -108,7 +135,7 @@
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, var(--primary-green) 0%, #1a4d2a 100%);
+            background: linear-gradient(135deg, var(--primary-green) 0%, #0f3d1e 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -220,6 +247,98 @@
         .features {
             padding: 5rem 0;
             background: var(--bg-light);
+        }
+
+        /* Announcements (enhanced) */
+        #announcements .announcement-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        #announcements .announcement-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        #announcements .announcement-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(0,0,0,0.08);
+        }
+
+        #announcements .announcement-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-green), var(--primary-green));
+            color: white;
+            box-shadow: 0 6px 16px rgba(34,139,34,0.2);
+            margin-bottom: 1rem;
+        }
+
+        #announcements .announcement-title {
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: .25rem;
+        }
+
+        #announcements .announcement-meta {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: .75rem;
+        }
+
+        #announcements .announcement-date {
+            display: inline-block;
+            padding: .25rem .6rem;
+            border-radius: 999px;
+            background: rgba(255, 203, 5, 0.15);
+            color: #8a6d00;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        #announcements .badge-new {
+            display: inline-block;
+            padding: .25rem .5rem;
+            border-radius: 999px;
+            background: var(--accent-orange);
+            color: #1a1a1a;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+
+        #announcements .announcement-excerpt {
+            color: var(--text-light);
+        }
+
+        #announcements .announcement-action {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            color: var(--accent-green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        #announcements .announcement-action:hover {
+            color: var(--primary-green);
         }
 
         .feature-card {
@@ -388,6 +507,24 @@
             background: var(--bg-light);
         }
 
+        .testimonials-carousel {
+            position: relative;
+        }
+
+        .testimonials-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .testimonials-track {
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .testimonial-slide {
+            padding: 0 1rem;
+        }
+
         .testimonial-card {
             background: white;
             border-radius: 20px;
@@ -396,6 +533,7 @@
             box-shadow: var(--shadow);
             position: relative;
             transition: all 0.3s ease;
+            height: 100%;
         }
 
         .testimonial-card:hover {
@@ -429,6 +567,71 @@
         .testimonial-role {
             color: var(--text-light);
             font-size: 0.9rem;
+        }
+
+        /* Navigation Arrows */
+        .testimonial-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.3);
+        }
+
+        .testimonial-nav:hover {
+            background: var(--accent-green);
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(34, 139, 34, 0.4);
+        }
+
+        .testimonial-nav:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .testimonial-prev {
+            left: -25px;
+        }
+
+        .testimonial-next {
+            right: -25px;
+        }
+
+        /* Dots Indicator */
+        .testimonial-dots {
+            margin-top: 2rem;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(34, 139, 34, 0.3);
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--primary-green);
+            transform: scale(1.2);
+        }
+
+        .dot:hover {
+            background: var(--accent-green);
+            transform: scale(1.1);
         }
 
         /* FAQ Section */
@@ -486,7 +689,7 @@
 
         /* Footer */
         .footer {
-            background: linear-gradient(135deg, var(--primary-green), #1a4d2a);
+            background: linear-gradient(135deg, var(--primary-green), #0f3d1e);
             color: white;
             padding: 3rem 0 1rem;
             position: relative;
@@ -640,19 +843,64 @@
             .footer-links {
                 grid-template-columns: 1fr;
             }
+
+            /* Testimonials responsive */
+            .testimonial-slide {
+                width: 100% !important;
+            }
+
+            .testimonial-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .testimonial-prev {
+                left: -20px;
+            }
+
+            .testimonial-next {
+                right: -20px;
+            }
+
+            .testimonial-card {
+                margin: 0.5rem;
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .testimonial-slide {
+                width: 50% !important;
+            }
+        }
+        
+        
+        
+        /* Page Zoom */
+        .home-zoom {
+            zoom: 0.85;
+        }
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.85);
+                transform-origin: top center;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="home-zoom">
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="navbar-reveal-zone" aria-hidden="true"></div>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" role="navigation" aria-label="Primary">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <div style="width: 45px; height: 45px; background: linear-gradient(135deg, var(--primary-green), var(--accent-green)); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.5rem;">C</div>
-                <span>CMU Guidance & Counseling</span>
+            <a class="navbar-brand" href="{{ route('home') }}" aria-label="CMU Guidance & Counseling home">
+                <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo">
+                <span>CMU Guidance & Counseling Center</span>
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
@@ -671,7 +919,7 @@
                         <a class="nav-link" href="#contact">Contact</a>
                     </li>
                     <li class="nav-item ms-3">
-                        <a href="/login" class="btn btn-auth">
+                        <a href="#" class="btn btn-auth" data-bs-toggle="modal" data-bs-target="#loginModal">
                             <i class="fas fa-user-circle me-2"></i>Sign In
                         </a>
                     </li>
@@ -679,6 +927,8 @@
             </div>
         </div>
     </nav>
+
+    
 
     <!-- Hero Section -->
     <section id="home" class="hero">
@@ -689,10 +939,10 @@
                         <h1 class="mt-4">Empowering Students Through Accessible Counseling</h1>
                         <p class="text-center mx-auto">Your mental health matters. Connect with professional counselors, access valuable resources, and take control of your well-being journey with our comprehensive support system.</p>
                         <div class="hero-buttons justify-content-center d-flex flex-wrap">
-                            <a href="#" class="btn btn-primary-custom">
+                            <a href="{{ auth()->check() ? route('appointments.create') : route('login') }}" class="btn btn-primary-custom" aria-label="Book appointment">
                                 <i class="fas fa-calendar-plus me-2"></i>Book Appointment
                             </a>
-                            <a href="#" class="btn btn-secondary-custom">
+                            <a href="{{ auth()->check() ? route('chat') : route('login') }}" class="btn btn-secondary-custom" aria-label="Start chat">
                                 <i class="fas fa-comments me-2"></i>Start Chat
                             </a>
                         </div>
@@ -700,78 +950,64 @@
                 </div>
             </div>
         </div>
-        
-        <div class="hero-badge d-none d-lg-block">
-            <h3>24/7</h3>
-            <p>Crisis Support<br>Available</p>
-        </div>
-
-        <div class="hero-badge d-none d-lg-block">
-            <h3>24/7</h3>
-            <p>Crisis Support<br>Available</p>
-        </div>
 
     </section>
 
-    <!-- Features Section -->
-    <section id="services" class="features">
+    <!-- Announcements Section -->
+    <section id="announcements" class="py-5" style="background: var(--bg-light);">
         <div class="container">
             <div class="section-header">
-                <h2>Why Choose Our Services</h2>
-                <div class="section-divider"></div>
-                <p>We provide comprehensive mental health support tailored to student needs</p>
+                <h2 style="color: var(--primary-green);">Announcements</h2>
+                <div class="section-divider" style="background: var(--accent-orange);"></div>
+                <p>Latest updates and important information from our center</p>
             </div>
-            
+
             <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-calendar-check"></i>
+                @forelse($announcements as $announcement)
+                <div class="col-lg-4 col-md-6">
+                    <div class="announcement-card h-100 position-relative">
+                        <div class="announcement-icon"><i class="fas fa-bullhorn"></i></div>
+                        <h5 class="announcement-title">{{ $announcement->title }}</h5>
+                        <div class="announcement-meta">
+                            <span class="announcement-date">{{ optional($announcement->created_at)->format('M d, Y') }}</span>
+                            @if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14)))
+                                <span class="badge-new">NEW</span>
+                            @endif
                         </div>
-                        <h5>Easy Scheduling</h5>
-                        <p>Book appointments seamlessly with our intuitive online system. Choose your preferred time and counselor with just a few clicks.</p>
+                        <p class="announcement-excerpt mb-4">{{ \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? $announcement->body ?? ''), 160) }}</p>
+                        <a href="{{ route('announcements.show', $announcement) }}" class="announcement-action stretched-link" aria-label="Read more about {{ $announcement->title }}">
+                            <span>Read more</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
-                
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-comments"></i>
+                @empty
+                <div class="col-12">
+                    <div class="bg-white rounded-4 shadow-sm p-5 text-center">
+                        <div class="d-inline-flex align-items-center justify-content-center announcement-icon" style="margin-bottom: .75rem;">
+                            <i class="fas fa-bullhorn"></i>
                         </div>
-                        <h5>Live Chat Support</h5>
-                        <p>Get immediate assistance through our secure real-time chat system. Available 24/7 for crisis support and general guidance.</p>
+                        <h5 class="fw-bold mb-2" style="color: var(--text-dark);">No announcements yet</h5>
+                        <p class="mb-0 text-muted">Please check back later for updates and center news.</p>
                     </div>
                 </div>
-                
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h5>100% Confidential</h5>
-                        <p>All sessions and communications are strictly confidential. Your privacy and trust are our top priorities.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-book-open"></i>
-                        </div>
-                        <h5>Resource Library</h5>
-                        <p>Access comprehensive self-help materials, guides, and tools designed to support your mental health journey.</p>
-                    </div>
-                </div>
+                @endforelse
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ route('announcements.index') }}" class="btn btn-success px-4 py-2 fw-bold" style="background: var(--primary-green); border: none; border-radius: 10px; box-shadow: 0 6px 18px rgba(34,139,34,0.18);">
+                    <i class="fas fa-list me-2"></i>View all announcements
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Counselors Section -->
-    <section id="counselors" class="counselors">
+    <section id="counselors" class="counselors py-5" style="background: var(--bg-light);">
         <div class="container">
             <div class="section-header">
-                <h2>Meet Our Professional Team</h2>
-                <div class="section-divider"></div>
+                <h2 style="color: var(--primary-green);">Meet Our Professional Team</h2>
+                <div class="section-divider" style="background: var(--accent-orange);"></div>
                 <p>Experienced, licensed professionals dedicated to supporting your mental health and academic success</p>
             </div>
             
@@ -848,48 +1084,172 @@
     </section>
 
     <!-- Testimonials Section -->
-    <section class="testimonials">
+    <section class="testimonials py-5" style="background: white;">
         <div class="container">
             <div class="section-header">
-                <h2>Student Success Stories</h2>
-                <div class="section-divider"></div>
+                <h2 style="color: var(--primary-green);">Student Success Stories</h2>
+                <div class="section-divider" style="background: var(--accent-orange);"></div>
                 <p>Real experiences from students who have benefited from our counseling services</p>
             </div>
             
+            <div class="testimonials-carousel position-relative">
+                <div class="testimonials-container overflow-hidden">
+                    <div class="testimonials-track d-flex" id="testimonialsTrack">
+                        <!-- Testimonial 1 -->
+                        <div class="testimonial-slide flex-shrink-0" style="width: 33.333%;">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">The counseling services at CMU helped me manage my anxiety before exams. Dr. Smith provided practical techniques that I still use today. I'm now more confident and focused.</p>
+                                <div class="testimonial-author">Jamie C.</div>
+                                <div class="testimonial-role">Computer Science, Senior</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Testimonial 2 -->
+                        <div class="testimonial-slide flex-shrink-0" style="width: 33.333%;">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">When I was struggling with career decisions, Prof. Doe helped me identify my strengths and explore options I hadn't considered before. The career planning sessions were transformative.</p>
+                                <div class="testimonial-author">Alex M.</div>
+                                <div class="testimonial-role">Business Administration, Junior</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Testimonial 3 -->
+                        <div class="testimonial-slide flex-shrink-0" style="width: 33.333%;">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">The 24/7 chat support was there for me during a late-night study session when I was overwhelmed. Just having someone to talk to made all the difference in my mental health journey.</p>
+                                <div class="testimonial-author">Taylor W.</div>
+                                <div class="testimonial-role">Engineering, Sophomore</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Testimonial 4 -->
+                        <div class="testimonial-slide flex-shrink-0" style="width: 33.333%;">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">I was dealing with family issues that affected my studies. The counseling center provided a safe space to process my emotions and develop coping strategies. I graduated with honors!</p>
+                                <div class="testimonial-author">Maria S.</div>
+                                <div class="testimonial-role">Nursing, Graduate</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Testimonial 5 -->
+                        <div class="testimonial-slide flex-shrink-0" style="width: 33.333%;">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">The group therapy sessions helped me connect with other students facing similar challenges. We formed a support network that continues even after graduation.</p>
+                                <div class="testimonial-author">David L.</div>
+                                <div class="testimonial-role">Psychology, Senior</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Testimonial 6 -->
+                        <div class="testimonial-slide flex-shrink-0" style="width: 33.333%;">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">As an international student, I felt isolated and homesick. The counselors helped me adjust to campus life and build meaningful friendships. CMU feels like home now.</p>
+                                <div class="testimonial-author">Ahmed K.</div>
+                                <div class="testimonial-role">Information Technology, Junior</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Testimonial 7 -->
+                        <div class="testimonial-slide flex-shrink-0" style="width: 33.333%;">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">I struggled with time management and academic pressure. The study skills workshops and one-on-one sessions with counselors transformed my approach to learning.</p>
+                                <div class="testimonial-author">Sarah P.</div>
+                                <div class="testimonial-role">Education, Sophomore</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Testimonial 8 -->
+                        <div class="testimonial-slide flex-shrink-0" style="width: 33.333%;">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">The career counseling helped me discover my passion for research. I'm now pursuing a master's degree and working as a research assistant. Thank you, CMU counseling!</p>
+                                <div class="testimonial-author">Michael R.</div>
+                                <div class="testimonial-role">Biology, Graduate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Arrows -->
+                <button class="testimonial-nav testimonial-prev" id="testimonialPrev" aria-label="Previous testimonials">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="testimonial-nav testimonial-next" id="testimonialNext" aria-label="Next testimonials">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <!-- Dots Indicator -->
+                <div class="testimonial-dots text-center mt-4">
+                    <span class="dot active" data-slide="0"></span>
+                    <span class="dot" data-slide="1"></span>
+                    <span class="dot" data-slide="2"></span>
+                    <span class="dot" data-slide="3"></span>
+                    <span class="dot" data-slide="4"></span>
+                    <span class="dot" data-slide="5"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="services" class="features py-5" style="background: var(--bg-light);">
+        <div class="container">
+            <div class="section-header">
+                <h2 style="color: var(--primary-green);">Why Choose Our Services</h2>
+                <div class="section-divider" style="background: var(--accent-orange);"></div>
+                <p>We provide comprehensive mental health support tailored to student needs</p>
+            </div>
+            
             <div class="row g-4">
-                <div class="col-lg-4">
-                    <div class="testimonial-card">
-                        <p class="testimonial-text">The counseling services at CMU helped me manage my anxiety before exams. Dr. Smith provided practical techniques that I still use today. I'm now more confident and focused.</p>
-                        <div class="testimonial-author">Jamie C.</div>
-                        <div class="testimonial-role">Computer Science, Senior</div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h5>Easy Scheduling</h5>
+                        <p>Book appointments seamlessly with our intuitive online system. Choose your preferred time and counselor with just a few clicks.</p>
                     </div>
                 </div>
                 
-                <div class="col-lg-4">
-                    <div class="testimonial-card">
-                        <p class="testimonial-text">When I was struggling with career decisions, Prof. Doe helped me identify my strengths and explore options I hadn't considered before. The career planning sessions were transformative.</p>
-                        <div class="testimonial-author">Alex M.</div>
-                        <div class="testimonial-role">Business Administration, Junior</div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h5>Live Chat Support</h5>
+                        <p>Get immediate assistance through our secure real-time chat system. Available 24/7 for crisis support and general guidance.</p>
                     </div>
                 </div>
                 
-                <div class="col-lg-4">
-                    <div class="testimonial-card">
-                        <p class="testimonial-text">The 24/7 chat support was there for me during a late-night study session when I was overwhelmed. Just having someone to talk to made all the difference in my mental health journey.</p>
-                        <div class="testimonial-author">Taylor W.</div>
-                        <div class="testimonial-role">Engineering, Sophomore</div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h5>100% Confidential</h5>
+                        <p>All sessions and communications are strictly confidential. Your privacy and trust are our top priorities.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h5>Resource Library</h5>
+                        <p>Access comprehensive self-help materials, guides, and tools designed to support your mental health journey.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+
     <!-- FAQ Section -->
-    <section class="faq">
+    <section class="faq py-5" style="background: white;">
         <div class="container">
             <div class="section-header">
-                <h2>Frequently Asked Questions</h2>
-                <div class="section-divider"></div>
+                <h2 style="color: var(--primary-green);">Frequently Asked Questions</h2>
+                <div class="section-divider" style="background: var(--accent-orange);"></div>
                 <p>Find answers to common questions about our counseling services</p>
             </div>
             
@@ -955,7 +1315,7 @@
             <div class="section-header">
                 <h2 style="color: var(--primary-green);">Contact Us</h2>
                 <div class="section-divider" style="background: var(--accent-orange);"></div>
-                <p>Get in touch with our team</p>
+                <p>Visit our Guidance and Counseling Center at CMU</p>
             </div>
             <div class="row g-4">
                 <!-- Contact Info Cards -->
@@ -967,7 +1327,7 @@
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
                                 <h5 class="fw-bold mb-2" style="color: var(--primary-green);">Visit Us</h5>
-                                <div class="text-muted small">Student Center, Room 301<br>CMU Campus<br>Central Avenue, City</div>
+                                <div class="text-muted small">Office of Student Affairs<br>Central Mindanao University<br>Musuan, Maramag, Bukidnon</div>
                             </div>
                         </div>
                         <div class="col-12">
@@ -976,7 +1336,7 @@
                                     <i class="fas fa-clock"></i>
                                 </div>
                                 <h5 class="fw-bold mb-2" style="color: var(--primary-green);">Office Hours</h5>
-                                <div class="text-muted small">Monday-Friday: 8:00 AM - 6:00 PM<br>Saturday: 9:00 AM - 1:00 PM<br>Sunday: Closed</div>
+                                <div class="text-muted small">Monday-Friday: 8:00 AM - 5:00 PM<br>Saturday: 9:00 AM - 12:00 PM<br>Sunday: Closed</div>
                             </div>
                         </div>
                     </div>
@@ -987,7 +1347,7 @@
                                     <i class="fas fa-phone"></i>
                                 </div>
                                 <h6 class="fw-bold mb-2" style="color: var(--primary-green);">Call Us</h6>
-                                <div class="text-muted small">Office: (555) 123-4567<br>Emergency: (555) 987-6543</div>
+                                <div class="text-muted small">Office: (088) 356-0802<br>Emergency: (088) 356-0803</div>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
@@ -996,34 +1356,68 @@
                                     <i class="fas fa-envelope"></i>
                                 </div>
                                 <h6 class="fw-bold mb-2" style="color: var(--primary-green);">Email Us</h6>
-                                <div class="text-muted small">counseling@cmu.edu<br>appointments@cmu.edu</div>
+                                <div class="text-muted" style="font-size: 0.95rem; line-height: 1.8;">
+                                    <div>gcc@cmu.edu.ph</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Contact Form -->
+                <!-- Map Location -->
                 <div class="col-lg-8">
-                    <div class="bg-white rounded-4 shadow-sm p-5 h-100">
-                        <h4 class="fw-bold mb-4" style="color: var(--primary-green);">Send Us a Message</h4>
-                        <form>
-                            <div class="mb-3">
-                                <label for="contactName" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" id="contactName" placeholder="Enter your name">
+                    <div class="bg-white rounded-4 shadow-sm overflow-hidden h-100">
+                        <div class="p-4 border-bottom">
+                            <h4 class="fw-bold mb-2" style="color: var(--primary-green);">
+                                <i class="fas fa-map-marked-alt me-2"></i>Our Location
+                            </h4>
+                            <p class="text-muted mb-0">Central Mindanao University - Office of Student Affairs</p>
+                        </div>
+                        <div class="position-relative" style="height: 400px;">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2873.3071768702684!2d125.04851375433854!3d7.857984169928984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32ff183d356de2b7%3A0xabf652a12386c983!2sCMU%20Office%20of%20Student%20Affairs!5e0!3m2!1sen!2sph!4v1757472964019!5m2!1sen!2sph" 
+                                width="100%" 
+                                height="100%" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="CMU Office of Student Affairs Location">
+                            </iframe>
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <a href="https://maps.google.com/?q=Central+Mindanao+University+Musuan+Maramag+Bukidnon" 
+                                   target="_blank" 
+                                   class="btn btn-success btn-sm fw-bold" 
+                                   style="background: var(--primary-green); border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(34,139,34,0.3);">
+                                    <i class="fas fa-external-link-alt me-1"></i>Open in Maps
+                                </a>
                             </div>
-                            <div class="mb-3">
-                                <label for="contactEmail" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="contactEmail" placeholder="Enter your email">
+                        </div>
+                        <div class="p-4 bg-light">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3" style="color: var(--primary-green);">
+                                            <i class="fas fa-walking" style="font-size: 1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <small class="fw-bold text-dark">Walking Distance</small>
+                                            <div class="text-muted small">5-10 minutes from main gate</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3" style="color: var(--primary-green);">
+                                            <i class="fas fa-car" style="font-size: 1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <small class="fw-bold text-dark">Parking Available</small>
+                                            <div class="text-muted small">Student Center parking area</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="contactSubject" class="form-label">Subject</label>
-                                <input type="text" class="form-control" id="contactSubject" placeholder="Subject">
-                            </div>
-                            <div class="mb-3">
-                                <label for="contactMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="contactMessage" rows="5" placeholder="Type your message..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-success px-4 py-2 fw-bold" style="background: var(--primary-green); border: none; border-radius: 8px; box-shadow: 0 4px 15px rgba(45,90,61,0.1);">SEND MESSAGE</button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1035,16 +1429,7 @@
         <div class="container">
             <div class="footer-content">
                 <!-- Newsletter Section -->
-                <div class="newsletter">
-                    <h4>Stay Connected with Mental Health Resources</h4>
-                    <p>Subscribe to receive the latest wellness tips, mental health resources, and updates about our services.</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Enter your email address" required>
-                        <button type="submit">
-                            <i class="fas fa-paper-plane me-2"></i>Subscribe
-                        </button>
-                    </form>
-                </div>
+                
                 
                 <!-- Footer Links -->
                 <div class="footer-links">
@@ -1053,7 +1438,7 @@
                         <a href="#home">Home</a>
                         <a href="#counselors">Our Counselors</a>
                         <a href="#services">Services</a>
-                        <a href="#resources">Resources</a>
+                        <a href="{{ route('resources') }}">Resources</a>
                         <a href="#contact">Contact Us</a>
                     </div>
                     
@@ -1116,6 +1501,7 @@
             </div>
         </div>
     </footer>
+    </div>
 
     <!-- Bootstrap JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -1175,6 +1561,20 @@
             }
         });
 
+        // Hide navbar when scrolled, show on hover via CSS
+        (function() {
+            const navbar = document.querySelector('.navbar');
+            const toggleHidden = () => {
+                if (window.scrollY > 5) {
+                    navbar.classList.add('nav-hidden');
+                } else {
+                    navbar.classList.remove('nav-hidden');
+                }
+            };
+            toggleHidden();
+            window.addEventListener('scroll', toggleHidden);
+        })();
+
         // Newsletter form submission
         document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1211,6 +1611,754 @@
         // Observe elements for animation
         document.querySelectorAll('.feature-card, .counselor-card, .testimonial-card, .faq-item').forEach(el => {
             observer.observe(el);
+        });
+
+        // Testimonials Carousel
+        let currentSlide = 0;
+        const totalSlides = 6; // Number of slide groups (8 testimonials / 3 per slide = ~3 groups, but we'll show 6 groups for smooth scrolling)
+        const track = document.getElementById('testimonialsTrack');
+        const prevBtn = document.getElementById('testimonialPrev');
+        const nextBtn = document.getElementById('testimonialNext');
+        const dots = document.querySelectorAll('.dot');
+
+        function updateCarousel() {
+            const slideWidth = 100 / 3; // 3 slides visible at once
+            const translateX = -currentSlide * slideWidth;
+            track.style.transform = `translateX(${translateX}%)`;
+            
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+            
+            // Update button states
+            prevBtn.style.opacity = currentSlide === 0 ? '0.5' : '1';
+            nextBtn.style.opacity = currentSlide === totalSlides - 1 ? '0.5' : '1';
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateCarousel();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateCarousel();
+            }
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            updateCarousel();
+        }
+
+        // Event listeners
+        if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+        if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+        
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => goToSlide(index));
+        });
+
+        // Auto-play functionality (optional)
+        let autoPlayInterval;
+        function startAutoPlay() {
+            autoPlayInterval = setInterval(() => {
+                if (currentSlide < totalSlides - 1) {
+                    nextSlide();
+                } else {
+                    currentSlide = 0;
+                    updateCarousel();
+                }
+            }, 5000); // Change slide every 5 seconds
+        }
+
+        function stopAutoPlay() {
+            clearInterval(autoPlayInterval);
+        }
+
+        // Start auto-play
+        startAutoPlay();
+
+        // Pause auto-play on hover
+        const carousel = document.querySelector('.testimonials-carousel');
+        if (carousel) {
+            carousel.addEventListener('mouseenter', stopAutoPlay);
+            carousel.addEventListener('mouseleave', startAutoPlay);
+        }
+
+        // Initialize carousel
+        updateCarousel();
+    </script>
+    
+    <!-- Auth Modals -->
+    <style>
+        /* Scoped modern styles for the auth modals */
+        #loginModal .left-pane, #forgotPasswordModal .left-pane, #twoFactorModal .left-pane {
+            background: linear-gradient(160deg, #0f5e1d 0%, #127a25 100%);
+        }
+        #loginModal .nav-tabs {
+            border-bottom: 0;
+            display: flex;
+            justify-content: center;
+            gap: 1.25rem;
+        }
+        #loginModal .nav-tabs .nav-link {
+            border: 0;
+            color: #344054;
+            font-weight: 700;
+            background-color: transparent !important;
+            position: relative;
+            z-index: 1;
+        }
+        #loginModal .nav-tabs .nav-link { padding-bottom: .5rem; }
+        #loginModal .nav-tabs .nav-link.active,
+        #loginModal .nav-tabs .nav-link.active:focus,
+        #loginModal .nav-tabs .nav-link.active:hover {
+            color: #0f5e1d !important;
+            background-color: transparent !important;
+            border-bottom: 3px solid #0f5e1d !important;
+        }
+        /* Remove any pseudo underline if present from earlier loads */
+        #loginModal .nav-tabs .nav-link::after { content: none !important; }
+        #loginModal .modal-content, #forgotPasswordModal .modal-content, #twoFactorModal .modal-content {
+            box-shadow: 0 20px 60px rgba(0,0,0,.2);
+            border: 0;
+        }
+        #loginModal .form-control, #forgotPasswordModal .form-control, #twoFactorModal .form-control {
+            border-radius: 12px;
+            border: 1px solid #e6e8ec;
+            padding: 12px 14px;
+        }
+        #loginModal .form-control:focus, #forgotPasswordModal .form-control:focus, #twoFactorModal .form-control:focus {
+            border-color: #b8e1c2;
+            box-shadow: 0 0 0 .25rem rgba(15,94,29,.15);
+        }
+        #loginModal .input-group-text, #forgotPasswordModal .input-group-text, #twoFactorModal .input-group-text {
+            border-radius: 12px 0 0 12px;
+            background: #f3f5f7;
+            border: 1px solid #e6e8ec;
+            color: #0f5e1d;
+        }
+        #loginModal .btn-auth-primary, #forgotPasswordModal .btn-auth-primary, #twoFactorModal .btn-auth-primary {
+            background: #0f5e1d;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+        }
+        #loginModal .btn-auth-primary:focus,
+        #loginModal .btn-auth-primary:active,
+        #loginModal .btn-auth-primary:disabled,
+        #forgotPasswordModal .btn-auth-primary:focus,
+        #forgotPasswordModal .btn-auth-primary:active,
+        #forgotPasswordModal .btn-auth-primary:disabled,
+        #twoFactorModal .btn-auth-primary:focus,
+        #twoFactorModal .btn-auth-primary:active,
+        #twoFactorModal .btn-auth-primary:disabled {
+            background: #0f5e1d !important;
+            color: #fff !important;
+            border: none !important;
+        }
+        #loginModal .btn-auth-primary:hover, #forgotPasswordModal .btn-auth-primary:hover, #twoFactorModal .btn-auth-primary:hover { filter: brightness(.95); }
+        #loginModal .tiny-link, #forgotPasswordModal .tiny-link, #twoFactorModal .tiny-link { color: var(--accent-green); text-decoration: none; }
+        /* numbered bullets on left pane */
+        #loginModal .num-badge { width: 32px; height: 32px; border-radius: 50% !important; display: inline-flex; align-items: center; justify-content: center; background:#ffc107; color:#0f5e1d; font-weight: 800; margin-right: .75rem; }
+        /* otp inputs */
+        #twoFactorModal .otp-box { display:flex; gap:.5rem; justify-content:center; }
+        #twoFactorModal .otp-input { width: 42px; height: 48px; text-align:center; font-size:1.25rem; border-radius: 10px; border:1px solid #e6e8ec; }
+        #twoFactorModal .otp-input:focus { outline: none; border-color:#0f5e1d; box-shadow: 0 0 0 .2rem rgba(15,94,29,.12); }
+        /* green toggle buttons (Show/Hide) */
+        #loginModal .btn-eye { border-color: #0f5e1d; color: #0f5e1d; background: #eaf6ee; }
+        #loginModal .btn-eye:hover,
+        #loginModal .btn-eye:focus,
+        #loginModal .btn-eye:active { background: #0f5e1d; color: #fff; border-color: #0f5e1d; }
+        /* tab indicator */
+        #loginModal .tabs-wrapper { position: relative; padding-bottom: 10px; }
+        #authTabIndicator { display:none; }
+    </style>
+    @guest
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-center p-4 left-pane" style="color:#fff;">
+                        <div class="text-center">
+                            <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="width:90px;height:90px;border-radius:50%; background:#fff; object-fit:cover;" class="mb-3">
+                            <h5 class="fw-bold mb-3">CMU Guidance and<br> Counseling Center</h5>
+                            <ul class="list-unstyled text-start mx-auto" style="max-width:260px;">
+                                <li class="mb-3 d-flex align-items-center"><span class="num-badge">1</span><span>Easy appointment scheduling with university counselors</span></li>
+                                <li class="mb-3 d-flex align-items-center"><span class="num-badge">2</span><span>Access to mental health resources and information</span></li>
+                                <li class="d-flex align-items-center"><span class="num-badge">3</span><span>Secure and confidential counseling services</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 p-4">
+                        <div class="d-flex justify-content-end align-items-center mb-3">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="tabs-wrapper">
+                            <ul class="nav nav-tabs mb-3" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="tab-login" data-bs-toggle="tab" data-bs-target="#pane-login" type="button" role="tab">Login</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="tab-signup" data-bs-toggle="tab" data-bs-target="#pane-signup" type="button" role="tab">Sign Up</button>
+                                </li>
+                            </ul>
+                            <div id="authTabIndicator"></div>
+                        </div>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="pane-login" role="tabpanel" aria-labelledby="tab-login">
+                                <form id="modalLoginForm" method="POST" action="{{ url('/login') }}">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                            <input type="email" name="email" class="form-control" required autocomplete="email" placeholder="Enter your email">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password" name="password" class="form-control" required autocomplete="current-password" placeholder="Enter your password" id="loginPassword">
+                                            <button class="btn btn-outline-secondary btn-eye" type="button" id="toggleLoginPassword" style="border-radius:0 12px 12px 0;" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
+                                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                                        </div>
+                                        <a href="#" class="small tiny-link" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" data-bs-dismiss="modal">Forgot Password?</a>
+                                    </div>
+                                    <button type="submit" class="btn w-100 fw-bold btn-auth-primary">Login</button>
+                                </form>
+                                
+                            </div>
+                            <div class="tab-pane fade" id="pane-signup" role="tabpanel" aria-labelledby="tab-signup">
+                                <form method="POST" action="{{ url('/register') }}" enctype="multipart/form-data" id="signupForm">
+                                    @csrf
+                                    
+                                    <div id="signupStep1">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label">First Name</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                    <input type="text" name="first_name" class="form-control" required placeholder="e.g., Juan">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Middle Name</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                    <input type="text" name="middle_name" class="form-control" placeholder="Optional">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Last Name</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                    <input type="text" name="last_name" class="form-control" required placeholder="e.g., Dela Cruz">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Contact Number</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                                <input type="tel" name="contact_number" class="form-control" required placeholder="e.g., 09XXXXXXXXX" pattern="[0-9]{10,11}">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Home Address</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                                <input type="text" name="address" class="form-control" required placeholder="House/Street, Barangay, City/Province">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-auth-primary" id="goToStep2">Next</button>
+                                        </div>
+                                    </div>
+                                    <div id="signupStep2" class="d-none">
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                                <input type="email" name="email" class="form-control" required autocomplete="email" placeholder="Enter your email">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Password</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                                <input type="password" name="password" class="form-control" required autocomplete="new-password" placeholder="Create a password" id="signupPassword">
+                                                <button class="btn btn-outline-secondary btn-eye" type="button" id="toggleSignupPassword" style="border-radius:0 12px 12px 0;" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Confirm Password</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                                <input type="password" name="password_confirmation" class="form-control" required autocomplete="new-password" placeholder="Confirm your password" id="signupPasswordConfirm">
+                                                <button class="btn btn-outline-secondary btn-eye" type="button" id="toggleSignupPasswordConfirm" style="border-radius:0 12px 12px 0;" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-outline-secondary" id="backToStep1">Back</button>
+                                            <button type="button" class="btn btn-auth-primary" id="goToStep3">Next</button>
+                                        </div>
+                                    </div>
+                                    <div id="signupStep3" class="d-none">
+                                        <div class="mb-3">
+                                            <label class="form-label">Student ID</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                                <input type="text" name="student_id" class="form-control" required placeholder="e.g., 2021-12345">
+                                            </div>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-7">
+                                                <label class="form-label">College</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-university"></i></span>
+                                                    <select class="form-select" name="college" id="collegeSelect" required>
+                                                        <option value="" selected disabled>Select college</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label class="form-label">Year Level</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-layer-group"></i></span>
+                                                    <select class="form-select" name="year_level" required>
+                                                        <option value="" selected disabled>Select</option>
+                                                        <option>1st Year</option>
+                                                        <option>2nd Year</option>
+                                                        <option>3rd Year</option>
+                                                        <option>4th Year</option>
+                                                        <option>5th Year</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <label class="form-label">Course / Program</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                                                <select class="form-select" name="course" id="courseSelect" required>
+                                                    <option value="" selected disabled>Select course</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3 mt-3">
+                                            <label class="form-label">Attach COR (PDF/JPG/PNG)</label>
+                                            <input class="form-control" type="file" name="cor_file" accept=".pdf,image/*" required>
+                                            <div class="form-text">Max 5MB. Used for verification by the counselor.</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-outline-secondary" id="backToStep2">Back</button>
+                        					<button type="submit" class="btn btn-auth-primary">Sign Up</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endguest
+
+    @guest
+    <!-- Forgot Password Modal -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-center p-4 left-pane" style="color:#fff;">
+                        <div class="text-center">
+                            <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="width:90px;height:90px;border-radius:50%; background:#fff; object-fit:cover;" class="mb-3">
+                            <h5 class="fw-bold mb-3">Reset your password</h5>
+                            <p class="small mb-0">We’ll email you a secure link to create a new password.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 p-4">
+                        <div class="d-flex justify-content-end align-items-center mb-3">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <h5 class="mb-3" style="color:#0f5e1d;">Forgot Password</h5>
+                        <p class="small text-muted">Enter your email address and we'll send you a link to reset your password.</p>
+                        <form method="POST" action="{{ route('password.email') }}">
+                            @csrf
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" name="email" class="form-control" required autocomplete="email" placeholder="Enter your email">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn w-100 fw-bold btn-auth-primary">Send Reset Link</button>
+                        </form>
+                        <div class="text-center mt-3 small">
+                            <a href="#" data-bs-target="#loginModal" data-bs-toggle="modal" data-bs-dismiss="modal" class="tiny-link">Back to Sign In</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resend Verification Modal -->
+    <div class="modal fade" id="resendVerificationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header" style="border-bottom: none;">
+                    <h5 class="modal-title" style="color: var(--primary-green);">Resend Verification Email</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    <p class="small text-muted">Enter your email to resend the verification link.</p>
+                    <form method="POST" action="{{ route('verification.resend') }}">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" required autocomplete="email">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold" style="background: var(--primary-green); border: none; border-radius: 10px;">Resend Email</button>
+                    </form>
+                    <div class="text-center mt-3 small">
+                        <a href="#" data-bs-target="#loginModal" data-bs-toggle="modal" data-bs-dismiss="modal" style="color: var(--accent-green); text-decoration: none;">Back to Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two-Factor Authentication Modal -->
+    <div class="modal fade" id="twoFactorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-center p-4 left-pane" style="color:#fff;">
+                        <div class="text-center">
+                            <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="width:90px;height:90px;border-radius:50%; background:#fff; object-fit:cover;" class="mb-3">
+                            <h5 class="fw-bold mb-2">Two-Factor Verification</h5>
+                            <p class="small mb-0">Enter the 6-digit code we sent to your email or phone to continue.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 p-4">
+                        <div class="d-flex justify-content-end align-items-center mb-3">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <h5 class="mb-3" style="color:#0f5e1d;">Two-Factor Authentication</h5>
+                        <form id="modal2faForm" method="POST" action="{{ route('2fa.verify') }}">
+                            @csrf
+                            <div class="otp-box mb-3">
+                                <input class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+                                <input class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+                                <input class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+                                <input class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+                                <input class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+                                <input class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+                                <input type="hidden" name="code" id="otpHidden" />
+                            </div>
+                            <button type="submit" class="btn w-100 fw-bold btn-auth-primary">Verify</button>
+                        </form>
+                        <div class="d-flex justify-content-between align-items-center mt-3 small">
+                            <a href="#" data-bs-target="#loginModal" data-bs-toggle="modal" data-bs-dismiss="modal" class="tiny-link">Back to Sign In</a>
+                            <form method="POST" action="{{ route('2fa.resend') }}">
+                                @csrf
+                                <button type="submit" class="btn btn-link p-0 tiny-link">Resend code</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endguest
+
+    <script>
+        // Auto-open relevant modal based on session flash
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab indicator alignment
+            // Use simple active border underline to avoid disappearing indicator
+            const loginTabBtn = document.getElementById('tab-login');
+            const signupTabBtn = document.getElementById('tab-signup');
+            if (loginTabBtn && signupTabBtn) {
+                const updateBorders = () => {
+                    loginTabBtn.classList.toggle('active', document.getElementById('pane-login').classList.contains('active'));
+                    signupTabBtn.classList.toggle('active', document.getElementById('pane-signup').classList.contains('active'));
+                };
+                loginTabBtn.addEventListener('shown.bs.tab', updateBorders);
+                signupTabBtn.addEventListener('shown.bs.tab', updateBorders);
+                setTimeout(updateBorders, 0);
+            }
+            // Password visibility toggles
+            const toggle = (btnId, inputId) => {
+                const btn = document.getElementById(btnId);
+                const input = document.getElementById(inputId);
+                if (!btn || !input) return;
+                btn.addEventListener('click', () => {
+                    const showing = input.type === 'text';
+                    input.type = showing ? 'password' : 'text';
+                    const icon = btn.querySelector('i');
+                    if (icon) icon.className = showing ? 'fas fa-eye' : 'fas fa-eye-slash';
+                    btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+                });
+            };
+            toggle('toggleLoginPassword', 'loginPassword');
+            toggle('toggleSignupPassword', 'signupPassword');
+            toggle('toggleSignupPasswordConfirm', 'signupPasswordConfirm');
+
+            // Sign up multi-step
+            const step1 = document.getElementById('signupStep1');
+            const step2 = document.getElementById('signupStep2');
+            const step3 = document.getElementById('signupStep3');
+            const goToStep2 = document.getElementById('goToStep2');
+            const backToStep1 = document.getElementById('backToStep1');
+            const goToStep3 = document.getElementById('goToStep3');
+            const backToStep2 = document.getElementById('backToStep2');
+            if (step1 && step2 && goToStep2 && backToStep1) {
+                goToStep2.addEventListener('click', () => {
+                    // simple front-end validation for step1 required fields
+                    const required = step1.querySelectorAll('input[required], select[required]');
+                    for (const field of required) {
+                        if (!field.value) { field.focus(); return; }
+                    }
+                    step1.classList.add('d-none');
+                    step2.classList.remove('d-none');
+                });
+                backToStep1.addEventListener('click', () => {
+                    step2.classList.add('d-none');
+                    step1.classList.remove('d-none');
+                });
+            }
+            if (step2 && step3 && goToStep3 && backToStep2) {
+                goToStep3.addEventListener('click', () => {
+                    const required = step2.querySelectorAll('input[required], select[required]');
+                    for (const field of required) {
+                        if (!field.value) { field.focus(); return; }
+                    }
+                    step2.classList.add('d-none');
+                    step3.classList.remove('d-none');
+                });
+                backToStep2.addEventListener('click', () => {
+                    step3.classList.add('d-none');
+                    step2.classList.remove('d-none');
+                });
+            }
+
+            // College/Course mapping
+            const collegeToCourses = {
+                'College of Agriculture': [
+                    'BS in Agriculture - Agronomy',
+                    'BS in Agriculture - Agricultural Economics',
+                    'BS in Agriculture - Agricultural Education',
+                    'BS in Agriculture - Agricultural Extension',
+                    'BS in Agriculture - Animal Science',
+                    'BS in Agriculture - Entomology',
+                    'BS in Agriculture - Horticulture',
+                    'BS in Agriculture - Plant Pathology',
+                    'BS in Agriculture - Soil Science',
+                    'BS in Agribusiness Management (Crop Enterprise)',
+                    'BS in Agribusiness Management (Livestock Enterprise)',
+                    'BS in Development Communication'
+                ],
+                'College of Arts and Sciences': [
+                    'BA in English',
+                    'BA in History',
+                    'BA in Political Science',
+                    'BA in Psychology',
+                    'BA in Sociology',
+                    'BS in Biology',
+                    'BS in Chemistry',
+                    'BS in Mathematics',
+                    'BS in Physics'
+                ],
+                'College of Business and Management': [
+                    'BS in Accountancy (5 years)',
+                    'BS in Accounting Technology (4 years)',
+                    'Certificate in Accounting Technology (2 years)',
+                    'BSBA - Marketing Management',
+                    'BSBA - Financial Management',
+                    'BSBA - Operations Management',
+                    'BS in Office Administration',
+                    'BS in Entrepreneurship'
+                ],
+                'College of Education': [
+                    'BSEd - Biology',
+                    'BSEd - English',
+                    'BSEd - Filipino',
+                    'BSEd - General Science',
+                    'BSEd - Mathematics',
+                    'BSEd - Physical Education',
+                    'BSEd - Physics',
+                    'Bachelor of Physical Education (BPEd)'
+                ],
+                'College of Engineering': [
+                    'BS in Agricultural and Biosystems Engineering',
+                    'BS in Civil Engineering',
+                    'BS in Electrical Engineering',
+                    'BS in Information Technology',
+                    'BS in Mechanical Engineering'
+                ],
+                'College of Forestry': [
+                    'BS in Environmental Science',
+                    'BS in Forestry'
+                ],
+                'College of Human Ecology': [
+                    'BS in Home Economics - Home Economics Education',
+                    'BS in Home Economics - Food Business Management (Food Service)',
+                    'BS in Home Economics - Food Business Management (Food Processing)',
+                    'BS in Food Technology',
+                    'BS in Nutrition and Dietetics',
+                    'BS in Hotel and Restaurant Management'
+                ],
+                'College of Nursing': [
+                    'BS in Nursing'
+                ],
+                'College of Veterinary Medicine': [
+                    'Doctor of Veterinary Medicine'
+                ],
+                'College of Information Sciences and Computing': [
+                    'BS in Information Technology'
+                ]
+            };
+
+            const collegeSelect = document.getElementById('collegeSelect');
+            const courseSelect = document.getElementById('courseSelect');
+            if (collegeSelect && courseSelect) {
+                // Populate colleges
+                for (const college of Object.keys(collegeToCourses)) {
+                    const opt = document.createElement('option');
+                    opt.value = college; opt.textContent = college;
+                    collegeSelect.appendChild(opt);
+                }
+                const populateCourses = () => {
+                    courseSelect.innerHTML = '<option value="" disabled selected>Select course</option>';
+                    const selected = collegeSelect.value;
+                    const courses = collegeToCourses[selected] || [];
+                    for (const c of courses) {
+                        const opt = document.createElement('option');
+                        opt.value = c; opt.textContent = c;
+                        courseSelect.appendChild(opt);
+                    }
+                };
+                collegeSelect.addEventListener('change', populateCourses);
+            }
+
+            const status = @json(session('status'));
+            if (status && typeof status === 'string') {
+                // If password reset email sent or verification resent, briefly toast could be shown.
+                // Optionally, open login modal after actions
+            }
+
+            // AJAX login -> intercept 2FA redirect and open modal instead
+            const loginForm = document.getElementById('modalLoginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const submitBtn = loginForm.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    try {
+                        const formData = new FormData(loginForm);
+                        const resp = await fetch(loginForm.action, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            body: formData,
+                            redirect: 'manual',
+                            credentials: 'same-origin'
+                        });
+                        // If server attempts redirect (opaqueredirect), assume 2FA and open modal
+                        if (resp.type === 'opaqueredirect') {
+                            const loginModalEl = document.getElementById('loginModal');
+                            if (loginModalEl) bootstrap.Modal.getOrCreateInstance(loginModalEl).hide();
+                            const twoFaEl = document.getElementById('twoFactorModal');
+                            if (twoFaEl) bootstrap.Modal.getOrCreateInstance(twoFaEl).show();
+                            return;
+                        }
+                        // If redirected somewhere else (e.g., dashboard), go there
+                        if (resp.redirected) {
+                            window.location.href = resp.url;
+                            return;
+                        }
+                        if (resp.ok) {
+                            // Some apps return 204/200 on success; reload
+                            window.location.reload();
+                        } else {
+                            // Attempt to read validation errors
+                            let msg = 'Login failed';
+                            try { const data = await resp.json(); msg = (data.message || Object.values(data.errors||{})[0]?.[0]) || msg; } catch {}
+                            alert(msg);
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Network error. Please try again.');
+                    } finally {
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+
+            // AJAX 2FA verify to avoid navigation
+            const twofaForm = document.getElementById('modal2faForm');
+            if (twofaForm) {
+                // OTP input handling
+                const otpInputs = Array.from(document.querySelectorAll('#twoFactorModal .otp-input'));
+                const otpHidden = document.getElementById('otpHidden');
+                const updateHidden = () => { if (otpHidden) otpHidden.value = otpInputs.map(i => i.value).join(''); };
+                otpInputs.forEach((input, idx) => {
+                    input.addEventListener('input', () => {
+                        input.value = input.value.replace(/\D/g, '').slice(0,1);
+                        if (input.value && idx < otpInputs.length - 1) otpInputs[idx+1].focus();
+                        updateHidden();
+                    });
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' && !input.value && idx > 0) {
+                            otpInputs[idx-1].focus();
+                        }
+                    });
+                });
+
+                twofaForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const submitBtn = twofaForm.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    try {
+                        updateHidden();
+                        const formData = new FormData(twofaForm);
+                        const resp = await fetch(twofaForm.action, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            body: formData,
+                            credentials: 'same-origin'
+                        });
+                        if (resp.ok || resp.redirected) {
+                            window.location.href = resp.redirected ? resp.url : window.location.href;
+                        } else {
+                            let msg = 'Invalid authentication code';
+                            try { const data = await resp.json(); msg = data.message || msg; } catch {}
+                            alert(msg);
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Network error. Please try again.');
+                    } finally {
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
         });
     </script>
 </body>

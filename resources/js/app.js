@@ -112,6 +112,21 @@ document.addEventListener('DOMContentLoaded', function() {
     popoverTriggerList.map(function (popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl);
     });
+
+    // Auto-wrap tables in .table-responsive if not already wrapped
+    document.querySelectorAll('table').forEach(function(tbl) {
+        if (!tbl.closest('.table-responsive')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'table-responsive responsive-overflow';
+            tbl.parentNode.insertBefore(wrapper, tbl);
+            wrapper.appendChild(tbl);
+        }
+    });
+
+    // Ensure all inline images inside content scale appropriately
+    document.querySelectorAll('img').forEach(function(img) {
+        img.classList.add('img-fluid');
+    });
 });
 
 // Custom notification function

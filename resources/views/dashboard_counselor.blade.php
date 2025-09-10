@@ -120,29 +120,36 @@
         }
     }
     @media (max-width: 767.98px) {
+        /* Off-canvas behavior on mobile */
         .sidebar {
-            position: static;
-            width: 100%;
-            height: auto;
-            flex-direction: row;
-            padding: 0.5rem 0;
-        }
-        .sidebar-header, .menu-category {
-            display: none;
-        }
-        .sidebar-menu {
-            flex-direction: row;
-            gap: 0.25rem;
+            position: fixed;
+            z-index: 1040;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            width: 240px;
+            transform: translateX(-100%);
+            transition: transform 0.2s ease;
+            flex-direction: column;
             padding: 0;
         }
-        .menu-item {
-            flex: 1;
-            justify-content: center;
-            padding: 0.5rem 0.25rem;
-            font-size: 0.95rem;
-        }
-        .main-content {
-            margin-left: 0;
+        .sidebar.show { transform: translateX(0); }
+        .sidebar-header, .menu-category { display: block; }
+        .sidebar-menu { flex-direction: column; gap: 0.25rem; padding: 1rem 0.5rem; }
+        .menu-item { justify-content: flex-start; padding: 0.6rem 0.75rem; font-size: 1rem; }
+        .main-content { margin-left: 0; }
+        /* Toggle button */
+        #counselorSidebarToggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1100;
+            background: var(--forest-green);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            box-shadow: var(--shadow-sm);
         }
     }
     .main-content {
@@ -647,6 +654,7 @@
     </ul>
 </div>
 
+<button id="counselorSidebarToggle" class="d-md-none"><i class="bi bi-list"></i></button>
 @include('counselor.sidebar')
 <!-- Main Content -->
 <div class="main-content">
@@ -1227,6 +1235,27 @@
     </div>
 
     <script>
+    // Sidebar toggle for mobile
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.getElementById('counselorSidebarToggle');
+        if (sidebar && toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                if (window.innerWidth < 768) sidebar.classList.toggle('show');
+            });
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                    const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                    if (!clickInside) sidebar.classList.remove('show');
+                }
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        }
+    });
     // Auto-check for high-risk cases every 30 seconds
     setInterval(function() {
         fetch('/counselor/check-priority-cases')

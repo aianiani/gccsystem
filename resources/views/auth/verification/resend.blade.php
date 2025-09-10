@@ -1,65 +1,56 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Resend Email Verification
-            </h2>
-            <p class="mt-2 text-center text-sm text-gray-600">
-                Enter your email address and we'll send you a new verification link.
-            </p>
-        </div>
-        
-        @if (session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">{{ session('success') }}</span>
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">{{ session('error') }}</span>
-            </div>
-        @endif
-
-        @if (session('info'))
-            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">{{ session('info') }}</span>
-            </div>
-        @endif
-
-        <form class="mt-8 space-y-6" action="{{ route('verification.resend') }}" method="POST">
-            @csrf
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">
-                    Email Address
-                </label>
-                <div class="mt-1">
-                    <input id="email" name="email" type="email" autocomplete="email" required 
-                           class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm @error('email') border-red-500 @enderror"
-                           placeholder="Enter your email address"
-                           value="{{ old('email') }}">
+<div class="container d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-3">
+                    <h2 class="h3 fw-bold mb-1">Resend Email Verification</h2>
+                    <p class="text-muted mb-0">Enter your email address and we'll send you a new verification link.</p>
                 </div>
-                @error('email')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
 
-            <div>
-                <button type="submit" 
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Send Verification Link
-                </button>
-            </div>
+                @if (session('success'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
 
-            <div class="text-center">
-                <a href="{{ route('login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
-                    Back to Login
-                </a>
+                @if (session('error'))
+                    <div class="alert alert-danger" role="alert">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @if (session('info'))
+                    <div class="alert alert-info" role="alert">
+                        {{ session('info') }}
+                    </div>
+                @endif
+
+                <form action="{{ route('verification.resend') }}" method="POST" novalidate>
+                    @csrf
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input id="email" name="email" type="email" autocomplete="email" required
+                               class="form-control @error('email') is-invalid @enderror"
+                               placeholder="Enter your email address"
+                               value="{{ old('email') }}">
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Send Verification Link</button>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="{{ route('login') }}" class="link-primary text-decoration-none">Back to Login</a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
-@endsection 
+@endsection
