@@ -13,6 +13,15 @@ class Appointment extends Model
         'previous_scheduled_at',
         'notes',
         'status',
+        'guardian1_name',
+        'guardian1_relationship',
+        'guardian1_contact',
+        'guardian2_name',
+        'guardian2_relationship',
+        'guardian2_contact',
+        'nature_of_problem',
+        'nature_of_problem_other',
+        'reference_number',
     ];
 
     protected $casts = [

@@ -1,44 +1,141 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    :root {
-        --forest-green: #2d5016;
-        --forest-green-light: #4a7c59;
-        --forest-green-lighter: #e8f5e8;
-        --yellow-maize: #f4d03f;
-        --yellow-maize-light: #fef9e7;
-        --white: #ffffff;
-        --gray-50: #f8f9fa;
-        --gray-100: #f1f3f4;
-        --gray-200: #e9ecef;
-        --gray-600: #6c757d;
-        --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
+    <style>
+        /* Homepage theme variables (mapped into existing dashboard vars) */
+        :root {
+            --primary-green: #1f7a2d; /* Homepage forest green */
+            --primary-green-2: #13601f; /* darker stop */
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
+            --text-dark: #16321f;
+            --text-light: #6c757d;
+            --bg-light: #f6fbf6;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
 
-    .page-header {
-        background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
-        color: white;
-        border-radius: 20px;
-        padding: 3rem 2rem;
-        margin-bottom: 3rem;
-        box-shadow: var(--shadow-lg);
-        text-align: center;
-    }
+            /* Map dashboard-specific names to homepage palette for compatibility */
+            --forest-green: var(--primary-green);
+            --forest-green-dark: var(--primary-green-2);
+            --forest-green-light: var(--accent-green);
+            --forest-green-lighter: var(--light-green);
+            --yellow-maize: var(--accent-orange);
+            --yellow-maize-light: #fef9e7;
+            --white: #ffffff;
+            --gray-50: var(--bg-light);
+            --gray-100: #eef6ee;
+            --gray-600: var(--text-light);
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --info: #17a2b8;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+        }
 
-    .page-header h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-    }
+        /* Apply the same page zoom used on the homepage */
+        .home-zoom {
+            zoom: 0.85;
+        }
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.85);
+                transform-origin: top center;
+            }
+        }
+        
+        body, .profile-card, .stats-card, .main-content-card {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .custom-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            background: var(--forest-green) ;
+            color: #fff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0,0,0,0.08);
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+        
+        .main-dashboard-content {
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+            min-height: 100vh;
+            padding: 1rem 1.5rem;
+            margin-left: 240px;
+            transition: margin-left 0.2s;
+        }
 
-    .page-header p {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        margin-bottom: 0;
-    }
+        .main-dashboard-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+        
+        .welcome-card {
+            background: var(--hero-gradient);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            min-height: 100px;
+        }
+        
+        .welcome-card .welcome-text {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 0.25rem;
+        }
+        
+        .welcome-card .welcome-date {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-card .welcome-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .main-content-card .card-header {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-weight: 600;
+        }
+        
+        .main-content-card .card-body {
+            padding: 1.25rem;
+        }
 
     .student-grid {
         display: grid;
@@ -47,21 +144,21 @@
         margin-bottom: 2rem;
     }
 
-    .student-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--gray-100);
-        overflow: hidden;
-        transition: all 0.3s ease;
-        position: relative;
-    }
+        .student-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
 
-    .student-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-        border-color: var(--forest-green-light);
-    }
+        .student-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--forest-green-light);
+        }
 
     .student-header {
         background: linear-gradient(135deg, var(--forest-green-lighter) 0%, var(--yellow-maize-light) 100%);
@@ -165,33 +262,31 @@
         letter-spacing: 0.5px;
     }
 
-    .chat-btn {
-        background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 0.875rem 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        width: 100%;
-        text-decoration: none;
-    }
+        .chat-btn {
+            background: var(--forest-green);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.875rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            text-decoration: none;
+            box-shadow: 0 6px 18px rgba(17,94,37,0.06);
+        }
 
-    .chat-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-        color: white;
-        text-decoration: none;
-    }
-
-    .chat-btn:active {
-        transform: translateY(0);
-    }
+        .chat-btn:hover {
+            background: var(--forest-green-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+            color: white;
+            text-decoration: none;
+        }
 
     .empty-state {
         text-align: center;
@@ -214,27 +309,38 @@
         margin-bottom: 1rem;
     }
 
-    .back-btn {
-        background: var(--forest-green);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .back-btn:hover {
-        background: var(--forest-green-light);
-        color: white;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-sm);
-    }
+        .btn-outline-primary, .btn-outline-success, .btn-outline-info, .btn-outline-warning {
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.15s ease;
+            padding: 0.6rem 1rem;
+            border-width: 1px;
+            box-shadow: 0 6px 18px rgba(17,94,37,0.06);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--forest-green);
+            color: var(--forest-green);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--forest-green);
+            border-color: var(--forest-green);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        @media (max-width: 991.98px) { 
+            .main-dashboard-content { 
+                margin-left: 200px; 
+            } 
+        }
+        @media (max-width: 767.98px) { 
+            .main-dashboard-content { 
+                margin-left: 0; 
+            } 
+        }
 
     @media (max-width: 768px) {
         .page-header {
@@ -257,20 +363,36 @@
     }
 </style>
 
-<div class="container-fluid py-4">
-    <div class="page-header">
-        <h1>
-            <i class="bi bi-chat-dots me-3"></i>
-            Choose a Student to Chat With
-        </h1>
-        <p>Select a student to start a conversation and provide support</p>
-    </div>
-
-    <div class="container">
-        <a href="{{ route('dashboard') }}" class="back-btn">
-            <i class="bi bi-arrow-left"></i>
-            Back to Dashboard
-        </a>
+    <div class="home-zoom">
+    <div class="d-flex">
+        <!-- Mobile Sidebar Toggle -->
+        <button id="counselorSidebarToggle" class="d-md-none">
+            <i class="bi bi-list"></i>
+        </button>
+        <!-- Sidebar -->
+        @include('counselor.sidebar')
+        
+        <!-- Main Content -->
+        <div class="main-dashboard-content flex-grow-1">
+            <div class="main-dashboard-inner">
+            <div class="welcome-card">
+                <div>
+                    <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
+                    <div class="welcome-text">Choose a Student to Chat With</div>
+                    <div style="font-size: 0.9rem; margin-top: 0.5rem;">Select a student to start a conversation and provide support</div>
+                </div>
+                <div class="welcome-avatar">
+                    <img src="{{ auth()->user()->avatar_url }}" 
+                         alt="{{ auth()->user()->name }}" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                </div>
+            </div>
+            
+            <div class="main-content-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Available Students</h5>
+                </div>
+                <div class="card-body">
 
         @if($students->count() > 0)
             <div class="student-grid">
@@ -322,13 +444,43 @@
                     </div>
         @endforeach
             </div>
-        @else
-            <div class="empty-state">
-                <i class="bi bi-people"></i>
-                <h3>No Students Available</h3>
-                <p class="mb-0">There are currently no students available for chat. Please check back later or contact support for assistance.</p>
+                    @else
+                        <div class="empty-state">
+                            <i class="bi bi-people"></i>
+                            <h3>No Students Available</h3>
+                            <p class="mb-0">There are currently no students available for chat. Please check back later or contact support for assistance.</p>
+                        </div>
+                    @endif
+                </div>
             </div>
-        @endif
+            </div>
+        </div>
     </div>
-</div>
+    
+    </div>
+    <script>
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('counselorSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
 @endsection 

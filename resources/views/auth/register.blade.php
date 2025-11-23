@@ -355,6 +355,27 @@
                         @enderror
                     </div>
                     <div class="form-group">
+                        <label for="gender" class="form-label">Gender</label>
+                        <select id="gender" name="gender" class="form-select @error('gender') is-invalid @enderror" required>
+                            <option value="" selected disabled>Select Gender</option>
+                            <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
+                            <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
+                            <option value="non-binary" {{ old('gender') == 'non-binary' ? 'selected' : '' }}>Non-binary</option>
+                            <option value="prefer_not_to_say" {{ old('gender') == 'prefer_not_to_say' ? 'selected' : '' }}>Prefer not to say</option>
+                            <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other (please specify)</option>
+                        </select>
+                        @error('gender')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-group" id="genderOtherField" style="display: none;">
+                        <label for="gender_other" class="form-label">Please specify</label>
+                        <input id="gender_other" type="text" class="form-control @error('gender_other') is-invalid @enderror" name="gender_other" value="{{ old('gender_other') }}" placeholder="Please specify your gender">
+                        @error('gender_other')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
                         <label for="password" class="form-label">Password</label>
                         <div class="password-group">
                             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Create a password" required>
@@ -413,6 +434,38 @@
                 passwordIcon.classList.add('bi-eye');
             }
         }
+        
+        // Gender "Other" field toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const genderSelect = document.getElementById('gender');
+            const genderOtherField = document.getElementById('genderOtherField');
+            const genderOtherInput = document.getElementById('gender_other');
+            
+            if (genderSelect && genderOtherField) {
+                genderSelect.addEventListener('change', function() {
+                    if (this.value === 'other') {
+                        genderOtherField.style.display = 'block';
+                        if (genderOtherInput) {
+                            genderOtherInput.setAttribute('required', 'required');
+                        }
+                    } else {
+                        genderOtherField.style.display = 'none';
+                        if (genderOtherInput) {
+                            genderOtherInput.removeAttribute('required');
+                            genderOtherInput.value = '';
+                        }
+                    }
+                });
+                
+                // Check on page load if "other" is already selected
+                if (genderSelect.value === 'other') {
+                    genderOtherField.style.display = 'block';
+                    if (genderOtherInput) {
+                        genderOtherInput.setAttribute('required', 'required');
+                    }
+                }
+            }
+        });
         // SweetAlert2 Toast Notification
         document.addEventListener('DOMContentLoaded', function() {
             @if(session('success'))

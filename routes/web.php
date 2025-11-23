@@ -21,13 +21,9 @@ Route::get('announcements/{announcement}', [App\Http\Controllers\AnnouncementCon
 
 // Guest routes
 Route::middleware('guest')->group(function () {
-    Route::get('/login', function () {
-        return view('auth.login');
-    })->name('login');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/register', function () {
-        return view('auth.register');
-    })->name('register');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 });
 
@@ -109,6 +105,8 @@ Route::prefix('admin/registration-approvals')->name('admin.registration-approval
         Route::get('appointments', [App\Http\Controllers\AppointmentController::class, 'index'])->name('appointments.index');
         Route::get('appointments/create', [App\Http\Controllers\AppointmentController::class, 'create'])->name('appointments.create');
         Route::post('appointments', [App\Http\Controllers\AppointmentController::class, 'store'])->name('appointments.store');
+        Route::get('appointments/{id}/confirmation', [App\Http\Controllers\AppointmentController::class, 'confirmation'])->name('appointments.confirmation');
+        Route::get('appointments/{id}/download-pdf', [App\Http\Controllers\AppointmentController::class, 'downloadPdf'])->name('appointments.downloadPdf');
         Route::get('/appointments/available-slots/{counselor}', [App\Http\Controllers\AppointmentController::class, 'availableSlots'])->name('appointments.availableSlots');
         // Accept/Decline rescheduled appointment
         Route::patch('appointments/{id}/accept-reschedule', [App\Http\Controllers\AppointmentController::class, 'acceptReschedule'])->name('appointments.acceptReschedule');
@@ -118,9 +116,13 @@ Route::get('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackCo
 Route::post('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackController::class, 'store'])->name('session-feedback.store');
         // Assessments route for students
         Route::get('assessments', [App\Http\Controllers\AssessmentController::class, 'index'])->name('assessments.index');
-        Route::post('assessments/dass21', [App\Http\Controllers\AssessmentController::class, 'submitDass21'])->name('assessments.dass21.submit');
+        Route::post('assessments/dass42', [App\Http\Controllers\AssessmentController::class, 'submitDass42'])->name('assessments.dass42.submit');
         Route::post('assessments/academic', [App\Http\Controllers\AssessmentController::class, 'submitAcademicSurvey'])->name('assessments.academic.submit');
         Route::post('assessments/wellness', [App\Http\Controllers\AssessmentController::class, 'submitWellnessCheck'])->name('assessments.wellness.submit');
+        
+        // Consent routes
+        Route::get('consent', [App\Http\Controllers\ConsentController::class, 'show'])->name('consent.show');
+        Route::post('consent', [App\Http\Controllers\ConsentController::class, 'store'])->name('consent.store');
     });
 
     // Counselor and Admin routes
@@ -198,6 +200,8 @@ Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(functi
 //     ->name('counselor.feedback.index');
 Route::get('feedback/{id}', [App\Http\Controllers\SessionFeedbackController::class, 'show'])->name('counselor.feedback.show');
     Route::get('availability', [App\Http\Controllers\CounselorAvailabilityController::class, 'index'])->name('counselor.availability.index');
+    Route::get('students', [App\Http\Controllers\CounselorStudentController::class, 'index'])->name('counselor.students.index');
+    Route::get('students/{student}', [App\Http\Controllers\CounselorStudentController::class, 'show'])->name('counselor.students.show');
     Route::get('availabilities', [App\Http\Controllers\AvailabilityController::class, 'index']);
     Route::post('availabilities', [App\Http\Controllers\AvailabilityController::class, 'store']);
     Route::delete('availabilities', [App\Http\Controllers\AvailabilityController::class, 'destroy']);

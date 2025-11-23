@@ -2,23 +2,48 @@
 
 @section('content')
     <style>
+        /* Homepage theme variables (mapped into existing dashboard vars) */
         :root {
-            --forest-green: #2d5016;
-            --forest-green-light: #4a7c59;
-            --forest-green-lighter: #e8f5e8;
-            --yellow-maize: #f4d03f;
+            --primary-green: #1f7a2d; /* Homepage forest green */
+            --primary-green-2: #13601f; /* darker stop */
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
+            --text-dark: #16321f;
+            --text-light: #6c757d;
+            --bg-light: #f6fbf6;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+
+            /* Map dashboard-specific names to homepage palette for compatibility */
+            --forest-green: var(--primary-green);
+            --forest-green-dark: var(--primary-green-2);
+            --forest-green-light: var(--accent-green);
+            --forest-green-lighter: var(--light-green);
+            --yellow-maize: var(--accent-orange);
             --yellow-maize-light: #fef9e7;
             --white: #ffffff;
-            --gray-50: #f8f9fa;
-            --gray-100: #f1f3f4;
-            --gray-600: #6c757d;
+            --gray-50: var(--bg-light);
+            --gray-100: #eef6ee;
+            --gray-600: var(--text-light);
             --danger: #dc3545;
             --warning: #ffc107;
             --success: #28a745;
             --info: #17a2b8;
-            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+        }
+
+        /* Apply the same page zoom used on the homepage */
+        .home-zoom {
+            zoom: 0.85;
+        }
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.85);
+                transform-origin: top center;
+            }
         }
         
         body, .profile-card, .stats-card, .main-content-card {
@@ -29,15 +54,16 @@
             position: fixed;
             top: 0;
             left: 0;
-            height: 100vh;
-            width: 250px;
-            background: #2d5016;
+            bottom: 0;
+            width: 240px;
+            background: var(--forest-green) ;
             color: #fff;
             z-index: 1040;
             display: flex;
             flex-direction: column;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+            box-shadow: 2px 0 18px rgba(0,0,0,0.08);
             overflow-y: auto;
+            padding-bottom: 1rem;
         }
         
         .custom-sidebar .sidebar-logo {
@@ -151,32 +177,42 @@
         }
         
         .main-dashboard-content {
-            background: var(--gray-50);
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
             min-height: 100vh;
-            padding: 2.5rem 2rem;
-            margin-left: 250px;
+            padding: 1rem 1.5rem;
+            margin-left: 240px;
             transition: margin-left 0.2s;
+        }
+
+        /* Constrain inner content and center it within the available area */
+        .main-dashboard-inner {
+            max-width: 1180px;
+            margin: 0 auto;
         }
         
         .welcome-card {
-            background: var(--forest-green);
-            border-radius: 18px;
-            box-shadow: var(--shadow-md);
-            padding: 2.5rem 2rem 2rem 2.5rem;
-            margin-bottom: 2.5rem;
+            background: var(--hero-gradient);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem 1.5rem;
+            margin-bottom: 1.5rem;
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 1rem;
+            min-height: 100px;
         }
         
         .welcome-card .welcome-text {
-            font-size: 2.2rem;
+            font-size: 1.75rem;
             font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 0.25rem;
         }
         
         .welcome-card .welcome-date {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 500;
             margin-bottom: 0.5rem;
         }
@@ -193,26 +229,32 @@
         
         .dashboard-layout {
             display: grid;
-            grid-template-columns: 1fr 280px;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: 1fr 320px;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: start;
         }
         
         .dashboard-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 0.75rem;
+            align-items: stretch; /* ensure children stretch to equal height */
         }
         
         .dashboard-stat-card {
             background: #fff;
             border-radius: 12px;
             box-shadow: var(--shadow-sm);
-            padding: 1.5rem 1rem;
+            padding: 1.25rem 1rem;
             text-align: center;
             border: 1px solid var(--gray-100);
             transition: all 0.3s ease;
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px; /* ensure consistent card height */
         }
         
         .dashboard-stat-card:hover {
@@ -221,10 +263,42 @@
         }
         
         .dashboard-stat-card .stat-value {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--forest-green);
             margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Hero CTA buttons inside welcome card */
+        .btn-hero {
+            background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            border: 2px solid rgba(255,255,255,0.12);
+            color: #fff;
+            padding: 0.9rem 1.6rem;
+            border-radius: 999px;
+            font-weight: 700;
+            box-shadow: 0 8px 30px rgba(17, 94, 37, 0.18);
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+        .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(17, 94, 37, 0.22); }
+        .btn-ghost {
+            background: transparent;
+            color: #fff;
+            border: 1.5px solid rgba(255,255,255,0.14);
+            padding: 0.8rem 1.4rem;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        /* Make main content cards use flex so headers and bodies behave predictably */
+        .main-content-card, .quick-actions-sidebar {
+            display: flex;
+            flex-direction: column;
+            min-height: 120px;
+        }
+        .main-content-card .card-body, .quick-actions-sidebar .card-body {
+            flex: 1 1 auto;
         }
         
         .dashboard-stat-card .stat-label {
@@ -289,14 +363,14 @@
             border-radius: 16px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--gray-100);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             overflow: hidden;
         }
         
         .main-content-card .card-header {
             background: var(--forest-green-lighter);
             color: var(--forest-green);
-            padding: 1.25rem 1.5rem;
+            padding: 1rem 1.25rem;
             border-bottom: 1px solid var(--gray-100);
             font-weight: 600;
             display: flex;
@@ -305,14 +379,14 @@
         }
         
         .main-content-card .card-body {
-            padding: 1.5rem;
+            padding: 1.25rem;
         }
         
         .appointment-item {
             background: var(--gray-50);
             border-radius: 12px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
             border: 1px solid var(--gray-100);
             transition: all 0.2s ease;
         }
@@ -330,8 +404,8 @@
         .announcement-item {
             background: var(--gray-50);
             border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
             border-left: 4px solid var(--forest-green);
             transition: all 0.2s ease;
         }
@@ -347,8 +421,8 @@
         .message-preview {
             background: var(--gray-50);
             border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
             border: 1px solid var(--gray-100);
             transition: all 0.2s ease;
         }
@@ -387,29 +461,30 @@
             border-radius: 12px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--gray-100);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             overflow: hidden;
             height: fit-content;
         }
         
         .quick-actions-sidebar .card-header {
-            background: var(--forest-green-lighter);
+            background: linear-gradient(180deg, rgba(34,139,34,0.06), rgba(34,139,34,0.02));
             color: var(--forest-green);
-            padding: 1rem 1.25rem;
+            padding: 0.875rem 1rem;
             border-bottom: 1px solid var(--gray-100);
             font-weight: 600;
         }
         
         .quick-actions-sidebar .card-body {
-            padding: 1.25rem;
+            padding: 1rem;
         }
         
         .btn-outline-primary, .btn-outline-success, .btn-outline-info, .btn-outline-warning {
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.15s ease;
+            padding: 0.6rem 1rem;
             border-width: 1px;
+            box-shadow: 0 6px 18px rgba(17,94,37,0.06);
         }
         
         .btn-outline-primary {
@@ -438,6 +513,11 @@
             border-radius: 12px;
             border: 2px dashed var(--gray-100);
         }
+
+        /* Small refinements for spacing */
+        .sidebar-logo img { box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+        .sidebar-link { padding-left: 1.1rem; padding-right: 1.1rem; }
+        .sidebar-link i { font-size: 1.1rem; }
         
         .empty-state i {
             font-size: 2rem;
@@ -490,6 +570,7 @@
     
 
 
+    <div class="home-zoom">
     <div class="d-flex">
         <!-- Mobile Sidebar Toggle -->
         <button id="studentSidebarToggle" class="d-md-none">
@@ -498,8 +579,8 @@
         <!-- Sidebar -->
         <div class="custom-sidebar">
             <div class="sidebar-logo mb-4">
-                <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto;">
-                <h3 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.3rem; font-weight: 700; color: #f4d03f;">CMU Guidance</h3>
+                <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
+                <h3 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">CMU Guidance and Counseling Center</h3>
                 <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Student Portal</p>
             </div>
             <nav class="sidebar-nav flex-grow-1">
@@ -522,11 +603,12 @@
         
         <!-- Main Content -->
         <div class="main-dashboard-content flex-grow-1">
+            <div class="main-dashboard-inner">
             <div class="welcome-card">
                 <div>
                     <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
                     <div class="welcome-text">Welcome back, {{ auth()->user()->first_name ?? auth()->user()->name }}!</div>
-                    <div style="font-size: 1.1rem; margin-top: 0.5rem;">Always stay updated in your student portal</div>
+                    <div style="font-size: 0.9rem; margin-top: 0.5rem;">Always stay updated in your student portal</div>
                 </div>
                 <div class="welcome-avatar">
                     <img src="{{ auth()->user()->avatar_url }}" 
@@ -752,9 +834,11 @@
                     @endif
                 </div>
             </div>
+            </div>
         </div>
     </div>
     
+    </div>
     <script>
         // Enable Bootstrap tooltips
         document.addEventListener('DOMContentLoaded', function () {

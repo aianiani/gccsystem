@@ -2,14 +2,37 @@
 
 @section('content')
 <style>
-    /* Theme Colors */
+    /* Homepage theme variables (mapped into existing dashboard vars) */
     :root {
-        --forest-green: #2d5016;
-        --forest-green-light: #4a7c59;
-        --yellow-maize: #f4d03f;
-        --white: #fff;
-        --gray-100: #f1f3f4;
-        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        --primary-green: #1f7a2d; /* Homepage forest green */
+        --primary-green-2: #13601f; /* darker stop */
+        --accent-green: #2e7d32;
+        --light-green: #eaf5ea;
+        --accent-orange: #FFCB05;
+        --text-dark: #16321f;
+        --text-light: #6c757d;
+        --bg-light: #f6fbf6;
+        --shadow: 0 10px 30px rgba(0,0,0,0.08);
+
+        /* Map dashboard-specific names to homepage palette for compatibility */
+        --forest-green: var(--primary-green);
+        --forest-green-dark: var(--primary-green-2);
+        --forest-green-light: var(--accent-green);
+        --forest-green-lighter: var(--light-green);
+        --yellow-maize: var(--accent-orange);
+        --yellow-maize-light: #fef9e7;
+        --white: #ffffff;
+        --gray-50: var(--bg-light);
+        --gray-100: #eef6ee;
+        --gray-600: var(--text-light);
+        --danger: #dc3545;
+        --warning: #ffc107;
+        --success: #28a745;
+        --info: #17a2b8;
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+        --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
     }
     .fc .fc-toolbar-title {
         color: var(--forest-green);
@@ -87,30 +110,180 @@
     .help-icon:hover {
         color: var(--forest-green-light);
     }
-    @media (max-width: 991.98px) {
-        .fc .fc-toolbar-title { font-size: 1.1rem; }
-    }
-</style>
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary mb-3" style="font-weight: 600; border-radius: 8px;">
-                <i class="bi bi-arrow-left"></i> Back to Dashboard
-            </a>
-            <div class="card shadow-sm border-0" style="border-radius: 24px;">
-                <div class="card-body p-4" style="background: #fafcf8; border-radius: 24px;">
-                    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap">
-                        <h2 class="mb-0 d-flex align-items-center gap-2" style="font-weight: 700; color: var(--forest-green);">
-                            <i class="bi bi-calendar2-week"></i> My Availability Calendar
-                        </h2>
-                        <div class="availability-legend">
-                            <span class="legend-dot"></span>
-                            <span style="color: var(--forest-green); font-weight: 500;">Available Slot</span>
-                            <span class="help-icon" tabindex="0" data-bs-toggle="tooltip" title="Click and drag on the calendar to add available slots. Click an event to edit or delete. Use the Save button to store your availability.">
-                                <i class="bi bi-question-circle-fill"></i>
-                            </span>
-                        </div>
+        /* Apply the same page zoom used on the homepage */
+        .home-zoom {
+            zoom: 0.85;
+        }
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.85);
+                transform-origin: top center;
+            }
+        }
+        
+        body, .profile-card, .stats-card, .main-content-card {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .custom-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            background: var(--forest-green) ;
+            color: #fff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0,0,0,0.08);
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+        
+        .main-dashboard-content {
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+            min-height: 100vh;
+            padding: 1rem 1.5rem;
+            margin-left: 240px;
+            transition: margin-left 0.2s;
+        }
+
+        .main-dashboard-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+        
+        .welcome-card {
+            background: var(--hero-gradient);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            min-height: 100px;
+        }
+        
+        .welcome-card .welcome-text {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 0.25rem;
+        }
+        
+        .welcome-card .welcome-date {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-card .welcome-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main-content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .main-content-card .card-header {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-weight: 600;
+        }
+        
+        .main-content-card .card-body {
+            padding: 1.25rem;
+        }
+        
+        .btn-outline-primary, .btn-outline-success, .btn-outline-info, .btn-outline-warning {
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.15s ease;
+            padding: 0.6rem 1rem;
+            border-width: 1px;
+            box-shadow: 0 6px 18px rgba(17,94,37,0.06);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--forest-green);
+            color: var(--forest-green);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--forest-green);
+            border-color: var(--forest-green);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        @media (max-width: 991.98px) {
+            .fc .fc-toolbar-title { font-size: 1.1rem; }
+            .main-dashboard-content { 
+                margin-left: 200px; 
+            } 
+        }
+        @media (max-width: 767.98px) { 
+            .main-dashboard-content { 
+                margin-left: 0; 
+            } 
+        }
+    </style>
+    
+    <div class="home-zoom">
+    <div class="d-flex">
+        <!-- Mobile Sidebar Toggle -->
+        <button id="counselorSidebarToggle" class="d-md-none">
+            <i class="bi bi-list"></i>
+        </button>
+        <!-- Sidebar -->
+        @include('counselor.sidebar')
+        
+        <!-- Main Content -->
+        <div class="main-dashboard-content flex-grow-1">
+            <div class="main-dashboard-inner">
+            <div class="welcome-card">
+                <div>
+                    <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
+                    <div class="welcome-text">My Availability Calendar</div>
+                    <div style="font-size: 0.9rem; margin-top: 0.5rem;">Manage your available time slots for appointments</div>
+                </div>
+                <div class="welcome-avatar">
+                    <img src="{{ auth()->user()->avatar_url }}" 
+                         alt="{{ auth()->user()->name }}" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                </div>
+            </div>
+            
+            <div class="main-content-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-calendar2-week me-2"></i>Availability Calendar</h5>
+                    <div class="availability-legend">
+                        <span class="legend-dot"></span>
+                        <span style="color: var(--forest-green); font-weight: 500;">Available Slot</span>
+                        <span class="help-icon" tabindex="0" data-bs-toggle="tooltip" title="Click and drag on the calendar to add available slots. Click an event to edit or delete. Use the Save button to store your availability.">
+                            <i class="bi bi-question-circle-fill"></i>
+                        </span>
                     </div>
+                </div>
+                <div class="card-body">
                     <div id="calendar"></div>
                     <div class="mt-4 text-end">
                         <button id="resetAvailabilityBtn" class="btn btn-outline-danger px-4 py-2 me-2" style="font-weight:600; border-radius: 12px;">
@@ -134,12 +307,40 @@
                                 <tbody></tbody>
                             </table>
                         </div>
+                        </div>
                     </div>
                 </div>
             </div>
+            </div>
         </div>
     </div>
-</div>
+    
+    </div>
+    <script>
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('counselorSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
 <!-- Edit Event Modal -->
 <div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
   <div class="modal-dialog">

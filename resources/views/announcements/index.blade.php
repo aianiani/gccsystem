@@ -2,62 +2,131 @@
 
 @section('content')
 <style>
-    .create-announcement-btn {
-        background: #FFCB05;
-        color: #1a3a1f;
-        border: none;
-        border-radius: 16px;
-        padding: 1rem 2.2rem;
-        font-size: 1.15rem;
-        font-weight: 700;
-        box-shadow: 0 4px 16px rgba(44,62,80,0.10);
-        display: inline-flex;
-        align-items: center;
-        gap: 0.7rem;
-        transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
-        text-decoration: none;
-        margin-left: 0.5rem;
+    :root {
+        --forest-green: #1f7a2d;
+        --forest-green-light: #4a7c59;
+        --forest-green-lighter: #e8f5e8;
+        --yellow-maize: #f4d03f;
+        --gray-50: #f8f9fa;
+        --gray-100: #eef6ee;
+        --gray-600: #6c757d;
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+        --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
     }
-    .create-announcement-btn:hover, .create-announcement-btn:focus {
-        background: #ffe066;
-        color: #1a3a1f;
-        box-shadow: 0 8px 24px rgba(44,62,80,0.13);
-        transform: translateY(-2px) scale(1.03);
-        text-decoration: none;
+
+    /* Apply the same page zoom used on the homepage */
+    .home-zoom {
+        zoom: 0.85;
     }
-    .back-dashboard-btn {
-        background: #FFCB05;
-        color: #1a3a1f;
-        border: none;
-        border-radius: 16px;
-        padding: 1rem 2.2rem;
-        font-size: 1.15rem;
-        font-weight: 700;
-        box-shadow: 0 4px 16px rgba(44,62,80,0.10);
-        display: inline-flex;
-        align-items: center;
-        gap: 0.7rem;
-        transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
-        text-decoration: none;
-        margin-left: 0.5rem;
-    }
-    .back-dashboard-btn:hover, .back-dashboard-btn:focus {
-        background: #ffe066;
-        color: #1a3a1f;
-        box-shadow: 0 8px 24px rgba(44,62,80,0.13);
-        transform: translateY(-2px) scale(1.03);
-        text-decoration: none;
-    }
-    @media (max-width: 600px) {
-        .create-announcement-btn, .back-dashboard-btn {
-            width: 100%;
-            justify-content: center;
-            font-size: 1rem;
-            padding: 0.8rem 1.2rem;
+    @supports not (zoom: 1) {
+        .home-zoom {
+            transform: scale(0.85);
+            transform-origin: top center;
         }
     }
 
-    /* Announcements Grid */
+    @if(auth()->check() && auth()->user()->isAdmin())
+    .main-dashboard-inner {
+        padding: 2rem;
+    }
+    @elseif(auth()->check() && auth()->user()->isCounselor())
+    .main-dashboard-content {
+        background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+        min-height: 100vh;
+        padding: 1rem 1.5rem;
+        margin-left: 240px;
+        transition: margin-left 0.2s;
+    }
+
+    .main-dashboard-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+    @endif
+
+    .welcome-card {
+        background: var(--hero-gradient);
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        padding: 1.5rem 2rem;
+        margin-bottom: 1.5rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    
+    .welcome-card .welcome-text {
+        font-size: 1.75rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 0.25rem;
+    }
+    
+    .welcome-card .welcome-date {
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .welcome-card .welcome-avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .page-header-card {
+        background: var(--hero-gradient);
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        padding: 1.5rem 2rem;
+        margin-bottom: 1.5rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-header-card h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+        color: #fff;
+    }
+
+    .main-content-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-100);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    .main-content-card .card-header {
+        background: var(--forest-green-lighter);
+        color: var(--forest-green);
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--gray-100);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .main-content-card .card-body {
+        padding: 1.25rem;
+    }
+
     .announcement-card {
         background: #ffffff;
         border-radius: 16px;
@@ -97,19 +166,88 @@
     .announcement-new { display: inline-block; padding: .22rem .5rem; border-radius: 999px; background: #FFCB05; color: #1a1a1a; font-size: .72rem; font-weight: 700; }
     .announcement-excerpt { color: #6c757d; margin-bottom: 0; }
 </style>
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h1 class="fw-bold mb-0" style="color: #228B22;"><i class="bi bi-megaphone me-2"></i>Announcements</h1>
-        @if(auth()->check() && method_exists(auth()->user(), 'isAdmin') && auth()->user()->isAdmin())
-            <a href="{{ route('announcements.create') }}" class="create-announcement-btn"><i class="bi bi-plus-circle me-1"></i> Create Announcement</a>
-        @else
-            <a href="{{ route('home') }}" class="back-dashboard-btn"><i class="bi bi-arrow-left me-1"></i> Back to Home</a>
+
+@if(auth()->check() && auth()->user()->isCounselor())
+    <div class="home-zoom">
+    <div class="d-flex">
+        <!-- Mobile Sidebar Toggle -->
+        <button id="counselorSidebarToggle" class="d-md-none">
+            <i class="bi bi-list"></i>
+        </button>
+        <!-- Sidebar -->
+        @include('counselor.sidebar')
+        
+        <!-- Main Content -->
+        <div class="main-dashboard-content flex-grow-1">
+            <div class="main-dashboard-inner">
+            <div class="welcome-card">
+                <div>
+                    <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
+                    <div class="welcome-text">Announcements</div>
+                    <div style="font-size: 0.9rem; margin-top: 0.5rem;">Stay updated with the latest news and updates</div>
+                </div>
+                <div class="welcome-avatar">
+                    <img src="{{ auth()->user()->avatar_url }}" 
+                         alt="{{ auth()->user()->name }}" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                </div>
+            </div>
+            
+            <div class="main-content-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-megaphone me-2"></i>All Announcements</h5>
+                    @if(auth()->check() && method_exists(auth()->user(), 'isAdmin') && auth()->user()->isAdmin())
+                        <a href="{{ route('announcements.create') }}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Create Announcement
+                        </a>
+                    @endif
+                </div>
+                <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
+                    <div class="row g-4">
+@elseif(auth()->check() && auth()->user()->isAdmin())
+    <div class="home-zoom">
+    <div class="main-dashboard-inner">
+        <div class="page-header-card">
+            <div>
+                <h1><i class="bi bi-megaphone me-2"></i>Announcements</h1>
+                <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.95rem;">Manage and create system announcements</p>
+            </div>
+            <div>
+                <a href="{{ route('announcements.create') }}" class="btn btn-light btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Create Announcement
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-megaphone me-2"></i>All Announcements</h5>
+            </div>
+            <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                <div class="row g-4">
+@else
+    <div class="container py-4">
+        <div class="page-header-card">
+            <div>
+                <h1><i class="bi bi-megaphone me-2"></i>Announcements</h1>
+            </div>
+            <div>
+                <a href="{{ route('home') }}" class="btn btn-light">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Home
+                </a>
+            </div>
+        </div>
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-    </div>
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-    <div class="row g-4">
+        <div class="row g-4">
+@endif
         @forelse($announcements as $announcement)
             <div class="col-md-6 col-lg-4">
                 <a href="{{ route('announcements.show', $announcement->id) }}" class="announcement-card">
@@ -135,9 +273,42 @@
                 </div>
             </div>
         @endforelse
+        </div>
+        <div class="mt-3">
+            {{ $announcements->links() }}
+        </div>
     </div>
-    <div class="mt-3">
-        {{ $announcements->links() }}
     </div>
-</div>
-@endsection 
+@if(auth()->check() && auth()->user()->isCounselor())
+            </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('counselorSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+@endif
+@endsection

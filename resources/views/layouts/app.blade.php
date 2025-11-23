@@ -171,299 +171,241 @@
             padding-right: 2.5rem;
         }
     </style>
+        <style>
+            /* Shared custom-sidebar styles to match student dashboard theme
+               Increased specificity and some !important flags to ensure the
+               sidebar appearance overrides other stylesheet rules. */
+            .custom-sidebar, aside.custom-sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                bottom: 0 !important;
+                height: auto !important;
+                width: 275px !important;
+                background: var(--forest-green, #2d5016) !important;
+                color: #fff !important;
+                z-index: 1040 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                box-shadow: 2px 0 12px rgba(0,0,0,0.08) !important;
+                overflow-y: auto !important;
+                box-sizing: border-box !important;
+                transition: width 0.18s ease, padding 0.18s ease, transform 0.18s ease !important;
+                padding-bottom: 1rem !important;
+            }
+            .custom-sidebar .sidebar-logo {
+                text-align: center;
+                padding: 1.6rem 1rem 0.6rem 1rem;
+                border-bottom: 1px solid rgba(255,255,255,0.06);
+            }
+            .custom-sidebar .sidebar-logo img { display:block; margin:0 auto 0.5rem; }
+            .custom-sidebar .sidebar-logo h3 { margin:0.25rem 0 0; font-size:1.25rem; font-weight:700; color: var(--yellow-maize, #f4d03f); }
+            .custom-sidebar .sidebar-logo p { margin:0; font-size:0.9rem; color: #fff; opacity:0.85; }
+
+            .custom-sidebar .sidebar-nav {
+                flex:1;
+                padding: 1rem 0.5rem 0.5rem 0.5rem;
+                display:flex;
+                flex-direction:column;
+                gap:0.5rem;
+            }
+
+            .custom-sidebar .sidebar-link {
+                display:flex !important;
+                align-items:center !important;
+                gap:0.9rem !important;
+                padding:0.75rem 1rem !important;
+                border-radius:10px !important;
+                color:#fff !important;
+                text-decoration:none !important;
+                font-weight:600 !important;
+                transition:background 0.18s ease, color 0.18s ease, transform 0.12s ease !important;
+                position:relative !important;
+                overflow:visible !important;
+            }
+            .custom-sidebar .sidebar-link i { font-size:1.12rem; width:26px; text-align:center; }
+
+            /* Active / hover state: light rounded panel with yellow accent */
+            .custom-sidebar .sidebar-link.active, .custom-sidebar .sidebar-link:hover {
+                background: rgba(255,255,255,0.04) !important;
+                color: var(--yellow-maize, #f4d03f) !important;
+                transform: translateX(0.5px) !important;
+                box-shadow: inset 4px 0 0 0 rgba(244,208,63,0.06) !important;
+            }
+            .custom-sidebar .sidebar-link.active::before {
+                content: '';
+                position: absolute;
+                left: 10px;
+                top: 10px;
+                bottom: 10px;
+                width: 4px;
+                background: var(--yellow-maize, #f4d03f);
+                border-radius: 6px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            }
+
+            .custom-sidebar .sidebar-divider { margin: 0.75rem 0; }
+
+            .custom-sidebar .sidebar-resources .text-uppercase { color: rgba(255,255,255,0.75) !important; font-weight:700; }
+
+            .custom-sidebar .sidebar-bottom { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.04); }
+            .custom-sidebar .logout { background: transparent !important; color: #fff !important; border-radius:8px; padding:0.6rem 0.75rem; font-weight:700; }
+            .custom-sidebar .logout i { margin-right: 0.55rem; }
+            .custom-sidebar .logout:hover { background: rgba(255,255,255,0.03) !important; color: #fff !important; }
+
+            /* Ensure main content is pushed to the right when sidebar exists */
+            #mainContent { margin-left: 240px !important; transition: margin-left 0.18s ease !important; }
+
+            /* Responsive adjustments */
+            @media (max-width: 991.98px) {
+                .custom-sidebar { width: 200px !important; }
+                #mainContent { margin-left: 200px !important; }
+            }
+            @media (max-width: 767.98px) {
+                .custom-sidebar { transform: translateX(-100%); position: fixed; }
+                .custom-sidebar.show { transform: translateX(0); }
+                #mainContent { margin-left: 0 !important; }
+            }
+        </style>
 </head>
 <body>
 
     @auth
         @if(auth()->user()->isAdmin())
-            <!-- Admin Top Navbar -->
-            <nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-bottom: none; border-radius: 0; margin-bottom: 0; position: fixed; top: 0; right: 0; left: 250px; z-index: 1030; transition: left 0.2s;">
-                <div class="container-fluid" style="padding-left: 0;">
-                    <button id="sidebarToggle" class="btn btn-link text-white me-3" style="font-size: 1.5rem;" type="button">
-                        <i class="bi bi-list"></i>
-                    </button>
-                    <div class="navbar-brand d-flex align-items-center" style="color: var(--yellow-maize); font-size: 1.3rem;">
-                        <span class="fw-bold">CMU Guidance and Counseling Center</span>
-                    </div>
-                    <div class="d-flex align-items-center ms-auto">
-                        <div class="dropdown">
-                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="adminNavbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="{{ auth()->user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}" alt="" width="32" height="32" class="rounded-circle me-2">
-                                <strong style="color: var(--yellow-maize);">{{ auth()->user()->name }}</strong>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminNavbarDropdown">
-                                <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-            <div class="d-flex" style="min-height: 100vh;">
+            <div class="home-zoom">
+            <div class="d-flex">
+                <!-- Mobile Sidebar Toggle -->
+                <button id="adminSidebarToggle" class="d-md-none" style="position: fixed; top: 1rem; left: 1rem; z-index: 1050; background: var(--forest-green); color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-size: 1.5rem;">
+                    <i class="bi bi-list"></i>
+                </button>
                 <!-- Sidebar -->
-                <div id="adminSidebar" class="sidebar">
-                    <div class="sidebar-header">
-                        <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto;">
-                        <h3>CMU Guidance</h3>
-                        <p>Admin Portal</p>
+                <div class="custom-sidebar" id="adminSidebar">
+                    <div class="sidebar-logo mb-4">
+                        <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
+                        <h3 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">CMU Guidance and Counseling Center</h3>
+                        <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Admin Portal</p>
                     </div>
-                    <div class="sidebar-menu">
-                        <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span class="sidebar-label">Dashboard</span>
+                    <nav class="sidebar-nav flex-grow-1">
+                        <a href="{{ route('dashboard') }}" class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i class="bi bi-speedometer2"></i>Dashboard</a>
+                        <a href="{{ route('profile') }}" class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i class="bi bi-person"></i>Profile</a>
+                        <a href="{{ route('users.index') }}" class="sidebar-link{{ request()->routeIs('users.*') ? ' active' : '' }}"><i class="bi bi-people"></i>Users</a>
+                        <a href="{{ route('admin.registration-approvals.index') }}" class="sidebar-link{{ request()->routeIs('admin.registration-approvals.*') ? ' active' : '' }}"><i class="bi bi-person-check"></i>Registration Approvals</a>
+                        <a href="{{ route('announcements.index') }}" class="sidebar-link{{ request()->routeIs('announcements.*') ? ' active' : '' }}"><i class="bi bi-megaphone"></i>Announcements</a>
+                        <a href="{{ route('activities') }}" class="sidebar-link{{ request()->routeIs('activities') ? ' active' : '' }}"><i class="bi bi-activity"></i>Activity Logs</a>
+                        <a href="{{ route('admin.logs') }}" class="sidebar-link{{ request()->routeIs('admin.logs') ? ' active' : '' }}"><i class="bi bi-journal-text"></i>System Logs</a>
+                    </nav>
+                    <div class="sidebar-bottom w-100">
+                        <a href="{{ route('logout') }}" class="sidebar-link logout"
+                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="bi bi-box-arrow-right"></i>Logout
                         </a>
-                        <a href="{{ route('profile') }}" class="menu-item {{ request()->routeIs('profile') ? 'active' : '' }}">
-                            <i class="fas fa-user"></i>
-                            <span class="sidebar-label">Profile</span>
-                        </a>
-                        <a href="{{ route('users.index') }}" class="menu-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                            <i class="fas fa-users"></i>
-                            <span class="sidebar-label">Users</span>
-                        </a>
-                        <a href="{{ route('announcements.index') }}" class="menu-item {{ request()->routeIs('announcements.*') ? 'active' : '' }}">
-                            <i class="fas fa-bullhorn"></i>
-                            <span class="sidebar-label">Announcements</span>
-                        </a>
-                        <a href="{{ route('activities') }}" class="menu-item {{ request()->routeIs('activities') ? 'active' : '' }}">
-                            <i class="fas fa-chart-line"></i>
-                            <span class="sidebar-label">Activity Logs</span>
-                        </a>
-                        <a href="{{ route('admin.logs') }}" class="menu-item {{ request()->routeIs('admin.logs') ? 'active' : '' }}">
-                            <i class="fas fa-database"></i>
-                            <span class="sidebar-label">System Logs</span>
-                        </a>
-                        <form action="{{ route('logout') }}" method="POST" style="width: 100%;">
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
-                            <button type="submit" class="menu-item" id="logoutButton" style="width: 100%; border: none; background: none;">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span class="sidebar-label">Logout</span>
-                            </button>
                         </form>
                     </div>
                 </div>
+                
                 <!-- Main Content -->
-                <div class="flex-grow-1" id="mainContent">
-                    <main class="fade-in">
-                        <div class="container py-4">
-                            @yield('content')
-                        </div>
-                    </main>
+                <div class="main-dashboard-content flex-grow-1" id="mainContent">
+                    <div class="main-dashboard-inner">
+                        @yield('content')
+                    </div>
                 </div>
             </div>
+            </div>
             <style>
-                /* Admin Sidebar Styles - Matching Counselor Sidebar */
-                #adminSidebar.sidebar {
+                /* Admin Dashboard Styles - Matching Student Dashboard */
+                .main-dashboard-content {
+                    margin-left: 240px;
+                    min-height: 100vh;
+                    background: linear-gradient(135deg, #f8fafc 0%, #e8f5e8 100%);
+                    transition: margin-left 0.2s ease;
+                }
+                
+                .main-dashboard-inner {
+                    padding: 2rem;
+                }
+                
+                /* Mobile Sidebar Toggle Button */
+                #adminSidebarToggle {
                     position: fixed;
-                    top: 0;
-                    left: 0;
-                    height: 100vh;
-                    width: 250px;
-                    background: #2d5016;
-                    color: #fff;
-                    z-index: 1040;
-                    display: flex;
-                    flex-direction: column;
-                    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
-                    overflow-y: auto;
-                    transition: width 0.2s, padding 0.2s;
-                }
-                #adminSidebar.sidebar .sidebar-header {
-                    text-align: center;
-                    padding: 2rem 1rem 1rem 1rem;
-                    border-bottom: 1px solid #4a7c59;
-                }
-                #adminSidebar.sidebar .sidebar-header h3 {
-                    margin: 0.5rem 0 0.25rem 0;
-                    font-size: 1.3rem;
-                    font-weight: 700;
-                    color: #f4d03f;
-                }
-                #adminSidebar.sidebar .sidebar-header p {
-                    margin: 0;
-                    font-size: 0.95rem;
-                    color: #fff;
-                    opacity: 0.7;
-                }
-                #adminSidebar.sidebar .sidebar-menu {
-                    flex: 1;
-                    padding: 1.5rem 0.5rem 0 0.5rem;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                }
-                #adminSidebar.sidebar .menu-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                    padding: 0.75rem 1rem;
+                    top: 1rem;
+                    left: 1rem;
+                    z-index: 1050;
+                    background: var(--forest-green);
+                    color: white;
+                    border: none;
                     border-radius: 8px;
-                    color: #fff;
-                    text-decoration: none;
-                    font-weight: 500;
-                    transition: background 0.2s, color 0.2s;
-                    position: relative;
+                    padding: 0.5rem 1rem;
+                    font-size: 1.5rem;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 }
-                #adminSidebar.sidebar .menu-item.active, #adminSidebar.sidebar .menu-item:hover {
-                    background: #4a7c59;
-                    color: #f4d03f;
+                
+                #adminSidebarToggle:hover {
+                    background: var(--forest-green-light);
                 }
-                #adminSidebar.sidebar #logoutButton {
-                    margin-top: 2rem;
-                    background: #dc3545;
-                    color: #fff;
+                
+                /* Logout button styling */
+                .custom-sidebar .sidebar-link.logout {
+                    background: #dc3545 !important;
+                    color: #fff !important;
                     border-radius: 8px;
                     text-align: center;
                     padding: 0.75rem 1rem;
                     font-weight: 600;
                     transition: background 0.2s;
                 }
-                #adminSidebar.sidebar #logoutButton:hover {
-                    background: #b52a37;
-                    color: #fff;
-                }
                 
-                /* Collapsible Functionality */
-                #adminSidebar.collapsed {
-                    width: 90px !important;
-                }
-                #adminSidebar.collapsed .sidebar-header h3,
-                #adminSidebar.collapsed .sidebar-header p {
-                    display: none !important;
-                }
-                #adminSidebar.collapsed .sidebar-label {
-                    display: none !important;
-                }
-                #adminSidebar.collapsed .menu-item {
-                    justify-content: center !important;
-                    padding: 0.75rem 0.25rem !important;
-                }
-                
-                #mainContent.sidebar-collapsed {
-                    margin-left: 100px !important;
-                }
-                
-                /* Navbar positioning for collapsed state */
-                .navbar.collapsed {
-                    left: 60px !important;
-                }
-                
-                /* Ensure navbar is properly positioned */
-                .navbar {
-                    height: 70px;
-                    padding: 0 1rem;
-                }
-                
-                /* Ensure main content has proper margin */
-                #mainContent {
-                    margin-left: 250px !important;
-                    margin-top: 70px !important;
-                    transition: margin-left 0.2s;
+                .custom-sidebar .sidebar-link.logout:hover {
+                    background: #b52a37 !important;
+                    color: #fff !important;
                 }
                 
                 @media (max-width: 991.98px) {
-                    #adminSidebar.sidebar {
-                        width: 200px;
-                    }
-                    #mainContent {
+                    .main-dashboard-content {
                         margin-left: 200px;
                     }
-                    #mainContent.sidebar-collapsed {
-                        margin-left: 60px !important;
-                    }
-                    /* Align navbar with narrower sidebar on tablets */
-                    .navbar {
-                        left: 200px;
-                    }
-                    .navbar.collapsed {
-                        left: 60px !important;
-                    }
                 }
+                
                 @media (max-width: 767.98px) {
-                    #adminSidebar.sidebar {
-                        position: fixed;
-                        z-index: 1040;
-                        height: 100vh;
-                        left: 0;
-                        top: 0;
-                        transition: transform 0.2s, width 0.2s;
+                    .custom-sidebar {
                         transform: translateX(-100%);
+                        position: fixed;
                     }
-                    #adminSidebar.sidebar.show {
+                    .custom-sidebar.show {
                         transform: translateX(0);
                     }
-                    #mainContent {
+                    .main-dashboard-content {
                         margin-left: 0 !important;
                     }
-                    /* Ensure navbar spans full width on mobile */
-                    .navbar {
-                        left: 0 !important;
-                        right: 0;
-                    }
-                    /* Smaller brand and better truncation on phones */
-                    .navbar .navbar-brand { font-size: 1rem; max-width: 65vw; }
-                    #adminNavbarDropdown strong { font-size: .95rem; }
                 }
             </style>
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const sidebar = document.getElementById('adminSidebar');
-                    const mainContent = document.getElementById('mainContent');
-                    const toggleBtn = document.getElementById('sidebarToggle');
+                    const toggleBtn = document.getElementById('adminSidebarToggle');
                     
-                    console.log('Sidebar:', sidebar);
-                    console.log('MainContent:', mainContent);
-                    console.log('ToggleBtn:', toggleBtn);
-                    
-                    // Add tooltips to icons when sidebar is collapsed
-                    function updateTooltips() {
-                        const menuItems = sidebar.querySelectorAll('.menu-item');
-                        menuItems.forEach(item => {
-                            const label = item.querySelector('.sidebar-label');
-                            if (sidebar.classList.contains('collapsed')) {
-                                if (label) item.setAttribute('title', label.textContent.trim());
-                            } else {
-                                item.removeAttribute('title');
-                            }
-                        });
-                    }
-                    
-                    if (toggleBtn && sidebar && mainContent) {
+                    if (toggleBtn && sidebar) {
                         toggleBtn.addEventListener('click', function() {
-                            console.log('Toggle button clicked!');
-                            if (window.innerWidth < 768) {
-                                sidebar.classList.toggle('show');
-                            } else {
-                                sidebar.classList.toggle('collapsed');
-                                mainContent.classList.toggle('sidebar-collapsed');
-                                const nav = document.querySelector('.navbar');
-                                if (nav) nav.classList.toggle('collapsed');
-                                updateTooltips();
-                            }
-                            console.log('Sidebar classes:', sidebar.className);
-                            console.log('MainContent classes:', mainContent.className);
+                            sidebar.classList.toggle('show');
                         });
+                        
+                        // Close sidebar when clicking outside on mobile
                         document.addEventListener('click', function(e) {
                             if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                const clickInside = sidebar.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target));
+                                const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
                                 if (!clickInside) {
                                     sidebar.classList.remove('show');
                                 }
                             }
                         });
+                        
+                        // Close sidebar on Escape key
                         document.addEventListener('keydown', function(e) {
                             if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
                                 sidebar.classList.remove('show');
                             }
                         });
-                        updateTooltips();
-                    } else {
-                        console.log('Missing elements:', { toggleBtn: !!toggleBtn, sidebar: !!sidebar, mainContent: !!mainContent });
                     }
                 });
             </script>
@@ -472,24 +414,25 @@
                 <!-- Enhanced Notification Bell for students - Dashboard Only -->
                 <style>
                     .notification-bell-container {
-                        position: fixed;
-                        top: 1.5rem;
-                        right: 2.5rem;
-                        z-index: 1050;
-                    }
-                    
-                    .notification-bell {
-                        background: var(--forest-green, #2d5016);
-                        border: none;
-                        border-radius: 50%;
-                        width: 50px;
-                        height: 50px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        transition: all 0.3s ease;
-                        box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
-                    }
+                            position: fixed !important;
+                            top: 0.6rem !important;
+                            right: 0.6rem !important;
+                            z-index: 2080 !important;
+                            pointer-events: auto;
+                        }
+
+                        .notification-bell {
+                            background: var(--forest-green, #2d5016) !important;
+                            border: none !important;
+                            border-radius: 50% !important;
+                            width: 56px !important;
+                            height: 56px !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            transition: all 0.18s ease !important;
+                            box-shadow: 0 6px 18px rgba(45, 80, 22, 0.35) !important;
+                        }
                     
                     .notification-bell:hover {
                         transform: scale(1.1);

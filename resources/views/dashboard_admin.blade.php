@@ -2,301 +2,413 @@
 
 @section('content')
 <style>
+    /* Homepage theme variables (mapped into existing dashboard vars) */
     :root {
-        --forest-green: #2d5016;
-        --forest-green-light: #4a7c59;
-        --forest-green-lighter: #e8f5e8;
-        --yellow-maize: #f4d03f;
+        --primary-green: #1f7a2d; /* Homepage forest green */
+        --primary-green-2: #13601f; /* darker stop */
+        --accent-green: #2e7d32;
+        --light-green: #eaf5ea;
+        --accent-orange: #FFCB05;
+        --text-dark: #16321f;
+        --text-light: #6c757d;
+        --bg-light: #f6fbf6;
+        --shadow: 0 10px 30px rgba(0,0,0,0.08);
+
+        /* Map dashboard-specific names to homepage palette for compatibility */
+        --forest-green: var(--primary-green);
+        --forest-green-dark: var(--primary-green-2);
+        --forest-green-light: var(--accent-green);
+        --forest-green-lighter: var(--light-green);
+        --yellow-maize: var(--accent-orange);
         --yellow-maize-light: #fef9e7;
         --white: #ffffff;
-        --gray-50: #f8f9fa;
-        --gray-100: #f1f3f4;
-        --gray-600: #6c757d;
+        --gray-50: var(--bg-light);
+        --gray-100: #eef6ee;
+        --gray-600: var(--text-light);
         --danger: #dc3545;
-        --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --warning: #ffc107;
+        --success: #28a745;
+        --info: #17a2b8;
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+        --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
     }
-    .admin-header {
-        background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
-        color: white;
+
+    /* Apply the same page zoom used on the homepage */
+    .home-zoom {
+        zoom: 0.85;
+    }
+    @supports not (zoom: 1) {
+        .home-zoom {
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+    }
+    
+    body, .profile-card, .stats-card, .main-content-card {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .main-dashboard-content {
+        background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+        min-height: 100vh;
+        padding: 1rem 1.5rem;
+        margin-left: 240px;
+        transition: margin-left 0.2s;
+    }
+
+    .main-dashboard-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+    
+    .welcome-card {
+        background: var(--hero-gradient);
         border-radius: 16px;
-        padding: 2rem 2rem 1.5rem 2rem;
-        margin-bottom: 2rem;
         box-shadow: var(--shadow-lg);
+        padding: 1.5rem 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #fff;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 1.5rem;
-    }
-    .admin-header .title {
-        display: flex;
-        align-items: center;
         gap: 1rem;
-        font-size: 1.6rem;
+        min-height: 100px;
+    }
+    
+    .welcome-card .welcome-text {
+        font-size: 1.75rem;
         font-weight: 700;
-        margin-bottom: 0;
+        line-height: 1.1;
+        margin-bottom: 0.25rem;
     }
-    .admin-header .badge {
-        font-size: 1.1rem;
-        padding: 0.7em 1.2em;
-        border-radius: 999px;
-        font-weight: 600;
-        box-shadow: 0 2px 8px rgba(44,62,80,0.08);
-        background: var(--yellow-maize);
-        color: var(--forest-green);
+    
+    .welcome-card .welcome-date {
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
     }
-    .admin-profile-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: var(--shadow-sm);
-        padding: 2rem;
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    .admin-profile-card img {
-        border: 3px solid var(--yellow-maize);
-        box-shadow: 0 2px 8px rgba(244, 208, 63, 0.08);
-    }
-    .admin-stats-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--gray-100);
-        transition: all 0.3s ease;
-        height: 100%;
-        text-align: center;
-    }
-    .admin-stats-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-    .admin-action-btn {
-        background: var(--yellow-maize);
-        color: var(--forest-green);
-        border: none;
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        box-shadow: var(--shadow-sm);
+    
+    .welcome-card .welcome-avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
+        overflow: hidden;
     }
-    .admin-action-btn:hover {
-        background: #f1c40f;
-        color: var(--forest-green);
-        transform: translateY(-1px);
+    
+    .dashboard-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        align-items: start;
+    }
+    
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+    
+    .dashboard-stat-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        padding: 1.25rem 1rem;
+        text-align: center;
+        border: 1px solid var(--gray-100);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 140px;
+    }
+    
+    .dashboard-stat-card:hover {
+        transform: translateY(-2px);
         box-shadow: var(--shadow-md);
     }
-    .admin-action-btn.primary {
-        background: var(--forest-green);
-        color: white;
-    }
-    .admin-action-btn.primary:hover {
-        background: var(--forest-green-light);
-        color: white;
-    }
-    .admin-action-btn.outline {
-        background: white;
+    
+    .dashboard-stat-card .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
         color: var(--forest-green);
-        border: 2px solid var(--forest-green);
+        margin-bottom: 0.5rem;
+        display: block;
     }
-    .admin-action-btn.outline:hover {
-        background: var(--forest-green-light);
-        color: white;
+
+    .dashboard-stat-card .stat-label {
+        font-size: 1rem;
+        color: var(--forest-green-light);
+        margin-bottom: 0.25rem;
     }
-    .admin-activity-card {
+    
+    .dashboard-stat-card .stat-subtitle {
+        font-size: 0.8rem;
+        color: var(--gray-600);
+        margin-bottom: 0.75rem;
+    }
+    
+    .dashboard-stat-card .stat-progress {
+        height: 6px;
+        background-color: var(--gray-100);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    
+    .dashboard-stat-card .stat-progress-bar {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease-in-out;
+    }
+    
+    .progress-success {
+        background-color: var(--success);
+    }
+    
+    .progress-warning {
+        background-color: var(--warning);
+    }
+    
+    .progress-info {
+        background-color: var(--info);
+    }
+    
+    .progress-danger {
+        background-color: var(--danger);
+    }
+    
+    .main-content-card {
         background: white;
         border-radius: 16px;
         box-shadow: var(--shadow-sm);
         border: 1px solid var(--gray-100);
-        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
     }
-    .admin-activity-card .card-header {
-        background: var(--forest-green-lighter) !important;
-        color: var(--forest-green) !important;
-        border-radius: 16px 16px 0 0 !important;
+    
+    .main-content-card .card-header {
+        background: var(--forest-green-lighter);
+        color: var(--forest-green);
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--gray-100);
         font-weight: 600;
-        font-size: 1.1rem;
-        padding: 1.5rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
-    .admin-activity-card .card-body {
-        padding: 2rem;
+    
+    .main-content-card .card-body {
+        padding: 1.25rem;
     }
-    @media (max-width: 991.98px) {
-        .admin-header {
+    
+    .quick-actions-sidebar {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-100);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        height: fit-content;
+    }
+    
+    .quick-actions-sidebar .card-header {
+        background: linear-gradient(180deg, rgba(34,139,34,0.06), rgba(34,139,34,0.02));
+        color: var(--forest-green);
+        padding: 0.875rem 1rem;
+        border-bottom: 1px solid var(--gray-100);
+        font-weight: 600;
+    }
+    
+    .quick-actions-sidebar .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-outline-primary, .btn-outline-success, .btn-outline-info, .btn-outline-warning {
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.15s ease;
+        padding: 0.6rem 1rem;
+        border-width: 1px;
+        box-shadow: 0 6px 18px rgba(17,94,37,0.06);
+    }
+    
+    .btn-outline-primary {
+        border-color: var(--forest-green);
+        color: var(--forest-green);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--forest-green);
+        border-color: var(--forest-green);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-outline-success:hover, .btn-outline-info:hover, .btn-outline-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid var(--gray-100);
+        padding: 0.75rem 0;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    
+    @media (max-width: 991px) {
+        .dashboard-layout {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .dashboard-stats {
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+        }
+        
+        .welcome-card {
             flex-direction: column;
             align-items: flex-start;
-            gap: 0.75rem;
-            padding: 1.25rem 1rem;
+            padding: 2rem 1.5rem;
+            text-align: center;
         }
-        .admin-header .title { font-size: 1.3rem; }
-        .admin-header .badge { font-size: 1rem; padding: 0.5em 0.9em; }
+        
+        .main-dashboard-content {
+            padding: 1.5rem 1rem;
+        }
     }
-    @media (max-width: 575.98px) {
-        .admin-action-btn { padding: 0.8rem 1rem; }
-        .admin-stats-card { padding: 1rem; }
-        .admin-activity-card .card-header { padding: 1rem; }
-        .admin-activity-card .card-body { padding: 1rem; }
+    
+    @media (max-width: 768px) {
+        .welcome-card .welcome-text {
+            font-size: 1.8rem;
+        }
+        
+        .dashboard-stat-card {
+            padding: 1.5rem 1rem;
+        }
+        
+        .main-content-card .card-header,
+        .main-content-card .card-body,
+        .quick-actions-sidebar .card-header,
+        .quick-actions-sidebar .card-body {
+            padding: 1rem;
+        }
     }
 </style>
-<div class="container py-4">
-    <div class="admin-header mb-4">
-        <div class="title">
-            <i class="bi bi-speedometer2 fs-2"></i>
-            Admin Dashboard
-        </div>
-        <span class="badge">Welcome, {{ auth()->user()->name }}!</span>
-        <span class="text-white">Today is <strong>{{ now()->format('l, F j, Y') }}</strong></span>
+
+<div class="welcome-card">
+    <div>
+        <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
+        <div class="welcome-text">Welcome back, {{ auth()->user()->name }}!</div>
+        <div style="font-size: 0.9rem; margin-top: 0.5rem;">Manage and monitor the GCC System</div>
     </div>
-    <div class="row g-4 mb-4 align-items-stretch">
-        <div class="col-12">
-            <div class="row g-3 mb-3 align-items-stretch">
-                <div class="col-6 col-lg-3 d-flex">
-                    <a href="{{ route('users.index') }}" class="admin-action-btn w-100 primary align-self-stretch d-flex align-items-center justify-content-center"><i class="bi bi-people me-2"></i>Manage Users</a>
-                </div>
-                <div class="col-6 col-lg-3 d-flex">
-                    <a href="{{ route('announcements.index') }}" class="admin-action-btn w-100 align-self-stretch d-flex align-items-center justify-content-center"><i class="bi bi-megaphone me-2"></i>Manage Announcements</a>
-                </div>
-                <div class="col-6 col-lg-3 d-flex">
-                    <a href="{{ route('activities') }}" class="admin-action-btn w-100 outline align-self-stretch d-flex align-items-center justify-content-center"><i class="bi bi-activity me-2"></i>Activity Logs</a>
-                </div>
-                <div class="col-6 col-lg-3 d-flex">
-                    <a href="{{ route('admin.logs') }}" class="admin-action-btn w-100 outline align-self-stretch d-flex align-items-center justify-content-center"><i class="bi bi-journal-text me-2"></i>View All Logs</a>
-                </div>
-            </div>
-            <div class="row g-3 align-items-stretch">
-                <div class="col-6 col-lg-3 d-flex">
-                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
-                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\User::count() }}</div>
-                        <div class="text-muted">Total Users</div>
-                        <div class="small text-muted mt-1">
-                            {{ \App\Models\User::where('role', 'student')->count() }} Students • 
-                            {{ \App\Models\User::where('role', 'counselor')->count() }} Counselors
-                        </div>
-                        <a href="{{ route('admin.logs.users') }}" class="btn btn-sm btn-outline-primary mt-2">
-                            <i class="bi bi-arrow-right me-1"></i>View All Users
-                        </a>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3 d-flex">
-                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
-                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\Appointment::count() }}</div>
-                        <div class="text-muted">Total Appointments</div>
-                        <div class="small text-muted mt-1">
-                            {{ \App\Models\Appointment::where('status', 'pending')->count() }} Pending • 
-                            {{ \App\Models\Appointment::where('status', 'completed')->count() }} Completed
-                        </div>
-                        <a href="{{ route('admin.logs.appointments') }}" class="btn btn-sm btn-outline-success mt-2">
-                            <i class="bi bi-arrow-right me-1"></i>View All Appointments
-                        </a>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3 d-flex">
-                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
-                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\Assessment::count() }}</div>
-                        <div class="text-muted">Total Assessments</div>
-                        <div class="small text-muted mt-1">
-                            {{ \App\Models\Assessment::where('status', 'completed')->count() }} Completed • 
-                            {{ \App\Models\Assessment::where('status', 'pending')->count() }} Pending
-                        </div>
-                        <a href="{{ route('admin.logs.assessments') }}" class="btn btn-sm btn-outline-danger mt-2">
-                            <i class="bi bi-arrow-right me-1"></i>View All Assessments
-                        </a>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3 d-flex">
-                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
-                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\Announcement::count() }}</div>
-                        <div class="text-muted">Total Announcements</div>
-                        <div class="small text-muted mt-1">
-                            {{ \App\Models\Announcement::where('is_active', true)->count() }} Active • 
-                            {{ \App\Models\Announcement::where('is_active', false)->count() }} Inactive
-                        </div>
-                        <a href="{{ route('announcements.index') }}" class="btn btn-sm btn-outline-warning mt-2">
-                            <i class="bi bi-arrow-right me-1"></i>Manage Announcements
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Additional Stats Row -->
-            <div class="row g-3 align-items-stretch mt-3">
-                <div class="col-6 col-lg-3 d-flex">
-                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
-                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\SessionNote::count() }}</div>
-                        <div class="text-muted">Session Notes</div>
-                        <div class="small text-muted mt-1">
-                            {{ \App\Models\SessionNote::where('created_at', '>=', now()->subDays(30))->count() }} This Month
-                        </div>
-                        <a href="{{ route('admin.logs.session-notes') }}" class="btn btn-sm btn-outline-info mt-2">
-                            <i class="bi bi-arrow-right me-1"></i>View Session Notes
-                        </a>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3 d-flex">
-                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
-                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\SessionFeedback::count() }}</div>
-                        <div class="text-muted">Session Feedbacks Logs</div>
-                        <div class="small text-muted mt-1">
-                            {{ \App\Models\SessionFeedback::where('created_at', '>=', now()->subDays(30))->count() }} This Month
-                        </div>
-                        <a href="{{ route('admin.logs.session-feedbacks') }}" class="btn btn-sm btn-outline-warning mt-2">
-                            <i class="bi bi-arrow-right me-1"></i>View Session Feedbacks
-                        </a>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3 d-flex">
-                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
-                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\UserActivity::count() }}</div>
-                        <div class="text-muted">System Activities</div>
-                        <div class="small text-muted mt-1">
-                            {{ \App\Models\UserActivity::where('created_at', '>=', now()->subDays(7))->count() }} This Week
-                        </div>
-                        <a href="{{ route('activities') }}" class="btn btn-sm btn-outline-dark mt-2">
-                            <i class="bi bi-arrow-right me-1"></i>View Activities
-                        </a>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3 d-flex">
-                    <div class="admin-stats-card w-100 d-flex flex-column justify-content-center align-items-center">
-                        <div class="fs-2 fw-bold" style="color: var(--forest-green);">{{ \App\Models\User::where('is_active', true)->count() }}</div>
-                        <div class="text-muted">Active Users</div>
-                        <div class="small text-muted mt-1">
-                            {{ round((\App\Models\User::where('is_active', true)->count() / \App\Models\User::count()) * 100) }}% of Total
-                        </div>
-                        <a href="{{ route('users.index') }}" class="btn btn-sm btn-outline-primary mt-2">
-                            <i class="bi bi-arrow-right me-1"></i>View Active Users
-                        </a>
-                    </div>
-                </div>
+    <div class="welcome-avatar">
+        <img src="{{ auth()->user()->avatar_url }}" 
+             alt="{{ auth()->user()->name }}" 
+             style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+    </div>
+</div>
+
+<div class="dashboard-layout">
+    <div class="dashboard-stats">
+        <div class="dashboard-stat-card">
+            <div class="stat-value">{{ \App\Models\User::count() }}</div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-subtitle">{{ \App\Models\User::where('role', 'student')->count() }} Students • {{ \App\Models\User::where('role', 'counselor')->count() }} Counselors</div>
+            <div class="stat-progress">
+                <div class="stat-progress-bar progress-success" style="width: {{ round((\App\Models\User::where('is_active', true)->count() / \App\Models\User::count()) * 100) }}%"></div>
             </div>
         </div>
-    <div class="admin-activity-card card shadow-sm mt-4">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
+        <div class="dashboard-stat-card">
+            <div class="stat-value">{{ \App\Models\Appointment::count() }}</div>
+            <div class="stat-label">Total Appointments</div>
+            <div class="stat-subtitle">{{ \App\Models\Appointment::where('status', 'pending')->count() }} Pending • {{ \App\Models\Appointment::where('status', 'completed')->count() }} Completed</div>
+            <div class="stat-progress">
+                <div class="stat-progress-bar progress-info" style="width: {{ \App\Models\Appointment::count() > 0 ? round((\App\Models\Appointment::where('status', 'completed')->count() / \App\Models\Appointment::count()) * 100) : 0 }}%"></div>
+            </div>
         </div>
-        <div class="card-body">
-            @php $userActivities = \App\Models\UserActivity::where('user_id', auth()->id())->latest()->take(5)->get(); @endphp
-            @if($userActivities->count())
-                <ul class="list-group list-group-flush">
-                    @foreach($userActivities as $activity)
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>{{ ucfirst($activity->action) }} - {{ $activity->description }}</span>
-                            <span class="text-muted small">{{ $activity->created_at->diffForHumans() }}</span>
-                        </li>
-                    @endforeach
-                </ul>
+        <div class="dashboard-stat-card">
+            <div class="stat-value">{{ \App\Models\Assessment::count() }}</div>
+            <div class="stat-label">Total Assessments</div>
+            <div class="stat-subtitle">{{ \App\Models\Assessment::where('status', 'completed')->count() }} Completed • {{ \App\Models\Assessment::where('status', 'pending')->count() }} Pending</div>
+            <div class="stat-progress">
+                <div class="stat-progress-bar progress-warning" style="width: {{ \App\Models\Assessment::count() > 0 ? round((\App\Models\Assessment::where('status', 'completed')->count() / \App\Models\Assessment::count()) * 100) : 0 }}%"></div>
+            </div>
+        </div>
+        <div class="dashboard-stat-card">
+            <div class="stat-value">{{ \App\Models\User::where('registration_status', 'pending')->count() }}</div>
+            <div class="stat-label">Pending Approvals</div>
+            <div class="stat-subtitle">{{ \App\Models\User::where('registration_status', 'pending')->count() }} registrations awaiting review</div>
+            @if(\App\Models\User::where('registration_status', 'pending')->count() > 0)
+                <div class="stat-progress">
+                    <div class="stat-progress-bar progress-danger" style="width: 100%"></div>
+                </div>
             @else
-                <div class="text-muted">No recent activities.</div>
+                <div class="stat-progress">
+                    <div class="stat-progress-bar" style="width: 0%"></div>
+                </div>
             @endif
         </div>
     </div>
+    
+    <!-- Quick Actions Section -->
+    <div class="quick-actions-sidebar">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h6>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-column gap-2">
+                <a href="{{ route('users.index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-people me-1"></i>Manage Users
+                </a>
+                <a href="{{ route('admin.registration-approvals.index') }}" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-person-check me-1"></i>Review Registrations
+                </a>
+                <a href="{{ route('announcements.index') }}" class="btn btn-outline-info btn-sm">
+                    <i class="bi bi-megaphone me-1"></i>Manage Announcements
+                </a>
+                <a href="{{ route('activities') }}" class="btn btn-outline-warning btn-sm">
+                    <i class="bi bi-activity me-1"></i>View Activity Logs
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
-@endsection 
+
+<div class="main-content-card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
+        <a href="{{ route('activities') }}" class="btn btn-success btn-sm">
+            <i class="bi bi-arrow-right me-1"></i>View All
+        </a>
+    </div>
+    <div class="card-body">
+        @php $userActivities = \App\Models\UserActivity::where('user_id', auth()->id())->latest()->take(10)->get(); @endphp
+        @if($userActivities->count())
+            <ul class="list-group list-group-flush">
+                @foreach($userActivities as $activity)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ ucfirst($activity->action) }} - {{ $activity->description }}</span>
+                        <span class="text-muted small">{{ $activity->created_at->diffForHumans() }}</span>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <div class="text-muted text-center py-4">No recent activities.</div>
+        @endif
+    </div>
+</div>
+@endsection

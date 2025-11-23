@@ -81,7 +81,7 @@
             <!-- Summary Tab -->
             <div class="tab-pane fade show active" id="summaryTab" role="tabpanel" aria-labelledby="summary-tab">
                 <div class="row mb-4 g-3">
-                    @if($assessment->type === 'DASS-21')
+                    @if($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21')
                         <div class="col-md-4">
                             <div class="card shadow-sm p-3 h-100">
                                 <div class="fw-bold mb-1">Depression</div>
@@ -89,6 +89,17 @@
                                     <div class="progress-bar bg-primary" style="width: {{ isset($scores['depression']) ? min($scores['depression']/42*100,100) : 0 }}%"></div>
                                 </div>
                                 <span class="fw-bold">{{ $scores['depression'] ?? '-' }}/42</span>
+                                @if(isset($score_interpretation['depression']))
+                                    <div class="mt-1">
+                                        <span class="badge 
+                                            @if($score_interpretation['depression'] === 'Extremely Severe' || $score_interpretation['depression'] === 'Severe') bg-danger
+                                            @elseif($score_interpretation['depression'] === 'Moderate') bg-warning text-dark
+                                            @elseif($score_interpretation['depression'] === 'Mild') bg-info text-dark
+                                            @else bg-success @endif">
+                                            {{ $score_interpretation['depression'] }}
+                                        </span>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -98,6 +109,17 @@
                                     <div class="progress-bar bg-info" style="width: {{ isset($scores['anxiety']) ? min($scores['anxiety']/42*100,100) : 0 }}%"></div>
                                 </div>
                                 <span class="fw-bold">{{ $scores['anxiety'] ?? '-' }}/42</span>
+                                @if(isset($score_interpretation['anxiety']))
+                                    <div class="mt-1">
+                                        <span class="badge 
+                                            @if($score_interpretation['anxiety'] === 'Extremely Severe' || $score_interpretation['anxiety'] === 'Severe') bg-danger
+                                            @elseif($score_interpretation['anxiety'] === 'Moderate') bg-warning text-dark
+                                            @elseif($score_interpretation['anxiety'] === 'Mild') bg-info text-dark
+                                            @else bg-success @endif">
+                                            {{ $score_interpretation['anxiety'] }}
+                                        </span>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -107,6 +129,17 @@
                                     <div class="progress-bar bg-secondary" style="width: {{ isset($scores['stress']) ? min($scores['stress']/42*100,100) : 0 }}%"></div>
                                 </div>
                                 <span class="fw-bold">{{ $scores['stress'] ?? '-' }}/42</span>
+                                @if(isset($score_interpretation['stress']))
+                                    <div class="mt-1">
+                                        <span class="badge 
+                                            @if($score_interpretation['stress'] === 'Extremely Severe' || $score_interpretation['stress'] === 'Severe') bg-danger
+                                            @elseif($score_interpretation['stress'] === 'Moderate') bg-warning text-dark
+                                            @elseif($score_interpretation['stress'] === 'Mild') bg-info text-dark
+                                            @else bg-success @endif">
+                                            {{ $score_interpretation['stress'] }}
+                                        </span>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @else

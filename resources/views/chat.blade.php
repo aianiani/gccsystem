@@ -10,6 +10,230 @@
 @endpush
 
 @section('content')
+    <style>
+        /* Homepage theme variables (mapped into existing dashboard vars) */
+        :root {
+            --primary-green: #1f7a2d; /* Homepage forest green */
+            --primary-green-2: #13601f; /* darker stop */
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
+            --text-dark: #16321f;
+            --text-light: #6c757d;
+            --bg-light: #f6fbf6;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+
+            /* Map dashboard-specific names to homepage palette for compatibility */
+            --forest-green: var(--primary-green);
+            --forest-green-dark: var(--primary-green-2);
+            --forest-green-light: var(--accent-green);
+            --forest-green-lighter: var(--light-green);
+            --yellow-maize: var(--accent-orange);
+            --yellow-maize-light: #fef9e7;
+            --white: #ffffff;
+            --gray-50: var(--bg-light);
+            --gray-100: #eef6ee;
+            --gray-600: var(--text-light);
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --info: #17a2b8;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+        }
+
+        /* Apply the same page zoom used on the homepage */
+        .home-zoom {
+            zoom: 0.85;
+        }
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.85);
+                transform-origin: top center;
+            }
+        }
+        
+        body, .profile-card, .stats-card, .main-content-card {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .custom-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            background: var(--forest-green) ;
+            color: #fff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0,0,0,0.08);
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+        
+        .custom-sidebar .sidebar-logo {
+            text-align: center;
+            padding: 2rem 1rem 1rem 1rem;
+            border-bottom: 1px solid #4a7c59;
+        }
+        
+        .custom-sidebar .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0.5rem 0 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .custom-sidebar .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+            position: relative;
+        }
+        
+        .custom-sidebar .sidebar-link.active, .custom-sidebar .sidebar-link:hover {
+            background: #4a7c59;
+            color: #f4d03f;
+        }
+        
+        .custom-sidebar .sidebar-link .bi {
+            font-size: 1.1rem;
+        }
+        
+        .custom-sidebar .sidebar-bottom {
+            padding: 1rem 0.5rem;
+            border-top: 1px solid #4a7c59;
+        }
+        
+        .custom-sidebar .sidebar-link.logout {
+            background: #dc3545;
+            color: #fff;
+            border-radius: 8px;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .custom-sidebar .sidebar-link.logout:hover {
+            background: #b52a37;
+            color: #fff;
+        }
+        
+        @media (max-width: 991.98px) {
+            .custom-sidebar {
+                width: 200px;
+            }
+            .main-dashboard-content {
+                margin-left: 200px;
+            }
+        }
+        @media (max-width: 767.98px) {
+            /* Off-canvas behavior on mobile */
+            .custom-sidebar {
+                position: fixed;
+                z-index: 1040;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                width: 240px;
+                transform: translateX(-100%);
+                transition: transform 0.2s ease;
+                flex-direction: column;
+                padding: 0;
+            }
+            .custom-sidebar.show {
+                transform: translateX(0);
+            }
+            .custom-sidebar .sidebar-logo { display: block; }
+            .custom-sidebar .sidebar-nav {
+                flex-direction: column;
+                gap: 0.25rem;
+                padding: 1rem 0.5rem 1rem 0.5rem;
+            }
+            .custom-sidebar .sidebar-link {
+                justify-content: flex-start;
+                padding: 0.6rem 0.75rem;
+                font-size: 1rem;
+            }
+            .main-dashboard-content {
+                margin-left: 0;
+            }
+            /* Toggle button */
+            #studentSidebarToggle {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1100;
+                background: var(--forest-green);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                padding: 0.5rem 0.75rem;
+                box-shadow: var(--shadow-sm);
+            }
+        }
+        
+        .main-dashboard-content {
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+            min-height: 100vh;
+            padding: 1rem 1.5rem;
+            margin-left: 240px;
+            transition: margin-left 0.2s;
+        }
+
+        /* Constrain inner content and center it within the available area */
+        .main-dashboard-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+    </style>
+
+    <div class="home-zoom">
+    <div class="d-flex">
+        <!-- Mobile Sidebar Toggle -->
+        <button id="studentSidebarToggle" class="d-md-none">
+            <i class="bi bi-list"></i>
+        </button>
+        <!-- Sidebar -->
+        <div class="custom-sidebar">
+            <div class="sidebar-logo mb-4">
+                <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
+                <h3 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">CMU Guidance and Counseling Center</h3>
+                <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Student Portal</p>
+            </div>
+            <nav class="sidebar-nav flex-grow-1">
+                <a href="{{ route('profile') }}" class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i class="bi bi-person"></i>Profile</a>
+                <a href="{{ route('dashboard') }}" class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i class="bi bi-house-door"></i>Dashboard</a>
+                <a href="{{ route('appointments.index') }}" class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i class="bi bi-calendar-check"></i>Appointments</a>
+                <a href="{{ route('assessments.index') }}" class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i class="bi bi-clipboard-data"></i>Assessments</a>
+                <a href="{{ route('chat.selectCounselor') }}" class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i class="bi bi-chat-dots"></i>Chat with a Counselor</a>
+            </nav>
+            <div class="sidebar-bottom w-100">
+                <a href="{{ route('logout') }}" class="sidebar-link logout"
+                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="bi bi-box-arrow-right"></i>Logout
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-dashboard-content flex-grow-1">
+            <div class="main-dashboard-inner">
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
@@ -34,9 +258,6 @@
                     </div>
                     
                     <div class="d-grid gap-2">
-                        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                        </a>
                         @if(auth()->user()->role === 'student')
                             <a href="{{ route('chat.selectCounselor') }}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-users me-2"></i>Chat with Another Counselor
@@ -195,6 +416,10 @@
         </div>
     </div>
 </div>
+            </div>
+        </div>
+    </div>
+    </div>
 
 <style>
 .message-own .message-content {
@@ -543,4 +768,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+    <script>
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('studentSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
 @endsection 

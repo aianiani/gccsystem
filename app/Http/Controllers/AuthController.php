@@ -19,7 +19,7 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
-        return view('auth.login');
+        return redirect()->route('home');
     }
 
     /**
@@ -36,6 +36,14 @@ class AuthController extends Controller
             // Log failed login attempt
             $user = User::where('email', $request->email)->first();
             \App\Models\UserActivity::log($user?->id, 'login_failed', 'Validation failed during login');
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Please correct the errors below and try again.',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput($request->except('password'))
@@ -52,7 +60,7 @@ class AuthController extends Controller
             if (!$user->isActive()) {
                 Auth::logout();
                 \App\Models\UserActivity::log($user->id, 'login_failed', 'Login attempt for deactivated account');
-                return redirect()->route('login')
+                return redirect()->route('home')
                     ->with('error', 'Your account has been deactivated. Please contact an administrator for assistance.');
             }
 
@@ -60,7 +68,7 @@ class AuthController extends Controller
             if ($user->role === 'student' && !$user->isApproved()) {
                 Auth::logout();
                 \App\Models\UserActivity::log($user->id, 'login_failed', 'Login attempt for unapproved student registration');
-                return redirect()->route('login')
+                return redirect()->route('home')
                     ->with('error', 'Your registration is pending approval. You will be notified via email once your account is approved by an administrator.');
             }
 
@@ -68,7 +76,7 @@ class AuthController extends Controller
             if (!$user->hasVerifiedEmail()) {
                 Auth::logout();
                 \App\Models\UserActivity::log($user->id, 'login_failed', 'Login attempt with unverified email');
-                return redirect()->route('login')
+                return redirect()->route('home')
                     ->with('error', 'Please verify your email address before logging in. <a href="' . route('verification.resend') . '" class="underline">Click here to resend verification email</a>.');
             }
 
@@ -88,6 +96,14 @@ class AuthController extends Controller
                 Auth::logout();
                 $request->session()->put('2fa:user:id', $user->id);
                 \App\Models\UserActivity::log($user->id, 'login_2fa', '2FA code sent to user email');
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'status' => '2fa_required',
+                        'message' => 'A 2FA code has been sent to your email.',
+                    ], 200);
+                }
+
                 return redirect()->route('2fa.form')->with('info', 'A 2FA code has been sent to your email.');
             }
 
@@ -95,14 +111,29 @@ class AuthController extends Controller
             \App\Models\UserActivity::log($user->id, 'login', 'User logged in successfully');
 
             $request->session()->regenerate();
-            
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => "Welcome back, {$user->name}! You have successfully logged in.",
+                    'redirect' => route('dashboard'),
+                ], 200);
+            }
+
             return redirect()->intended(route('dashboard'))
                 ->with('success', "Welcome back, {$user->name}! You have successfully logged in.");
         }
 
         // Log failed login attempt
         \App\Models\UserActivity::log($user?->id, 'login_failed', 'Invalid credentials');
-        return redirect()->route('login')
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'The provided credentials do not match our records. Please check your email and password and try again.',
+            ], 401);
+        }
+
+        return redirect()->route('home')
             ->with('error', 'The provided credentials do not match our records. Please check your email and password and try again.')
             ->withInput($request->except('password'));
     }
@@ -120,10 +151,33 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        // Build name from first_name, middle_name, last_name if provided, otherwise use name field
+        $fullName = $request->name;
+        if ($request->filled('first_name') && $request->filled('last_name')) {
+            $nameParts = array_filter([
+                $request->first_name,
+                $request->middle_name,
+                $request->last_name
+            ]);
+            $fullName = implode(' ', $nameParts);
+        }
+
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => 'required_without:first_name|string|max:255',
+            'first_name' => 'required_without:name|string|max:255',
+            'last_name' => 'required_without:name|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'contact_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'student_id' => 'nullable|string|max:50',
+            'college' => 'nullable|string|max:255',
+            'course' => 'nullable|string|max:255',
+            'year_level' => 'nullable|string|max:50',
+            'gender' => 'nullable|in:male,female,non-binary,prefer_not_to_say,other',
+            'gender_other' => 'required_if:gender,other|nullable|string|max:255',
+            'cor_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
         ]);
 
         if ($validator->fails()) {
@@ -133,13 +187,48 @@ class AuthController extends Controller
                 ->with('error', 'Please correct the errors below and try again.');
         }
 
+        // Handle gender - if "other" is selected, use gender_other value
+        $gender = $request->gender;
+        if ($request->gender === 'other' && $request->filled('gender_other')) {
+            // Store as "other" in enum, but we could also store the custom value
+            // For now, we'll keep it as "other" since enum doesn't support custom values
+            // You might want to add a separate field for custom gender if needed
+            $gender = 'other';
+        }
+
+        // Handle COR file upload
+        $corFileName = null;
+        if ($request->hasFile('cor_file')) {
+            $file = $request->file('cor_file');
+            $originalName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            // Create unique filename: timestamp_userid_originalname
+            $corFileName = time() . '_' . uniqid() . '.' . $extension;
+            
+            // Store in storage/app/public/cor_files
+            $destinationPath = storage_path('app/public/cor_files');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            
+            $file->move($destinationPath, $corFileName);
+        }
+
         $user = User::create([
-            'name' => $request->name,
+            'name' => $fullName,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'student', // Always set to student
             'is_active' => false, // Set as inactive until approved
             'registration_status' => 'pending', // Set as pending approval
+            'contact_number' => $request->contact_number,
+            'address' => $request->address,
+            'student_id' => $request->student_id,
+            'college' => $request->college,
+            'course' => $request->course,
+            'year_level' => $request->year_level,
+            'gender' => $gender,
+            'cor_file' => $corFileName,
         ]);
 
         // Send email verification
@@ -148,7 +237,15 @@ class AuthController extends Controller
         // Log registration activity
         UserActivity::log($user->id, 'register', 'User registered successfully');
 
-        return redirect()->route('login')
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => "Welcome to our platform, {$user->name}! We've sent you an email verification link. Please check your email.",
+                'redirect' => route('home'),
+            ], 201);
+        }
+
+        return redirect()->route('home')
             ->with('success', "Welcome to our platform, {$user->name}! We've sent you an email verification link. Please check your email and click the verification link. After email verification, your registration will be reviewed by an administrator. You will be notified once your account is approved.");
     }
 
@@ -160,12 +257,12 @@ class AuthController extends Controller
         $user = User::findOrFail($id);
 
         if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return redirect()->route('login')
+            return redirect()->route('home')
                 ->with('error', 'Invalid verification link.');
         }
 
         if ($user->hasVerifiedEmail()) {
-            return redirect()->route('login')
+            return redirect()->route('home')
                 ->with('info', 'Your email has already been verified.');
         }
 
@@ -174,7 +271,7 @@ class AuthController extends Controller
         // Log email verification activity
         UserActivity::log($user->id, 'email_verified', 'User email verified successfully');
 
-        return redirect()->route('login')
+        return redirect()->route('home')
             ->with('success', 'Your email has been verified successfully! You can now log in to your account.');
     }
 
@@ -190,7 +287,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user->hasVerifiedEmail()) {
-            return redirect()->route('login')
+            return redirect()->route('home')
                 ->with('info', 'Your email has already been verified.');
         }
 
@@ -199,7 +296,7 @@ class AuthController extends Controller
         // Log resend verification activity
         UserActivity::log($user->id, 'verification_resent', 'Email verification resent');
 
-        return redirect()->route('login')
+        return redirect()->route('home')
             ->with('success', 'A new verification link has been sent to your email address.');
     }
 
@@ -225,11 +322,19 @@ class AuthController extends Controller
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => "You have been successfully logged out. Thank you for using our platform, {$userName}!",
+                    'redirect' => route('home'),
+                ], 200);
+            }
+
+            return redirect()->route('home')
                 ->with('success', "You have been successfully logged out. Thank you for using our platform, {$userName}!");
         }
 
-        return redirect()->route('login')
+        return redirect()->route('home')
             ->with('info', 'You were not logged in.');
     }
 
@@ -300,7 +405,7 @@ class AuthController extends Controller
         $user->save();
         // Delete the reset token
         DB::table('password_resets')->where('email', $request->email)->delete();
-        return redirect()->route('login')->with('success', 'Your password has been reset! You can now log in.');
+        return redirect()->route('home')->with('success', 'Your password has been reset! You can now log in.');
     }
 
     /**
@@ -309,7 +414,7 @@ class AuthController extends Controller
     public function showTwoFactorForm(Request $request)
     {
         if (!$request->session()->has('2fa:user:id')) {
-            return redirect()->route('login')->with('error', '2FA session expired. Please log in again.');
+            return redirect()->route('home')->with('error', '2FA session expired. Please log in again.');
         }
         return view('auth.twofactor');
     }
@@ -322,11 +427,11 @@ class AuthController extends Controller
         $request->validate(['code' => 'required|digits:6']);
         $userId = $request->session()->get('2fa:user:id');
         if (!$userId) {
-            return redirect()->route('login')->with('error', '2FA session expired. Please log in again.');
+            return redirect()->route('home')->with('error', '2FA session expired. Please log in again.');
         }
         $record = DB::table('two_factor_codes')->where('user_id', $userId)->first();
         if (!$record) {
-            return redirect()->route('login')->with('error', 'No 2FA code found. Please log in again.');
+            return redirect()->route('home')->with('error', 'No 2FA code found. Please log in again.');
         }
         // Check code and expiry (5 minutes)
         if ($record->code == $request->code && now()->diffInMinutes($record->created_at) < 5) {
@@ -350,11 +455,11 @@ class AuthController extends Controller
     {
         $userId = $request->session()->get('2fa:user:id');
         if (!$userId) {
-            return redirect()->route('login')->with('error', '2FA session expired. Please log in again.');
+            return redirect()->route('home')->with('error', '2FA session expired. Please log in again.');
         }
         $user = User::find($userId);
         if (!$user) {
-            return redirect()->route('login')->with('error', 'User not found. Please log in again.');
+            return redirect()->route('home')->with('error', 'User not found. Please log in again.');
         }
         // Generate new 2FA code
         $code = random_int(100000, 999999);

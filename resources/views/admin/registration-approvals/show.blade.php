@@ -2,23 +2,56 @@
 
 @section('content')
 <style>
+    :root {
+        --forest-green: #1f7a2d;
+        --forest-green-light: #4a7c59;
+        --forest-green-lighter: #e8f5e8;
+        --yellow-maize: #f4d03f;
+        --gray-50: #f8f9fa;
+        --gray-100: #eef6ee;
+        --gray-600: #6c757d;
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+        --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
+    }
+
+    /* Apply the same page zoom used on the homepage */
+    .home-zoom {
+        zoom: 0.85;
+    }
+    @supports not (zoom: 1) {
+        .home-zoom {
+            transform: scale(0.85);
+            transform-origin: top center;
+        }
+    }
+
+    .main-dashboard-inner {
+        padding: 2rem;
+    }
+
     .registration-detail {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-100);
+        margin-bottom: 1.5rem;
         overflow: hidden;
     }
 
-    .card-header {
-        background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
-        color: white;
-        padding: 1.5rem 2rem;
-        border-bottom: none;
+    .registration-detail .card-header {
+        background: var(--forest-green-lighter);
+        color: var(--forest-green);
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--gray-100);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
-    .card-body {
-        padding: 2rem;
+    .registration-detail .card-body {
+        padding: 1.25rem;
     }
 
     .status-badge {
@@ -32,21 +65,40 @@
     .status-approved { background: #d4edda; color: #155724; }
     .status-rejected { background: #f8d7da; color: #721c24; }
 
-    .page-header {
-        background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
-        color: white;
+    .page-header-card {
+        background: var(--hero-gradient);
         border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: var(--shadow-md);
+        padding: 1.5rem 2rem;
+        margin-bottom: 1.5rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-header-card h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+        color: #fff;
+    }
+
+    .page-header-card p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
     }
 
     .info-row {
         display: flex;
         justify-content-between;
-        align-items: center;
+        align-items: flex-start;
         padding: 1rem 0;
-        border-bottom: 1px solid #e9ecef;
+        gap: 1rem;
+        border-bottom: 1px solid var(--gray-100);
     }
 
     .info-row:last-child {
@@ -55,39 +107,88 @@
 
     .info-label {
         font-weight: 600;
-        color: #495057;
+        color: var(--forest-green);
+        min-width: 180px;
+        flex-shrink: 0;
     }
 
     .info-value {
-        color: #6c757d;
+        color: var(--gray-600);
+        text-align: right;
+        flex: 1;
+        word-break: break-word;
     }
 
     .action-buttons {
         background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-100);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .student-avatar-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.5rem;
+        background: var(--gray-50);
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .student-avatar-container img,
+    .student-avatar-container .avatar-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1rem;
+    }
+
+    .student-avatar-container .avatar-placeholder {
+        background: var(--forest-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3rem;
+        font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+        .main-dashboard-inner {
+            padding: 1rem;
+        }
+
+        .page-header-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .info-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
     }
 </style>
 
-<div class="container-fluid py-4">
+<div class="home-zoom">
+<div class="main-dashboard-inner">
     <!-- Page Header -->
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="mb-2">
-                    <i class="bi bi-person me-3"></i>
-                    Registration Details
-                </h1>
-                <p class="mb-0 opacity-75">Review student registration information</p>
-            </div>
-            <div>
-                <a href="{{ route('admin.registration-approvals.index') }}" class="btn btn-outline-light">
-                    <i class="bi bi-arrow-left me-2"></i>
-                    Back to Approvals
-                </a>
-            </div>
+    <div class="page-header-card">
+        <div>
+            <h1><i class="bi bi-person me-2"></i>Registration Details</h1>
+            <p>Review student registration information</p>
+        </div>
+        <div>
+            <a href="{{ route('admin.registration-approvals.index') }}" class="btn btn-outline-light">
+                <i class="bi bi-arrow-left me-2"></i>
+                Back to Approvals
+            </a>
         </div>
     </div>
 
@@ -126,18 +227,19 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-4 text-center mb-4">
-                    @if($user->avatar)
-                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" 
-                             class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                    @else
-                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" 
-                             style="width: 150px; height: 150px;">
-                            <span class="text-white fw-bold" style="font-size: 3rem;">{{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}</span>
-                        </div>
-                    @endif
-                    <h4 class="mb-1">{{ $user->name ?? 'N/A' }}</h4>
-                    <p class="text-muted">{{ $user->email ?? 'N/A' }}</p>
+                <div class="col-md-4 mb-4">
+                    <div class="student-avatar-container">
+                        @if($user->avatar)
+                            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" 
+                                 class="rounded-circle">
+                        @else
+                            <div class="avatar-placeholder">
+                                {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
+                            </div>
+                        @endif
+                        <h4 class="mb-1 fw-bold">{{ $user->name ?? 'N/A' }}</h4>
+                        <p class="text-muted mb-0">{{ $user->email ?? 'N/A' }}</p>
+                    </div>
                 </div>
                 <div class="col-md-8">
                     <div class="info-row">
@@ -212,6 +314,80 @@
             </div>
         </div>
     </div>
+
+    <!-- Student Details (if student) -->
+    @if($user->role === 'student' && ($user->student_id || $user->college || $user->course || $user->contact_number || $user->address || $user->cor_file))
+        <div class="registration-detail">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-graduation-cap me-2"></i>
+                    Academic & Contact Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        @if($user->student_id)
+                            <div class="info-row">
+                                <span class="info-label">Student ID:</span>
+                                <span class="info-value">{{ $user->student_id }}</span>
+                            </div>
+                        @endif
+                        @if($user->college)
+                            <div class="info-row">
+                                <span class="info-label">College:</span>
+                                <span class="info-value">{{ $user->college }}</span>
+                            </div>
+                        @endif
+                        @if($user->course)
+                            <div class="info-row">
+                                <span class="info-label">Course/Program:</span>
+                                <span class="info-value">{{ $user->course }}</span>
+                            </div>
+                        @endif
+                        @if($user->year_level)
+                            <div class="info-row">
+                                <span class="info-label">Year Level:</span>
+                                <span class="info-value">{{ $user->year_level }}</span>
+                            </div>
+                        @endif
+                        @if($user->gender)
+                            <div class="info-row">
+                                <span class="info-label">Gender:</span>
+                                <span class="info-value">{{ ucfirst(str_replace('_', ' ', $user->gender)) }}</span>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="col-md-6">
+                        @if($user->contact_number)
+                            <div class="info-row">
+                                <span class="info-label">Contact Number:</span>
+                                <span class="info-value">{{ $user->contact_number }}</span>
+                            </div>
+                        @endif
+                        @if($user->address)
+                            <div class="info-row">
+                                <span class="info-label">Address:</span>
+                                <span class="info-value">{{ $user->address }}</span>
+                            </div>
+                        @endif
+                        @if($user->cor_file)
+                            <div class="info-row">
+                                <span class="info-label">Certificate of Registration (COR):</span>
+                                <span class="info-value">
+                                    <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url('cor_files/' . $user->cor_file) }}" target="_blank" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-file-earmark-pdf me-1"></i>
+                                        View COR File
+                                    </a>
+                                </span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+</div>
 </div>
 
 <!-- Approve Modal -->

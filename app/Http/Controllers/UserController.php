@@ -13,9 +13,45 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('activities')->paginate(10);
+        $query = User::with('activities');
+
+        // Search by name, email, or student_id
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('student_id', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Filter by role
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        // Filter by status (active/inactive)
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+
+        // Filter by registration status
+        if ($request->filled('registration_status')) {
+            $query->where('registration_status', $request->registration_status);
+        }
+
+        // Order by role (admin first), then by created_at descending (newest first)
+        $users = $query->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
+                       ->orderBy('created_at', 'desc')
+                       ->paginate(10)
+                       ->withQueryString();
+
         return view('users.index', compact('users'));
     }
 
@@ -204,6 +240,12 @@ class UserController extends Controller
     {
         $user = auth()->user();
         $activities = $user->activities()->latest()->paginate(10);
+        
+        // Return different views based on role
+        if ($user->role === 'counselor') {
+            return view('counselor.profile', compact('user', 'activities'));
+        }
+        
         return view('profile', compact('user', 'activities'));
     }
 
@@ -213,11 +255,60 @@ class UserController extends Controller
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
-        $request->validate([
+        
+        // Base validation rules for all users
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'contact_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+        ];
+        
+        // Add role-specific validation rules
+        if ($user->role === 'student') {
+            $rules = array_merge($rules, [
+                'student_id' => 'nullable|string|max:50',
+                'college' => 'nullable|string|max:255',
+                'course' => 'nullable|string|max:255',
+                'year_level' => 'nullable|string|max:50',
+            ]);
+        } elseif ($user->role === 'counselor') {
+            $rules = array_merge($rules, [
+                'license_number' => 'nullable|string|max:100',
+                'specialization' => 'nullable|string|max:255',
+                'years_of_experience' => 'nullable|integer|min:0',
+                'education' => 'nullable|string|max:1000',
+            ]);
+        }
+        
+        $request->validate($rules);
+        
+        // Base update data for all users
+        $updateData = $request->only([
+            'name', 
+            'email', 
+            'contact_number', 
+            'address'
         ]);
-        $user->update($request->only('name', 'email'));
+        
+        // Add role-specific fields
+        if ($user->role === 'student') {
+            $updateData = array_merge($updateData, $request->only([
+                'student_id', 
+                'college', 
+                'course', 
+                'year_level'
+            ]));
+        } elseif ($user->role === 'counselor') {
+            $updateData = array_merge($updateData, $request->only([
+                'license_number',
+                'specialization',
+                'years_of_experience',
+                'education'
+            ]));
+        }
+        
+        $user->update($updateData);
         UserActivity::log($user->id, 'update_profile', 'Updated profile information');
         return back()->with('success', 'Profile updated successfully.');
     }

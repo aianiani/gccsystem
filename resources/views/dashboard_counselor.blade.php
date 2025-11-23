@@ -1,201 +1,380 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    :root {
-        --forest-green: #2d5016;
-        --forest-green-light: #4a7c59;
-        --forest-green-lighter: #e8f5e8;
-        --yellow-maize: #f4d03f;
-        --yellow-maize-light: #fef9e7;
-        --white: #ffffff;
-        --gray-50: #f8f9fa;
-        --gray-100: #f1f3f4;
-        --gray-600: #6c757d;
-        --danger: #dc3545;
-        --warning: #ffc107;
-        --success: #28a745;
-        --info: #17a2b8;
-        --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
+    <style>
+        /* Homepage theme variables (mapped into existing dashboard vars) */
+        :root {
+            --primary-green: #1f7a2d; /* Homepage forest green */
+            --primary-green-2: #13601f; /* darker stop */
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
+            --text-dark: #16321f;
+            --text-light: #6c757d;
+            --bg-light: #f6fbf6;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
 
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        width: 250px;
-        background: #2d5016;
-        color: #fff;
-        z-index: 1040;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 2px 0 8px rgba(0,0,0,0.04);
-        overflow-y: auto; /* Make sidebar scrollable */
-    }
-    .sidebar-header {
-        text-align: center;
-        padding: 2rem 1rem 1rem 1rem;
-        border-bottom: 1px solid #4a7c59;
-    }
-    .sidebar-header img {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        margin-bottom: 0.5rem;
-    }
-    .sidebar-header h3 {
-        margin: 0.5rem 0 0.25rem 0;
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #f4d03f;
-    }
-    .sidebar-header p {
-        margin: 0;
-        font-size: 0.95rem;
-        color: #fff;
-        opacity: 0.7;
-    }
-    .sidebar-menu {
-        flex: 1;
-        padding: 1.5rem 0.5rem 0 0.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    .menu-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        color: #fff;
-        text-decoration: none;
-        font-weight: 500;
-        transition: background 0.2s, color 0.2s;
-        position: relative;
-    }
-    .menu-item.active, .menu-item:hover {
-        background: #4a7c59;
-        color: #f4d03f;
-    }
-    .menu-category {
-        margin: 1.5rem 0 0.5rem 1rem;
-        font-size: 0.85rem;
-        color: #f4d03f;
-        font-weight: 600;
-        opacity: 0.8;
-    }
-    .appointment-count {
-        background: #f4d03f;
-        color: #2d5016;
-        border-radius: 12px;
-        padding: 0.1rem 0.6rem;
-        font-size: 0.8rem;
-        font-weight: 700;
-        margin-left: auto;
-    }
-    #logoutButton {
-        margin-top: 2rem;
-        background: #dc3545;
-        color: #fff;
-        border-radius: 8px;
-        text-align: center;
-        padding: 0.75rem 1rem;
-        font-weight: 600;
-        transition: background 0.2s;
-    }
-    #logoutButton:hover {
-        background: #b52a37;
-        color: #fff;
-    }
-    @media (max-width: 991.98px) {
-        .sidebar {
-            width: 200px;
+            /* Map dashboard-specific names to homepage palette for compatibility */
+            --forest-green: var(--primary-green);
+            --forest-green-dark: var(--primary-green-2);
+            --forest-green-light: var(--accent-green);
+            --forest-green-lighter: var(--light-green);
+            --yellow-maize: var(--accent-orange);
+            --yellow-maize-light: #fef9e7;
+            --white: #ffffff;
+            --gray-50: var(--bg-light);
+            --gray-100: #eef6ee;
+            --gray-600: var(--text-light);
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --info: #17a2b8;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
-        .main-content {
-            margin-left: 200px;
+
+        /* Apply the same page zoom used on the homepage */
+        .home-zoom {
+            zoom: 0.85;
         }
-    }
-    @media (max-width: 767.98px) {
-        /* Off-canvas behavior on mobile */
-        .sidebar {
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.85);
+                transform-origin: top center;
+            }
+        }
+        
+        body, .profile-card, .stats-card, .main-content-card {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .custom-sidebar {
             position: fixed;
-            z-index: 1040;
-            height: 100vh;
-            left: 0;
             top: 0;
+            left: 0;
+            bottom: 0;
             width: 240px;
-            transform: translateX(-100%);
-            transition: transform 0.2s ease;
-            flex-direction: column;
-            padding: 0;
-        }
-        .sidebar.show { transform: translateX(0); }
-        .sidebar-header, .menu-category { display: block; }
-        .sidebar-menu { flex-direction: column; gap: 0.25rem; padding: 1rem 0.5rem; }
-        .menu-item { justify-content: flex-start; padding: 0.6rem 0.75rem; font-size: 1rem; }
-        .main-content { margin-left: 0; }
-        /* Toggle button */
-        #counselorSidebarToggle {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1100;
-            background: var(--forest-green);
+            background: var(--forest-green) ;
             color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem 0.75rem;
-            box-shadow: var(--shadow-sm);
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0,0,0,0.08);
+            overflow-y: auto;
+            padding-bottom: 1rem;
         }
-    }
-    .main-content {
-        margin-left: 250px;
-        transition: margin-left 0.2s;
-    }
+        
+        .custom-sidebar .sidebar-logo {
+            text-align: center;
+            padding: 2rem 1rem 1rem 1rem;
+            border-bottom: 1px solid #4a7c59;
+        }
+        
+        .custom-sidebar .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0.5rem 0 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .custom-sidebar .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+            position: relative;
+        }
+        
+        .custom-sidebar .sidebar-link.active, .custom-sidebar .sidebar-link:hover {
+            background: #4a7c59;
+            color: #f4d03f;
+        }
+        
+        .custom-sidebar .sidebar-link .bi {
+            font-size: 1.1rem;
+        }
+        
+        .custom-sidebar .sidebar-bottom {
+            padding: 1rem 0.5rem;
+            border-top: 1px solid #4a7c59;
+        }
+        
+        .custom-sidebar .sidebar-link.logout {
+            background: #dc3545;
+            color: #fff;
+            border-radius: 8px;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .custom-sidebar .sidebar-link.logout:hover {
+            background: #b52a37;
+            color: #fff;
+        }
+        
+        @media (max-width: 991.98px) {
+            .custom-sidebar {
+                width: 200px;
+            }
+            .main-dashboard-content {
+                margin-left: 200px;
+            }
+        }
+        @media (max-width: 767.98px) {
+            /* Off-canvas behavior on mobile */
+            .custom-sidebar {
+                position: fixed;
+                z-index: 1040;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                width: 240px;
+                transform: translateX(-100%);
+                transition: transform 0.2s ease;
+                flex-direction: column;
+                padding: 0;
+            }
+            .custom-sidebar.show {
+                transform: translateX(0);
+            }
+            .custom-sidebar .sidebar-logo { display: block; }
+            .custom-sidebar .sidebar-nav {
+                flex-direction: column;
+                gap: 0.25rem;
+                padding: 1rem 0.5rem 1rem 0.5rem;
+            }
+            .custom-sidebar .sidebar-link {
+                justify-content: flex-start;
+                padding: 0.6rem 0.75rem;
+                font-size: 1rem;
+            }
+            .main-dashboard-content {
+                margin-left: 0;
+            }
+            /* Toggle button */
+            #counselorSidebarToggle {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1100;
+                background: var(--forest-green);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                padding: 0.5rem 0.75rem;
+                box-shadow: var(--shadow-sm);
+            }
+        }
+        
+        .main-dashboard-content {
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+            min-height: 100vh;
+            padding: 1rem 1.5rem;
+            margin-left: 240px;
+            transition: margin-left 0.2s;
+        }
 
-    .dashboard-header {
-        background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
-        color: white;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: var(--shadow-lg);
-    }
+        /* Constrain inner content and center it within the available area */
+        .main-dashboard-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
 
-    .stats-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--gray-100);
-        transition: all 0.3s ease;
-        height: 100%;
-    }
+        .welcome-card {
+            background: var(--hero-gradient);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            min-height: 100px;
+        }
+        
+        .welcome-card .welcome-text {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 0.25rem;
+        }
+        
+        .welcome-card .welcome-date {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-card .welcome-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: start;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 0.75rem;
+            align-items: stretch; /* ensure children stretch to equal height */
+        }
+        
+        .dashboard-stat-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.25rem 1rem;
+            text-align: center;
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px; /* ensure consistent card height */
+        }
+        
+        .dashboard-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .dashboard-stat-card .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--forest-green);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .dashboard-stat-card .stat-label {
+            font-size: 1rem;
+            color: var(--forest-green-light);
+            margin-bottom: 0.25rem;
+        }
+        
+        .dashboard-stat-card .stat-subtitle {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            margin-bottom: 0.75rem;
+        }
+        
+        .dashboard-stat-card .stat-progress {
+            height: 6px;
+            background-color: var(--gray-100);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .dashboard-stat-card .stat-progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .progress-success {
+            background-color: var(--success);
+        }
+        
+        .progress-warning {
+            background-color: var(--warning);
+        }
+        
+        .progress-info {
+            background-color: var(--info);
+        }
+        
+        .progress-danger {
+            background-color: var(--danger);
+        }
 
-    .stats-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
+        .main-content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .main-content-card .card-header {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .main-content-card .card-body {
+            padding: 1.25rem;
+        }
+        
+        /* Make main content cards use flex so headers and bodies behave predictably */
+        .main-content-card, .quick-actions-sidebar {
+            display: flex;
+            flex-direction: column;
+            min-height: 120px;
+        }
+        .main-content-card .card-body, .quick-actions-sidebar .card-body {
+            flex: 1 1 auto;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
 
-    .stats-card.priority {
-        border-left: 4px solid var(--danger);
-    }
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
 
-    .stats-card.warning {
-        border-left: 4px solid var(--warning);
-    }
+        .stats-card.priority {
+            border-left: 4px solid var(--danger);
+        }
 
-    .stats-card.success {
-        border-left: 4px solid var(--success);
-    }
+        .stats-card.warning {
+            border-left: 4px solid var(--warning);
+        }
 
-    .stats-card.info {
-        border-left: 4px solid var(--info);
-    }
+        .stats-card.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .stats-card.info {
+            border-left: 4px solid var(--info);
+        }
 
     .profile-card {
         background: white;
@@ -318,26 +497,115 @@
         margin-bottom: 0;
     }
 
-    .appointment-item {
-        background: var(--gray-50);
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-        border: 1px solid var(--gray-100);
-        transition: all 0.2s ease;
-    }
+        .appointment-item {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--gray-100);
+            transition: all 0.2s ease;
+        }
+        
+        .appointment-item:hover {
+            background: var(--forest-green-lighter);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .appointment-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .announcement-item {
+            background: var(--gray-50);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--forest-green);
+            transition: all 0.2s ease;
+        }
+        
+        .announcement-item:hover {
+            background: var(--forest-green-lighter);
+        }
+        
+        .announcement-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .message-preview {
+            background: var(--gray-50);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--gray-100);
+            transition: all 0.2s ease;
+        }
+        
+        .message-preview:hover {
+            background: var(--forest-green-lighter);
+        }
+        
+        .message-preview:last-child {
+            margin-bottom: 0;
+        }
+        
+        .quick-actions-sidebar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            height: fit-content;
+        }
+        
+        .quick-actions-sidebar .card-header {
+            background: linear-gradient(180deg, rgba(34,139,34,0.06), rgba(34,139,34,0.02));
+            color: var(--forest-green);
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-weight: 600;
+        }
+        
+        .quick-actions-sidebar .card-body {
+            padding: 1rem;
+        }
+        
+        .btn-outline-primary, .btn-outline-success, .btn-outline-info, .btn-outline-warning {
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.15s ease;
+            padding: 0.6rem 1rem;
+            border-width: 1px;
+            box-shadow: 0 6px 18px rgba(17,94,37,0.06);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--forest-green);
+            color: var(--forest-green);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--forest-green);
+            border-color: var(--forest-green);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-outline-success:hover, .btn-outline-info:hover, .btn-outline-warning:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
 
-    .appointment-item:hover {
-        background: var(--forest-green-lighter);
-    }
+        .appointment-item.urgent {
+            border-left: 4px solid var(--danger);
+        }
 
-    .appointment-item.urgent {
-        border-left: 4px solid var(--danger);
-    }
-
-    .appointment-item.upcoming {
-        border-left: 4px solid var(--success);
-    }
+        .appointment-item.upcoming {
+            border-left: 4px solid var(--success);
+        }
 
     .message-item {
         background: var(--gray-50);
@@ -442,20 +710,65 @@
         font-size: 1rem;
     }
 
-    .empty-state {
-        text-align: center;
-        padding: 2rem;
-        color: var(--gray-600);
-        background: var(--gray-50);
-        border-radius: 12px;
-        border: 2px dashed var(--gray-100);
-    }
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-600);
+            background: var(--gray-50);
+            border-radius: 12px;
+            border: 2px dashed var(--gray-100);
+        }
 
-    .empty-state i {
-        font-size: 2rem;
-        color: var(--gray-600);
-        margin-bottom: 1rem;
-    }
+        .empty-state i {
+            font-size: 2rem;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+        }
+        
+        /* Small refinements for spacing */
+        .sidebar-logo img { box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+        .sidebar-link { padding-left: 1.1rem; padding-right: 1.1rem; }
+        .sidebar-link i { font-size: 1.1rem; }
+        
+        @media (max-width: 991px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            
+            .welcome-card {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 2rem 1.5rem;
+                text-align: center;
+            }
+            
+            .main-dashboard-content {
+                padding: 1.5rem 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .welcome-card .welcome-text {
+                font-size: 1.8rem;
+            }
+            
+            .dashboard-stat-card {
+                padding: 1.5rem 1rem;
+            }
+            
+            .main-content-card .card-header,
+            .main-content-card .card-body,
+            .quick-actions .card-header,
+            .quick-actions .card-body {
+                padding: 1rem;
+            }
+        }
 
     .stats-grid {
         display: grid;
@@ -654,11 +967,21 @@
     </ul>
 </div>
 
-<button id="counselorSidebarToggle" class="d-md-none"><i class="bi bi-list"></i></button>
-@include('counselor.sidebar')
-<!-- Main Content -->
-<div class="main-content">
-    <div class="container-fluid py-4">
+    </style>
+    
+
+    <div class="home-zoom">
+    <div class="d-flex">
+        <!-- Mobile Sidebar Toggle -->
+        <button id="counselorSidebarToggle" class="d-md-none">
+            <i class="bi bi-list"></i>
+        </button>
+        <!-- Sidebar -->
+        @include('counselor.sidebar')
+        
+        <!-- Main Content -->
+        <div class="main-dashboard-content flex-grow-1">
+            <div class="main-dashboard-inner">
         {{-- Notification Section --}}
         @php
             $unreadNotifications = auth()->user()->unreadNotifications()->take(5)->get();
@@ -686,220 +1009,129 @@
                 @endforeach
             </div>
         @endif
-        <div class="dashboard-header position-relative">
-            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
-                <div class="flex-grow-1">
-                    <h1 class="mb-2 fw-bold d-flex align-items-center" style="gap: 0.75rem;">
-                        <i class="bi bi-speedometer2" style="font-size: 2rem;"></i>
-                        Counselor Dashboard
-                    </h1>
-                    <p class="welcome-text mb-1">
-                        Welcome back, <strong>{{ auth()->user()->name }}</strong>!
-                    </p>
-                    <p class="date-text mb-0">
-                        <i class="bi bi-calendar3 me-2"></i>{{ now()->format('l, F j, Y') }}
-                    </p>
-                    <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
-                        <span class="badge-counselor">
-                            <i class="bi bi-person-badge me-2"></i>Licensed Counselor
-                        </span>
-                        <small class="text-white-50 ms-2">CMU Counseling Services</small>
-                    </div>
+            <div class="welcome-card">
+                <div>
+                    <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
+                    <div class="welcome-text">Welcome back, {{ auth()->user()->first_name ?? auth()->user()->name }}!</div>
+                    <div style="font-size: 0.9rem; margin-top: 0.5rem;">Always stay updated in your counselor portal</div>
                 </div>
-                <div class="d-flex flex-column align-items-end gap-2 position-relative" style="min-width: 240px; max-width: 320px;">
-                    <div class="profile-card p-3 d-flex flex-column align-items-center justify-content-center text-center" style="background: #fff; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); min-width: 240px; max-width: 320px;">
-                        <div class="position-relative mb-2">
-                            <img src="{{ auth()->user()->avatar_url }}" 
-                                 alt="Avatar" 
-                                 class="rounded-circle border border-3 shadow-sm" 
-                                 width="100" 
-                                 height="80" 
-                                 style="border-color: var(--yellow-maize) !important;">
-                            <div class="position-absolute bottom-0 end-0 bg-success rounded-circle" 
-                                 style="width: 18px; height: 18px; border: 2px solid white;"></div>
-                        </div>
-                        <h5 class="fw-bold mb-1" style="color: var(--forest-green);">
-                            {{ auth()->user()->name }}
-                        </h5>
-                        <div class="text-muted mb-2 small">{{ auth()->user()->email }}</div>
-                        <span class="badge-counselor mb-2">
-                            <i class="bi bi-shield-check me-1"></i>Counselor
-                        </span>
-                        <a href="{{ route('profile') }}" class="btn-edit mt-2">
-                            <i class="bi bi-pencil me-2"></i>Edit Profile
-                        </a>
-                    </div>
+                <div class="welcome-avatar">
+                    <img src="{{ auth()->user()->avatar_url }}" 
+                         alt="{{ auth()->user()->name }}" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                 </div>
             </div>
-        </div>
 
-        <!-- Statistics Cards and Quick Actions Row -->
-        @php
-            $counselorId = auth()->id();
+            @php
+                $counselorId = auth()->id();
+                
+                // Today's appointments
+                $todayAppointments = \App\Models\Appointment::where('counselor_id', $counselorId)
+                    ->whereDate('scheduled_at', today())
+                    ->count();
+                
+                // Pending appointments
+                $pendingAppointments = \App\Models\Appointment::where('counselor_id', $counselorId)
+                    ->where('status', 'pending')
+                    ->count();
+                
+                // Completed sessions this month
+                $completedThisMonth = \App\Models\Appointment::where('counselor_id', $counselorId)
+                    ->where('status', 'completed')
+                    ->whereMonth('scheduled_at', now()->month)
+                    ->whereYear('scheduled_at', now()->year)
+                    ->count();
+                
+                // Active students (with appointments in last 30 days)
+                $activeStudents = \App\Models\Appointment::where('counselor_id', $counselorId)
+                    ->where('scheduled_at', '>=', now()->subDays(30))
+                    ->distinct('student_id')
+                    ->count('student_id');
+                
+                // High-risk cases
+                $highRiskCases = \App\Models\User::where('role', 'student')
+                    ->whereHas('assessments', function($q) {
+                        $q->where('risk_level', 'high');
+                    })
+                    ->whereHas('appointments', function($q) use ($counselorId) {
+                        $q->where('counselor_id', $counselorId);
+                    })
+                    ->count();
+            @endphp
             
-            // Today's appointments
-            $todayAppointments = \App\Models\Appointment::where('counselor_id', $counselorId)
-                ->whereDate('scheduled_at', today())
-                ->count();
-            
-            // Pending appointments
-            $pendingAppointments = \App\Models\Appointment::where('counselor_id', $counselorId)
-                ->where('status', 'pending')
-                ->count();
-            
-            // Completed sessions this month
-            $completedThisMonth = \App\Models\Appointment::where('counselor_id', $counselorId)
-                ->where('status', 'completed')
-                ->whereMonth('scheduled_at', now()->month)
-                ->whereYear('scheduled_at', now()->year)
-                ->count();
-            
-            // Active students (with appointments in last 30 days)
-            $activeStudents = \App\Models\Appointment::where('counselor_id', $counselorId)
-                ->where('scheduled_at', '>=', now()->subDays(30))
-                ->distinct('student_id')
-                ->count('student_id');
-            
-            // High-risk cases
-            $highRiskCases = \App\Models\User::where('role', 'student')
-                ->whereHas('assessments', function($q) {
-                    $q->where('risk_level', 'high');
-                })
-                ->whereHas('appointments', function($q) use ($counselorId) {
-                    $q->where('counselor_id', $counselorId);
-                })
-                ->count();
-        @endphp
-
-        <div class="row mb-4">
-            <!-- Statistics Cards Column -->
-            <div class="col-lg-8">
-                <div class="stats-grid">
+            <div class="dashboard-layout">
+                <div class="dashboard-stats">
                     <!-- Today's Appointments -->
-                    <div class="stats-card info">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $todayAppointments }}</h3>
-                                <p class="mb-0 text-muted">Today's Appointments</p>
-                                <a href="{{ route('admin.logs.appointments') }}" class="btn btn-sm btn-outline-info mt-2">
-                                    <i class="bi bi-arrow-right me-1"></i>View All Appointments
-                                </a>
-                            </div>
-                            <div class="text-info" style="font-size: 2.5rem;">
-                                <i class="bi bi-calendar-check"></i>
-                            </div>
-                        </div>
+                    <div class="dashboard-stat-card">
+                        <div class="stat-value">{{ $todayAppointments }}</div>
+                        <div class="stat-label">Today's Appointments</div>
+                        <div class="stat-subtitle">{{ $todayAppointments }} scheduled for today</div>
                     </div>
-
+                    
                     <!-- Pending Appointments -->
-                    <div class="stats-card warning">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $pendingAppointments }}</h3>
-                                <p class="mb-0 text-muted">Pending Appointments</p>
-                                <a href="{{ route('admin.logs.appointments') }}?status=pending" class="btn btn-sm btn-outline-warning mt-2">
-                                    <i class="bi bi-arrow-right me-1"></i>View Pending
-                                </a>
-                            </div>
-                            <div class="text-warning" style="font-size: 2.5rem;">
-                                <i class="bi bi-clock"></i>
-                            </div>
-                        </div>
+                    <div class="dashboard-stat-card">
+                        <div class="stat-value">{{ $pendingAppointments }}</div>
+                        <div class="stat-label">Pending Appointments</div>
+                        <div class="stat-subtitle">Awaiting your response</div>
                     </div>
-
+                    
                     <!-- Completed Sessions This Month -->
-                    <div class="stats-card success">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $completedThisMonth }}</h3>
-                                <p class="mb-0 text-muted">Completed This Month</p>
-                                <a href="{{ route('admin.logs.session-notes') }}" class="btn btn-sm btn-outline-success mt-2">
-                                    <i class="bi bi-arrow-right me-1"></i>View Session Notes
-                                </a>
-                            </div>
-                            <div class="text-success" style="font-size: 2.5rem;">
-                                <i class="bi bi-check-circle"></i>
-                            </div>
-                        </div>
+                    <div class="dashboard-stat-card">
+                        <div class="stat-value">{{ $completedThisMonth }}</div>
+                        <div class="stat-label">Completed This Month</div>
+                        <div class="stat-subtitle">Sessions completed</div>
                     </div>
-
+                    
                     <!-- Active Students -->
-                    <div class="stats-card">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $activeStudents }}</h3>
-                                <p class="mb-0 text-muted">Active Students</p>
-                                <a href="{{ route('admin.logs.users') }}?role=student&status=active" class="btn btn-sm btn-outline-primary mt-2">
-                                    <i class="bi bi-arrow-right me-1"></i>View Students
-                                </a>
-                            </div>
-                            <div class="text-primary" style="font-size: 2.5rem;">
-                                <i class="bi bi-people"></i>
-                            </div>
-                        </div>
+                    <div class="dashboard-stat-card">
+                        <div class="stat-value">{{ $activeStudents }}</div>
+                        <div class="stat-label">Active Students</div>
+                        <div class="stat-subtitle">Students in last 30 days</div>
                     </div>
-
+                    
                     <!-- High-Risk Cases -->
-                    <div class="stats-card priority">
-                        <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h3 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $highRiskCases }}</h3>
-                            <p class="mb-0 text-muted">High-Risk Cases</p>
-                            <a href="{{ route('admin.logs.assessments') }}?risk_level=high" class="btn btn-sm btn-outline-danger mt-2">
-                                <i class="bi bi-arrow-right me-1"></i>View Assessments
-                            </a>
+                    <div class="dashboard-stat-card">
+                        <div class="stat-value">
+                            <i class="bi bi-exclamation-triangle text-danger"></i>
+                            {{ $highRiskCases }}
                         </div>
-                        <div class="text-danger" style="font-size: 2.5rem;">
-                            <i class="bi bi-exclamation-triangle"></i>
-                        </div>
-                    </div>
+                        <div class="stat-label">High-Risk Cases</div>
+                        <div class="stat-subtitle">Requires immediate attention</div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Quick Actions Column -->
-            <div class="col-lg-4">
-                <div class="info-card h-100">
-                    <div class="info-card-header">
-                        <i class="bi bi-lightning me-2"></i>Quick Actions
+                
+                <!-- Quick Actions Section - Beside Stats -->
+                <div class="quick-actions-sidebar">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h6>
                     </div>
-                    <div class="info-card-body">
-                        <div class="d-flex flex-column gap-3">
-                            <a href="{{ route('counselor.appointments.index') }}" class="action-btn w-100">
-                                <i class="bi bi-calendar-event me-2"></i>
-                                View All Appointments
+                    <div class="card-body">
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{{ route('counselor.appointments.index') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-calendar-event me-1"></i>View All Appointments
                             </a>
-                            <a href="{{ route('counselor.session_notes.index') }}" class="action-btn w-100">
-                                <i class="bi bi-journal-text me-2"></i>
-                                Session Notes
+                            <a href="{{ route('counselor.session_notes.index') }}" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-journal-text me-1"></i>Session Notes
                             </a>
-                            <a href="{{ route('counselor.assessments.index') }}" class="action-btn w-100">
-                                <i class="bi bi-clipboard-data me-2"></i>
-                                Student Assessments
+                            <a href="{{ route('counselor.assessments.index') }}" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-clipboard-data me-1"></i>Student Assessments
                             </a>
-                            <a href="{{ route('counselor.availability.index') }}" class="action-btn w-100">
-                                <i class="bi bi-clock me-2"></i>
-                                Set Availability
+                            <a href="{{ route('counselor.availability.index') }}" class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-clock me-1"></i>Set Availability
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row g-4 align-items-stretch mb-4">
-            <div class="col-lg-12">
-                <!-- All Appointments -->
-                <div class="info-card mb-4 h-100">
-                    <div class="info-card-header">
-                        <div>
-                            <i class="bi bi-calendar-event me-2"></i>All Appointments
-                        </div>
-                        <a href="{{ route('counselor.appointments.index') }}" class="btn-view btn-small">
-                            View All
-                        </a>
-                    </div>
-                    <div class="info-card-body">
+            <div class="main-content-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>All Appointments</h5>
+                    <a href="{{ route('counselor.appointments.index') }}" class="btn btn-success btn-sm" data-bs-toggle="tooltip" title="View all appointments">
+                        <i class="bi bi-eye me-1"></i>View All
+                    </a>
+                </div>
+                <div class="card-body">
                         @forelse($allAppointments as $appointment)
                             @php
                                 $start = $appointment->scheduled_at;
@@ -953,75 +1185,46 @@
                                     @endif
                                 </div>
                             </div>
-                        @empty
-                            <div class="empty-state">
-                                <i class="bi bi-calendar-x"></i>
-                                <p class="mb-0">No appointments found.</p>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
-            {{-- Removed Today's Appointments card as requested --}}
-        </div>
-<!-- Announcements Card -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="info-card">
-            <div class="info-card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <i class="bi bi-megaphone me-2"></i>Latest Announcements
-                </div>
-                <a href="{{ route('announcements.index') }}" class="btn-view btn-small">
-                    View All
-                </a>
-            </div>
-            <div class="info-card-body">
-                @php
-                    $announcements = \App\Models\Announcement::orderBy('created_at', 'desc')->take(3)->get();
-                @endphp
-                @if($announcements->count())
-                    @foreach($announcements as $announcement)
-                        <div class="mb-3 pb-3 border-bottom">
-                            <h6 class="fw-bold mb-1" style="color: var(--forest-green);">
-                                {{ $announcement->title }}
-                            </h6>
-                            <small class="text-muted">{{ $announcement->created_at->format('M d, Y') }}</small>
-                            <p class="mb-1 mt-2">{{ Str::limit($announcement->content, 80) }}</p>
-                            <a href="{{ route('announcements.show', $announcement->id) }}" class="btn-view btn-small">
-                                <i class="bi bi-eye"></i> Read More
-                            </a>
+                    @empty
+                        <div class="empty-state">
+                            <i class="bi bi-calendar-x"></i>
+                            <p class="mb-0">No appointments found.</p>
                         </div>
-                    @endforeach
-                @else
-                    <div class="empty-state">
-                        <i class="bi bi-megaphone"></i>
-                        <p class="mb-0">No announcements at this time.</p>
-                    </div>
-                @endif
+                    @endforelse
+                </div>
             </div>
-        </div>
-    </div>
-</div>
+            
+            <div class="main-content-card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-megaphone me-2"></i>Announcements</h6>
+                </div>
+                <div class="card-body">
+                    @forelse($recentAnnouncements as $announcement)
+                        <div class="announcement-item">
+                            <h6 class="mb-1 fw-bold small">{{ $announcement->title }}</h6>
+                            <p class="mb-1 small text-muted">{{ Str::limit($announcement->content, 80) }}</p>
+                            <small class="text-muted">{{ $announcement->created_at->format('F j, Y') }}</small>
+                        </div>
+                    @empty
+                        <div class="empty-state">
+                            <i class="bi bi-megaphone"></i>
+                            <p class="mb-0">No announcements available.</p>
+                        </div>
+                    @endforelse
+                    <div class="text-center mt-3">
+                        <a href="{{ route('announcements.index') }}" class="btn btn-outline-success btn-sm" data-bs-toggle="tooltip" title="View all announcements">
+                            <i class="bi bi-eye me-1"></i>View All
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-        
-
-            <!-- Main Content -->
-            <div class="col-lg-12">
-                <!-- Priority Students and Recent Messages Row -->
-                <div class="row g-4 mb-4 align-items-stretch w-100" style="margin-left:0; margin-right:0;">
-                    <div class="col-12 col-lg-6 d-flex">
-                        <!-- Priority Students (High-Risk Cases) -->
-                        <div class="info-card h-100 flex-fill d-flex flex-column">
-                            <div class="info-card-header">
-                                <div>
-                                    <i class="bi bi-exclamation-triangle me-2"></i>Priority Students
-                                </div>
-                                {{-- <a href="{{ route('counselor.priority-cases.index') }}" class="btn-view btn-small"> --}}
-                                {{-- View All --}}
-                                {{-- </a> --}}
-                            </div>
-                            <div class="info-card-body">
+            
+            <div class="main-content-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Priority Students</h5>
+                </div>
+                <div class="card-body">
                                 @php 
                                     $priorityStudents = \App\Models\User::where('role', 'student')
                                         ->whereHas('assessments', function($q) {
@@ -1079,21 +1282,17 @@
                                         <p class="mb-0">No priority cases at this time.</p>
                                     </div>
                                 @endif
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-6 d-flex">
-                        <!-- Recent Messages -->
-                        <div class="info-card h-100 flex-fill d-flex flex-column">
-                            <div class="info-card-header">
-                                <div>
-                                    <i class="bi bi-chat-dots me-2"></i>Recent Messages
-                                </div>
-                                {{-- <a href="{{ route('counselor.messages.index') }}" class="btn-view btn-small"> --}}
-                                {{-- View All --}}
-                                {{-- </a> --}}
-                            </div>
-                            <div class="info-card-body">
+                </div>
+            </div>
+            
+            <div class="main-content-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>Recent Messages</h5>
+                    <a href="{{ route('chat.selectStudent') }}" class="btn btn-light btn-sm" data-bs-toggle="tooltip" title="Open chat with students">
+                        <i class="bi bi-chat-dots me-1"></i>Open Chat
+                    </a>
+                </div>
+                <div class="card-body">
                                 @php 
                                     $recentMessages = \App\Models\Message::where('recipient_id', auth()->id())
                                         ->with('sender')
@@ -1137,22 +1336,14 @@
                                         <p class="mb-0">No recent messages.</p>
                                     </div>
                                 @endif
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
-                <!-- Session Feedback -->
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <div>
-                            <i class="bi bi-star me-2"></i>Recent Session Feedback
-                        </div>
-                        {{-- <a href="{{ route('counselor.feedback.index') }}" class="btn-view btn-small"> --}}
-                        {{-- View All --}}
-                        {{-- </a> --}}
-                    </div>
-                    <div class="info-card-body">
+            </div>
+            
+            <div class="main-content-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-star me-2"></i>Recent Session Feedback</h5>
+                </div>
+                <div class="card-body">
                         @php 
                             $recentFeedback = \App\Models\SessionFeedback::whereHas('appointment', function($q) {
                                     $q->where('counselor_id', auth()->id());
@@ -1200,10 +1391,12 @@
                                 <p class="mb-0">No feedback received yet.</p>
                             </div>
                         @endif
-                    </div>
                 </div>
             </div>
+            </div>
         </div>
+    </div>
+    
     </div>
 
     <!-- Quick Access Modal for Emergency Cases -->
@@ -1235,27 +1428,34 @@
     </div>
 
     <script>
-    // Sidebar toggle for mobile
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.querySelector('.sidebar');
-        const toggleBtn = document.getElementById('counselorSidebarToggle');
-        if (sidebar && toggleBtn) {
-            toggleBtn.addEventListener('click', function() {
-                if (window.innerWidth < 768) sidebar.classList.toggle('show');
+        // Enable Bootstrap tooltips
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
             });
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                    const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                    if (!clickInside) sidebar.classList.remove('show');
-                }
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                    sidebar.classList.remove('show');
-                }
-            });
-        }
-    });
+            // Sidebar toggle for mobile
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('counselorSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
     // Auto-check for high-risk cases every 30 seconds
     setInterval(function() {
         fetch('/counselor/check-priority-cases')

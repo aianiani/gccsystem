@@ -32,6 +32,16 @@ class User extends Authenticatable implements MustVerifyEmail
         'approved_by',
         'approved_at',
         'rejection_reason',
+        'contact_number',
+        'address',
+        'student_id',
+        'college',
+        'course',
+        'year_level',
+        'gender',
+        'cor_file',
+        'consent_agreed',
+        'consent_agreed_at',
     ];
 
     /**
@@ -56,6 +66,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'is_active' => 'boolean',
             'approved_at' => 'datetime',
+            'consent_agreed' => 'boolean',
+            'consent_agreed_at' => 'datetime',
         ];
     }
 
@@ -119,6 +131,17 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the COR file URL
+     */
+    public function getCorFileUrlAttribute()
+    {
+        if ($this->cor_file) {
+            return asset('storage/cor_files/' . $this->cor_file);
+        }
+        return null;
+    }
+
+    /**
      * Send the email verification notification.
      *
      * @return void
@@ -126,6 +149,31 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new \App\Notifications\EmailVerificationNotification);
+    }
+
+    /**
+     * Determine if the user's email has been verified.
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        return !is_null($this->email_verified_at);
+    }
+
+    /**
+     * Mark the given user's email as verified.
+     */
+    public function markEmailAsVerified(): bool
+    {
+        $this->email_verified_at = now();
+        return $this->save();
+    }
+
+    /**
+     * Get the e-mail address that should be used for verification.
+     */
+    public function getEmailForVerification(): string
+    {
+        return $this->email;
     }
 
     public function assessments()

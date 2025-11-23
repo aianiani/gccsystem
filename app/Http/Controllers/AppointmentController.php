@@ -42,8 +42,78 @@ class AppointmentController extends Controller
     // Show form to create a new appointment
     public function create()
     {
+        // Check if user has completed DASS-42 assessment
+        $hasDass42 = \App\Models\Assessment::where('user_id', auth()->id())
+            ->where('type', 'DASS-42')
+            ->exists();
+
+        if (!$hasDass42) {
+            return redirect()->route('assessments.index')
+                ->with('error', 'Please complete the DASS-42 assessment first before booking an appointment.');
+        }
+
+        // Check if user has agreed to consent
+        if (!auth()->user()->consent_agreed) {
+            return redirect()->route('consent.show')
+                ->with('error', 'Please agree to the consent information before booking an appointment.');
+        }
+
         $counselors = User::where('role', 'counselor')->get();
-        return view('appointments.create', compact('counselors'));
+        $student = auth()->user();
+        
+        // Get latest DASS-42 assessment
+        $dass42Assessment = \App\Models\Assessment::where('user_id', auth()->id())
+            ->where('type', 'DASS-42')
+            ->latest()
+            ->first();
+        
+        return view('appointments.create', compact('counselors', 'student', 'dass42Assessment'));
+    }
+
+    // Show appointment confirmation page
+    public function confirmation($id)
+    {
+        $appointment = Appointment::with(['student', 'counselor'])->findOrFail($id);
+        
+        // Ensure the appointment belongs to the authenticated student
+        if ($appointment->student_id !== auth()->id()) {
+            abort(403);
+        }
+        
+        // Check if DASS-42 assessment exists (but don't pass scores to student)
+        $hasDass42 = \App\Models\Assessment::where('user_id', $appointment->student_id)
+            ->where('type', 'DASS-42')
+            ->exists();
+        
+        return view('appointments.confirmation', compact('appointment', 'hasDass42'));
+    }
+
+    // Generate PDF for appointment confirmation
+    public function downloadPdf($id)
+    {
+        $appointment = Appointment::with(['student', 'counselor'])->findOrFail($id);
+        
+        // Ensure the appointment belongs to the authenticated student
+        if ($appointment->student_id !== auth()->id()) {
+            abort(403);
+        }
+        
+        // Check if DASS-42 assessment exists (but don't pass scores to student)
+        $hasDass42 = \App\Models\Assessment::where('user_id', $appointment->student_id)
+            ->where('type', 'DASS-42')
+            ->exists();
+        
+        // Get assessment date only (no scores)
+        $dass42Assessment = null;
+        if ($hasDass42) {
+            $dass42Assessment = \App\Models\Assessment::where('user_id', $appointment->student_id)
+                ->where('type', 'DASS-42')
+                ->latest()
+                ->first(['id', 'created_at', 'type']); // Only get date, not scores
+        }
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('appointments.confirmation-pdf', compact('appointment', 'dass42Assessment'));
+        return $pdf->download('appointment-confirmation-' . $appointment->reference_number . '.pdf');
     }
 
     // Store a new appointment
@@ -51,12 +121,32 @@ class AppointmentController extends Controller
     {
         $request->validate([
             'counselor_id' => 'required|exists:users,id',
-            'scheduled_at' => 'required|date|after:now',
+            'scheduled_at' => 'nullable|date|after:now',
+            'appointment_date' => 'nullable|date|after:today',
+            'appointment_time' => 'nullable|string',
             'notes' => 'nullable|string',
+            'guardian1_name' => 'required|string|max:255',
+            'guardian1_relationship' => 'required|string|max:255',
+            'guardian1_contact' => 'required|string|max:20',
+            'guardian1_relationship_other' => 'nullable|string|max:255',
+            'guardian2_name' => 'nullable|string|max:255',
+            'guardian2_relationship' => 'nullable|string|max:255',
+            'guardian2_contact' => 'nullable|string|max:20',
+            'guardian2_relationship_other' => 'nullable|string|max:255',
+            'nature_of_problem' => 'required|in:Academic,Family,Personal / Emotional,Social,Psychological,Other',
+            'nature_of_problem_other' => 'nullable|string|max:500',
         ]);
 
         // Normalize scheduled_at to Asia/Manila and format for DB
-        $scheduledAt = \Carbon\Carbon::parse($request->scheduled_at)->timezone('Asia/Manila')->format('Y-m-d H:i:s');
+        // Handle both scheduled_at (from time select) or appointment_date + appointment_time
+        if ($request->scheduled_at) {
+            $scheduledAt = \Carbon\Carbon::parse($request->scheduled_at)->timezone('Asia/Manila')->format('Y-m-d H:i:s');
+        } elseif ($request->appointment_date && $request->appointment_time) {
+            // Combine date and time
+            $scheduledAt = \Carbon\Carbon::parse($request->appointment_date . ' ' . $request->appointment_time)->timezone('Asia/Manila')->format('Y-m-d H:i:s');
+        } else {
+            return redirect()->back()->with('error', 'Please select a date and time for your appointment.')->withInput();
+        }
         // Check if the counselor is available at the requested time
         $availability = \DB::table('availabilities')
             ->where('user_id', $request->counselor_id)
@@ -66,7 +156,7 @@ class AppointmentController extends Controller
             if ($request->expectsJson()) {
                 return response()->json(['error' => 'The counselor is not available at the selected time.'], 422);
             }
-            return redirect()->back()->with('error', 'The counselor is not available at the selected time.');
+            return redirect()->back()->with('error', 'The counselor is not available at the selected time.')->withInput();
         }
 
         // Check if the slot is already booked
@@ -77,7 +167,22 @@ class AppointmentController extends Controller
             if ($request->expectsJson()) {
                 return response()->json(['error' => 'This slot is already booked.'], 422);
             }
-            return redirect()->back()->with('error', 'This slot is already booked.');
+            return redirect()->back()->with('error', 'This slot is already booked.')->withInput();
+        }
+
+        // Generate unique reference number
+        $referenceNumber = 'APT-' . strtoupper(uniqid());
+
+        // Handle guardian relationship "Other" fields
+        $guardian1Relationship = $request->guardian1_relationship === 'Other' 
+            ? $request->guardian1_relationship_other 
+            : $request->guardian1_relationship;
+        
+        $guardian2Relationship = null;
+        if ($request->guardian2_relationship) {
+            $guardian2Relationship = $request->guardian2_relationship === 'Other' 
+                ? $request->guardian2_relationship_other 
+                : $request->guardian2_relationship;
         }
 
         // When creating the appointment, use $scheduledAt
@@ -87,7 +192,17 @@ class AppointmentController extends Controller
             'scheduled_at' => $scheduledAt,
             'notes' => $request->notes,
             'status' => 'pending',
+            'guardian1_name' => $request->guardian1_name,
+            'guardian1_relationship' => $guardian1Relationship,
+            'guardian1_contact' => $request->guardian1_contact,
+            'guardian2_name' => $request->guardian2_name,
+            'guardian2_relationship' => $guardian2Relationship,
+            'guardian2_contact' => $request->guardian2_contact,
+            'nature_of_problem' => $request->nature_of_problem,
+            'nature_of_problem_other' => $request->nature_of_problem_other,
+            'reference_number' => $referenceNumber,
         ]);
+        
         // Notify the counselor
         $counselor = \App\Models\User::find($request->counselor_id);
         if ($counselor) {
@@ -96,9 +211,9 @@ class AppointmentController extends Controller
         
         // Return JSON for AJAX, redirect for normal POST
         if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Appointment booked successfully!']);
+            return response()->json(['success' => true, 'message' => 'Appointment booked successfully!', 'appointment_id' => $appointment->id]);
         }
-        return redirect()->route('dashboard')->with('success', 'Appointment booked successfully!');
+        return redirect()->route('appointments.confirmation', $appointment->id);
     }
 
     // Return available slots for a given counselor as JSON

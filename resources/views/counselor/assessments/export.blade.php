@@ -42,7 +42,7 @@
 
     <div class="section">
         <div class="subtitle">Scores & Interpretation</div>
-        @if($assessment->type === 'DASS-21')
+        @if($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21')
             <div class="mb-1"><strong>Depression:</strong> {{ $scores['depression'] ?? '-' }} <span class="badge {{ ($score_interpretation['depression'] ?? '') === 'Severe' || ($score_interpretation['depression'] ?? '') === 'Extremely Severe' ? 'bg-danger' : (($score_interpretation['depression'] ?? '') === 'Moderate' ? 'bg-warning' : (($score_interpretation['depression'] ?? '') === 'Mild' ? 'bg-info' : 'bg-success')) }}">{{ $score_interpretation['depression'] ?? '' }}</span></div>
             <div class="mb-1"><strong>Anxiety:</strong> {{ $scores['anxiety'] ?? '-' }} <span class="badge {{ ($score_interpretation['anxiety'] ?? '') === 'Severe' || ($score_interpretation['anxiety'] ?? '') === 'Extremely Severe' ? 'bg-danger' : (($score_interpretation['anxiety'] ?? '') === 'Moderate' ? 'bg-warning' : (($score_interpretation['anxiety'] ?? '') === 'Mild' ? 'bg-info' : 'bg-success')) }}">{{ $score_interpretation['anxiety'] ?? '' }}</span></div>
             <div class="mb-1"><strong>Stress:</strong> {{ $scores['stress'] ?? '-' }} <span class="badge {{ ($score_interpretation['stress'] ?? '') === 'Severe' || ($score_interpretation['stress'] ?? '') === 'Extremely Severe' ? 'bg-danger' : (($score_interpretation['stress'] ?? '') === 'Moderate' ? 'bg-warning' : (($score_interpretation['stress'] ?? '') === 'Mild' ? 'bg-info' : 'bg-success')) }}">{{ $score_interpretation['stress'] ?? '' }}</span></div>

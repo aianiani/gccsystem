@@ -15,32 +15,46 @@ class AssessmentController extends Controller
     public function index()
     {
         return view('assessments', [
-            'dass21_questions' => $this->getDass21Questions(),
+            'dass42_questions' => $this->getDass42Questions(),
             'academic_questions' => $this->getAcademicQuestions(),
             'wellness_questions' => $this->getWellnessQuestions(),
         ]);
     }
 
-    // Handle DASS-21 form submission
-    public function submitDass21(Request $request)
+    // Handle DASS-42 form submission
+    public function submitDass42(Request $request)
     {
         $request->validate([
-            'answers' => 'required|array|size:21',
+            'answers' => 'required|array|size:42',
             'answers.*' => 'required|in:0,1,2,3',
         ]);
         $answers = $request->input('answers');
-        // DASS-21 scoring: 7 questions per scale
-        $depression_idx = [2,4,9,12,15,17,20];
-        $anxiety_idx = [1,6,8,14,18,19,21];
-        $stress_idx = [0,3,5,7,10,11,13,16];
-        $depression = array_sum(array_intersect_key($answers, array_flip($depression_idx))) * 2;
-        $anxiety = array_sum(array_intersect_key($answers, array_flip($anxiety_idx))) * 2;
-        $stress = array_sum(array_intersect_key($answers, array_flip($stress_idx))) * 2;
-        // Determine risk level (simple example)
+        // DASS-42 scoring: 14 questions per scale (0-indexed)
+        // Standard DASS-42 mapping (1-indexed to 0-indexed conversion):
+        // Depression: 3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42 (1-indexed)
+        // Anxiety: 2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41 (1-indexed)
+        // Stress: 1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39 (1-indexed)
+        // Converting to 0-indexed:
+        $depression_idx = [2, 4, 9, 12, 15, 16, 20, 23, 25, 30, 33, 36, 37, 41];
+        $anxiety_idx = [1, 3, 6, 8, 14, 18, 19, 22, 24, 27, 29, 35, 39, 40];
+        $stress_idx = [0, 5, 7, 10, 11, 13, 17, 21, 26, 28, 31, 32, 34, 38];
+        $depression = array_sum(array_intersect_key($answers, array_flip($depression_idx)));
+        $anxiety = array_sum(array_intersect_key($answers, array_flip($anxiety_idx)));
+        $stress = array_sum(array_intersect_key($answers, array_flip($stress_idx)));
+        // Determine risk level based on DASS-42 interpretation guide
+        // Extremely Severe or Severe = high risk
+        // Moderate = moderate risk
+        // Mild or Normal = normal risk
         $risk_level = 'normal';
-        if ($depression >= 14 || $anxiety >= 10 || $stress >= 19) {
+        $depression_severity = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
+        $anxiety_severity = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
+        $stress_severity = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
+        
+        if ($depression_severity === 'Extremely Severe' || $depression_severity === 'Severe' || 
+            $anxiety_severity === 'Extremely Severe' || $anxiety_severity === 'Severe' || 
+            $stress_severity === 'Extremely Severe' || $stress_severity === 'Severe') {
             $risk_level = 'high';
-        } elseif ($depression >= 10 || $anxiety >= 8 || $stress >= 14) {
+        } elseif ($depression_severity === 'Moderate' || $anxiety_severity === 'Moderate' || $stress_severity === 'Moderate') {
             $risk_level = 'moderate';
         }
         $comment = $request->input('student_comment');
@@ -48,13 +62,16 @@ class AssessmentController extends Controller
 
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
-            'type' => 'DASS-21',
+            'type' => 'DASS-42',
             'score' => json_encode(['depression'=>$depression,'anxiety'=>$anxiety,'stress'=>$stress]),
             'risk_level' => $risk_level,
             'student_comment' => $comment,
             'ai_sentiment' => $sentiment,
         ]);
-        return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'DASS-21']);
+        
+        // Redirect to consent page after DASS-42 completion
+        return redirect()->route('consent.show')
+            ->with('success', 'DASS-42 assessment completed successfully. Please proceed to the consent page.');
     }
 
     // Counselor: View all DASS-21 assessment results
@@ -126,31 +143,52 @@ class AssessmentController extends Controller
         return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'Wellness Check']);
     }
 
-    // Helper for DASS-21 questions
-    private function getDass21Questions()
+    // Helper for DASS-42 questions
+    private function getDass42Questions()
     {
         return [
-            'I found it hard to wind down',
+            'I found myself getting upset by quite trivial things',
             'I was aware of dryness of my mouth',
-            'I couldn’t seem to experience any positive feeling at all',
-            'I experienced breathing difficulty (e.g., excessively rapid breathing, breathlessness in the absence of physical exertion)',
-            'I found it difficult to work up the initiative to do things',
+            'I couldn\'t seem to experience any positive feeling at all',
+            'I experienced breathing difficulty (e.g. excessively rapid breathing, breathlessness in the absence of physical exertion)',
+            'I just couldn\'t seem to get going',
             'I tended to over-react to situations',
-            'I experienced trembling (e.g., in the hands)',
-            'I felt that I was using a lot of nervous energy',
-            'I was worried about situations in which I might panic and make a fool of myself',
-            'I felt that I had nothing to look forward to',
-            'I found myself getting agitated',
+            'I had a feeling of shakiness (e.g. legs going to give way)',
             'I found it difficult to relax',
-            'I felt down-hearted and blue',
-            'I was intolerant of anything that kept me from getting on with what I was doing',
-            'I felt I was close to panic',
-            'I was unable to become enthusiastic about anything',
-            'I felt I wasn’t worth much as a person',
+            'I found myself in situations that made me so anxious I was most relieved when they ended',
+            'I felt that I had nothing to look forward to',
+            'I found myself getting upset rather easily',
+            'I felt that I was using a lot of nervous energy',
+            'I felt sad and depressed',
+            'I found myself getting impatient when I was delayed in any way (e.g. elevators, traffic lights, being kept waiting)',
+            'I had feeling of faintness',
+            'I felt that I had lost interest in just about everything',
+            'I felt I wasn\'t worth much as a person',
             'I felt that I was rather touchy',
-            'I was aware of the action of my heart in the absence of physical exertion (e.g., sense of heart rate increase, heart missing a beat)',
+            'I perspired noticeably (e.g. hands sweaty) in the absence of high temperatures or physical exertion',
             'I felt scared without any good reason',
+            'I felt that life wasn\'t worthwhile',
+            'I found it hard to wind down',
+            'I had difficulty in swallowing',
+            'I couldn\'t seem to get any enjoyment out of the things I did',
+            'I was aware of the action of my heart in the absence of physical exertion (e.g. sense of heart rate increase, heart missing a beat)',
+            'I felt down-hearted and blue',
+            'I found that I was very irritable',
+            'I felt I was close to panic',
+            'I found it hard to calm down after something upset me',
+            'I feared that I would be "thrown" by some trivial but unfamiliar task',
+            'I was unable to become enthusiastic about anything',
+            'I found it difficult to tolerate interruptions to what I was doing',
+            'I was in a state of nervous tension',
+            'I felt I was pretty worthless',
+            'I was intolerant of anything that kept me from getting on with what I was doing',
+            'I felt terrified',
+            'I could see nothing in the future to be hopeful about',
             'I felt that life was meaningless',
+            'I found myself getting agitated',
+            'I was worried about situations in which I might panic and make a fool of myself',
+            'I experienced trembling (e.g. in the hands)',
+            'I found it difficult to work up the initiative to do things',
         ];
     }
     // Helper for Academic Stress Survey questions
@@ -273,7 +311,7 @@ class AssessmentController extends Controller
         }
 
         // Calculate total score for percentile/trend
-        if ($assessment->type === 'DASS-21') {
+        if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
             $total = ($scores['depression'] ?? 0) + ($scores['anxiety'] ?? 0) + ($scores['stress'] ?? 0);
         } else {
             $total = is_array($assessment->score) ? ($assessment->score['score'] ?? 0) : (is_numeric($assessment->score) ? $assessment->score : 0);
@@ -283,7 +321,7 @@ class AssessmentController extends Controller
         $allScores = \App\Models\Assessment::where('type', $assessment->type)->pluck('score');
         $allTotals = $allScores->map(function($s) use ($assessment) {
             $arr = is_array($s) ? $s : json_decode($s, true);
-            if ($assessment->type === 'DASS-21') {
+            if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
                 return ($arr['depression'] ?? 0) + ($arr['anxiety'] ?? 0) + ($arr['stress'] ?? 0);
             }
             return is_array($arr) ? ($arr['score'] ?? 0) : (is_numeric($arr) ? $arr : 0);
@@ -297,7 +335,7 @@ class AssessmentController extends Controller
             ->orderByDesc('id')->first();
         if ($previous) {
             $prevScore = is_array($previous->score) ? ($previous->score['score'] ?? 0) : (is_numeric($previous->score) ? $previous->score : 0);
-            if ($assessment->type === 'DASS-21') {
+            if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
                 $prevArr = is_array($previous->score) ? $previous->score : json_decode($previous->score, true);
                 $prevScore = ($prevArr['depression'] ?? 0) + ($prevArr['anxiety'] ?? 0) + ($prevArr['stress'] ?? 0);
             }
@@ -324,22 +362,37 @@ class AssessmentController extends Controller
             $actionPlan[] = 'Leverage student strengths (e.g., ' . implode(', ', array_slice($strengths, 0, 2)) . ') in counseling.';
         }
 
-        if ($assessment->type === 'DASS-21') {
+        if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
             $depression = $scores['depression'] ?? 0;
             $anxiety = $scores['anxiety'] ?? 0;
             $stress = $scores['stress'] ?? 0;
 
-            $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
-            $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
-            $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 27 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
+            // Use DASS-42 interpretation guide if DASS-42, otherwise use DASS-21 interpretation
+            if ($assessment->type === 'DASS-42') {
+                // DASS-42 Interpretation Guide:
+                // Normal: D 0-9, A 0-7, S 0-14
+                // Mild: D 10-13, A 8-9, S 15-18
+                // Moderate: D 14-20, A 10-14, S 19-25
+                // Severe: D 21-27, A 15-19, S 26-33
+                // Extremely Severe: D 28+, A 20+, S 34+
+                $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
+                $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
+                $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
+            } else {
+                // DASS-21 interpretation (multiplied by 2)
+                $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
+                $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
+                $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 27 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
+            }
 
-            $ai_summary = "DASS-21 Subscale Scores: Depression ($depression, {$score_interpretation['depression']}), Anxiety ($anxiety, {$score_interpretation['anxiety']}), Stress ($stress, {$score_interpretation['stress']}).";
+            $dassType = $assessment->type === 'DASS-42' ? 'DASS-42' : 'DASS-21';
+            $ai_summary = "$dassType Subscale Scores: Depression ($depression, {$score_interpretation['depression']}), Anxiety ($anxiety, {$score_interpretation['anxiety']}), Stress ($stress, {$score_interpretation['stress']}).";
 
             if ($depression >= 21) $ai_suggested_actions[] = 'Refer for depression support.';
             if ($anxiety >= 15) $ai_suggested_actions[] = 'Provide anxiety coping strategies.';
-            if ($stress >= 20) $ai_suggested_actions[] = 'Discuss stress management techniques.';
+            if ($stress >= 26) $ai_suggested_actions[] = 'Discuss stress management techniques.';
 
-            $ai_resource = ['title' => 'DASS-21 Self-Help Guide', 'url' => '#'];
+            $ai_resource = ['title' => "$dassType Self-Help Guide", 'url' => '#'];
             $graph_data = [
                 'labels' => ['Depression', 'Anxiety', 'Stress'],
                 'scores' => [$depression, $anxiety, $stress],
@@ -485,7 +538,7 @@ class AssessmentController extends Controller
         }
 
         // Calculate total score for percentile/trend
-        if ($assessment->type === 'DASS-21') {
+        if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
             $total = ($scores['depression'] ?? 0) + ($scores['anxiety'] ?? 0) + ($scores['stress'] ?? 0);
         } else {
             $total = is_array($assessment->score) ? ($assessment->score['score'] ?? 0) : (is_numeric($assessment->score) ? $assessment->score : 0);
@@ -495,7 +548,7 @@ class AssessmentController extends Controller
         $allScores = \App\Models\Assessment::where('type', $assessment->type)->pluck('score');
         $allTotals = $allScores->map(function($s) use ($assessment) {
             $arr = is_array($s) ? $s : json_decode($s, true);
-            if ($assessment->type === 'DASS-21') {
+            if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
                 return ($arr['depression'] ?? 0) + ($arr['anxiety'] ?? 0) + ($arr['stress'] ?? 0);
             }
             return is_array($arr) ? ($arr['score'] ?? 0) : (is_numeric($arr) ? $arr : 0);
@@ -509,7 +562,7 @@ class AssessmentController extends Controller
             ->orderByDesc('id')->first();
         if ($previous) {
             $prevScore = is_array($previous->score) ? ($previous->score['score'] ?? 0) : (is_numeric($previous->score) ? $previous->score : 0);
-            if ($assessment->type === 'DASS-21') {
+            if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
                 $prevArr = is_array($previous->score) ? $previous->score : json_decode($previous->score, true);
                 $prevScore = ($prevArr['depression'] ?? 0) + ($prevArr['anxiety'] ?? 0) + ($prevArr['stress'] ?? 0);
             }
@@ -536,22 +589,37 @@ class AssessmentController extends Controller
             $actionPlan[] = 'Leverage student strengths (e.g., ' . implode(', ', array_slice($strengths, 0, 2)) . ') in counseling.';
         }
 
-        if ($assessment->type === 'DASS-21') {
+        if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
             $depression = $scores['depression'] ?? 0;
             $anxiety = $scores['anxiety'] ?? 0;
             $stress = $scores['stress'] ?? 0;
 
-            $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
-            $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
-            $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 27 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
+            // Use DASS-42 interpretation guide if DASS-42, otherwise use DASS-21 interpretation
+            if ($assessment->type === 'DASS-42') {
+                // DASS-42 Interpretation Guide:
+                // Normal: D 0-9, A 0-7, S 0-14
+                // Mild: D 10-13, A 8-9, S 15-18
+                // Moderate: D 14-20, A 10-14, S 19-25
+                // Severe: D 21-27, A 15-19, S 26-33
+                // Extremely Severe: D 28+, A 20+, S 34+
+                $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
+                $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
+                $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
+            } else {
+                // DASS-21 interpretation (multiplied by 2)
+                $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
+                $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
+                $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 27 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
+            }
 
-            $ai_summary = "DASS-21 Subscale Scores: Depression ($depression, {$score_interpretation['depression']}), Anxiety ($anxiety, {$score_interpretation['anxiety']}), Stress ($stress, {$score_interpretation['stress']}).";
+            $dassType = $assessment->type === 'DASS-42' ? 'DASS-42' : 'DASS-21';
+            $ai_summary = "$dassType Subscale Scores: Depression ($depression, {$score_interpretation['depression']}), Anxiety ($anxiety, {$score_interpretation['anxiety']}), Stress ($stress, {$score_interpretation['stress']}).";
 
             if ($depression >= 21) $ai_suggested_actions[] = 'Refer for depression support.';
             if ($anxiety >= 15) $ai_suggested_actions[] = 'Provide anxiety coping strategies.';
-            if ($stress >= 20) $ai_suggested_actions[] = 'Discuss stress management techniques.';
+            if ($stress >= 26) $ai_suggested_actions[] = 'Discuss stress management techniques.';
 
-            $ai_resource = ['title' => 'DASS-21 Self-Help Guide', 'url' => '#'];
+            $ai_resource = ['title' => "$dassType Self-Help Guide", 'url' => '#'];
             $graph_data = [
                 'labels' => ['Depression', 'Anxiety', 'Stress'],
                 'scores' => [$depression, $anxiety, $stress],
