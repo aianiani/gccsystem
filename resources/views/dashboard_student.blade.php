@@ -49,6 +49,62 @@
         body, .profile-card, .stats-card, .main-content-card {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
+        /* DASS reminder modal styles */
+        .dass-modal .modal-content {
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+        }
+        .dass-modal-header {
+            background: linear-gradient(135deg, var(--forest-green), var(--forest-green-dark));
+            color: #fff;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .dass-modal-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .dass-modal-body {
+            padding: 1.75rem 1.75rem 1.25rem;
+        }
+        .dass-modal-body p {
+            margin-bottom: 0.75rem;
+            color: #4b5563;
+        }
+        .dass-modal-checklist {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .dass-modal-checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        .dass-modal-checklist li i {
+            color: var(--forest-green);
+            margin-top: 2px;
+        }
+        .dass-modal-footer {
+            padding: 0 1.75rem 1.75rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
         
         .custom-sidebar {
             position: fixed;
@@ -675,7 +731,7 @@
                         <a href="{{ route('chat.selectCounselor') }}" class="btn btn-outline-success btn-sm">
                             <i class="bi bi-chat-dots me-1"></i>Message Counselor
                         </a>
-                        <a href="{{ route('appointments.create') }}" class="btn btn-outline-info btn-sm">
+                        <a href="#" class="btn btn-outline-info btn-sm js-book-appointment-trigger">
                             <i class="bi bi-calendar-plus me-1"></i>Book Session
                         </a>
                         @if($studentStats['sessionsWithNotes'] > 0)
@@ -691,7 +747,7 @@
             <div class="main-content-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Upcoming Appointments</h5>
-                    <a href="{{ route('appointments.create') }}" class="btn btn-success btn-sm" data-bs-toggle="tooltip" title="Book a new appointment">
+                    <a href="#" class="btn btn-success btn-sm js-book-appointment-trigger" data-bs-toggle="tooltip" title="Book a new appointment">
                         <i class="bi bi-calendar-plus me-1"></i>Book Appointment
                     </a>
                 </div>
@@ -839,6 +895,35 @@
     </div>
     
     </div>
+
+    <!-- DASS-42 reminder modal -->
+    <div class="modal fade" id="dassReminderModal" tabindex="-1" aria-labelledby="dassReminderLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered dass-modal">
+            <div class="modal-content">
+                <div class="dass-modal-header">
+                    <div class="dass-modal-icon">
+                        <i class="bi bi-clipboard-heart"></i>
+                    </div>
+                    <div>
+                        <p class="mb-0 fw-semibold" id="dassReminderLabel">Complete the DASS-42 Assessment</p>
+                        <small class="text-white-50">This helps counselors tailor your session</small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="dass-modal-body">
+                    <p>Prior to booking an appointment, students are required to complete the DASS-42 assessment. This brief assessment provides counselors with essential insights to support you effectively.</p>
+                    <p class="text-muted small mb-0">Once you finish the assessment, you’ll be able to proceed with booking your appointment</p>
+                </div>
+                <div class="dass-modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Maybe Later</button>
+                    <a href="{{ route('assessments.index') }}#dass42" class="btn btn-success">
+                        Proceed
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Enable Bootstrap tooltips
         document.addEventListener('DOMContentLoaded', function () {
@@ -865,6 +950,18 @@
                     if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
                         sidebar.classList.remove('show');
                     }
+                });
+            }
+
+            // Gate appointment booking behind DASS-42 modal
+            const dassModalElement = document.getElementById('dassReminderModal');
+            if (dassModalElement) {
+                const dassModal = new bootstrap.Modal(dassModalElement);
+                document.querySelectorAll('.js-book-appointment-trigger').forEach(function(trigger) {
+                    trigger.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        dassModal.show();
+                    });
                 });
             }
         });

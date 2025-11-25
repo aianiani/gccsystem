@@ -15,6 +15,7 @@ class Assessment extends Model
         'score',
         'type',
         'notes',
+        'status',
     ];
 
     // Relationship to User

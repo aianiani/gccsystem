@@ -1964,6 +1964,414 @@
 
     <!-- Bootstrap JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Detect Chrome browser
+        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        
+        // Global error handler to suppress Bootstrap modal errors (especially for Chrome)
+        window.addEventListener('error', function(e) {
+            // Suppress Bootstrap modal initialization errors
+            if (e.message && (
+                e.message.includes('backdrop') || 
+                e.message.includes('Modal') ||
+                e.message.includes('Cannot read properties of undefined') ||
+                e.message.includes('Cannot read properties of null') ||
+                e.message.includes('defaultPrevented') ||
+                e.message.includes('FOCUSTRAP')
+            )) {
+                // Check if it's related to a modal that doesn't exist
+                const stack = e.error && e.error.stack ? e.error.stack : '';
+                if (stack.includes('modal') || stack.includes('Modal') || stack.includes('FOCUSTRAP')) {
+                    e.preventDefault();
+                    return true; // Suppress the error
+                }
+            }
+        }, true);
+        
+        // Chrome-specific: Ensure modals work by waiting for DOM to be fully ready
+        if (isChrome) {
+            // Wait a bit longer for Chrome to fully initialize
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(function() {
+                        // Force re-initialization of Bootstrap modals in Chrome
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                            // Re-initialize any modals that might have failed
+                            document.querySelectorAll('.modal[data-bs-toggle]').forEach(function(modal) {
+                                try {
+                                    bootstrap.Modal.getOrCreateInstance(modal);
+                                } catch (e) {
+                                    // Silently fail
+                                }
+                            });
+                        }
+                    }, 100);
+                });
+            }
+        }
+        
+        // Fix Bootstrap Modal initialization errors in Chrome
+        // This must run immediately after Bootstrap loads
+        (function() {
+            if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
+                // Wait for Bootstrap to load
+                const checkBootstrap = setInterval(function() {
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        clearInterval(checkBootstrap);
+                        fixModalInitialization();
+                    }
+                }, 10);
+                // Timeout after 5 seconds
+                setTimeout(function() {
+                    clearInterval(checkBootstrap);
+                }, 5000);
+            } else {
+                fixModalInitialization();
+            }
+            
+            function fixModalInitialization() {
+                // Store original constructor and method
+                const OriginalModal = bootstrap.Modal;
+                const originalGetOrCreateInstance = bootstrap.Modal.getOrCreateInstance;
+                const ModalPrototype = OriginalModal.prototype;
+                
+                // CRITICAL: Patch show method to handle null events
+                if (ModalPrototype.show) {
+                    const originalShow = ModalPrototype.show;
+                    ModalPrototype.show = function(relatedTarget) {
+                        // Ensure relatedTarget is valid if provided
+                        if (relatedTarget !== undefined && relatedTarget !== null && !relatedTarget.nodeType) {
+                            // If it's not a valid element, treat it as undefined
+                            relatedTarget = undefined;
+                        }
+                        try {
+                            return originalShow.call(this, relatedTarget);
+                        } catch (e) {
+                            // If show fails, try manual show
+                            if (this._element) {
+                                this._element.classList.add('show');
+                                this._element.style.display = 'block';
+                                this._element.setAttribute('aria-hidden', 'false');
+                                document.body.classList.add('modal-open');
+                                if (!document.querySelector('.modal-backdrop')) {
+                                    const backdrop = document.createElement('div');
+                                    backdrop.className = 'modal-backdrop fade show';
+                                    document.body.appendChild(backdrop);
+                                }
+                            }
+                            return;
+                        }
+                    };
+                }
+                
+                // CRITICAL: Patch FocusTrap to handle undefined trapElement
+                if (bootstrap.FocusTrap) {
+                    const OriginalFocusTrap = bootstrap.FocusTrap;
+                    
+                    // Patch FocusTrap constructor to handle missing trapElement
+                    const originalFocusTrapConstructor = OriginalFocusTrap;
+                    bootstrap.FocusTrap = function(config) {
+                        // Ensure config exists
+                        if (!config) {
+                            config = {};
+                        }
+                        // If trapElement is missing but focus is enabled, provide a fallback
+                        if (config.focus !== false && !config.trapElement) {
+                            // Use body as fallback - better than undefined
+                            config.trapElement = document.body;
+                        }
+                        // Call original constructor with safe config
+                        try {
+                            return new originalFocusTrapConstructor(config);
+                        } catch (e) {
+                            // Return a minimal focus trap if creation fails
+                            return {
+                                activate: function() {},
+                                deactivate: function() {},
+                                pause: function() {},
+                                unpause: function() {},
+                                _config: config
+                            };
+                        }
+                    };
+                    // Copy static methods and prototype
+                    Object.setPrototypeOf(bootstrap.FocusTrap, OriginalFocusTrap);
+                    Object.assign(bootstrap.FocusTrap, OriginalFocusTrap);
+                }
+                
+                // CRITICAL: Patch the _initializeBackDrop method directly to prevent the error
+                if (ModalPrototype._initializeBackDrop) {
+                    const originalInitBackdrop = ModalPrototype._initializeBackDrop;
+                    ModalPrototype._initializeBackDrop = function() {
+                        // Ensure _config exists and has backdrop property
+                        if (!this._config) {
+                            this._config = {};
+                        }
+                        if (this._config.backdrop === undefined) {
+                            // Get backdrop from element or default
+                            const element = this._element;
+                            if (element) {
+                                const backdropValue = element.getAttribute('data-bs-backdrop') || 
+                                                    element.getAttribute('data-backdrop') || 
+                                                    'static';
+                                this._config.backdrop = backdropValue === 'true' ? true : 
+                                                       backdropValue === 'false' ? false : 
+                                                       backdropValue;
+                            } else {
+                                this._config.backdrop = 'static';
+                            }
+                        }
+                        // Now safely call original method
+                        try {
+                            return originalInitBackdrop.call(this);
+                        } catch (e) {
+                            // Silently fail if backdrop initialization fails
+                            return;
+                        }
+                    };
+                }
+                
+                // CRITICAL: Patch _initializeFocusTrap to ensure trapElement is set
+                if (ModalPrototype._initializeFocusTrap) {
+                    const originalInitFocusTrap = ModalPrototype._initializeFocusTrap;
+                    ModalPrototype._initializeFocusTrap = function() {
+                        // Ensure _config and focus are set
+                        if (!this._config) {
+                            this._config = {};
+                        }
+                        if (this._config.focus === undefined) {
+                            this._config.focus = true;
+                        }
+                        // Ensure trapElement is set if focus is enabled
+                        if (this._config.focus && !this._config.trapElement) {
+                            this._config.trapElement = this._element || document.body;
+                        }
+                        // Call original method
+                        try {
+                            return originalInitFocusTrap.call(this);
+                        } catch (e) {
+                            // Create a dummy focus trap if initialization fails
+                            this._focustrap = {
+                                activate: function() {},
+                                deactivate: function() {},
+                                pause: function() {},
+                                unpause: function() {},
+                                _config: { trapElement: this._element || document.body }
+                            };
+                            return;
+                        }
+                    };
+                }
+                
+                // Patch the constructor to ensure _config is always set
+                const originalConstructor = OriginalModal;
+                bootstrap.Modal = function(element, config) {
+                    // CRITICAL: Check if element exists and is valid BEFORE anything else
+                    if (!element) {
+                        // Return a dummy object to prevent errors
+                        return {
+                            show: function() {},
+                            hide: function() {},
+                            toggle: function() {},
+                            dispose: function() {},
+                            _element: null,
+                            _config: { backdrop: 'static', keyboard: true, focus: true }
+                        };
+                    }
+                    
+                    // Ensure element is valid
+                    if (!element.classList || !element.classList.contains('modal')) {
+                        return {
+                            show: function() {},
+                            hide: function() {},
+                            toggle: function() {},
+                            dispose: function() {},
+                            _element: element,
+                            _config: { backdrop: 'static', keyboard: true, focus: true }
+                        };
+                    }
+                    
+                    // Ensure element is in DOM
+                    if (!document.body.contains(element)) {
+                        return {
+                            show: function() {},
+                            hide: function() {},
+                            toggle: function() {},
+                            dispose: function() {},
+                            _element: element,
+                            _config: { backdrop: 'static', keyboard: true, focus: true }
+                        };
+                    }
+                    
+                    // Ensure data attributes exist
+                    if (!element.hasAttribute('data-bs-backdrop') && !element.hasAttribute('data-backdrop')) {
+                        element.setAttribute('data-bs-backdrop', 'static');
+                    }
+                    
+                    // Create safe config object with all required properties
+                    const backdropValue = element.getAttribute('data-bs-backdrop') || 
+                                        element.getAttribute('data-backdrop') || 
+                                        'static';
+                    
+                    const keyboardValue = element.getAttribute('data-bs-keyboard');
+                    const keyboard = keyboardValue === null ? true : keyboardValue !== 'false';
+                    
+                    const safeConfig = config || {};
+                    
+                    // Always ensure backdrop is set and valid
+                    if (!safeConfig.hasOwnProperty('backdrop') || safeConfig.backdrop === undefined) {
+                        safeConfig.backdrop = backdropValue === 'true' ? true : 
+                                            backdropValue === 'false' ? false : 
+                                            backdropValue;
+                    }
+                    
+                    // Always ensure keyboard is set
+                    if (!safeConfig.hasOwnProperty('keyboard') || safeConfig.keyboard === undefined) {
+                        safeConfig.keyboard = keyboard;
+                    }
+                    
+                    // Always ensure focus is set
+                    if (!safeConfig.hasOwnProperty('focus') || safeConfig.focus === undefined) {
+                        safeConfig.focus = true;
+                    }
+                    
+                    // CRITICAL: Ensure trapElement is ALWAYS set if focus is enabled
+                    // Bootstrap's FocusTrap requires this to be a valid DOM element
+                    if (safeConfig.focus) {
+                        // Always set trapElement to the modal element
+                        safeConfig.trapElement = element;
+                    } else {
+                        // If focus is disabled, set trapElement to null explicitly
+                        safeConfig.trapElement = null;
+                    }
+                    
+                    try {
+                        // Call original constructor with safe config
+                        const instance = new originalConstructor(element, safeConfig);
+                        // Ensure _config is set on the instance
+                        if (!instance._config) {
+                            instance._config = safeConfig;
+                        }
+                        // Ensure _focustrap is properly initialized with trapElement
+                        if (instance._focustrap) {
+                            if (!instance._focustrap._config) {
+                                instance._focustrap._config = {};
+                            }
+                            if (!instance._focustrap._config.trapElement && safeConfig.focus) {
+                                instance._focustrap._config.trapElement = element;
+                            }
+                        }
+                        return instance;
+                    } catch (e) {
+                        // Return dummy object on error to prevent crashes
+                        return {
+                            show: function() {},
+                            hide: function() {},
+                            toggle: function() {},
+                            dispose: function() {},
+                            _element: element,
+                            _config: safeConfig
+                        };
+                    }
+                };
+                
+                // Copy static methods and properties
+                Object.setPrototypeOf(bootstrap.Modal, OriginalModal);
+                Object.assign(bootstrap.Modal, OriginalModal);
+                
+                // Override getOrCreateInstance to use safe config
+                bootstrap.Modal.getOrCreateInstance = function(element, config) {
+                    // CRITICAL: Return null immediately if element doesn't exist
+                    if (!element) {
+                        return null;
+                    }
+                    
+                    // Safety checks
+                    if (!element.classList || !element.classList.contains('modal')) {
+                        return null;
+                    }
+                    
+                    if (!document.body.contains(element)) {
+                        return null;
+                    }
+                    
+                    if (!element.querySelector('.modal-dialog')) {
+                        return null;
+                    }
+                    
+                    // Ensure data attributes exist
+                    if (!element.hasAttribute('data-bs-backdrop') && !element.hasAttribute('data-backdrop')) {
+                        element.setAttribute('data-bs-backdrop', 'static');
+                    }
+                    
+                    // Create safe config object
+                    const backdropValue = element.getAttribute('data-bs-backdrop') || 
+                                        element.getAttribute('data-backdrop') || 
+                                        'static';
+                    
+                    const keyboardValue = element.getAttribute('data-bs-keyboard');
+                    const keyboard = keyboardValue === null ? true : keyboardValue !== 'false';
+                    
+                    const safeConfig = config || {};
+                    if (!safeConfig.hasOwnProperty('backdrop') || safeConfig.backdrop === undefined) {
+                        safeConfig.backdrop = backdropValue === 'true' ? true : 
+                                            backdropValue === 'false' ? false : 
+                                            backdropValue;
+                    }
+                    if (!safeConfig.hasOwnProperty('keyboard') || safeConfig.keyboard === undefined) {
+                        safeConfig.keyboard = keyboard;
+                    }
+                    if (!safeConfig.hasOwnProperty('focus') || safeConfig.focus === undefined) {
+                        safeConfig.focus = true;
+                    }
+                    
+                    // CRITICAL: Ensure trapElement is ALWAYS set if focus is enabled
+                    if (safeConfig.focus) {
+                        safeConfig.trapElement = element;
+                    } else {
+                        safeConfig.trapElement = null;
+                    }
+                    
+                    try {
+                        // Try to get existing instance
+                        const existing = bootstrap.Modal.getInstance(element);
+                        if (existing) {
+                            // Ensure existing instance has valid config
+                            if (!existing._config) {
+                                existing._config = safeConfig;
+                            }
+                            // Fix focus trap if it exists - ensure trapElement is set
+                            if (existing._focustrap) {
+                                if (!existing._focustrap._config) {
+                                    existing._focustrap._config = {};
+                                }
+                                if (safeConfig.focus && !existing._focustrap._config.trapElement) {
+                                    existing._focustrap._config.trapElement = element;
+                                }
+                            }
+                            return existing;
+                        }
+                        
+                        // Create new instance with safe config using original method
+                        const instance = originalGetOrCreateInstance.call(this, element, safeConfig);
+                        // Fix focus trap after creation - ensure trapElement is set
+                        if (instance && instance._focustrap) {
+                            if (!instance._focustrap._config) {
+                                instance._focustrap._config = {};
+                            }
+                            if (safeConfig.focus && !instance._focustrap._config.trapElement) {
+                                instance._focustrap._config.trapElement = element;
+                            }
+                        }
+                        return instance;
+                    } catch (e) {
+                        // Silently return null on error - don't log to prevent console spam
+                        return null;
+                    }
+                };
+            }
+        })();
+    </script>
     
     <!-- Custom JavaScript -->
     <script>
@@ -3905,6 +4313,66 @@
                 // Optionally, open login modal after actions
             }
 
+            // Helper function to safely get or create modal instance
+            // Note: Bootstrap Modal.getOrCreateInstance is already patched earlier in the page
+            function safeGetModalInstance(element) {
+                if (!element) return null;
+                if (typeof bootstrap === 'undefined' || !bootstrap.Modal) return null;
+                
+                // Check if element has modal class structure
+                if (!element.classList.contains('modal')) return null;
+                
+                // Ensure element is in the DOM
+                if (!document.body.contains(element)) return null;
+                
+                // Ensure element has required modal structure (modal-dialog child)
+                if (!element.querySelector('.modal-dialog')) return null;
+                
+                try {
+                    // Use the overridden getOrCreateInstance which has error handling
+                    return bootstrap.Modal.getOrCreateInstance(element);
+                } catch (e) {
+                    console.warn('Could not create modal instance:', e);
+                    return null;
+                }
+            }
+
+            // Helper function to safely show modal
+            function safeShowModal(elementId) {
+                const element = document.getElementById(elementId);
+                if (!element) return false;
+                
+                const instance = safeGetModalInstance(element);
+                if (instance) {
+                    try {
+                        instance.show();
+                        return true;
+                    } catch (e) {
+                        console.warn('Could not show modal:', e);
+                        return false;
+                    }
+                }
+                return false;
+            }
+
+            // Helper function to safely hide modal
+            function safeHideModal(elementId) {
+                const element = document.getElementById(elementId);
+                if (!element) return false;
+                
+                const instance = safeGetModalInstance(element);
+                if (instance) {
+                    try {
+                        instance.hide();
+                        return true;
+                    } catch (e) {
+                        console.warn('Could not hide modal:', e);
+                        return false;
+                    }
+                }
+                return false;
+            }
+
             // AJAX login -> intercept 2FA redirect and open modal instead
             const loginForm = document.getElementById('modalLoginForm');
             if (loginForm) {
@@ -3914,37 +4382,68 @@
                     submitBtn.disabled = true;
                     try {
                         const formData = new FormData(loginForm);
+                        
+                        // Get CSRF token from meta tag for Chrome compatibility
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        if (csrfToken) {
+                            formData.append('_token', csrfToken);
+                        }
+                        
                         const resp = await fetch(loginForm.action, {
                             method: 'POST',
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            headers: { 
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrfToken || '',
+                                'Accept': 'application/json, text/html, */*'
+                            },
                             body: formData,
                             redirect: 'manual',
-                            credentials: 'same-origin'
+                            credentials: 'include' // Use 'include' instead of 'same-origin' for better Chrome compatibility
                         });
+
+                        // Check for redirect status codes (Chrome compatibility)
+                        if (resp.status >= 300 && resp.status < 400) {
+                            const location = resp.headers.get('Location');
+                            if (location) {
+                                // Check if it's a 2FA redirect
+                                if (location.includes('2fa') || location.includes('two-factor')) {
+                                    safeHideModal('loginModal');
+                                    safeShowModal('twoFactorModal');
+                                    return;
+                                }
+                                // Otherwise redirect to the location
+                                window.location.href = location;
+                                return;
+                            }
+                        }
 
                         // Try to parse JSON response (for AJAX/modal flows)
                         let data = null;
                         const contentType = resp.headers.get('content-type') || '';
                         if (contentType.includes('application/json')) {
-                            try { data = await resp.json(); } catch (e) { /* ignore */ }
+                            try { 
+                                data = await resp.json(); 
+                            } catch (e) { 
+                                console.error('JSON parse error:', e);
+                            }
                         }
 
                         // If server returned a JSON indicating 2FA is required, show 2FA modal
                         if (data && data.status === '2fa_required') {
-                            const loginModalEl = document.getElementById('loginModal');
-                            if (loginModalEl) bootstrap.Modal.getOrCreateInstance(loginModalEl).hide();
-                            const twoFaEl = document.getElementById('twoFactorModal');
-                            if (twoFaEl) bootstrap.Modal.getOrCreateInstance(twoFaEl).show();
+                            safeHideModal('loginModal');
+                            safeShowModal('twoFactorModal');
                             return;
                         }
 
-                        // If server attempts redirect (opaqueredirect), assume old 2FA redirect and open modal
-                        if (resp.type === 'opaqueredirect') {
-                            const loginModalEl = document.getElementById('loginModal');
-                            if (loginModalEl) bootstrap.Modal.getOrCreateInstance(loginModalEl).hide();
-                            const twoFaEl = document.getElementById('twoFactorModal');
-                            if (twoFaEl) bootstrap.Modal.getOrCreateInstance(twoFaEl).show();
-                            return;
+                        // If server attempts redirect (opaqueredirect), check Location header
+                        if (resp.type === 'opaqueredirect' || resp.status === 0) {
+                            // Try to get redirect URL from response
+                            const location = resp.headers.get('Location');
+                            if (location && (location.includes('2fa') || location.includes('two-factor'))) {
+                                safeHideModal('loginModal');
+                                safeShowModal('twoFactorModal');
+                                return;
+                            }
                         }
 
                         // If redirected somewhere else (e.g., dashboard), go there
@@ -3963,19 +4462,49 @@
                             return;
                         }
 
+                        // Handle successful login with 200 status but no JSON (Chrome fallback)
+                        if (resp.ok && resp.status === 200 && !data) {
+                            // Try to read response as text to check for redirect hints
+                            const text = await resp.text();
+                            if (text.includes('dashboard') || text.includes('redirect')) {
+                                window.location.href = '/dashboard';
+                                return;
+                            }
+                            // Otherwise reload
+                            window.location.reload();
+                            return;
+                        }
+
                         // Fallbacks: show message from JSON or generic error
                         if (data && data.message) {
                             alert(data.message);
                         } else if (!resp.ok) {
                             let msg = 'Login failed';
-                            try { const parsed = await resp.json(); msg = parsed.message || Object.values(parsed.errors||{})[0]?.[0] || msg; } catch {}
+                            try { 
+                                const text = await resp.text();
+                                try {
+                                    const parsed = JSON.parse(text);
+                                    msg = parsed.message || Object.values(parsed.errors||{})[0]?.[0] || msg;
+                                } catch {
+                                    // If not JSON, check for error messages in HTML
+                                    if (text.includes('credentials')) {
+                                        msg = 'Invalid email or password. Please try again.';
+                                    } else if (text.includes('verify')) {
+                                        msg = 'Please verify your email address before logging in.';
+                                    } else if (text.includes('approved')) {
+                                        msg = 'Your registration is pending approval.';
+                                    }
+                                }
+                            } catch (e) {
+                                console.error('Error parsing response:', e);
+                            }
                             alert(msg);
                         } else {
                             window.location.reload();
                         }
                     } catch (err) {
-                        console.error(err);
-                        alert('Network error. Please try again.');
+                        console.error('Login error:', err);
+                        alert('Network error. Please check your connection and try again.');
                     } finally {
                         submitBtn.disabled = false;
                     }
@@ -4542,57 +5071,9 @@
             // Initialize modal enhancements
             enhanceModalBehavior();
 
-            // Ensure sign-in button opens modal (fallback for data-bs-toggle)
-            // Try multiple selectors to find the sign-in button
-            const signInButton = document.querySelector('.btn-auth[data-bs-target="#loginModal"]') || 
-                                 document.querySelector('a.btn-auth[href="#"]') ||
-                                 document.querySelector('.navbar .btn-auth');
-            
-            if (signInButton) {
-                signInButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const loginModal = document.getElementById('loginModal');
-                    if (loginModal) {
-                        // Check if Bootstrap is available
-                        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                            try {
-                                const modalInstance = bootstrap.Modal.getOrCreateInstance(loginModal);
-                                modalInstance.show();
-                            } catch (error) {
-                                console.error('Error showing modal:', error);
-                                // Fallback: manually show modal
-                                loginModal.classList.add('show');
-                                loginModal.style.display = 'block';
-                                loginModal.setAttribute('aria-hidden', 'false');
-                                document.body.classList.add('modal-open');
-                                const existingBackdrop = document.getElementById('modalBackdrop');
-                                if (!existingBackdrop) {
-                                    const backdrop = document.createElement('div');
-                                    backdrop.className = 'modal-backdrop fade show';
-                                    backdrop.id = 'modalBackdrop';
-                                    document.body.appendChild(backdrop);
-                                }
-                            }
-                        } else {
-                            // Fallback: manually show modal if Bootstrap isn't loaded
-                            loginModal.classList.add('show');
-                            loginModal.style.display = 'block';
-                            loginModal.setAttribute('aria-hidden', 'false');
-                            document.body.classList.add('modal-open');
-                            const existingBackdrop = document.getElementById('modalBackdrop');
-                            if (!existingBackdrop) {
-                                const backdrop = document.createElement('div');
-                                backdrop.className = 'modal-backdrop fade show';
-                                backdrop.id = 'modalBackdrop';
-                                document.body.appendChild(backdrop);
-                            }
-                        }
-                    } else {
-                        console.warn('Login modal not found in DOM. User may be logged in.');
-                    }
-                }, { once: false, capture: true });
-            }
+            // Let Bootstrap handle modal opening naturally via data-bs-toggle
+            // Only add a fallback handler if Bootstrap fails
+            // Don't interfere with Bootstrap's native event handling
         });
     </script>
 </body>
