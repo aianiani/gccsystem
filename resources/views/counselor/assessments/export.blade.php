@@ -4,67 +4,219 @@
     <meta charset="utf-8">
     <title>Assessment Summary</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 14px; color: #222; }
-        .header { border-bottom: 2px solid #237728; margin-bottom: 20px; padding-bottom: 10px; }
-        .section { margin-bottom: 18px; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; }
+        body { font-family: Arial, sans-serif; font-size: 13px; color: #222; }
+        .header { border-bottom: 2px solid #237728; margin-bottom: 14px; padding-bottom: 8px; }
+        .title { color: #1f6f2f; font-size: 20px; font-weight: bold; margin-bottom: 2px; }
+        .muted { color: #666; font-size: 12px; }
+        .section { margin-bottom: 14px; }
+        .label { width: 140px; display: inline-block; font-weight: 600; }
+        .value { display: inline-block; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 6px; }
         .bg-danger { background: #dc3545; color: #fff; }
         .bg-warning { background: #ffc107; color: #222; }
         .bg-success { background: #198754; color: #fff; }
         .bg-info { background: #0dcaf0; color: #222; }
         .bg-secondary { background: #6c757d; color: #fff; }
-        .title { color: #237728; font-size: 22px; font-weight: bold; }
-        .subtitle { color: #555; font-size: 16px; font-weight: bold; margin-bottom: 6px; }
-        ul, ol { margin: 0 0 0 18px; }
-        .mb-1 { margin-bottom: 6px; }
-        .mb-2 { margin-bottom: 12px; }
-        .mb-3 { margin-bottom: 18px; }
-        .border-box { border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px; margin-bottom: 12px; }
+        .bg-depression { background: #0d6efd; color: #fff; }
+        .bg-anxiety { background: #0099ff; color: #fff; }
+        .bg-stress { background: #666; color: #fff; }
+        table { width: 100%; border-collapse: collapse; }
+        .info-table td { padding: 6px 4px; vertical-align: top; }
+        .box { border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px; }
         .small { font-size: 12px; color: #888; }
+        .key-scores td { padding: 6px; border: 1px solid #efefef; }
+        .interpretation th, .interpretation td { padding: 6px; border: 1px solid #ddd; text-align: left; }
     </style>
-</head>
+    </head>
 <body>
+
     <div class="header">
         <div class="title">Assessment Summary</div>
-        <div><strong>Student:</strong> {{ $assessment->user->name ?? 'N/A' }} ({{ $assessment->user->email ?? 'N/A' }})</div>
-        <div><strong>Assessment Type:</strong> {{ $assessment->type }}</div>
-        <div><strong>Date:</strong> {{ $assessment->created_at->format('M d, Y h:i A') }}</div>
-        <div><strong>Risk Level:</strong>
-            @if($assessment->risk_level==='high')
-                <span class="badge bg-danger">High</span>
-            @elseif($assessment->risk_level==='moderate')
-                <span class="badge bg-warning">Moderate</span>
-            @else
-                <span class="badge bg-success">Normal</span>
-            @endif
-        </div>
+        <div class="muted">Assessment ID: {{ $assessment->id ?? 'N/A' }} &nbsp;|&nbsp; Date: {{ $assessment->created_at ? $assessment->created_at->format('M d, Y h:i A') : 'N/A' }}</div>
+    </div>
+    </div>
+    <div class="section box">
+        <table class="info-table">
+            <tr>
+                <td style="width:50%;">
+                    <div><span class="label">Student Name:</span> <span class="value">{{ $assessment->user->name ?? 'N/A' }}</span></div>
+                    <div><span class="label">Student ID:</span> <span class="value">{{ $assessment->user->student_id ?? $assessment->user->id ?? 'N/A' }}</span></div>
+                    <div><span class="label">College / Course:</span> <span class="value">{{ ($assessment->user->college ?? '') . (isset($assessment->user->course) ? ' / '.$assessment->user->course : '') }}</span></div>
+                    <div><span class="label">Year / Gender:</span> <span class="value">{{ $assessment->user->year_level ?? $assessment->user->year ?? 'N/A' }} / {{ $assessment->user->gender ?? 'N/A' }}</span></div>
+                </td>
+                <td style="width:50%;">
+                    <div><span class="label">Email:</span> <span class="value">{{ $assessment->user->email ?? 'N/A' }}</span></div>
+                    <div><span class="label">Contact:</span> <span class="value">{{ $assessment->user->contact_number ?? $assessment->user->phone ?? 'N/A' }}</span></div>
+                    <div><span class="label">Address:</span> <span class="value small">{{ $assessment->user->address ?? $assessment->user->city ?? 'N/A' }}</span></div>
+                    <div><span class="label">Assessed By:</span> <span class="value">{{ $assessment->counselor->name ?? $assessment->assessed_by ?? 'N/A' }}</span></div>
+                </td>
+            </tr>
+        </table>
     </div>
 
+    @if(isset($dass42_questions) && is_array($dass42_questions))
     <div class="section">
-        <div class="subtitle">Scores & Interpretation</div>
+        <div style="font-weight:700; margin-bottom:6px;">Score Sheet (DASS-42)</div>
+        @php
+            // Normalize stored scores to 1..42 keys
+            $studentAnswers = [];
+            if(isset($scores) && is_array($scores)) {
+                foreach($scores as $k=>$v) {
+                    if(is_numeric($k)) {
+                        $ik = (int)$k;
+                        if($ik >= 0 && $ik <= 41) {
+                            $studentAnswers[$ik+1] = (int)$v; continue;
+                        }
+                    }
+                    $studentAnswers[$k] = $v;
+                }
+            }
+
+            // DASS-42 groups (1-indexed)
+            $depressionItems = [3,5,10,13,16,17,21,24,26,31,34,37,38,42];
+            $anxietyItems = [2,4,7,9,15,19,20,23,25,28,30,36,40,41];
+            $stressItems = [1,6,8,11,12,14,18,22,27,29,32,33,35,39];
+
+            // helper color function for inline styling
+            $getCategoryColor = function($q) use ($depressionItems, $anxietyItems, $stressItems) {
+                if(in_array($q, $depressionItems)) return '#0d6efd';
+                if(in_array($q, $anxietyItems)) return '#0099ff';
+                if(in_array($q, $stressItems)) return '#666';
+                return '#000';
+            };
+
+            // compute totals
+            $depressionTotal = 0; $anxietyTotal = 0; $stressTotal = 0;
+            foreach($depressionItems as $it) { $depressionTotal += (int)($studentAnswers[$it] ?? 0); }
+            foreach($anxietyItems as $it) { $anxietyTotal += (int)($studentAnswers[$it] ?? 0); }
+            foreach($stressItems as $it) { $stressTotal += (int)($studentAnswers[$it] ?? 0); }
+        @endphp
+
+        <div class="box">
+            <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                <thead>
+                    <tr>
+                        <th style="width:50px; border:1px solid #ddd; padding:6px;">Q</th>
+                        <th style="width:70px; border:1px solid #ddd; padding:6px;">SCORE</th>
+                        <th style="width:50px; border:1px solid #ddd; padding:6px;">Q</th>
+                        <th style="width:70px; border:1px solid #ddd; padding:6px;">SCORE</th>
+                        <th style="width:110px; border:1px solid #ddd; padding:6px; color:#0d6efd; font-weight:700;">DEPRESSION</th>
+                        <th style="width:110px; border:1px solid #ddd; padding:6px; color:#0099ff; font-weight:700;">ANXIETY</th>
+                        <th style="width:110px; border:1px solid #ddd; padding:6px; color:#666; font-weight:700;">STRESS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for($i=1;$i<=21;$i++)
+                        @php
+                            $q1 = $i; $q2 = $i+21;
+                            $q1_ans = (int)($studentAnswers[$q1] ?? 0);
+                            $q2_ans = (int)($studentAnswers[$q2] ?? 0);
+
+                            $rowDep = (in_array($q1, $depressionItems) ? $q1_ans : 0) + (in_array($q2, $depressionItems) ? $q2_ans : 0);
+                            $rowAnx = (in_array($q1, $anxietyItems) ? $q1_ans : 0) + (in_array($q2, $anxietyItems) ? $q2_ans : 0);
+                            $rowStr = (in_array($q1, $stressItems) ? $q1_ans : 0) + (in_array($q2, $stressItems) ? $q2_ans : 0);
+                        @endphp
+                        <tr>
+                            <td style="border:1px solid #ddd; padding:6px; text-align:center;">{{ $q1 }}</td>
+                            <td style="border:1px solid #ddd; padding:6px; text-align:center; color:{{ $getCategoryColor($q1) }}; font-weight:700;">{{ $q1_ans }}</td>
+                            <td style="border:1px solid #ddd; padding:6px; text-align:center;">{{ $q2 }}</td>
+                            <td style="border:1px solid #ddd; padding:6px; text-align:center; color:{{ $getCategoryColor($q2) }}; font-weight:700;">{{ $q2_ans }}</td>
+                            <td style="border:1px solid #ddd; padding:6px; text-align:center; color:#0d6efd; font-weight:700;">{{ $rowDep>0 ? $rowDep : '-' }}</td>
+                            <td style="border:1px solid #ddd; padding:6px; text-align:center; color:#0099ff; font-weight:700;">{{ $rowAnx>0 ? $rowAnx : '-' }}</td>
+                            <td style="border:1px solid #ddd; padding:6px; text-align:center; color:#666; font-weight:700;">{{ $rowStr>0 ? $rowStr : '-' }}</td>
+                        </tr>
+                    @endfor
+
+                    <tr style="font-weight:700; text-align:center;">
+                        <td colspan="4" style="border:1px solid #333; padding:8px;">Total</td>
+                        <td style="border:1px solid #333; padding:8px; color:#0d6efd;">{{ $depressionTotal }}</td>
+                        <td style="border:1px solid #333; padding:8px; color:#0099ff;">{{ $anxietyTotal }}</td>
+                        <td style="border:1px solid #333; padding:8px; color:#666;">{{ $stressTotal }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    <div class="section">
+        <div style="font-weight:700; margin-bottom:6px;">Scores & Interpretation</div>
         @if($assessment->type === 'DASS-42')
-            <div class="mb-1"><strong>Depression:</strong> {{ $scores['depression'] ?? '-' }} <span class="badge {{ ($score_interpretation['depression'] ?? '') === 'Severe' || ($score_interpretation['depression'] ?? '') === 'Extremely Severe' ? 'bg-danger' : (($score_interpretation['depression'] ?? '') === 'Moderate' ? 'bg-warning' : (($score_interpretation['depression'] ?? '') === 'Mild' ? 'bg-info' : 'bg-success')) }}">{{ $score_interpretation['depression'] ?? '' }}</span></div>
-            <div class="mb-1"><strong>Anxiety:</strong> {{ $scores['anxiety'] ?? '-' }} <span class="badge {{ ($score_interpretation['anxiety'] ?? '') === 'Severe' || ($score_interpretation['anxiety'] ?? '') === 'Extremely Severe' ? 'bg-danger' : (($score_interpretation['anxiety'] ?? '') === 'Moderate' ? 'bg-warning' : (($score_interpretation['anxiety'] ?? '') === 'Mild' ? 'bg-info' : 'bg-success')) }}">{{ $score_interpretation['anxiety'] ?? '' }}</span></div>
-            <div class="mb-1"><strong>Stress:</strong> {{ $scores['stress'] ?? '-' }} <span class="badge {{ ($score_interpretation['stress'] ?? '') === 'Severe' || ($score_interpretation['stress'] ?? '') === 'Extremely Severe' ? 'bg-danger' : (($score_interpretation['stress'] ?? '') === 'Moderate' ? 'bg-warning' : (($score_interpretation['stress'] ?? '') === 'Mild' ? 'bg-info' : 'bg-success')) }}">{{ $score_interpretation['stress'] ?? '' }}</span></div>
+            @php
+                // Use the totals computed from the score sheet to avoid mismatch with stored values
+                $computedDep = $depressionTotal ?? ($scores['depression'] ?? 0);
+                $computedAnx = $anxietyTotal ?? ($scores['anxiety'] ?? 0);
+                $computedStr = $stressTotal ?? ($scores['stress'] ?? 0);
+
+                $localInterpretation = [];
+                $localInterpretation['depression'] = $computedDep >= 28 ? 'Extremely Severe' : ($computedDep >= 21 ? 'Severe' : ($computedDep >= 14 ? 'Moderate' : ($computedDep >= 10 ? 'Mild' : 'Normal')));
+                $localInterpretation['anxiety'] = $computedAnx >= 20 ? 'Extremely Severe' : ($computedAnx >= 15 ? 'Severe' : ($computedAnx >= 10 ? 'Moderate' : ($computedAnx >= 8 ? 'Mild' : 'Normal')));
+                $localInterpretation['stress'] = $computedStr >= 34 ? 'Extremely Severe' : ($computedStr >= 26 ? 'Severe' : ($computedStr >= 19 ? 'Moderate' : ($computedStr >= 15 ? 'Mild' : 'Normal')));
+            @endphp
+            <table class="key-scores" style="width:100%; margin-bottom:8px;">
+                <tr>
+                    <td style="width:33%;"><strong>Depression</strong><div class="small">Score: {{ $computedDep }}</div><div style="margin-top:6px;"><span class="badge bg-depression">{{ $localInterpretation['depression'] }}</span></div></td>
+                    <td style="width:33%;"><strong>Anxiety</strong><div class="small">Score: {{ $computedAnx }}</div><div style="margin-top:6px;"><span class="badge bg-anxiety">{{ $localInterpretation['anxiety'] }}</span></div></td>
+                    <td style="width:34%;"><strong>Stress</strong><div class="small">Score: {{ $computedStr }}</div><div style="margin-top:6px;"><span class="badge bg-stress">{{ $localInterpretation['stress'] }}</span></div></td>
+                </tr>
+            </table>
         @else
-            <div class="mb-1"><strong>Total Score:</strong> {{ $graph_data['scores'][0] ?? '-' }} / {{ $graph_data['max'] ?? '-' }} <span class="badge bg-info">{{ $graph_data['score_level'] ?? '' }}</span></div>
+            <div class="box">Total Score: {{ $graph_data['scores'][0] ?? '-' }} / {{ $graph_data['max'] ?? '-' }} <span class="badge bg-info">{{ $graph_data['score_level'] ?? '' }}</span></div>
         @endif
     </div>
 
-    <div class="section">
-        <div class="subtitle">Student Comment</div>
-        @if($assessment->student_comment)
-            <div class="border-box">{{ $assessment->student_comment }}</div>
-        @else
-            <div class="text-muted">No comment provided</div>
-        @endif
-    </div>
+    {{-- Student comment removed from PDF export per request --}}
 
     <div class="section">
-        <div class="subtitle">Case Management Notes</div>
-        <div style="min-height: 60px; border: 1px dashed #aaa; padding: 8px;">
-            {{ $assessment->case_notes ?? '' }}
-        </div>
+        <div style="font-weight:700; margin-bottom:6px;">Case Management Notes</div>
+        <div class="box" style="min-height:70px;">{{ $assessment->case_notes ?? '' }}</div>
     </div>
+
+    <div class="mt-4 section">
+        <div style="font-weight:700; margin-bottom:6px;">Table. Interpretation guide for scores</div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px; border:1px solid #ddd;">
+            <thead>
+                <tr style="background:#f3f3f3; text-align:center; font-weight:700;">
+                    <th style="width:25%; padding:8px; border:1px solid #ddd;">Severity</th>
+                    <th style="width:25%; padding:8px; border:1px solid #ddd; color:#0d6efd;">Depression (D)</th>
+                    <th style="width:25%; padding:8px; border:1px solid #ddd; color:#0099ff;">Anxiety (A)</th>
+                    <th style="width:25%; padding:8px; border:1px solid #ddd; color:#666;">Stress (S)</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center;">
+                <tr>
+                    <td style="padding:8px; border:1px solid #ddd; font-weight:700;">Normal</td>
+                    <td style="padding:8px; border:1px solid #ddd;">0 - 9</td>
+                    <td style="padding:8px; border:1px solid #ddd;">0 - 7</td>
+                    <td style="padding:8px; border:1px solid #ddd;">0 - 14</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; border:1px solid #ddd; font-weight:700;">Mild</td>
+                    <td style="padding:8px; border:1px solid #ddd;">10 - 13</td>
+                    <td style="padding:8px; border:1px solid #ddd;">8 - 9</td>
+                    <td style="padding:8px; border:1px solid #ddd;">15 - 18</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; border:1px solid #ddd; font-weight:700;">Moderate</td>
+                    <td style="padding:8px; border:1px solid #ddd;">14 - 20</td>
+                    <td style="padding:8px; border:1px solid #ddd;">10 - 14</td>
+                    <td style="padding:8px; border:1px solid #ddd;">19 - 25</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; border:1px solid #ddd; font-weight:700;">Severe</td>
+                    <td style="padding:8px; border:1px solid #ddd;">21 - 27</td>
+                    <td style="padding:8px; border:1px solid #ddd;">15 - 19</td>
+                    <td style="padding:8px; border:1px solid #ddd;">26 - 33</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; border:1px solid #ddd; font-weight:700;">Extremely Severe</td>
+                    <td style="padding:8px; border:1px solid #ddd;">28+</td>
+                    <td style="padding:8px; border:1px solid #ddd;">20+</td>
+                    <td style="padding:8px; border:1px solid #ddd;">34+</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 </body>
-</html> 
+</html>

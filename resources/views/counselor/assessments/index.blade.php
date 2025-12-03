@@ -293,18 +293,35 @@
                 $high = $assessments->where('risk_level', 'high')->count();
                 $veryHigh = $assessments->where('risk_level', 'very-high')->count();
                 $dassAssessments = $assessments->where('type', 'DASS-42');
-                $avgDepression = $dassAssessments->count() ? $dassAssessments->avg(function($a) {
-                    $score = is_array($a->score) ? $a->score : json_decode($a->score, true);
-                    return $score['depression'] ?? 0;
-                }) : 0;
-                $avgAnxiety = $dassAssessments->count() ? $dassAssessments->avg(function($a) {
-                    $score = is_array($a->score) ? $a->score : json_decode($a->score, true);
-                    return $score['anxiety'] ?? 0;
-                }) : 0;
-                $avgStress = $dassAssessments->count() ? $dassAssessments->avg(function($a) {
-                    $score = is_array($a->score) ? $a->score : json_decode($a->score, true);
-                    return $score['stress'] ?? 0;
-                }) : 0;
+                // Compute averages from computed per-item totals to avoid mismatch
+                $avgDepression = 0; $avgAnxiety = 0; $avgStress = 0;
+                if ($dassAssessments->count()) {
+                    $depSum = 0; $anxSum = 0; $strSum = 0; $count = 0;
+                    foreach ($dassAssessments as $a) {
+                        $raw = is_array($a->score) ? $a->score : json_decode($a->score, true);
+                        $studentAnswers = [];
+                        if (!empty($raw) && is_array($raw)) {
+                            foreach ($raw as $k=>$v) {
+                                if (is_numeric($k)) {
+                                    $ik = (int)$k;
+                                    if ($ik >= 0 && $ik <= 41) { $studentAnswers[$ik+1] = (int)$v; continue; }
+                                }
+                                $studentAnswers[$k] = $v;
+                            }
+                        }
+                        $depressionItems = [3,5,10,13,16,17,21,24,26,31,34,37,38,42];
+                        $anxietyItems = [2,4,7,9,15,19,20,23,25,28,30,36,40,41];
+                        $stressItems = [1,6,8,11,12,14,18,22,27,29,32,33,35,39];
+                        $dT=0; $aT=0; $sT=0;
+                        foreach($depressionItems as $it) { $dT += (int)($studentAnswers[$it] ?? 0); }
+                        foreach($anxietyItems as $it) { $aT += (int)($studentAnswers[$it] ?? 0); }
+                        foreach($stressItems as $it) { $sT += (int)($studentAnswers[$it] ?? 0); }
+                        $depSum += $dT; $anxSum += $aT; $strSum += $sT; $count++;
+                    }
+                    $avgDepression = $count ? $depSum / $count : 0;
+                    $avgAnxiety = $count ? $anxSum / $count : 0;
+                    $avgStress = $count ? $strSum / $count : 0;
+                }
                 $avgOverall = ($avgDepression + $avgAnxiety + $avgStress) / 3;
             @endphp
             
@@ -333,39 +350,7 @@
                 </div>
             </div>
 
-            <!-- Risk category counts -->
-            <div class="row g-3 mb-3">
-                <div class="col-6 col-sm-4 col-md-2">
-                    <div class="dashboard-stat-card text-center">
-                        <div style="font-size:0.85rem; color:var(--text-light);">Low Risk</div>
-                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $low }}</div>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2">
-                    <div class="dashboard-stat-card text-center">
-                        <div style="font-size:0.85rem; color:var(--text-light);">Low-Moderate</div>
-                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $lowModerate }}</div>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2">
-                    <div class="dashboard-stat-card text-center">
-                        <div style="font-size:0.85rem; color:var(--text-light);">Moderate</div>
-                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $moderate }}</div>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2">
-                    <div class="dashboard-stat-card text-center">
-                        <div style="font-size:0.85rem; color:var(--text-light);">High</div>
-                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $high }}</div>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2">
-                    <div class="dashboard-stat-card text-center">
-                        <div style="font-size:0.85rem; color:var(--text-light);">Very High</div>
-                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $veryHigh }}</div>
-                    </div>
-                </div>
-            </div>
+            {{-- Risk category counts removed per request --}}
 
             <div class="main-content-card">
                 <div class="card-header">
@@ -413,14 +398,7 @@
                             </div>
                         </div>
                     </form>
-                    {{-- Risk legend --}}
-                    <div class="risk-legend">
-                        <div class="legend-item"><span class="pill low"></span>Low</div>
-                        <div class="legend-item"><span class="pill low-moderate"></span>Low-Moderate</div>
-                        <div class="legend-item"><span class="pill moderate"></span>Moderate</div>
-                        <div class="legend-item"><span class="pill high"></span>High</div>
-                        <div class="legend-item"><span class="pill very-high"></span>Very High</div>
-                    </div>
+                    {{-- Risk legend removed per request --}}
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0 w-100" id="assessments-table">
                     <colgroup>
@@ -448,23 +426,45 @@
                     </thead>
                     <tbody>
                         @forelse($assessments as $assessment)
-                            @php 
-                                $scores = is_array($assessment->score) ? $assessment->score : json_decode($assessment->score, true); 
+                            @php
+                                // Normalize stored score payload (could be JSON string) and compute
+                                // subscale totals from per-item answers to ensure consistency.
+                                $rawScore = is_array($assessment->score) ? $assessment->score : json_decode($assessment->score, true);
+                                $studentAnswers = [];
+                                if (!empty($rawScore) && is_array($rawScore)) {
+                                    foreach ($rawScore as $k => $v) {
+                                        if (is_numeric($k)) {
+                                            $ik = (int)$k;
+                                            if ($ik >= 0 && $ik <= 41) {
+                                                $studentAnswers[$ik + 1] = (int)$v;
+                                                continue;
+                                            }
+                                        }
+                                        $studentAnswers[$k] = $v;
+                                    }
+                                }
+                                // DASS groups (1-indexed)
+                                $depressionItems = [3,5,10,13,16,17,21,24,26,31,34,37,38,42];
+                                $anxietyItems = [2,4,7,9,15,19,20,23,25,28,30,36,40,41];
+                                $stressItems = [1,6,8,11,12,14,18,22,27,29,32,33,35,39];
+                                $depTotal = 0; $anxTotal = 0; $strTotal = 0;
+                                foreach ($depressionItems as $it) { $depTotal += (int)($studentAnswers[$it] ?? 0); }
+                                foreach ($anxietyItems as $it) { $anxTotal += (int)($studentAnswers[$it] ?? 0); }
+                                foreach ($stressItems as $it) { $strTotal += (int)($studentAnswers[$it] ?? 0); }
+                                $scores = $rawScore;
                             @endphp
                             <tr class="align-middle">
                                 <td class="text-center align-middle"><span class="badge rounded-pill bg-light text-dark border border-1">{{ $assessment->type }}</span></td>
                                 <td class="text-center align-middle" style="white-space:nowrap;">{{ $assessment->created_at->format('M d, Y h:i A') }}</td>
                                 <td class="text-start align-middle">
-                                    @php $riskCls = strtolower($assessment->risk_level ?? 'normal'); @endphp
-                                    <span class="risk-dot {{ $riskCls }}" title="{{ ucwords(str_replace('-', ' ', $assessment->risk_level ?? 'normal')) }}"></span>
                                     {{ $assessment->user->name ?? 'N/A' }}
                                 </td>
                                 <td class="text-start align-middle" style="max-width: 240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ $assessment->user->email ?? 'N/A' }}">{{ $assessment->user->email ?? 'N/A' }}</td>
                                 <!-- Risk indicator removed -->
                                 @if($assessment->type === 'DASS-42')
-                                    <td class="text-end align-middle"><span class="badge bg-primary">{{ $scores['depression'] ?? '-' }}</span></td>
-                                    <td class="text-end align-middle"><span class="badge bg-info text-dark">{{ $scores['anxiety'] ?? '-' }}</span></td>
-                                    <td class="text-end align-middle"><span class="badge bg-secondary">{{ $scores['stress'] ?? '-' }}</span></td>
+                                    <td class="text-end align-middle"><span class="badge bg-primary">{{ $depTotal ?? ($scores['depression'] ?? '-') }}</span></td>
+                                    <td class="text-end align-middle"><span class="badge bg-info text-dark">{{ $anxTotal ?? ($scores['anxiety'] ?? '-') }}</span></td>
+                                    <td class="text-end align-middle"><span class="badge bg-secondary">{{ $strTotal ?? ($scores['stress'] ?? '-') }}</span></td>
                                 @else
                                     <td class="text-end align-middle"><span class="badge bg-primary">-</span></td>
                                     <td class="text-end align-middle"><span class="badge bg-info text-dark">-</span></td>

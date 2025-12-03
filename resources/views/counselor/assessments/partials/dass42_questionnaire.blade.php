@@ -54,39 +54,35 @@
             $studentAnswers = json_decode($assessment->score, true) ?? [];
         }
     }
+
+    // Normalize keys: if answers were saved with 0-based numeric keys (0..41),
+    // convert them to 1-based keys (1..42) so the view can use question numbers.
+    $normalized = [];
+    foreach ($studentAnswers as $k => $v) {
+        if (is_numeric($k)) {
+            $ik = (int)$k;
+            // if original keys were 0..41, convert to 1..42
+            if ($ik >= 0 && $ik <= 41) {
+                $normalized[$ik + 1] = (int)$v;
+                continue;
+            }
+        }
+        $normalized[$k] = $v;
+    }
+    $studentAnswers = $normalized;
 @endphp
 
 <div class="dass42-questionnaire">
-    <!-- Rating Scale Instructions -->
-    <div class="card mb-4 border-0 shadow-sm" style="background: #f8f9fa;">
-        <div class="card-body">
-            <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Rating Scale Instructions</h6>
-            <p class="small mb-2">Please read each statement and circle a number 0, 1, 2 or 3 which indicates how much the statement applied to the student over the past week. There are no right or wrong answers. Do not spend too much time on any one statement.</p>
-            
-            <div class="mt-3">
-                <p class="small fw-bold mb-2">The rating scale is as follows:</p>
-                <ul class="small mb-0" style="list-style: none; padding-left: 0;">
-                    <li><span class="badge bg-success">0</span> <strong>Did not apply</strong> - Did not apply to me at all</li>
-                    <li><span class="badge bg-info">1</span> <strong>Sometimes</strong> - Applied to me to some degree, or some of the time</li>
-                    <li><span class="badge bg-warning text-dark">2</span> <strong>Often</strong> - Applied to me to a considerable degree, or a good part of time</li>
-                    <li><span class="badge bg-danger">3</span> <strong>Very Much</strong> - Applied to me very much, or most of the time</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    <!-- Rating Scale Instructions removed for compact counselor view -->
 
-    <!-- Questions Table -->
+    <!-- Questions Table (compact) -->
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead class="table-light">
                 <tr>
-                    <th style="width: 50px; text-align: center;">Q</th>
+                    <th style="width: 60px; text-align: center;">Q</th>
                     <th>Statement</th>
-                    <th style="width: 80px; text-align: center;">0</th>
-                    <th style="width: 80px; text-align: center;">1</th>
-                    <th style="width: 80px; text-align: center;">2</th>
-                    <th style="width: 80px; text-align: center;">3</th>
-                    <th style="width: 100px; text-align: center;">Answer</th>
+                    <th style="width: 120px; text-align: center;">Answer</th>
                 </tr>
             </thead>
             <tbody>
@@ -97,34 +93,6 @@
                     <tr>
                         <td style="text-align: center; font-weight: bold; background: #f8f9fa;">{{ $qNum }}</td>
                         <td>{{ $question }}</td>
-                        <td style="text-align: center;">
-                            @if($answer === 0 || $answer === '0')
-                                <i class="bi bi-check-circle-fill text-success" style="font-size: 1.2rem;"></i>
-                            @else
-                                <span class="text-muted">○</span>
-                            @endif
-                        </td>
-                        <td style="text-align: center;">
-                            @if($answer === 1 || $answer === '1')
-                                <i class="bi bi-check-circle-fill text-info" style="font-size: 1.2rem;"></i>
-                            @else
-                                <span class="text-muted">○</span>
-                            @endif
-                        </td>
-                        <td style="text-align: center;">
-                            @if($answer === 2 || $answer === '2')
-                                <i class="bi bi-check-circle-fill text-warning" style="font-size: 1.2rem;"></i>
-                            @else
-                                <span class="text-muted">○</span>
-                            @endif
-                        </td>
-                        <td style="text-align: center;">
-                            @if($answer === 3 || $answer === '3')
-                                <i class="bi bi-check-circle-fill text-danger" style="font-size: 1.2rem;"></i>
-                            @else
-                                <span class="text-muted">○</span>
-                            @endif
-                        </td>
                         <td style="text-align: center; font-weight: bold; background: #f8f9fa;">
                             @if($answer !== null)
                                 <span class="badge 
@@ -145,25 +113,12 @@
         </table>
     </div>
 
-    <!-- Legend -->
-    <div class="card mt-4 border-0 shadow-sm" style="background: #f0f8f0;">
-        <div class="card-body">
-            <h6 class="fw-bold mb-2"><i class="bi bi-bookmark me-2"></i>Color Legend</h6>
-            <div class="row g-2 small">
-                <div class="col-md-3">
-                    <span class="badge bg-success me-2">0</span> Not Applicable
-                </div>
-                <div class="col-md-3">
-                    <span class="badge bg-info me-2">1</span> Some Degree
-                </div>
-                <div class="col-md-3">
-                    <span class="badge bg-warning text-dark me-2">2</span> Considerable Degree
-                </div>
-                <div class="col-md-3">
-                    <span class="badge bg-danger me-2">3</span> Very Much
-                </div>
-            </div>
-        </div>
+    <!-- Small inline legend for counselor view -->
+    <div class="small text-muted mt-3">
+        <span class="me-3"><span class="badge bg-success me-1">0</span> Did not apply</span>
+        <span class="me-3"><span class="badge bg-info me-1">1</span> Sometimes</span>
+        <span class="me-3"><span class="badge bg-warning text-dark me-1">2</span> Often</span>
+        <span class="me-0"><span class="badge bg-danger me-1">3</span> Very much</span>
     </div>
 </div>
 

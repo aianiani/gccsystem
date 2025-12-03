@@ -8,17 +8,30 @@
             $studentAnswers = json_decode($assessment->score, true) ?? [];
         }
     }
+    // Normalize 0-based keys (0..41) to 1-based (1..42) for compatibility
+    $normalized = [];
+    foreach ($studentAnswers as $k => $v) {
+        if (is_numeric($k)) {
+            $ik = (int)$k;
+            if ($ik >= 0 && $ik <= 41) {
+                $normalized[$ik + 1] = (int)$v;
+                continue;
+            }
+        }
+        $normalized[$k] = $v;
+    }
+    $studentAnswers = $normalized;
     
     // DASS-42 Scoring items
     $depressionItems = [3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38];
     $anxietyItems = [2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41];
     $stressItems = [1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39, 42];
     
-    // Calculate scores
+    // Calculate scores (raw sums of item values)
     $depressionScore = 0;
     $anxietyScore = 0;
     $stressScore = 0;
-    
+
     foreach ($depressionItems as $item) {
         $depressionScore += (int)($studentAnswers[$item] ?? 0);
     }
@@ -28,19 +41,14 @@
     foreach ($stressItems as $item) {
         $stressScore += (int)($studentAnswers[$item] ?? 0);
     }
-    
-    // Multiply by 2 for DASS-42 scoring
-    $depressionScore *= 2;
-    $anxietyScore *= 2;
-    $stressScore *= 2;
 @endphp
 
 <div class="score-sheet-block">
     <div class="mb-4">
-        <div class="mb-3">
-            <p class="mb-2"><strong>D</strong> = Depression</p>
-            <p class="mb-2"><strong>A</strong> = Anxiety</p>
-            <p class="mb-2"><strong>S</strong> = Stress</p>
+        <div class="mb-3 d-flex flex-row flex-wrap align-items-center gap-3">
+            <div class="small"><strong>D</strong> = Depression</div>
+            <div class="small"><strong>A</strong> = Anxiety</div>
+            <div class="small"><strong>S</strong> = Stress</div>
         </div>
     </div>
 
@@ -52,7 +60,7 @@
                     <th style="width: 70px;">SCORE</th>
                     <th style="width: 50px;">Q</th>
                     <th style="width: 70px;">SCORE</th>
-                    <th style="width: 110px; color: #1f7a2d; font-weight: bold;">DEPRESSION SCORE</th>
+                    <th style="width: 110px; color: #0d6efd; font-weight: bold;">DEPRESSION SCORE</th>
                     <th style="width: 110px; color: #0099ff; font-weight: bold;">ANXIETY SCORE</th>
                     <th style="width: 110px; color: #666; font-weight: bold;">STRESS SCORES</th>
                 </tr>
@@ -86,13 +94,14 @@
                         $stressRaw += isset($studentAnswers[$item]) ? $studentAnswers[$item] : 0;
                     }
 
-                    $depressionScore = $depressionRaw * 2;
-                    $anxietyScore = $anxietyRaw * 2;
-                    $stressScore = $stressRaw * 2;
+                    // Use raw summed scores (do not multiply by 2) to match stored totals
+                    $depressionScore = $depressionRaw;
+                    $anxietyScore = $anxietyRaw;
+                    $stressScore = $stressRaw;
 
                     // Helper to get category color
                     $getCategoryColor = function($qNum) use ($depressionItems, $anxietyItems, $stressItems) {
-                        if (in_array($qNum, $depressionItems)) return '#1f7a2d';
+                        if (in_array($qNum, $depressionItems)) return '#0d6efd';
                         if (in_array($qNum, $anxietyItems)) return '#0099ff';
                         if (in_array($qNum, $stressItems)) return '#666';
                         return '#ccc';
@@ -143,7 +152,7 @@
                         </td>
 
                         {{-- Depression Score for this row --}}
-                        <td style="border: 1px solid #ddd; color: #1f7a2d; font-weight: bold;">
+                        <td style="border: 1px solid #ddd; color: #0d6efd; font-weight: bold;">
                             {{ $rowDepression > 0 ? $rowDepression : '-' }}
                         </td>
 
@@ -162,7 +171,7 @@
                 {{-- Total row --}}
                 <tr class="fw-bold text-center" style="border: 2px solid #333;">
                     <td colspan="4" style="border: 1px solid #333;">Total</td>
-                    <td style="border: 1px solid #333; color: #1f7a2d; font-size: 1.1rem;">{{ $depressionScore }}</td>
+                    <td style="border: 1px solid #333; color: #0d6efd; font-size: 1.1rem;">{{ $depressionScore }}</td>
                     <td style="border: 1px solid #333; color: #0099ff; font-size: 1.1rem;">{{ $anxietyScore }}</td>
                     <td style="border: 1px solid #333; color: #666; font-size: 1.1rem;">{{ $stressScore }}</td>
                 </tr>
@@ -176,7 +185,7 @@
             <thead class="table-light">
                 <tr class="text-center">
                     <th style="width: 25%; font-weight: bold;">Severity</th>
-                    <th style="width: 25%; color: #1f7a2d; font-weight: bold;">Depression (D)</th>
+                    <th style="width: 25%; color: #0d6efd; font-weight: bold;">Depression (D)</th>
                     <th style="width: 25%; color: #0099ff; font-weight: bold;">Anxiety (A)</th>
                     <th style="width: 25%; color: #666; font-weight: bold;">Stress (S)</th>
                 </tr>

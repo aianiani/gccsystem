@@ -84,10 +84,29 @@ class AssessmentController extends Controller
         }
         $comment = $request->input('student_comment');
 
+        // Normalize answers to 1-indexed keys so views that expect questions 1..42 work
+        $answers_assoc = [];
+        foreach ($answers as $k => $v) {
+            // If answers come as 0-indexed numeric array (keys may be strings), shift to 1-indexed
+            if (is_numeric($k)) {
+                $idx = (int)$k + 1;
+            } else {
+                $idx = $k;
+            }
+            $answers_assoc[$idx] = (int)$v;
+        }
+
+        // Merge per-question answers with the computed subscale totals so existing views
+        // can read either the per-item values or the aggregated values via $scores['depression'] etc.
+        $scorePayload = $answers_assoc;
+        $scorePayload['depression'] = $depression;
+        $scorePayload['anxiety'] = $anxiety;
+        $scorePayload['stress'] = $stress;
+
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
             'type' => 'DASS-42',
-            'score' => json_encode(['depression'=>$depression,'anxiety'=>$anxiety,'stress'=>$stress]),
+            'score' => json_encode($scorePayload),
             'risk_level' => $risk_level,
             'student_comment' => $comment,
         ]);
@@ -298,9 +317,14 @@ class AssessmentController extends Controller
             $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
         }
 
-        $pdf = Pdf::loadView('counselor.assessments.export', compact(
-            'assessment', 'scores', 'score_interpretation'
-        ));
+        // If this is a DASS-42 assessment, include the questions so the export view
+        // can render per-question answers.
+        $viewData = compact('assessment', 'scores', 'score_interpretation');
+        if ($assessment->type === 'DASS-42') {
+            $viewData['dass42_questions'] = $this->getDass42Questions();
+        }
+
+        $pdf = Pdf::loadView('counselor.assessments.export', $viewData);
         return $pdf->download('assessment-summary-'.$assessment->id.'.pdf');
     }
 } 

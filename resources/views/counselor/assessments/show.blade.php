@@ -114,27 +114,7 @@
             </div>
         </div>
 
-        {{-- College Info on Top Right --}}
-        <div class="mb-4 d-flex justify-content-between align-items-start">
-            <div></div>
-            <div class="text-end" style="font-size: 0.95rem;">
-                <div style="color: #1f7a2d; font-weight: 600;">{{ $assessment->user->college ?? 'N/A' }}</div>
-                <div class="row mt-2">
-                    <div class="col text-end">
-                        <div class="text-muted small">Course</div>
-                        <div class="fw-bold" style="color: #1f7a2d;">{{ $assessment->user->course ?? '-' }}</div>
-                    </div>
-                    <div class="col text-end">
-                        <div class="text-muted small">Year</div>
-                        <div class="fw-bold" style="color: #1f7a2d;">{{ $assessment->user->year ?? '-' }}</div>
-                    </div>
-                    <div class="col text-end">
-                        <div class="text-muted small">Gender</div>
-                        <div class="fw-bold" style="color: #1f7a2d;">{{ $assessment->user->gender ?? '-' }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{-- College info removed from header to avoid duplication with hero card --}}
 
         @includeIf('counselor.assessments.partials.summary', ['assessment' => $assessment, 'scores' => $scores])
     </div>
