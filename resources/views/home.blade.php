@@ -1964,6 +1964,8 @@
 
     <!-- Bootstrap JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 for login feedback -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Detect Chrome browser
         const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
@@ -4477,7 +4479,15 @@
 
                         // Fallbacks: show message from JSON or generic error
                         if (data && data.message) {
-                            alert(data.message);
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Login failed',
+                                    text: data.message,
+                                });
+                            } else {
+                                alert(data.message);
+                            }
                         } else if (!resp.ok) {
                             let msg = 'Login failed';
                             try { 
@@ -4498,7 +4508,15 @@
                             } catch (e) {
                                 console.error('Error parsing response:', e);
                             }
-                            alert(msg);
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Login failed',
+                                    text: msg,
+                                });
+                            } else {
+                                alert(msg);
+                            }
                         } else {
                             window.location.reload();
                         }
@@ -5076,5 +5094,105 @@
             // Don't interfere with Bootstrap's native event handling
         });
     </script>
+
+    {{-- Simple registration success popup (non-SweetAlert) --}}
+    @if(session('registration_success_message'))
+    <style>
+        .registration-popup-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .registration-popup-card {
+            background: #ffffff;
+            border-radius: 18px;
+            max-width: 460px;
+            width: 90%;
+            padding: 24px 26px 20px 26px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+            text-align: left;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .registration-popup-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #eaf5ea;
+            color: #228B22;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .registration-popup-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: #1f2933;
+        }
+        .registration-popup-text {
+            font-size: 14px;
+            color: #4b5563;
+            margin: 0 0 14px 0;
+            line-height: 1.6;
+        }
+        .registration-popup-note {
+            font-size: 12px;
+            color: #6b7280;
+            margin: 0 0 18px 0;
+        }
+        .registration-popup-actions {
+            text-align: right;
+        }
+        .registration-popup-btn {
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 999px;
+            border: none;
+            background: #228B22;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .registration-popup-btn:hover {
+            background: #1e7e34;
+        }
+    </style>
+    <div class="registration-popup-backdrop" id="registrationPopup">
+        <div class="registration-popup-card">
+            <div class="registration-popup-badge">Almost there</div>
+            <h2 class="registration-popup-title">Please verify your CMU GCC account</h2>
+            <p class="registration-popup-text">
+                {{ session('registration_success_message') }}
+            </p>
+            <p class="registration-popup-note">
+                Tip: Check your CMU email inbox and spam folder for the verification message.
+            </p>
+            <div class="registration-popup-actions">
+                <button type="button" class="registration-popup-btn" id="registrationPopupOk">
+                    OK, got it
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var popup = document.getElementById('registrationPopup');
+            var okBtn = document.getElementById('registrationPopupOk');
+            if (popup && okBtn) {
+                okBtn.addEventListener('click', function () {
+                    popup.style.display = 'none';
+                    // Stay on homepage (already here) without changing any backend flow
+                });
+            }
+        });
+    </script>
+    @endif
 </body>
 </html>

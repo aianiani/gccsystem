@@ -42,20 +42,20 @@ class AppointmentController extends Controller
     // Show form to create a new appointment
     public function create()
     {
+        // Ensure user agreed to consent first
+        if (!auth()->user()->consent_agreed) {
+            return redirect()->route('consent.show')
+                ->with('error', 'Please agree to the consent information before continuing.');
+        }
+
         // Check if user has completed DASS-42 assessment
         $hasDass42 = \App\Models\Assessment::where('user_id', auth()->id())
             ->where('type', 'DASS-42')
             ->exists();
 
         if (!$hasDass42) {
-            return redirect()->route('assessments.index')
-                ->with('error', 'Please complete the DASS-42 assessment first before booking an appointment.');
-        }
-
-        // Check if user has agreed to consent
-        if (!auth()->user()->consent_agreed) {
-            return redirect()->route('consent.show')
-                ->with('error', 'Please agree to the consent information before booking an appointment.');
+            return redirect()->route('assessments.dass42')
+                ->with('error', 'Please complete the DASS-42 assessment before booking an appointment.');
         }
 
         $counselors = User::where('role', 'counselor')->get();

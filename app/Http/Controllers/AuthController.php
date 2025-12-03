@@ -246,7 +246,7 @@ class AuthController extends Controller
         }
 
         return redirect()->route('home')
-            ->with('success', "Welcome to our platform, {$user->name}! We've sent you an email verification link. Please check your email and click the verification link. After email verification, your registration will be reviewed by an administrator. You will be notified once your account is approved.");
+            ->with('registration_success_message', "Welcome to our platform, {$user->name}! We've sent you an email verification link. Please check your email and click the verification link. After email verification, your registration will be reviewed by an administrator. You will be notified once your account is approved.");
     }
 
     /**

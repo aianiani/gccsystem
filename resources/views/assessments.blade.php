@@ -326,18 +326,7 @@
         Take a moment to assess your mental well-being. Choose an assessment type below to get started.
     </div>
     <div class="assessment-cards-row" id="assessment-cards">
-        <!-- DASS-42 Assessment Card -->
-        <div class="assessment-card">
-            <div class="assessment-icon"><i class="bi bi-brain"></i></div>
-            <div class="assessment-title">DASS-42 Assessment</div>
-            <div class="assessment-desc">Depression, Anxiety, and Stress Scale</div>
-            <ul class="assessment-list">
-                <li><i class="bi bi-check2"></i>42 questions</li>
-                <li><i class="bi bi-check2"></i>10-15 minutes</li>
-                <li><i class="bi bi-check2"></i>Comprehensive evaluation</li>
-            </ul>
-            <button class="assessment-btn" id="start-dass42">START ASSESSMENT</button>
-        </div>
+        <!-- DASS-42 removed from hub: moved to its own dedicated flow -->
         <!-- Academic Stress Survey Card -->
         <div class="assessment-card">
             <div class="assessment-icon"><i class="bi bi-heart-pulse"></i></div>
@@ -363,66 +352,7 @@
             <button class="assessment-btn" id="start-wellness">START CHECK</button>
         </div>
     </div>
-    <!-- DASS-42 Assessment Form (hidden by default) -->
-    <div id="dass42-form-container" style="display:none;">
-        <form method="POST" action="{{ route('assessments.dass42.submit') }}" class="card p-0 shadow-sm dass42-form" style="max-width: 700px; margin: 0 auto;">
-            @csrf
-            <div class="dass42-sticky-header" style="position:sticky;top:0;z-index:10;background:#f8f9fa;padding:1.2rem 1.5rem 0.5rem 1.5rem;border-radius:18px 18px 0 0;box-shadow:0 2px 8px rgba(44,80,22,0.04);">
-                <h3 class="mb-2 text-center" style="color: #2d5016;">DASS-42 Assessment</h3>
-                <div class="progress mb-0" style="height: 18px;">
-                    <div id="dass42-progress" class="progress-bar bg-success" role="progressbar" style="width: 0%; font-weight: bold;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="42">0/42</div>
-                </div>
-            </div>
-            <div id="dass42-question-wrapper" class="p-4 pb-0">
-                <ol class="dass42-questions-list" style="padding-left: 0;">
-                    @foreach($dass42_questions as $idx => $question)
-                        <li class="mb-4 dass42-question-item" data-question="{{ $idx }}" style="list-style: none; display: none;">
-                            <div class="fw-bold mb-2">{{ ($idx+1) . ". " . $question }}</div>
-                            <div class="row g-2 align-items-center dass42-options-row">
-                                @for($i=0; $i<=3; $i++)
-                                    <div class="col-12 col-md-6 col-lg-3">
-                                        <div class="form-check dass42-option-check w-100">
-                                            <input class="form-check-input" type="radio" name="answers[{{ $idx }}]" id="q{{ $idx }}_{{ $i }}" value="{{ $i }}" required tabindex="-1">
-                                            <label class="form-check-label w-100" for="q{{ $idx }}_{{ $i }}" style="font-size: 0.98rem;">
-                                                {{ [0=>'Did not apply to me at all', 1=>'Applied to me to some degree, or some of the time', 2=>'Applied to me to a considerable degree, or a good part of time', 3=>'Applied to me very much, or most of the time'][$i] }}
-                                            </label>
-                                        </div>
-                                    </div>
-                                @endfor
-                            </div>
-                        </li>
-                    @endforeach
-                </ol>
-            </div>
-            <div class="dass42-nav-controls d-flex justify-content-between align-items-center px-4 pb-4 pt-2" style="background:#f8f9fa;border-radius:0 0 18px 18px;">
-                <button type="button" class="btn btn-outline-secondary px-4 py-2" id="dass42-prev" style="visibility:hidden;">Previous</button>
-                <button type="button" class="btn btn-outline-success px-4 py-2" id="dass42-next">Next</button>
-                <button type="submit" class="btn btn-success px-5 py-2" id="dass42-submit" style="display:none;">Submit Assessment</button>
-            </div>
-            <!-- Free-text field -->
-            <div class="px-4 pb-4">
-                <label for="dass42_comment" class="form-label">How are you feeling? (Optional)</label>
-                <textarea class="form-control" name="student_comment" id="dass42_comment" rows="2" placeholder="Share anything you'd like with your counselor..."></textarea>
-            </div>
-            <div id="dass42-summary" style="display:none;" class="p-4">
-                <h4 class="mb-3 text-center" style="color:#2d5016;">Review Your Answers</h4>
-                <div class="dass42-review-list mb-3">
-                    @foreach($dass42_questions as $idx => $question)
-                        <div class="dass42-review-item d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-2 p-3">
-                            <div class="dass42-review-question flex-grow-1 mb-2 mb-md-0"><span class="fw-semibold text-dark">{{ ($idx+1) . ". " . $question }}</span></div>
-                            <div class="dass42-review-answer text-end">
-                                <span class="badge dass42-summary-answer px-3 py-2" data-summary="{{ $idx }}" style="font-size:1rem;">Not answered</span>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="text-center">
-                    <button type="button" class="btn btn-outline-secondary px-4 py-2" id="dass42-edit">Edit Answers</button>
-                    <button type="submit" class="btn btn-success px-5 py-2 ms-2">Submit Assessment</button>
-                </div>
-            </div>
-        </form>
-    </div>
+    <!-- DASS-42 form removed from hub: moved to its own dedicated flow -->
     <!-- Academic Stress Survey Form (hidden by default) -->
     <div id="academic-form-container" style="display:none;">
         <form method="POST" action="{{ route('assessments.academic.submit') }}" class="card p-0 shadow-sm dass42-form" style="max-width: 700px; margin: 0 auto;">
@@ -665,101 +595,24 @@
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('start-dass42').addEventListener('click', function() {
-        document.getElementById('assessment-cards').style.display = 'none';
-        document.getElementById('dass42-form-container').style.display = 'block';
-        showDass42Question(0);
-    });
-    document.getElementById('start-academic').addEventListener('click', function() {
-        document.getElementById('assessment-cards').style.display = 'none';
-        document.getElementById('academic-form-container').style.display = 'block';
-        showAcademicQuestion(0); // Ensure first question is shown
-    });
-    document.getElementById('start-wellness').addEventListener('click', function() {
-        document.getElementById('assessment-cards').style.display = 'none';
-        document.getElementById('wellness-form-container').style.display = 'block';
-        showWellnessQuestion(0);
-    });
-    // Navigation logic
-    const totalQuestions = 42;
-    let currentQuestion = 0;
-    const questions = document.querySelectorAll('.dass42-question-item');
-    const prevBtn = document.getElementById('dass42-prev');
-    const nextBtn = document.getElementById('dass42-next');
-    const submitBtn = document.getElementById('dass42-submit');
-    const summaryDiv = document.getElementById('dass42-summary');
-    const questionWrapper = document.getElementById('dass42-question-wrapper');
-    const radios = document.querySelectorAll('.dass42-form input[type="radio"]');
-    const progressBar = document.getElementById('dass42-progress');
-    function showDass42Question(idx) {
-        questions.forEach((q, i) => {
-            q.style.display = (i === idx) ? '' : 'none';
-            q.classList.toggle('active', i === idx);
+    // DASS-42 removed from hub: start button and inline flow were moved to a dedicated page/flow.
+    // Initialize Academic and Wellness start buttons safely (only if present).
+    const startAcademicBtn = document.getElementById('start-academic');
+    if (startAcademicBtn) {
+        startAcademicBtn.addEventListener('click', function() {
+            document.getElementById('assessment-cards').style.display = 'none';
+            document.getElementById('academic-form-container').style.display = 'block';
+            showAcademicQuestion(0); // Ensure first question is shown
         });
-        prevBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
-        nextBtn.style.display = idx === totalQuestions-1 ? 'none' : '';
-        submitBtn.style.display = idx === totalQuestions-1 ? '' : 'none';
-        summaryDiv.style.display = 'none';
-        questionWrapper.style.display = '';
-        updateProgress();
-        // Focus first radio for accessibility
-        const firstRadio = questions[idx].querySelector('input[type="radio"]');
-        if(firstRadio) firstRadio.focus();
     }
-    prevBtn.onclick = () => { if(currentQuestion>0) showDass42Question(--currentQuestion); };
-    nextBtn.onclick = () => {
-        // Require answer before next
-        const checked = questions[currentQuestion].querySelector('input[type="radio"]:checked');
-        if(!checked) {
-            questions[currentQuestion].scrollIntoView({behavior:'smooth',block:'center'});
-            questions[currentQuestion].classList.add('border-danger');
-            setTimeout(()=>questions[currentQuestion].classList.remove('border-danger'), 1000);
-            return;
-        }
-        if(currentQuestion<totalQuestions-1) showDass42Question(++currentQuestion);
-    };
-    // Progress bar logic
-    function updateProgress() {
-        const answered = new Set();
-        radios.forEach(r => { if(r.checked) answered.add(r.name); });
-        const count = answered.size;
-        const percent = Math.round((count/totalQuestions)*100);
-        progressBar.style.width = percent + '%';
-        progressBar.setAttribute('aria-valuenow', count);
-        progressBar.textContent = count + '/42';
-    }
-    radios.forEach(r => r.addEventListener('change', updateProgress));
-    // Show summary before submit
-    submitBtn.onclick = function(e) {
-        e.preventDefault();
-        // Fill summary
-        document.querySelectorAll('.dass42-summary-answer').forEach(span => {
-            const idx = span.getAttribute('data-summary');
-            const checked = document.querySelector('input[name="answers['+idx+']"]:checked');
-            if(checked) {
-                span.textContent = checked.nextElementSibling.textContent;
-                span.className = 'badge bg-success dass42-summary-answer';
-            } else {
-                span.textContent = 'Not answered';
-                span.className = 'badge bg-danger dass42-summary-answer';
-            }
+    const startWellnessBtn = document.getElementById('start-wellness');
+    if (startWellnessBtn) {
+        startWellnessBtn.addEventListener('click', function() {
+            document.getElementById('assessment-cards').style.display = 'none';
+            document.getElementById('wellness-form-container').style.display = 'block';
+            showWellnessQuestion(0);
         });
-        summaryDiv.style.display = '';
-        questionWrapper.style.display = 'none';
-        prevBtn.style.display = nextBtn.style.display = submitBtn.style.display = 'none';
-    };
-    var dass42EditBtn = document.getElementById('dass42-edit');
-    if (dass42EditBtn) {
-        dass42EditBtn.onclick = function() {
-        summaryDiv.style.display = 'none';
-        questionWrapper.style.display = '';
-        showDass42Question(currentQuestion);
-        prevBtn.style.display = nextBtn.style.display = '';
-        submitBtn.style.display = currentQuestion === totalQuestions-1 ? '' : 'none';
-    };
     }
-    // On page load, show first question if form is visible
-    if(document.getElementById('dass42-form-container').style.display !== 'none') showDass42Question(0);
 
     // Academic Survey Navigation
     const academicTotal = {{ count($academic_questions) }};
@@ -924,8 +777,6 @@
         @php $type = session('last_assessment_type', 'DASS-42'); @endphp
         @if($type === 'DASS-42')
         <p class="mb-3">Thank you for completing the DASS-42 assessment.<br>Your responses have been submitted for review by a counselor.<br><span class="text-muted small">If you have any urgent concerns, please reach out to the guidance office directly.</span></p>
-        @elseif($type === 'DASS-21')
-        <p class="mb-3">Thank you for completing the DASS-21 assessment.<br>Your responses have been submitted for review by a counselor.<br><span class="text-muted small">If you have any urgent concerns, please reach out to the guidance office directly.</span></p>
         @elseif($type === 'Academic Stress Survey')
         <p class="mb-3">Thank you for completing the Academic Stress Survey.<br>Your responses have been submitted for review by a counselor.<br><span class="text-muted small">If you have any urgent concerns, please reach out to the guidance office directly.</span></p>
         @elseif($type === 'Wellness Check')

@@ -147,8 +147,8 @@
         </div>
         <div class="col-md-3">
             <div class="stats-card">
-                <div class="stats-number">{{ \App\Models\Assessment::where('type', 'dass21')->count() ?? 0 }}</div>
-                <div class="stats-label">DASS-21 Assessments</div>
+                <div class="stats-number">{{ \App\Models\Assessment::where('type', 'dass42')->count() ?? 0 }}</div>
+                <div class="stats-label">DASS-42 Assessments</div>
             </div>
         </div>
         <div class="col-md-3">
@@ -181,7 +181,7 @@
                 <label for="type" class="form-label">Assessment Type</label>
                 <select class="form-select" id="type" name="type">
                     <option value="">All Types</option>
-                    <option value="dass21" {{ request('type') == 'dass21' ? 'selected' : '' }}>DASS-21</option>
+                    <option value="dass42" {{ request('type') == 'dass42' ? 'selected' : '' }}>DASS-42</option>
                     <option value="academic" {{ request('type') == 'academic' ? 'selected' : '' }}>Academic</option>
                     <option value="wellness" {{ request('type') == 'wellness' ? 'selected' : '' }}>Wellness</option>
                 </select>

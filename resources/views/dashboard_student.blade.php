@@ -916,7 +916,7 @@
                 </div>
                 <div class="dass-modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Maybe Later</button>
-                    <a href="{{ route('assessments.index') }}#dass42" class="btn btn-success">
+                    <a href="{{ route('consent.show') }}" class="btn btn-success">
                         Proceed
                     </a>
                 </div>

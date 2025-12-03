@@ -3,10 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Http;
-use PHPInsight\Sentiment;
-use App\Services\CohereService;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class AssessmentController extends Controller
@@ -18,6 +14,20 @@ class AssessmentController extends Controller
             'dass42_questions' => $this->getDass42Questions(),
             'academic_questions' => $this->getAcademicQuestions(),
             'wellness_questions' => $this->getWellnessQuestions(),
+        ]);
+    }
+
+    // Show dedicated DASS-42 assessment page
+    public function dass42Page()
+    {
+        // Require consent first
+        if (!auth()->user() || !auth()->user()->consent_agreed) {
+            return redirect()->route('consent.show')
+                ->with('error', 'Please agree to the consent information before taking the assessment.');
+        }
+
+        return view('assessments.dass42', [
+            'dass42_questions' => $this->getDass42Questions(),
         ]);
     }
 
@@ -42,23 +52,37 @@ class AssessmentController extends Controller
         $anxiety = array_sum(array_intersect_key($answers, array_flip($anxiety_idx)));
         $stress = array_sum(array_intersect_key($answers, array_flip($stress_idx)));
         // Determine risk level based on DASS-42 interpretation guide
-        // Extremely Severe or Severe = high risk
-        // Moderate = moderate risk
-        // Mild or Normal = normal risk
-        $risk_level = 'normal';
+        // Map the worst subscale severity to a risk category with finer granularity:
+        // Normal -> low
+        // Mild -> low-moderate
+        // Moderate -> moderate
+        // Severe -> high
+        // Extremely Severe -> very-high
         $depression_severity = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
         $anxiety_severity = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
         $stress_severity = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
-        
-        if ($depression_severity === 'Extremely Severe' || $depression_severity === 'Severe' || 
-            $anxiety_severity === 'Extremely Severe' || $anxiety_severity === 'Severe' || 
-            $stress_severity === 'Extremely Severe' || $stress_severity === 'Severe') {
-            $risk_level = 'high';
-        } elseif ($depression_severity === 'Moderate' || $anxiety_severity === 'Moderate' || $stress_severity === 'Moderate') {
+
+        // severity ranking
+        $severity_rank = ['Normal' => 0, 'Mild' => 1, 'Moderate' => 2, 'Severe' => 3, 'Extremely Severe' => 4];
+        $worst = max(
+            $severity_rank[$depression_severity] ?? 0,
+            $severity_rank[$anxiety_severity] ?? 0,
+            $severity_rank[$stress_severity] ?? 0
+        );
+
+        $risk_level = 'low';
+        if ($worst === 0) {
+            $risk_level = 'low';
+        } elseif ($worst === 1) {
+            $risk_level = 'low-moderate';
+        } elseif ($worst === 2) {
             $risk_level = 'moderate';
+        } elseif ($worst === 3) {
+            $risk_level = 'high';
+        } elseif ($worst === 4) {
+            $risk_level = 'very-high';
         }
         $comment = $request->input('student_comment');
-        $sentiment = $comment ? $this->simpleSentiment($comment) : null;
 
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
@@ -66,15 +90,14 @@ class AssessmentController extends Controller
             'score' => json_encode(['depression'=>$depression,'anxiety'=>$anxiety,'stress'=>$stress]),
             'risk_level' => $risk_level,
             'student_comment' => $comment,
-            'ai_sentiment' => $sentiment,
         ]);
         
-        // Redirect to consent page after DASS-42 completion
-        return redirect()->route('consent.show')
-            ->with('success', 'DASS-42 assessment completed successfully. Please proceed to the consent page.');
+        // After completing the assessment send user to booking (appointments.create)
+        return redirect()->route('appointments.create')
+            ->with('success', 'DASS-42 assessment completed successfully. You may now continue to booking.');
     }
 
-    // Counselor: View all DASS-21 assessment results
+    // Counselor: View all DASS-42 assessment results
     public function counselorIndex()
     {
         // Only allow counselors
@@ -102,7 +125,6 @@ class AssessmentController extends Controller
             $risk_level = 'moderate';
         }
         $comment = $request->input('student_comment');
-        $sentiment = $comment ? $this->simpleSentiment($comment) : null;
 
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
@@ -110,7 +132,6 @@ class AssessmentController extends Controller
             'score' => $score,
             'risk_level' => $risk_level,
             'student_comment' => $comment,
-            'ai_sentiment' => $sentiment,
         ]);
         return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'Academic Stress Survey']);
     }
@@ -130,7 +151,6 @@ class AssessmentController extends Controller
             $risk_level = 'moderate';
         }
         $comment = $request->input('student_comment');
-        $sentiment = $comment ? $this->simpleSentiment($comment) : null;
 
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
@@ -138,7 +158,6 @@ class AssessmentController extends Controller
             'score' => $score,
             'risk_level' => $risk_level,
             'student_comment' => $comment,
-            'ai_sentiment' => $sentiment,
         ]);
         return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'Wellness Check']);
     }
@@ -231,222 +250,25 @@ class AssessmentController extends Controller
         ];
     }
 
-    public function simpleSentiment($text) {
-        $positive = ['happy', 'good', 'great', 'fantastic', 'positive', 'well', 'better', 'improved', 'relieved', 'hopeful', 'excited', 'calm'];
-        $negative = ['sad', 'bad', 'depressed', 'anxious', 'stressed', 'unhappy', 'worse', 'hopeless', 'angry', 'tired', 'worried', 'afraid'];
-        $text = strtolower($text);
-        foreach ($positive as $word) {
-            if (strpos($text, $word) !== false) return 'positive';
-        }
-        foreach ($negative as $word) {
-            if (strpos($text, $word) !== false) return 'negative';
-        }
-        return 'neutral';
-    }
-
     public function show($id)
     {
         $assessment = \App\Models\Assessment::with('user')->findOrFail($id);
         $scores = is_array($assessment->score) ? $assessment->score : json_decode($assessment->score, true);
 
-        $ai_summary = '';
-        $ai_suggested_actions = [];
-        $ai_resource = null;
         $score_interpretation = [];
-        $graph_data = [];
-        $redFlags = [];
-        $strengths = [];
-        $percentile = null;
-        $trend = null;
-        $dynamicResources = [];
-        $actionPlan = [];
 
-        // Example mapping for DASS-21 (customize for your survey)
-        $questionTopics = [
-            'q1' => 'Difficulty relaxing',
-            'q2' => 'Dryness of mouth',
-            'q3' => 'Lack of positive feeling',
-            'q4' => 'Breathing difficulty',
-            'q5' => 'Difficulty initiating tasks',
-            'q6' => 'Tendency to over-react',
-            'q7' => 'Trembling',
-            'q8' => 'Difficulty winding down',
-            'q9' => 'Lack of enthusiasm',
-            'q10' => 'Nervous energy',
-            'q11' => 'Feeling worthless',
-            'q12' => 'Agitation',
-            'q13' => 'Difficulty relaxing',
-            'q14' => 'Intolerant',
-            'q15' => 'Fear without reason',
-            'q16' => 'Meaninglessness',
-            'q17' => 'Irritability',
-            'q18' => 'Difficulty sleeping',
-            'q19' => 'Feeling down-hearted',
-            'q20' => 'Feeling close to panic',
-            'q21' => 'Unable to become enthusiastic',
-            // ...add more for other surveys
-        ];
-
-        // Resource map for flagged topics
-        $resourceMap = [
-            'Difficulty sleeping' => ['title' => 'Sleep Hygiene Tips', 'url' => '#'],
-            'Difficulty relaxing' => ['title' => 'Relaxation Techniques', 'url' => '#'],
-            'Feeling worthless' => ['title' => 'Self-Esteem Support', 'url' => '#'],
-            'Fear without reason' => ['title' => 'Anxiety Management', 'url' => '#'],
-            'Trembling' => ['title' => 'Grounding Exercises', 'url' => '#'],
-            // ...add more mappings as needed
-        ];
-
-        // Per-question analysis
-        $answers = $scores['answers'] ?? [];
-        foreach ($answers as $q => $val) {
-            // For DASS-21: 0=Did not apply, 1=Applied to some degree, 2=Applied a considerable degree, 3=Applied very much
-            if ($val >= 3) {
-                $topic = $questionTopics[$q] ?? $q;
-                $redFlags[] = $topic;
-                if (isset($resourceMap[$topic])) $dynamicResources[] = $resourceMap[$topic];
-            } elseif ($val == 0) {
-                $strengths[] = $questionTopics[$q] ?? $q;
-            }
-        }
-
-        // Calculate total score for percentile/trend
-        if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
-            $total = ($scores['depression'] ?? 0) + ($scores['anxiety'] ?? 0) + ($scores['stress'] ?? 0);
-        } else {
-            $total = is_array($assessment->score) ? ($assessment->score['score'] ?? 0) : (is_numeric($assessment->score) ? $assessment->score : 0);
-        }
-
-        // Percentile calculation
-        $allScores = \App\Models\Assessment::where('type', $assessment->type)->pluck('score');
-        $allTotals = $allScores->map(function($s) use ($assessment) {
-            $arr = is_array($s) ? $s : json_decode($s, true);
-            if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
-                return ($arr['depression'] ?? 0) + ($arr['anxiety'] ?? 0) + ($arr['stress'] ?? 0);
-            }
-            return is_array($arr) ? ($arr['score'] ?? 0) : (is_numeric($arr) ? $arr : 0);
-        });
-        $percentile = $allTotals->filter(fn($s) => $s < $total)->count() / max(1, $allTotals->count()) * 100;
-
-        // Trend calculation (compare to previous assessment for this user and type)
-        $previous = \App\Models\Assessment::where('user_id', $assessment->user_id)
-            ->where('type', $assessment->type)
-            ->where('id', '<', $assessment->id)
-            ->orderByDesc('id')->first();
-        if ($previous) {
-            $prevScore = is_array($previous->score) ? ($previous->score['score'] ?? 0) : (is_numeric($previous->score) ? $previous->score : 0);
-            if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
-                $prevArr = is_array($previous->score) ? $previous->score : json_decode($previous->score, true);
-                $prevScore = ($prevArr['depression'] ?? 0) + ($prevArr['anxiety'] ?? 0) + ($prevArr['stress'] ?? 0);
-            }
-            $trend = $total - $prevScore;
-            // Action plan based on trend
-            if ($trend > 0) {
-                $actionPlan[] = 'Schedule a follow-up session to address worsening scores.';
-            } elseif ($trend < 0) {
-                $actionPlan[] = 'Acknowledge improvement and reinforce positive behaviors.';
-            }
-        }
-
-        // Dynamic recommendations based on percentile/trend
-        if ($percentile !== null && $percentile > 80) {
-            $ai_suggested_actions[] = 'Student is among the most at-risk. Consider urgent intervention.';
-            $actionPlan[] = 'Refer to campus counseling center for urgent support.';
-        }
-        if ($trend !== null && $trend > 0) {
-            $ai_suggested_actions[] = 'Score has increased since last assessment (worsening). Escalate support.';
-        } elseif ($trend !== null && $trend < 0) {
-            $ai_suggested_actions[] = 'Score has decreased since last assessment (improving). Reinforce positive changes.';
-        }
-        if (!empty($strengths)) {
-            $actionPlan[] = 'Leverage student strengths (e.g., ' . implode(', ', array_slice($strengths, 0, 2)) . ') in counseling.';
-        }
-
-        if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
+        if ($assessment->type === 'DASS-42') {
             $depression = $scores['depression'] ?? 0;
             $anxiety = $scores['anxiety'] ?? 0;
             $stress = $scores['stress'] ?? 0;
 
-            // Use DASS-42 interpretation guide if DASS-42, otherwise use DASS-21 interpretation
-            if ($assessment->type === 'DASS-42') {
-                // DASS-42 Interpretation Guide:
-                // Normal: D 0-9, A 0-7, S 0-14
-                // Mild: D 10-13, A 8-9, S 15-18
-                // Moderate: D 14-20, A 10-14, S 19-25
-                // Severe: D 21-27, A 15-19, S 26-33
-                // Extremely Severe: D 28+, A 20+, S 34+
-                $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
-                $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
-                $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
-            } else {
-                // DASS-21 interpretation (multiplied by 2)
-                $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
-                $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
-                $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 27 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
-            }
-
-            $dassType = $assessment->type === 'DASS-42' ? 'DASS-42' : 'DASS-21';
-            $ai_summary = "$dassType Subscale Scores: Depression ($depression, {$score_interpretation['depression']}), Anxiety ($anxiety, {$score_interpretation['anxiety']}), Stress ($stress, {$score_interpretation['stress']}).";
-
-            if ($depression >= 21) $ai_suggested_actions[] = 'Refer for depression support.';
-            if ($anxiety >= 15) $ai_suggested_actions[] = 'Provide anxiety coping strategies.';
-            if ($stress >= 26) $ai_suggested_actions[] = 'Discuss stress management techniques.';
-
-            $ai_resource = ['title' => "$dassType Self-Help Guide", 'url' => '#'];
-            $graph_data = [
-                'labels' => ['Depression', 'Anxiety', 'Stress'],
-                'scores' => [$depression, $anxiety, $stress],
-                'interpretation' => [$score_interpretation['depression'], $score_interpretation['anxiety'], $score_interpretation['stress']],
-            ];
-        } else {
-            $max = $assessment->type === 'Academic Stress Survey' ? 45 : ($assessment->type === 'Wellness Check' ? 36 : 0);
-            // Score level interpretation
-            if ($max > 0) {
-                if ($total >= 0.8 * $max) {
-                    $score_level = 'Very High';
-                    $ai_suggested_actions[] = 'Urgent follow-up and intervention recommended.';
-                } elseif ($total >= 0.6 * $max) {
-                    $score_level = 'High';
-                    $ai_suggested_actions[] = 'Monitor closely and provide support resources.';
-                } elseif ($total >= 0.4 * $max) {
-                    $score_level = 'Moderate';
-                    $ai_suggested_actions[] = 'Encourage healthy coping strategies.';
-                } else {
-                    $score_level = 'Low';
-                    $ai_suggested_actions[] = 'Continue regular monitoring.';
-                }
-                $ai_summary = "Total Score: $total out of $max ($score_level).";
-                $graph_data = [
-                    'labels' => ['Total Score'],
-                    'scores' => [$total],
-                    'max' => $max,
-                    'score_level' => $score_level,
-                ];
-            } else {
-                $ai_summary = "Total Score: $total.";
-                $ai_suggested_actions[] = $assessment->risk_level === 'high'
-                    ? 'Immediate follow-up recommended due to high risk.'
-                    : ($assessment->risk_level === 'moderate'
-                        ? 'Monitor and schedule a check-in session.'
-                        : 'Continue regular monitoring.');
-                $graph_data = [
-                    'labels' => ['Total Score'],
-                    'scores' => [$total],
-                    'max' => 0,
-                    'score_level' => '',
-                ];
-            }
-            $ai_resource = ['title' => 'Academic Stress Coping Tips', 'url' => '#'];
+            // DASS-42 Interpretation Guide
+            $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
+            $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
+            $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
         }
 
-        // Sentiment (from Cohere)
-        $cohere = new CohereService();
-        $comment = $assessment->student_comment ?? '';
-        $ai_sentiment = $comment ? $cohere->sentiment($comment) : 'neutral';
-
-        return view('counselor.assessments.show', compact(
-            'assessment', 'scores', 'ai_sentiment', 'ai_summary', 'ai_suggested_actions', 'ai_resource', 'score_interpretation', 'graph_data', 'redFlags', 'strengths', 'percentile', 'trend', 'dynamicResources', 'actionPlan'
-        ));
+        return view('counselor.assessments.show', compact('assessment', 'scores', 'score_interpretation'));
     }
 
     public function saveNotes(Request $request, $id)
@@ -462,217 +284,23 @@ class AssessmentController extends Controller
     public function exportPdf($id)
     {
         $assessment = \App\Models\Assessment::with('user')->findOrFail($id);
-        // Reuse your show() logic to get all variables
-        // ... (copy the logic from show() to get $scores, $ai_summary, etc.)
-        // For brevity, let's assume you have all variables as in show()
-        extract($this->getAssessmentSummaryData($assessment)); // You may want to refactor show() logic into a private method
-
-        $pdf = Pdf::loadView('counselor.assessments.export', compact(
-            'assessment', 'scores', 'ai_sentiment', 'ai_summary', 'ai_suggested_actions', 'ai_resource', 'score_interpretation', 'graph_data', 'redFlags', 'strengths', 'percentile', 'trend', 'dynamicResources', 'actionPlan'
-        ));
-        return $pdf->download('assessment-summary-'.$assessment->id.'.pdf');
-    }
-
-    private function getAssessmentSummaryData($assessment) {
         $scores = is_array($assessment->score) ? $assessment->score : json_decode($assessment->score, true);
 
-        $ai_summary = '';
-        $ai_suggested_actions = [];
-        $ai_resource = null;
         $score_interpretation = [];
-        $graph_data = [];
-        $redFlags = [];
-        $strengths = [];
-        $percentile = null;
-        $trend = null;
-        $dynamicResources = [];
-        $actionPlan = [];
 
-        // Example mapping for DASS-21 (customize for your survey)
-        $questionTopics = [
-            'q1' => 'Difficulty relaxing',
-            'q2' => 'Dryness of mouth',
-            'q3' => 'Lack of positive feeling',
-            'q4' => 'Breathing difficulty',
-            'q5' => 'Difficulty initiating tasks',
-            'q6' => 'Tendency to over-react',
-            'q7' => 'Trembling',
-            'q8' => 'Difficulty winding down',
-            'q9' => 'Lack of enthusiasm',
-            'q10' => 'Nervous energy',
-            'q11' => 'Feeling worthless',
-            'q12' => 'Agitation',
-            'q13' => 'Difficulty relaxing',
-            'q14' => 'Intolerant',
-            'q15' => 'Fear without reason',
-            'q16' => 'Meaninglessness',
-            'q17' => 'Irritability',
-            'q18' => 'Difficulty sleeping',
-            'q19' => 'Feeling down-hearted',
-            'q20' => 'Feeling close to panic',
-            'q21' => 'Unable to become enthusiastic',
-            // ...add more for other surveys
-        ];
-
-        // Resource map for flagged topics
-        $resourceMap = [
-            'Difficulty sleeping' => ['title' => 'Sleep Hygiene Tips', 'url' => '#'],
-            'Difficulty relaxing' => ['title' => 'Relaxation Techniques', 'url' => '#'],
-            'Feeling worthless' => ['title' => 'Self-Esteem Support', 'url' => '#'],
-            'Fear without reason' => ['title' => 'Anxiety Management', 'url' => '#'],
-            'Trembling' => ['title' => 'Grounding Exercises', 'url' => '#'],
-            // ...add more mappings as needed
-        ];
-
-        // Per-question analysis
-        $answers = $scores['answers'] ?? [];
-        foreach ($answers as $q => $val) {
-            // For DASS-21: 0=Did not apply, 1=Applied to some degree, 2=Applied a considerable degree, 3=Applied very much
-            if ($val >= 3) {
-                $topic = $questionTopics[$q] ?? $q;
-                $redFlags[] = $topic;
-                if (isset($resourceMap[$topic])) $dynamicResources[] = $resourceMap[$topic];
-            } elseif ($val == 0) {
-                $strengths[] = $questionTopics[$q] ?? $q;
-            }
-        }
-
-        // Calculate total score for percentile/trend
-        if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
-            $total = ($scores['depression'] ?? 0) + ($scores['anxiety'] ?? 0) + ($scores['stress'] ?? 0);
-        } else {
-            $total = is_array($assessment->score) ? ($assessment->score['score'] ?? 0) : (is_numeric($assessment->score) ? $assessment->score : 0);
-        }
-
-        // Percentile calculation
-        $allScores = \App\Models\Assessment::where('type', $assessment->type)->pluck('score');
-        $allTotals = $allScores->map(function($s) use ($assessment) {
-            $arr = is_array($s) ? $s : json_decode($s, true);
-            if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
-                return ($arr['depression'] ?? 0) + ($arr['anxiety'] ?? 0) + ($arr['stress'] ?? 0);
-            }
-            return is_array($arr) ? ($arr['score'] ?? 0) : (is_numeric($arr) ? $arr : 0);
-        });
-        $percentile = $allTotals->filter(fn($s) => $s < $total)->count() / max(1, $allTotals->count()) * 100;
-
-        // Trend calculation (compare to previous assessment for this user and type)
-        $previous = \App\Models\Assessment::where('user_id', $assessment->user_id)
-            ->where('type', $assessment->type)
-            ->where('id', '<', $assessment->id)
-            ->orderByDesc('id')->first();
-        if ($previous) {
-            $prevScore = is_array($previous->score) ? ($previous->score['score'] ?? 0) : (is_numeric($previous->score) ? $previous->score : 0);
-            if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
-                $prevArr = is_array($previous->score) ? $previous->score : json_decode($previous->score, true);
-                $prevScore = ($prevArr['depression'] ?? 0) + ($prevArr['anxiety'] ?? 0) + ($prevArr['stress'] ?? 0);
-            }
-            $trend = $total - $prevScore;
-            // Action plan based on trend
-            if ($trend > 0) {
-                $actionPlan[] = 'Schedule a follow-up session to address worsening scores.';
-            } elseif ($trend < 0) {
-                $actionPlan[] = 'Acknowledge improvement and reinforce positive behaviors.';
-            }
-        }
-
-        // Dynamic recommendations based on percentile/trend
-        if ($percentile !== null && $percentile > 80) {
-            $ai_suggested_actions[] = 'Student is among the most at-risk. Consider urgent intervention.';
-            $actionPlan[] = 'Refer to campus counseling center for urgent support.';
-        }
-        if ($trend !== null && $trend > 0) {
-            $ai_suggested_actions[] = 'Score has increased since last assessment (worsening). Escalate support.';
-        } elseif ($trend !== null && $trend < 0) {
-            $ai_suggested_actions[] = 'Score has decreased since last assessment (improving). Reinforce positive changes.';
-        }
-        if (!empty($strengths)) {
-            $actionPlan[] = 'Leverage student strengths (e.g., ' . implode(', ', array_slice($strengths, 0, 2)) . ') in counseling.';
-        }
-
-        if ($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21') {
+        if ($assessment->type === 'DASS-42') {
             $depression = $scores['depression'] ?? 0;
             $anxiety = $scores['anxiety'] ?? 0;
             $stress = $scores['stress'] ?? 0;
 
-            // Use DASS-42 interpretation guide if DASS-42, otherwise use DASS-21 interpretation
-            if ($assessment->type === 'DASS-42') {
-                // DASS-42 Interpretation Guide:
-                // Normal: D 0-9, A 0-7, S 0-14
-                // Mild: D 10-13, A 8-9, S 15-18
-                // Moderate: D 14-20, A 10-14, S 19-25
-                // Severe: D 21-27, A 15-19, S 26-33
-                // Extremely Severe: D 28+, A 20+, S 34+
-                $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
-                $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
-                $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
-            } else {
-                // DASS-21 interpretation (multiplied by 2)
-                $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
-                $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
-                $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 27 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
-            }
-
-            $dassType = $assessment->type === 'DASS-42' ? 'DASS-42' : 'DASS-21';
-            $ai_summary = "$dassType Subscale Scores: Depression ($depression, {$score_interpretation['depression']}), Anxiety ($anxiety, {$score_interpretation['anxiety']}), Stress ($stress, {$score_interpretation['stress']}).";
-
-            if ($depression >= 21) $ai_suggested_actions[] = 'Refer for depression support.';
-            if ($anxiety >= 15) $ai_suggested_actions[] = 'Provide anxiety coping strategies.';
-            if ($stress >= 26) $ai_suggested_actions[] = 'Discuss stress management techniques.';
-
-            $ai_resource = ['title' => "$dassType Self-Help Guide", 'url' => '#'];
-            $graph_data = [
-                'labels' => ['Depression', 'Anxiety', 'Stress'],
-                'scores' => [$depression, $anxiety, $stress],
-                'interpretation' => [$score_interpretation['depression'], $score_interpretation['anxiety'], $score_interpretation['stress']],
-            ];
-        } else {
-            $max = $assessment->type === 'Academic Stress Survey' ? 45 : ($assessment->type === 'Wellness Check' ? 36 : 0);
-            // Score level interpretation
-            if ($max > 0) {
-                if ($total >= 0.8 * $max) {
-                    $score_level = 'Very High';
-                    $ai_suggested_actions[] = 'Urgent follow-up and intervention recommended.';
-                } elseif ($total >= 0.6 * $max) {
-                    $score_level = 'High';
-                    $ai_suggested_actions[] = 'Monitor closely and provide support resources.';
-                } elseif ($total >= 0.4 * $max) {
-                    $score_level = 'Moderate';
-                    $ai_suggested_actions[] = 'Encourage healthy coping strategies.';
-                } else {
-                    $score_level = 'Low';
-                    $ai_suggested_actions[] = 'Continue regular monitoring.';
-                }
-                $ai_summary = "Total Score: $total out of $max ($score_level).";
-                $graph_data = [
-                    'labels' => ['Total Score'],
-                    'scores' => [$total],
-                    'max' => $max,
-                    'score_level' => $score_level,
-                ];
-            } else {
-                $ai_summary = "Total Score: $total.";
-                $ai_suggested_actions[] = $assessment->risk_level === 'high'
-                    ? 'Immediate follow-up recommended due to high risk.'
-                    : ($assessment->risk_level === 'moderate'
-                        ? 'Monitor and schedule a check-in session.'
-                        : 'Continue regular monitoring.');
-                $graph_data = [
-                    'labels' => ['Total Score'],
-                    'scores' => [$total],
-                    'max' => 0,
-                    'score_level' => '',
-                ];
-            }
-            $ai_resource = ['title' => 'Academic Stress Coping Tips', 'url' => '#'];
+            $score_interpretation['depression'] = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
+            $score_interpretation['anxiety'] = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
+            $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
         }
 
-        // Sentiment (from Cohere)
-        $cohere = new CohereService();
-        $comment = $assessment->student_comment ?? '';
-        $ai_sentiment = $comment ? $cohere->sentiment($comment) : 'neutral';
-
-        return compact(
-            'assessment', 'scores', 'ai_sentiment', 'ai_summary', 'ai_suggested_actions', 'ai_resource', 'score_interpretation', 'graph_data', 'redFlags', 'strengths', 'percentile', 'trend', 'dynamicResources', 'actionPlan'
-        );
+        $pdf = Pdf::loadView('counselor.assessments.export', compact(
+            'assessment', 'scores', 'score_interpretation'
+        ));
+        return $pdf->download('assessment-summary-'.$assessment->id.'.pdf');
     }
 } 

@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('assessments', function (Blueprint $table) {
+            if (!Schema::hasColumn('assessments', 'responses')) {
+                $table->json('responses')->nullable()->after('score');
+            }
+            if (!Schema::hasColumn('assessments', 'case_notes')) {
+                $table->text('case_notes')->nullable()->after('responses');
+            }
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('assessments', function (Blueprint $table) {
+            if (Schema::hasColumn('assessments', 'responses')) {
+                $table->dropColumn('responses');
+            }
+            if (Schema::hasColumn('assessments', 'case_notes')) {
+                $table->dropColumn('case_notes');
+            }
+        });
+    }
+};

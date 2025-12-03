@@ -7,163 +7,51 @@
             --primary-green-2: #13601f;
             --accent-green: #2e7d32;
             --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
             --text-dark: #16321f;
             --text-light: #6c757d;
             --bg-light: #f6fbf6;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
 
-        .home-zoom {
-            zoom: 0.85;
-        }
-        @supports not (zoom: 1) {
-            .home-zoom {
-                transform: scale(0.85);
-                transform-origin: top center;
-            }
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--primary-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0,0,0,0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
-        
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2rem 1rem 1rem 1rem;
-            border-bottom: 1px solid #4a7c59;
-        }
-        
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.5rem 0.5rem 0 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-        }
-        
-        .custom-sidebar .sidebar-link.active, .custom-sidebar .sidebar-link:hover {
-            background: #4a7c59;
-            color: #f4d03f;
-        }
-        
-        .custom-sidebar .sidebar-bottom {
-            padding: 1rem 0.5rem;
-            border-top: 1px solid #4a7c59;
-        }
-        
-        .custom-sidebar .sidebar-link.logout {
-            background: #dc3545;
-            color: #fff;
-            border-radius: 8px;
-            text-align: center;
-            padding: 0.75rem 1rem;
-            font-weight: 600;
-        }
-        
-        .custom-sidebar .sidebar-link.logout:hover {
-            background: #b52a37;
-        }
-        
-        @media (max-width: 767.98px) {
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.2s ease;
-            }
-            .custom-sidebar.show {
-                transform: translateX(0);
-            }
-            .main-dashboard-content {
-                margin-left: 0;
-            }
-            #studentSidebarToggle {
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1100;
-                background: var(--primary-green);
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 0.5rem 0.75rem;
-            }
-        }
-        
-        .main-dashboard-content {
-            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
-            min-height: 100vh;
-            padding: 1rem 1.5rem;
-            margin-left: 240px;
-            transition: margin-left 0.2s;
+        .consent-page {
+            padding: 2rem 1.5rem;
         }
 
-        .main-dashboard-inner {
-            max-width: 1180px;
+        .consent-inner {
+            max-width: 900px;
             margin: 0 auto;
         }
 
+        .consent-header-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .consent-header-title {
+            color: #2d5016;
+            font-weight: 700;
+            font-size: 1.667rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .consent-header-subtitle {
+            color: #3d5c2d;
+            font-size: 0.889rem;
+        }
+
         .consent-container {
-            max-width: 800px;
-            margin: 2rem auto;
             background: #fff;
             border-radius: 16px;
             box-shadow: 0 4px 24px rgba(44, 80, 22, 0.08);
-            padding: 2.5rem;
-        }
-
-        .consent-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .consent-header h2 {
-            color: #2d5016;
-            font-weight: 700;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .consent-header p {
-            color: #6c757d;
-            font-size: 1rem;
+            padding: 2rem;
         }
 
         .consent-content {
             background: #f8f9fa;
             border-radius: 12px;
-            padding: 2rem;
+            padding: 1.5rem;
             margin-bottom: 2rem;
             border: 1px solid #e0e0e0;
         }
@@ -171,24 +59,24 @@
         .consent-content h3 {
             color: #2d5016;
             font-weight: 700;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.111rem;
+            margin-bottom: 1.25rem;
             text-align: center;
         }
 
         .consent-text {
             color: #333;
-            font-size: 1.05rem;
-            line-height: 1.8;
+            font-size: 0.889rem;
+            line-height: 1.7;
             text-align: justify;
         }
 
         .consent-checkbox {
             margin: 2rem 0;
             padding: 1.5rem;
-            background: #fff;
+            background: #eaf5ea;
             border-radius: 12px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #cfe8d0;
         }
 
         .consent-checkbox label {
@@ -196,16 +84,18 @@
             align-items: flex-start;
             gap: 1rem;
             cursor: pointer;
-            font-size: 1.05rem;
-            color: #333;
+            font-size: 0.889rem;
+            color: #2d5016;
+            margin-bottom: 0;
         }
 
         .consent-checkbox input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             margin-top: 2px;
             cursor: pointer;
             flex-shrink: 0;
+            accent-color: #2d9a36;
         }
 
         .consent-actions {
@@ -217,7 +107,7 @@
 
         .btn-consent {
             padding: 0.75rem 2rem;
-            font-size: 1.1rem;
+            font-size: 0.889rem;
             font-weight: 600;
             border-radius: 8px;
             border: none;
@@ -226,12 +116,12 @@
         }
 
         .btn-consent-primary {
-            background: #2d9a36;
-            color: #fff;
+            background: var(--accent-orange);
+            color: #1f2b10;
         }
 
         .btn-consent-primary:hover:not(:disabled) {
-            background: #237728;
+            filter: brightness(0.95);
         }
 
         .btn-consent-primary:disabled {
@@ -252,6 +142,7 @@
             padding: 1rem 1.5rem;
             border-radius: 8px;
             margin-bottom: 1.5rem;
+            font-size: 0.889rem;
         }
 
         .alert-danger {
@@ -265,47 +156,39 @@
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
+
+        .text-danger {
+            color: #dc3545;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .consent-header-title {
+                font-size: 1.5rem;
+            }
+            .consent-container {
+                padding: 1.5rem;
+            }
+            .consent-actions {
+                flex-direction: column;
+            }
+            .btn-consent {
+                width: 100%;
+            }
+        }
     </style>
 
-    <div class="home-zoom">
-        <div class="d-flex">
-            <!-- Mobile Sidebar Toggle -->
-            <button id="studentSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
-            <!-- Sidebar -->
-            <div class="custom-sidebar">
-                <div class="sidebar-logo mb-4">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
-                    <h3 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">CMU Guidance and Counseling Center</h3>
-                    <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Student Portal</p>
-                </div>
-                <nav class="sidebar-nav flex-grow-1">
-                    <a href="{{ route('profile') }}" class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i class="bi bi-person"></i>Profile</a>
-                    <a href="{{ route('dashboard') }}" class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i class="bi bi-house-door"></i>Dashboard</a>
-                    <a href="{{ route('appointments.index') }}" class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i class="bi bi-calendar-check"></i>Appointments</a>
-                    <a href="{{ route('assessments.index') }}" class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i class="bi bi-clipboard-data"></i>Assessments</a>
-                    <a href="{{ route('chat.selectCounselor') }}" class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i class="bi bi-chat-dots"></i>Chat with a Counselor</a>
-                </nav>
-                <div class="sidebar-bottom w-100">
-                    <a href="{{ route('logout') }}" class="sidebar-link logout"
-                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="bi bi-box-arrow-right"></i>Logout
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </div>
+    <div class="consent-page">
+        <div class="consent-inner">
+            <div class="consent-header-section">
+                <h2 class="consent-header-title">Consent for Counseling Services</h2>
+                <p class="consent-header-subtitle">Please read and agree to proceed with counseling services</p>
             </div>
-            
-            <!-- Main Content -->
-            <div class="main-dashboard-content flex-grow-1">
-                <div class="main-dashboard-inner">
-                    <div class="consent-container">
-                        <div class="consent-header">
-                            <h2>Consent for Counseling Services</h2>
-                            <p>Please read and agree to the consent information below to proceed with booking an appointment</p>
-                        </div>
+
+            <div class="consent-container">
 
                         @if(session('error'))
                             <div class="alert alert-danger">
@@ -350,7 +233,7 @@
                                     Cancel
                                 </button>
                                 <button type="submit" class="btn-consent btn-consent-primary" id="submitBtn" disabled>
-                                    Continue to Appointment Booking
+                                    Continue to Assessment
                                 </button>
                             </div>
                         </form>
@@ -368,28 +251,6 @@
             checkbox.addEventListener('change', function() {
                 submitBtn.disabled = !this.checked;
             });
-
-            // Sidebar toggle for mobile
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('studentSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function() {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function(e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        sidebar.classList.remove('show');
-                    }
-                });
-            }
         });
     </script>
 @endsection

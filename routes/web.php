@@ -116,6 +116,7 @@ Route::get('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackCo
 Route::post('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackController::class, 'store'])->name('session-feedback.store');
         // Assessments route for students
         Route::get('assessments', [App\Http\Controllers\AssessmentController::class, 'index'])->name('assessments.index');
+        Route::get('assessments/dass42', [App\Http\Controllers\AssessmentController::class, 'dass42Page'])->name('assessments.dass42');
         Route::post('assessments/dass42', [App\Http\Controllers\AssessmentController::class, 'submitDass42'])->name('assessments.dass42.submit');
         Route::post('assessments/academic', [App\Http\Controllers\AssessmentController::class, 'submitAcademicSurvey'])->name('assessments.academic.submit');
         Route::post('assessments/wellness', [App\Http\Controllers\AssessmentController::class, 'submitWellnessCheck'])->name('assessments.wellness.submit');

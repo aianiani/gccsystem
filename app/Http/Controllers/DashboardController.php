@@ -61,7 +61,7 @@ class DashboardController extends Controller
         
         // Assessment Progress
         $completedAssessments = $user->assessments()->count();
-        $totalAssessments = 3; // DASS-21, Academic, Wellness
+        $totalAssessments = 3; // DASS-42, Academic, Wellness
         $assessmentProgress = round(($completedAssessments / $totalAssessments) * 100);
         
         // Attendance Rate

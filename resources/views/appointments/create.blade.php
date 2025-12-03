@@ -28,7 +28,7 @@
             --danger: #dc3545;
             --warning: #ffc107;
             --success: #28a745;
-            --info: #17a2b8;
+            --info: #ffc107;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
@@ -189,6 +189,158 @@
             max-width: 1180px;
             margin: 0 auto;
         }
+
+        /* Appointment form visual improvements */
+        .counselor-selection-header h3,
+        .counselor-selection-header p,
+        .step-content h5,
+        .step-content h6,
+        .form-label {
+            color: var(--text-dark);
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        /* Clearer input boxes */
+        .form-control, .form-select, textarea {
+            border: 2.6px solid #9eaab0; /* match personal info thickness: slightly thicker */
+            border-radius: 10px;
+            padding: 0.68rem 0.9rem;
+            background: #ffffff;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+            transition: border-color .12s ease, box-shadow .12s ease, transform .08s ease;
+            color: #16321f;
+        }
+
+        /* Ensure placeholder and empty values remain readable */
+        .form-control::placeholder { color: #8f9b96; }
+
+        /* Slightly darker on hover to hint interactivity */
+        .form-control:not([readonly]):hover, .form-select:not([readonly]):hover {
+            border-color: #8aa19a;
+        }
+
+        /* Stronger visible border for readonly/disabled fields */
+        .form-control[readonly], .form-control[disabled], .form-select[disabled] {
+            background: #ffffff;
+            border-color: #9aa6a6;
+            border-width: 2.6px;
+            color: #16321f;
+            font-weight: 600;
+        }
+
+        /* Explicit rule to keep the idle state very visible (not focused) */
+        .form-control:not(:focus), .form-select:not(:focus), textarea:not(:focus) {
+            border-width: 2.6px;
+            border-style: solid;
+            border-color: #9eaab0;
+        }
+
+        /* Match guardian section inputs to the Personal Information appearance */
+        .mb-3.p-3.border .form-control,
+        .mb-3.p-3.border .form-select,
+        .p-3.border .form-control,
+        .p-3.border .form-select {
+            border-width: 1.6px !important;
+            border-color: #e4e1e1ff !important;
+            box-shadow: none !important;
+        }
+
+        /* Autofill styling: make browser auto-filled fields have a yellow background */
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px #fff176 inset !important;
+            box-shadow: 0 0 0px 1000px #fff176 inset !important;
+            -webkit-text-fill-color: #16321f !important;
+        }
+
+        input:-webkit-autofill:focus,
+        textarea:-webkit-autofill:focus,
+        select:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px #fff176 inset !important;
+            box-shadow: 0 0 0px 1000px #fff176 inset !important;
+            -webkit-text-fill-color: #16321f !important;
+        }
+
+        /* Firefox */
+        input:-moz-autofill,
+        textarea:-moz-autofill,
+        select:-moz-autofill {
+            background-color: #fff176 !important;
+            color: #16321f !important;
+            box-shadow: none !important;
+        }
+
+        .form-control:focus, .form-select:focus, textarea:focus {
+            outline: none;
+            border-width: 2.6px;
+            border-color: var(--forest-green-dark);
+            box-shadow: 0 12px 36px rgba(23,90,26,0.14);
+            transform: translateY(-1px);
+        }
+
+        .form-control[readonly], .form-control[disabled] {
+            background: #fff;
+            border-color: #cfe6cf;
+            color: #16321f;
+            font-weight: 600;
+        }
+
+        .form-control:focus, .form-select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--forest-green-dark);
+            box-shadow: 0 6px 20px rgba(33, 120, 37, 0.12);
+            transform: translateY(-1px);
+        }
+
+        /* Distinct containers for guardians and grouped inputs */
+        .step-content .border {
+            border-color: #e6efe4 !important;
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+            padding: 1rem !important;
+        }
+
+        /* Make review/confirmation sections stand out */
+        .scheduler-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--forest-green-dark);
+        }
+
+        .nav-step {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .5rem .75rem;
+            border-radius: 10px;
+            background: #fff;
+            color: var(--forest-green-dark);
+            border: 1px solid #ecf3ec;
+            font-weight: 600;
+            margin-right: .4rem;
+        }
+
+        .nav-step.active {
+            background: linear-gradient(90deg, var(--forest-green) 0%, var(--forest-green-dark) 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 6px 18px rgba(23, 90, 26, 0.08);
+        }
+
+        /* Form helper spacing */
+        .form-text { margin-top: .25rem; color: var(--gray-600); }
+
+        @media (max-width: 767.98px) {
+            .form-control, .form-select, textarea { padding: .5rem .6rem; }
+            .nav-step { font-size: .9rem; padding: .4rem .6rem; }
+        }
     </style>
 
     <div class="home-zoom">
@@ -275,7 +427,7 @@
             
             <!-- Personal Information (Auto-Filled) -->
             <div class="mb-4">
-                <h5 class="mb-3"><i class="bi bi-person-circle me-2"></i>Personal Information <span class="badge bg-info">Auto-filled</span></h5>
+                <h5 class="mb-3"><i class="bi bi-person-circle me-2"></i>Personal Information <span class="badge" style="background:#f4d03f;color:#16321f;">Auto-filled</span></h5>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label">Full Name</label>
@@ -412,7 +564,7 @@
             </div>
             <div class="mt-3" id="problem_other_specify" style="display:none;">
                 <label class="form-label">Please specify:</label>
-                <input type="text" class="form-control" name="nature_of_problem_other" id="nature_of_problem_other" placeholder="Enter details">
+                <textarea class="form-control" name="nature_of_problem_other" id="nature_of_problem_other" placeholder="Enter details" rows="6" style="min-height:160px; resize:vertical;"></textarea>
             </div>
         </div>
         <!-- Step 3: Counselor Selection -->
@@ -1386,7 +1538,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Check if nature of problem is selected
                 const natureOfProblem = document.querySelector('input[name="nature_of_problem"]:checked')?.value;
                 if (natureOfProblem === 'Other') {
-                    const otherSpecify = document.querySelector('input[name="nature_of_problem_other"]')?.value;
+                    const otherSpecify = document.querySelector('[name="nature_of_problem_other"]')?.value;
                     return otherSpecify && otherSpecify.trim() !== '';
                 }
                 return natureOfProblem !== undefined;
@@ -1851,7 +2003,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let natureOfProblem = natureOfProblemRadio.value;
                 // If "Other" is selected, append the specified text
                 if (natureOfProblem === 'Other') {
-                    const otherSpecify = document.querySelector('input[name="nature_of_problem_other"]')?.value;
+                    const otherSpecify = document.querySelector('[name="nature_of_problem_other"]')?.value;
                     if (otherSpecify && otherSpecify.trim() !== '') {
                         natureOfProblem = `Other: ${otherSpecify}`;
                     }

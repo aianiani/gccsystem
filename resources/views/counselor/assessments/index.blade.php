@@ -155,6 +155,32 @@
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
+
+        /* Risk indicator dots and legend */
+        .risk-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            border: 2px solid #fff;
+        }
+        .risk-dot.low { background: #4caf50; }
+        .risk-dot.low-moderate { background: #ffb300; }
+        .risk-dot.moderate { background: #f39c12; }
+        .risk-dot.high { background: #e74c3c; }
+        .risk-dot.very-high { background: #8b1e3f; }
+
+        .risk-legend { display:flex; gap:12px; align-items:center; margin-bottom:0.75rem; }
+        .risk-legend .legend-item { display:flex; align-items:center; gap:8px; font-size:0.95rem; color:var(--text-dark); }
+        .risk-legend .legend-item .pill { width:12px; height:12px; border-radius:50%; display:inline-block; }
+        .risk-legend .legend-item .pill.low { background:#4caf50; }
+        .risk-legend .legend-item .pill.low-moderate { background:#ffb300; }
+        .risk-legend .legend-item .pill.moderate { background:#f39c12; }
+        .risk-legend .legend-item .pill.high { background:#e74c3c; }
+        .risk-legend .legend-item .pill.very-high { background:#8b1e3f; }
         
         .btn-outline-primary, .btn-outline-success, .btn-outline-info, .btn-outline-warning {
             border-radius: 12px;
@@ -176,6 +202,49 @@
             color: white;
             transform: translateY(-1px);
             box-shadow: var(--shadow-sm);
+        }
+
+        /* Filter action buttons sizing and alignment */
+        .filter-actions {
+            align-items: center;
+            justify-content: flex-end;
+            /* Nudge the action buttons slightly upward to match input baseline */
+            transform: translateY(-6px);
+        }
+        .filter-actions .btn {
+            height: 44px;
+            padding: 0.45rem 0.9rem;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+        .filter-actions .btn i { margin-right: 6px; }
+        /* Reset button: compact circular style that lines up with inputs */
+        .filter-actions .btn-reset {
+            padding: 0.35rem 0.45rem;
+            width: 44px;
+            min-width: 44px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Filter button slightly more prominent */
+        .filter-actions .btn-filter { padding-left: 0.85rem; padding-right: 0.85rem; }
+        @media (max-width: 576px) {
+            .filter-actions .btn { height: 40px; padding: 0.35rem 0.6rem; font-size: 0.95rem; }
+            .filter-actions .btn-reset { width: 40px; min-width: 40px; }
+        }
+
+        /* Make filter inputs align with filter buttons by matching heights in this form */
+        .main-content-card .card-body > form .form-control,
+        .main-content-card .card-body > form .form-select {
+            height: 44px;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
         }
         
         @media (max-width: 991.98px) { 
@@ -217,10 +286,13 @@
 
             @php
                 $total = $assessments->total();
-                $high = $assessments->where('risk_level', 'high')->count();
+                // new detailed risk categories
+                $low = $assessments->where('risk_level', 'low')->count() + $assessments->where('risk_level', 'normal')->count(); // include legacy 'normal'
+                $lowModerate = $assessments->where('risk_level', 'low-moderate')->count();
                 $moderate = $assessments->where('risk_level', 'moderate')->count();
-                $normal = $assessments->where('risk_level', 'normal')->count();
-                $dassAssessments = $assessments->whereIn('type', ['DASS-42', 'DASS-21']);
+                $high = $assessments->where('risk_level', 'high')->count();
+                $veryHigh = $assessments->where('risk_level', 'very-high')->count();
+                $dassAssessments = $assessments->where('type', 'DASS-42');
                 $avgDepression = $dassAssessments->count() ? $dassAssessments->avg(function($a) {
                     $score = is_array($a->score) ? $a->score : json_decode($a->score, true);
                     return $score['depression'] ?? 0;
@@ -233,27 +305,68 @@
                     $score = is_array($a->score) ? $a->score : json_decode($a->score, true);
                     return $score['stress'] ?? 0;
                 }) : 0;
+                $avgOverall = ($avgDepression + $avgAnxiety + $avgStress) / 3;
             @endphp
             
-            <div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
-                <div class="dashboard-stat-card">
-                    <div class="stat-value" style="font-size: 1.5rem; font-weight: 700; color: var(--forest-green); margin-bottom: 0.5rem;">{{ $total }}</div>
-                    <div class="stat-label" style="font-size: 1rem; color: var(--forest-green-light);">Total Assessments</div>
+            <!-- Compact Hero / Summary Cards (reduced) -->
+            <div class="row g-3 mb-3 hero-cards">
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="dashboard-stat-card">
+                        <div style="font-size:0.85rem; color:var(--text-light);">Total Assessments</div>
+                        <div style="font-size:1.35rem; font-weight:700; margin-top:0.35rem;">{{ number_format($total) }}</div>
+                        <div style="font-size:0.8rem; color:var(--text-light); margin-top:0.25rem;">All types</div>
+                    </div>
                 </div>
-                <div class="dashboard-stat-card" style="border-left: 4px solid var(--danger);">
-                    <div class="stat-value" style="font-size: 1.5rem; font-weight: 700; color: var(--danger); margin-bottom: 0.5rem;"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ $high }}</div>
-                    <div class="stat-label" style="font-size: 1rem; color: var(--forest-green-light);">High Risk</div>
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="dashboard-stat-card">
+                        <div style="font-size:0.85rem; color:var(--text-light);">DASS-42 Count</div>
+                        <div style="font-size:1.35rem; font-weight:700; margin-top:0.35rem;">{{ $dassAssessments->count() }}</div>
+                        <div style="font-size:0.8rem; color:var(--text-light); margin-top:0.25rem;">Completed DASS-42</div>
+                    </div>
                 </div>
-                <div class="dashboard-stat-card" style="border-left: 4px solid var(--warning);">
-                    <div class="stat-value" style="font-size: 1.5rem; font-weight: 700; color: var(--warning); margin-bottom: 0.5rem;"><i class="bi bi-exclamation-circle-fill me-1"></i>{{ $moderate }}</div>
-                    <div class="stat-label" style="font-size: 1rem; color: var(--forest-green-light);">Moderate Risk</div>
-                </div>
-                <div class="dashboard-stat-card" style="border-left: 4px solid var(--success);">
-                    <div class="stat-value" style="font-size: 1.5rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;"><i class="bi bi-check-circle-fill me-1"></i>{{ $normal }}</div>
-                    <div class="stat-label" style="font-size: 1rem; color: var(--forest-green-light);">Normal</div>
+                <div class="col-12 col-sm-12 col-md-4">
+                    <div class="dashboard-stat-card">
+                        <div style="font-size:0.85rem; color:var(--text-light);">Average DASS Score</div>
+                        <div style="font-size:1.35rem; font-weight:700; margin-top:0.35rem;">{{ number_format($avgOverall,1) }}</div>
+                        <div style="font-size:0.8rem; color:var(--text-light); margin-top:0.25rem;">Mean of Depression, Anxiety, Stress</div>
+                    </div>
                 </div>
             </div>
-            
+
+            <!-- Risk category counts -->
+            <div class="row g-3 mb-3">
+                <div class="col-6 col-sm-4 col-md-2">
+                    <div class="dashboard-stat-card text-center">
+                        <div style="font-size:0.85rem; color:var(--text-light);">Low Risk</div>
+                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $low }}</div>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-4 col-md-2">
+                    <div class="dashboard-stat-card text-center">
+                        <div style="font-size:0.85rem; color:var(--text-light);">Low-Moderate</div>
+                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $lowModerate }}</div>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-4 col-md-2">
+                    <div class="dashboard-stat-card text-center">
+                        <div style="font-size:0.85rem; color:var(--text-light);">Moderate</div>
+                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $moderate }}</div>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-4 col-md-2">
+                    <div class="dashboard-stat-card text-center">
+                        <div style="font-size:0.85rem; color:var(--text-light);">High</div>
+                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $high }}</div>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-4 col-md-2">
+                    <div class="dashboard-stat-card text-center">
+                        <div style="font-size:0.85rem; color:var(--text-light);">Very High</div>
+                        <div style="font-size:1.25rem; font-weight:700; margin-top:0.4rem;">{{ $veryHigh }}</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="main-content-card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="bi bi-clipboard-data me-2"></i>Assessment Results</h5>
@@ -262,106 +375,109 @@
                     {{-- Filter Bar --}}
                     <form method="GET" class="mb-3">
                         <div class="row g-2 align-items-end">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label mb-1">Assessment Type</label>
                                 <select name="type" class="form-select">
                                     <option value="">All Types</option>
                                     <option value="DASS-42" @if(request('type')=='DASS-42') selected @endif>DASS-42</option>
-                                    <option value="DASS-21" @if(request('type')=='DASS-21') selected @endif>DASS-21</option>
                                     <option value="Academic Stress Survey" @if(request('type')=='Academic Stress Survey') selected @endif>Academic Stress Survey</option>
                                     <option value="Wellness Check" @if(request('type')=='Wellness Check') selected @endif>Wellness Check</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label mb-1">Risk Level</label>
                                 <select name="risk" class="form-select">
-                                    <option value="">All Levels</option>
-                                    <option value="high" @if(request('risk')=='high') selected @endif>High</option>
+                                    <option value="">All</option>
+                                    <option value="low" @if(request('risk')=='low') selected @endif>Low</option>
+                                    <option value="low-moderate" @if(request('risk')=='low-moderate') selected @endif>Low-Moderate</option>
                                     <option value="moderate" @if(request('risk')=='moderate') selected @endif>Moderate</option>
-                                    <option value="normal" @if(request('risk')=='normal') selected @endif>Normal</option>
+                                    <option value="high" @if(request('risk')=='high') selected @endif>High</option>
+                                    <option value="very-high" @if(request('risk')=='very-high') selected @endif>Very High</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
+                                <label class="form-label mb-1">Date From</label>
+                                <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label mb-1">Date To</label>
+                                <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
+                            </div>
+                            <div class="col-md-3">
                                 <label class="form-label mb-1">Student Name/Email</label>
                                 <input type="text" name="student" class="form-control" value="{{ request('student') }}" placeholder="Search...">
                             </div>
-                            <div class="col-md-2 d-grid">
-                                <button class="btn btn-primary"><i class="bi bi-funnel"></i> Filter</button>
+                            <div class="col-md-1 d-flex gap-2 filter-actions align-items-end">
+                                <button type="submit" class="btn btn-primary btn-filter" title="Filter"><i class="bi bi-funnel"></i></button>
+                                <a href="{{ route('counselor.assessments.index') }}" class="btn btn-outline-secondary btn-reset" title="Reset filters"><i class="bi bi-arrow-counterclockwise"></i></a>
                             </div>
                         </div>
                     </form>
+                    {{-- Risk legend --}}
+                    <div class="risk-legend">
+                        <div class="legend-item"><span class="pill low"></span>Low</div>
+                        <div class="legend-item"><span class="pill low-moderate"></span>Low-Moderate</div>
+                        <div class="legend-item"><span class="pill moderate"></span>Moderate</div>
+                        <div class="legend-item"><span class="pill high"></span>High</div>
+                        <div class="legend-item"><span class="pill very-high"></span>Very High</div>
+                    </div>
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 w-100" style="min-width:900px;">
+                <table class="table table-hover align-middle mb-0 w-100" id="assessments-table">
+                    <colgroup>
+                        <col style="width:10%;" />
+                        <col style="width:15%;" />
+                        <col style="width:15%;" />
+                        <col style="width:20%;" />
+                        <col style="width:10%;" />
+                        <col style="width:10%;" />
+                        <col style="width:10%;" />
+                        <col style="width:10%;" />
+                    </colgroup>
                     <thead class="table-light sticky-top" style="z-index:1;">
                         <tr>
                             <th class="text-center" style="width: 120px;">Type</th>
                             <th class="text-center" style="width: 170px; white-space:nowrap;">Date</th>
                             <th class="text-start" style="min-width: 160px;">Student</th>
                             <th class="text-start" style="min-width: 200px; max-width: 260px;">Email</th>
-                            <th class="text-center" style="width: 120px;">Risk Level</th>
                             <th class="text-end" style="width: 110px;">Depression</th>
                             <th class="text-end" style="width: 110px;">Anxiety</th>
                             <th class="text-end" style="width: 110px;">Stress</th>
-                            <th class="text-end" style="width: 110px;">Total Score</th>
-                            <th class="text-center" style="width: 120px;">Sentiment</th>
+                            <!-- Total Score column removed -->
                             <th class="text-center" style="width: 120px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php $sentimentAnalyzer = new \PHPInsight\Sentiment(); @endphp
                         @forelse($assessments as $assessment)
                             @php 
                                 $scores = is_array($assessment->score) ? $assessment->score : json_decode($assessment->score, true); 
-                                $comment = $assessment->student_comment ?? '';
-                                $ai_sentiment = $comment ? $sentimentAnalyzer->categorise($comment) : 'neu';
                             @endphp
-                            <tr class="align-middle @if($assessment->risk_level==='high') table-danger @elseif($assessment->risk_level==='moderate') table-warning @endif">
+                            <tr class="align-middle">
                                 <td class="text-center align-middle"><span class="badge rounded-pill bg-light text-dark border border-1">{{ $assessment->type }}</span></td>
                                 <td class="text-center align-middle" style="white-space:nowrap;">{{ $assessment->created_at->format('M d, Y h:i A') }}</td>
-                                <td class="text-start align-middle">{{ $assessment->user->name ?? 'N/A' }}</td>
-                                <td class="text-start align-middle" style="max-width: 240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ $assessment->user->email ?? 'N/A' }}">{{ $assessment->user->email ?? 'N/A' }}</td>
-                                <td class="text-center align-middle">
-                                    @if($assessment->risk_level==='high')
-                                        <span class="badge bg-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> High</span>
-                                    @elseif($assessment->risk_level==='moderate')
-                                        <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle-fill me-1"></i> Moderate</span>
-                                    @else
-                                        <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i> Normal</span>
-                                    @endif
+                                <td class="text-start align-middle">
+                                    @php $riskCls = strtolower($assessment->risk_level ?? 'normal'); @endphp
+                                    <span class="risk-dot {{ $riskCls }}" title="{{ ucwords(str_replace('-', ' ', $assessment->risk_level ?? 'normal')) }}"></span>
+                                    {{ $assessment->user->name ?? 'N/A' }}
                                 </td>
-                                @if($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21')
+                                <td class="text-start align-middle" style="max-width: 240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ $assessment->user->email ?? 'N/A' }}">{{ $assessment->user->email ?? 'N/A' }}</td>
+                                <!-- Risk indicator removed -->
+                                @if($assessment->type === 'DASS-42')
                                     <td class="text-end align-middle"><span class="badge bg-primary">{{ $scores['depression'] ?? '-' }}</span></td>
                                     <td class="text-end align-middle"><span class="badge bg-info text-dark">{{ $scores['anxiety'] ?? '-' }}</span></td>
                                     <td class="text-end align-middle"><span class="badge bg-secondary">{{ $scores['stress'] ?? '-' }}</span></td>
-                                    <td class="text-end align-middle"><span class="badge bg-primary">-</span></td>
                                 @else
                                     <td class="text-end align-middle"><span class="badge bg-primary">-</span></td>
                                     <td class="text-end align-middle"><span class="badge bg-info text-dark">-</span></td>
                                     <td class="text-end align-middle"><span class="badge bg-secondary">-</span></td>
-                                    <td class="text-end align-middle"><span class="badge bg-primary">{{ is_array($assessment->score) ? ($assessment->score['score'] ?? '-') : (is_numeric($assessment->score) ? $assessment->score : '-') }}</span></td>
                                 @endif
-                                <td class="text-center align-middle">
-                                    @if($ai_sentiment === 'pos')
-                                        <span class="badge bg-success"><i class="bi bi-emoji-smile"></i> Positive</span>
-                                    @elseif($ai_sentiment === 'neg')
-                                        <span class="badge bg-danger"><i class="bi bi-emoji-frown"></i> Negative</span>
-                                    @else
-                                        <span class="badge bg-secondary"><i class="bi bi-emoji-neutral"></i> Neutral</span>
-                                    @endif
-                                </td>
                                 <td class="text-center align-middle">
                                     <a href="{{ route('counselor.assessments.show', $assessment->id) }}" class="btn btn-outline-info btn-sm" style="white-space:nowrap; min-width:80px;">
                                         <i class="bi bi-eye"></i> View
                                     </a>
-                                    <button class="btn btn-outline-success btn-sm mt-1 ai-insights-btn" style="white-space:nowrap; min-width:80px;"
-                                        data-bs-toggle="modal" data-bs-target="#aiInsightsModal-{{ $assessment->id }}"
-                                    >
-                                        <i class="bi bi-robot"></i> AI Insights
-                                    </button>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="11" class="text-center text-muted py-4">No assessment results found.</td></tr>
+                            <tr><td colspan="8" class="text-center text-muted py-4">No assessment results found.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -421,158 +537,31 @@
         </div>
       </div>
     </div>
-    <!-- AI Insights Modal -->
-    <div class="modal fade" id="aiInsightsModal-{{ $assessment->id }}" tabindex="-1" aria-labelledby="aiInsightsModalLabel-{{ $assessment->id }}" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="aiInsightsModalLabel-{{ $assessment->id }}">AI Sentiment Analysis</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="card shadow-sm border-0" style="background: #f8fafd;">
-              <div class="card-body">
-                @if($assessment->ai_sentiment)
-                    <div class="d-flex align-items-center mb-2">
-                        @if($assessment->ai_sentiment === 'positive')
-                            <span class="badge bg-success px-3 py-2 me-2"><i class="bi bi-emoji-smile"></i> Positive</span>
-                        @elseif($assessment->ai_sentiment === 'negative')
-                            <span class="badge bg-danger px-3 py-2 me-2"><i class="bi bi-emoji-frown"></i> Negative</span>
-                        @else
-                            <span class="badge bg-secondary px-3 py-2 me-2"><i class="bi bi-emoji-neutral"></i> Neutral</span>
-                        @endif
-                        <span class="text-muted small">(Based on student comment)</span>
-                    </div>
-                    @if($assessment->student_comment)
-                        <div class="mb-2 p-2 rounded bg-light border"><strong>Student Comment:</strong><br>{{ $assessment->student_comment }}</div>
-                    @endif
-                @else
-                    <div class="alert alert-warning mb-0">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        No AI analysis available for this assessment. The student may not have provided a comment.
-                    </div>
-                @endif
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
 @endforeach
-
-            {{-- Summary Graphs and Suggestions at the Bottom --}}
-            <div class="main-content-card" style="margin-top: 1.5rem;">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Analytics & Insights</h5>
-                </div>
-                <div class="card-body">
-    <div class="row mb-4">
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm p-3 h-100">
-                <h6 class="fw-bold mb-2">Risk Level Distribution</h6>
-                <canvas id="riskPieChart" width="300" height="300"></canvas>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm p-3 h-100">
-                <h6 class="fw-bold mb-2">Assessment Type Breakdown</h6>
-                <canvas id="typeBarChart" width="300" height="300"></canvas>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm p-3 h-100">
-                <h6 class="fw-bold mb-2">DASS Subscale Averages</h6>
-                <canvas id="dassBarChart" width="300" height="300"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="row mb-4">
-        <div class="col">
-            <div class="card shadow-sm p-3">
-                <h6 class="fw-bold mb-2"><i class="bi bi-lightbulb me-2"></i>Actionable Suggestions</h6>
-                <ul class="mb-0">
-                    <li>Prioritize follow-up with students flagged as <span class="fw-bold text-danger">High Risk</span>. Consider scheduling immediate counseling sessions.</li>
-                    <li>If you see an increase in high/moderate risk or rising average scores, consider group interventions or workshops.</li>
-                    <li>If some students have not completed assessments, send reminders or encourage participation.</li>
-                    <li>Review <span class="fw-bold">AI Insights</span> for negative/neutral sentiment comments for early warning signs not captured by scores.</li>
-                    <li>Use the data to identify students who may benefit from additional wellness resources.</li>
-                </ul>
-            </div>
-        </div>
-                </div>
-            </div>
             </div>
         </div>
     </div>
     
     </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-const ctxRisk = document.getElementById('riskPieChart').getContext('2d');
-const riskPieChart = new Chart(ctxRisk, {
-    type: 'doughnut',
-    data: {
-        labels: ['High', 'Moderate', 'Normal'],
-        datasets: [{
-            data: [{{ $high }}, {{ $moderate }}, {{ $normal }}],
-            backgroundColor: ['#dc3545', '#ffc107', '#198754'],
-        }]
-    },
-    options: {
-        plugins: {
-            legend: { position: 'bottom' }
-        }
-    }
-});
-const ctxType = document.getElementById('typeBarChart').getContext('2d');
-const typeBarChart = new Chart(ctxType, {
-    type: 'bar',
-    data: {
-        labels: ['DASS-42', 'DASS-21', 'Academic Stress Survey', 'Wellness Check'],
-        datasets: [{
-            label: 'Assessments',
-            data: [
-                {{ $assessments->whereIn('type', ['DASS-42', 'DASS-21'])->count() }},
-                {{ $assessments->where('type', 'Academic Stress Survey')->count() }},
-                {{ $assessments->where('type', 'Wellness Check')->count() }}
-            ],
-            backgroundColor: ['#0d6efd', '#6610f2', '#20c997']
-        }]
-    },
-    options: {
-        plugins: {
-            legend: { display: false }
-        }
-    }
-});
-const ctxDass = document.getElementById('dassBarChart').getContext('2d');
-const dassBarChart = new Chart(ctxDass, {
-    type: 'bar',
-    data: {
-        labels: ['Depression', 'Anxiety', 'Stress'],
-        datasets: [{
-            label: 'Average Score',
-            data: [{{ round($avgDepression,1) }}, {{ round($avgAnxiety,1) }}, {{ round($avgStress,1) }}],
-            backgroundColor: ['#0d6efd', '#0dcaf0', '#6c757d']
-        }]
-    },
-    options: {
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            y: { beginAtZero: true, max: 42 }
-        }
-    }
-});
-</script>
 <style>
     .sticky-top { position: sticky !important; top: 0; background: #f8f9fa; }
     .table-hover tbody tr:hover { background: #f4f8fb !important; }
     .table th, .table td { vertical-align: middle !important; }
+    /* Improved table responsiveness and alignment */
+    .table-responsive { overflow-x: auto; }
+    .table { width: 100%; table-layout: fixed; }
+    /* Prevent header/body misalignment by constraining cell overflow */
+    .table th, .table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* Allow wrapping for long student names on small screens */
+    @media (max-width: 768px) {
+        #assessments-table th:nth-child(3), #assessments-table td:nth-child(3) {
+            white-space: normal;
+        }
+        #assessments-table th:nth-child(4), #assessments-table td:nth-child(4) {
+            white-space: nowrap; max-width: 180px;
+        }
+    }
+    .table td.text-center.align-middle, .table th.text-center { text-align: center; }
     @media (max-width: 900px) {
         .table th, .table td { font-size: 0.95rem; padding: 0.5rem 0.3rem; }
         .table th:nth-child(4), .table td:nth-child(4) { max-width: 120px; }

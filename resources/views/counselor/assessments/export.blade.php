@@ -42,7 +42,7 @@
 
     <div class="section">
         <div class="subtitle">Scores & Interpretation</div>
-        @if($assessment->type === 'DASS-42' || $assessment->type === 'DASS-21')
+        @if($assessment->type === 'DASS-42')
             <div class="mb-1"><strong>Depression:</strong> {{ $scores['depression'] ?? '-' }} <span class="badge {{ ($score_interpretation['depression'] ?? '') === 'Severe' || ($score_interpretation['depression'] ?? '') === 'Extremely Severe' ? 'bg-danger' : (($score_interpretation['depression'] ?? '') === 'Moderate' ? 'bg-warning' : (($score_interpretation['depression'] ?? '') === 'Mild' ? 'bg-info' : 'bg-success')) }}">{{ $score_interpretation['depression'] ?? '' }}</span></div>
             <div class="mb-1"><strong>Anxiety:</strong> {{ $scores['anxiety'] ?? '-' }} <span class="badge {{ ($score_interpretation['anxiety'] ?? '') === 'Severe' || ($score_interpretation['anxiety'] ?? '') === 'Extremely Severe' ? 'bg-danger' : (($score_interpretation['anxiety'] ?? '') === 'Moderate' ? 'bg-warning' : (($score_interpretation['anxiety'] ?? '') === 'Mild' ? 'bg-info' : 'bg-success')) }}">{{ $score_interpretation['anxiety'] ?? '' }}</span></div>
             <div class="mb-1"><strong>Stress:</strong> {{ $scores['stress'] ?? '-' }} <span class="badge {{ ($score_interpretation['stress'] ?? '') === 'Severe' || ($score_interpretation['stress'] ?? '') === 'Extremely Severe' ? 'bg-danger' : (($score_interpretation['stress'] ?? '') === 'Moderate' ? 'bg-warning' : (($score_interpretation['stress'] ?? '') === 'Mild' ? 'bg-info' : 'bg-success')) }}">{{ $score_interpretation['stress'] ?? '' }}</span></div>
@@ -52,49 +52,11 @@
     </div>
 
     <div class="section">
-        <div class="subtitle">AI Insights</div>
-        <div class="mb-1"><strong>AI Summary:</strong> {{ $ai_summary }}</div>
-        @if(isset($percentile))
-            <div class="mb-1"><strong>Percentile:</strong> {{ round($percentile) }}th percentile <span class="small">({{ $percentile > 50 ? 'Higher' : 'Lower' }} than most students)</span></div>
-        @endif
-        @if(isset($trend))
-            <div class="mb-1"><strong>Trend:</strong> <span class="badge {{ $trend > 0 ? 'bg-danger' : ($trend < 0 ? 'bg-success' : 'bg-secondary') }}">{{ $trend > 0 ? '+' : '' }}{{ $trend }}</span> <span class="small">{{ $trend > 0 ? 'Score increased (worsening)' : ($trend < 0 ? 'Score decreased (improving)' : 'No change') }} since last assessment</span></div>
-        @endif
-        @if(!empty($redFlags))
-            <div class="mb-1"><strong>Areas of Concern:</strong> {{ implode(', ', $redFlags) }}</div>
-        @endif
-        @if(!empty($strengths))
-            <div class="mb-1"><strong>Strengths:</strong> {{ implode(', ', $strengths) }}</div>
-        @endif
-        @if(!empty($ai_suggested_actions))
-            <div class="mb-1"><strong>AI Suggested Actions:</strong>
-                <ul>
-                    @foreach($ai_suggested_actions as $action)
-                        <li>{{ $action }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        @if(!empty($dynamicResources))
-            <div class="mb-1"><strong>Recommended Resources (Personalized):</strong>
-                <ul>
-                    @foreach($dynamicResources as $res)
-                        <li>{{ $res['title'] }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        @if(!empty($actionPlan))
-            <div class="mb-1"><strong>Action Plan:</strong>
-                <ol>
-                    @foreach($actionPlan as $step)
-                        <li>{{ $step }}</li>
-                    @endforeach
-                </ol>
-            </div>
-        @endif
+        <div class="subtitle">Student Comment</div>
         @if($assessment->student_comment)
-            <div class="mb-1"><strong>Student Comment:</strong> {{ $assessment->student_comment }}</div>
+            <div class="border-box">{{ $assessment->student_comment }}</div>
+        @else
+            <div class="text-muted">No comment provided</div>
         @endif
     </div>
 

@@ -41,7 +41,7 @@ class TwoFactorCodeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.twofactor.code',
+            view: 'emails.twofactor.code',
             with: [
                 'code' => $this->code,
                 'userName' => $this->userName,
