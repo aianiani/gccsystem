@@ -10,7 +10,12 @@ class Announcement extends Model
         'title',
         'content',
         'attachment',
+        'images',
         'created_by',
+    ];
+
+    protected $casts = [
+        'images' => 'array',
     ];
 
     public function user()

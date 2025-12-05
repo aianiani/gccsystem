@@ -242,13 +242,13 @@ class AuthController extends Controller
             // Create unique filename: timestamp_userid_originalname
             $corFileName = time() . '_' . uniqid() . '.' . $extension;
 
-            // Store in storage/app/public/cor_files
-            $destinationPath = storage_path('app/public/cor_files');
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
+            // Store in storage/app/public/cor_files using Storage facade
+            $path = $file->storeAs('cor_files', $corFileName, 'public');
 
-            $file->move($destinationPath, $corFileName);
+            if (!$path) {
+                // Fallback or error handling if needed
+                \Log::error('Failed to store COR file using Storage facade');
+            }
         }
 
         $user = User::create([

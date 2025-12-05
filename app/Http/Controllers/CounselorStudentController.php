@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\SeminarAttendance;
 use Illuminate\Http\Request;
 
 class CounselorStudentController extends Controller
@@ -37,16 +38,18 @@ class CounselorStudentController extends Controller
         // Search by name or email
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%')
-                  ->orWhere('student_id', 'like', '%' . $search . '%');
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('student_id', 'like', '%' . $search . '%');
             });
         }
 
-        $students = $query->with(['assessments' => function($q) {
-            $q->latest()->take(1);
-        }])->orderBy('name')->paginate(15);
+        $students = $query->with([
+            'assessments' => function ($q) {
+                $q->latest()->take(1);
+            }
+        ])->orderBy('name')->paginate(15);
 
         // Get unique values for filter dropdowns
         $colleges = User::where('role', 'student')
@@ -93,7 +96,17 @@ class CounselorStudentController extends Controller
             ->latest()
             ->get();
 
-        return view('counselor.students.show', compact('student', 'assessments', 'appointments'));
+        $attendances = SeminarAttendance::where('user_id', $student->id)->get();
+
+        $attendanceMatrix = [];
+        foreach ($attendances as $attendance) {
+            $attendanceMatrix[$attendance->year_level][$attendance->seminar_name] = [
+                'attended' => true,
+                'schedule_id' => $attendance->seminar_schedule_id,
+            ];
+        }
+
+        return view('counselor.students.show', compact('student', 'assessments', 'appointments', 'attendanceMatrix'));
     }
 }
 

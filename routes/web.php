@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    
+
     // (Announcements index/show are public above)
 
     // Admin routes
@@ -55,46 +55,46 @@ Route::middleware('auth')->group(function () {
         Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::get('/activities', [DashboardController::class, 'activities'])->name('activities');
         Route::get('/admin/logs', function () {
-    return view('admin.logs');
-})->name('admin.logs');
+            return view('admin.logs');
+        })->name('admin.logs');
 
-// Individual log sections
-Route::get('/admin/logs/users', function () {
-    return view('admin.logs.users');
-})->name('admin.logs.users');
+        // Individual log sections
+        Route::get('/admin/logs/users', function () {
+            return view('admin.logs.users');
+        })->name('admin.logs.users');
 
-Route::get('/admin/logs/appointments', function () {
-    return view('admin.logs.appointments');
-})->name('admin.logs.appointments');
+        Route::get('/admin/logs/appointments', function () {
+            return view('admin.logs.appointments');
+        })->name('admin.logs.appointments');
 
-Route::get('/admin/logs/session-notes', function () {
-    return view('admin.logs.session-notes');
-})->name('admin.logs.session-notes');
+        Route::get('/admin/logs/session-notes', function () {
+            return view('admin.logs.session-notes');
+        })->name('admin.logs.session-notes');
 
-Route::get('/admin/logs/session-feedbacks', function () {
-    return view('admin.logs.session-feedbacks');
-})->name('admin.logs.session-feedbacks');
+        Route::get('/admin/logs/session-feedbacks', function () {
+            return view('admin.logs.session-feedbacks');
+        })->name('admin.logs.session-feedbacks');
 
-Route::get('/admin/logs/assessments', function () {
-    return view('admin.logs.assessments');
-})->name('admin.logs.assessments');
+        Route::get('/admin/logs/assessments', function () {
+            return view('admin.logs.assessments');
+        })->name('admin.logs.assessments');
 
-Route::get('/admin/logs/messages', function () {
-    return view('admin.logs.messages');
-})->name('admin.logs.messages');
+        Route::get('/admin/logs/messages', function () {
+            return view('admin.logs.messages');
+        })->name('admin.logs.messages');
 
-Route::get('/admin/logs/activities', function () {
-    return view('admin.logs.activities');
-})->name('admin.logs.activities');
+        Route::get('/admin/logs/activities', function () {
+            return view('admin.logs.activities');
+        })->name('admin.logs.activities');
 
-// Registration Approval Routes
-Route::prefix('admin/registration-approvals')->name('admin.registration-approvals.')->group(function () {
-    Route::get('/', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'index'])->name('index');
-    Route::get('/{user}', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'show'])->name('show');
-    Route::post('/{user}/approve', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'approve'])->name('approve');
-    Route::post('/{user}/reject', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'reject'])->name('reject');
-    Route::get('/statistics', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'statistics'])->name('statistics');
-});
+        // Registration Approval Routes
+        Route::prefix('admin/registration-approvals')->name('admin.registration-approvals.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'index'])->name('index');
+            Route::get('/{user}', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'show'])->name('show');
+            Route::post('/{user}/approve', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'approve'])->name('approve');
+            Route::post('/{user}/reject', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'reject'])->name('reject');
+            Route::get('/statistics', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'statistics'])->name('statistics');
+        });
         // Only admins can create, edit, update, delete announcements
         Route::get('announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
         Route::post('announcements', [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
@@ -119,17 +119,17 @@ Route::prefix('admin/registration-approvals')->name('admin.registration-approval
         Route::get('/appointments/available-slots/{counselor}', [App\Http\Controllers\AppointmentController::class, 'availableSlots'])->name('appointments.availableSlots');
         // Accept/Decline rescheduled appointment
         Route::patch('appointments/{id}/accept-reschedule', [App\Http\Controllers\AppointmentController::class, 'acceptReschedule'])->name('appointments.acceptReschedule');
-Route::patch('appointments/{id}/decline-reschedule', [App\Http\Controllers\AppointmentController::class, 'declineReschedule'])->name('appointments.declineReschedule');
-Route::get('appointments/completed-with-notes', [App\Http\Controllers\AppointmentController::class, 'completedWithNotes'])->name('appointments.completedWithNotes');
-Route::get('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackController::class, 'create'])->name('session-feedback.create');
-Route::post('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackController::class, 'store'])->name('session-feedback.store');
+        Route::patch('appointments/{id}/decline-reschedule', [App\Http\Controllers\AppointmentController::class, 'declineReschedule'])->name('appointments.declineReschedule');
+        Route::get('appointments/completed-with-notes', [App\Http\Controllers\AppointmentController::class, 'completedWithNotes'])->name('appointments.completedWithNotes');
+        Route::get('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackController::class, 'create'])->name('session-feedback.create');
+        Route::post('appointments/{id}/feedback', [App\Http\Controllers\SessionFeedbackController::class, 'store'])->name('session-feedback.store');
         // Assessments route for students
         Route::get('assessments', [App\Http\Controllers\AssessmentController::class, 'index'])->name('assessments.index');
         Route::get('assessments/dass42', [App\Http\Controllers\AssessmentController::class, 'dass42Page'])->name('assessments.dass42');
         Route::post('assessments/dass42', [App\Http\Controllers\AssessmentController::class, 'submitDass42'])->name('assessments.dass42.submit');
         Route::post('assessments/academic', [App\Http\Controllers\AssessmentController::class, 'submitAcademicSurvey'])->name('assessments.academic.submit');
         Route::post('assessments/wellness', [App\Http\Controllers\AssessmentController::class, 'submitWellnessCheck'])->name('assessments.wellness.submit');
-        
+
         // Consent routes
         Route::get('consent', [App\Http\Controllers\ConsentController::class, 'show'])->name('consent.show');
         Route::post('consent', [App\Http\Controllers\ConsentController::class, 'store'])->name('consent.store');
@@ -208,7 +208,7 @@ Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(functi
     //     ->name('counselor.priority-cases.index');
     // Route::get('feedback', [App\Http\Controllers\Counselor\FeedbackController::class, 'index'])
 //     ->name('counselor.feedback.index');
-Route::get('feedback/{id}', [App\Http\Controllers\SessionFeedbackController::class, 'show'])->name('counselor.feedback.show');
+    Route::get('feedback/{id}', [App\Http\Controllers\SessionFeedbackController::class, 'show'])->name('counselor.feedback.show');
     Route::get('availability', [App\Http\Controllers\CounselorAvailabilityController::class, 'index'])->name('counselor.availability.index');
     Route::get('students', [App\Http\Controllers\CounselorStudentController::class, 'index'])->name('counselor.students.index');
     Route::get('students/{student}', [App\Http\Controllers\CounselorStudentController::class, 'show'])->name('counselor.students.show');
@@ -216,12 +216,32 @@ Route::get('feedback/{id}', [App\Http\Controllers\SessionFeedbackController::cla
     Route::post('availabilities', [App\Http\Controllers\AvailabilityController::class, 'store']);
     Route::delete('availabilities', [App\Http\Controllers\AvailabilityController::class, 'destroy']);
     Route::get('counselor/session-notes/timeline/{studentId}', [App\Http\Controllers\SessionNoteController::class, 'timeline'])->name('counselor.session_notes.timeline');
+
+    // Guidance Module Routes
+    Route::get('guidance', [App\Http\Controllers\Counselor\GuidanceController::class, 'index'])->name('counselor.guidance.index');
+    Route::get('guidance/bulk', [App\Http\Controllers\Counselor\BulkAttendanceController::class, 'create'])->name('counselor.guidance.bulk.create');
+    Route::post('guidance/bulk', [App\Http\Controllers\Counselor\BulkAttendanceController::class, 'store'])->name('counselor.guidance.bulk.store');
+    Route::post('guidance/import', [App\Http\Controllers\Counselor\BulkAttendanceController::class, 'import'])->name('counselor.guidance.import');
+    Route::get('guidance/{student}', [App\Http\Controllers\Counselor\GuidanceController::class, 'show'])->name('counselor.guidance.show');
+    Route::post('guidance/{student}/update', [App\Http\Controllers\Counselor\GuidanceController::class, 'update'])->name('counselor.guidance.update');
+    Route::post('guidance/{student}/profile', [App\Http\Controllers\Counselor\GuidanceController::class, 'updateProfile'])->name('counselor.guidance.update_profile');
+
+    // Seminar Management Routes
+    Route::resource('seminars', App\Http\Controllers\Counselor\SeminarController::class)->names('counselor.seminars');
+    Route::post('seminars/{seminar}/schedules', [App\Http\Controllers\Counselor\SeminarController::class, 'storeSchedule'])->name('counselor.seminars.schedules.store');
+    Route::delete('seminars/schedules/{schedule}', [App\Http\Controllers\Counselor\SeminarController::class, 'destroySchedule'])->name('counselor.seminars.schedules.destroy');
+
+    // Reports
+    Route::get('guidance/reports', [App\Http\Controllers\Counselor\GuidanceReportController::class, 'index'])->name('counselor.guidance.reports.index');
+    Route::post('guidance/reports/generate', [App\Http\Controllers\Counselor\GuidanceReportController::class, 'generate'])->name('counselor.guidance.reports.generate');
 });
 
 // TEST: Simple POST route to debug 404 issues
-Route::post('test-post', function() { return 'It works!'; });
+Route::post('test-post', function () {
+    return 'It works!';
+});
 
-Route::middleware('admin')->get('test-admin', function() {
+Route::middleware('admin')->get('test-admin', function () {
     return 'You are admin!';
 });
 

@@ -1,0 +1,412 @@
+@extends('layouts.app')
+
+@section('content')
+    <style>
+        /* Homepage theme variables (mapped into existing dashboard vars) */
+        :root {
+            --primary-green: #1f7a2d;
+            /* Homepage forest green */
+            --primary-green-2: #13601f;
+            /* darker stop */
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
+            --text-dark: #16321f;
+            --text-light: #6c757d;
+            --bg-light: #f6fbf6;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+            /* Map dashboard-specific names to homepage palette for compatibility */
+            --forest-green: var(--primary-green);
+            --forest-green-dark: var(--primary-green-2);
+            --forest-green-light: var(--accent-green);
+            --forest-green-lighter: var(--light-green);
+            --yellow-maize: var(--accent-orange);
+            --yellow-maize-light: #fef9e7;
+            --white: #ffffff;
+            --gray-50: var(--bg-light);
+            --gray-100: #eef6ee;
+            --gray-600: var(--text-light);
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --info: #17a2b8;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+        }
+
+        /* Apply the same page zoom used on the homepage */
+        .home-zoom {
+            zoom: 0.85;
+        }
+
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.85);
+                transform-origin: top center;
+            }
+        }
+
+        body,
+        .profile-card,
+        .stats-card,
+        .main-content-card {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .custom-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            background: var(--forest-green);
+            color: #fff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+
+        .custom-sidebar .sidebar-logo {
+            text-align: center;
+            padding: 2rem 1rem 1rem 1rem;
+            border-bottom: 1px solid #4a7c59;
+        }
+
+        .custom-sidebar .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0.5rem 0 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .custom-sidebar .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+            position: relative;
+        }
+
+        .custom-sidebar .sidebar-link.active,
+        .custom-sidebar .sidebar-link:hover {
+            background: #4a7c59;
+            color: #f4d03f;
+        }
+
+        .custom-sidebar .sidebar-link .bi {
+            font-size: 1.1rem;
+        }
+
+        .custom-sidebar .sidebar-bottom {
+            padding: 1rem 0.5rem;
+            border-top: 1px solid #4a7c59;
+        }
+
+        .custom-sidebar .sidebar-link.logout {
+            background: #dc3545;
+            color: #fff;
+            border-radius: 8px;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .custom-sidebar .sidebar-link.logout:hover {
+            background: #b52a37;
+            color: #fff;
+        }
+
+        @media (max-width: 991.98px) {
+            .custom-sidebar {
+                width: 200px;
+            }
+
+            .main-dashboard-content {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+
+            /* Off-canvas behavior on mobile */
+            .custom-sidebar {
+                position: fixed;
+                z-index: 1040;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                width: 240px;
+                transform: translateX(-100%);
+                transition: transform 0.2s ease;
+                flex-direction: column;
+                padding: 0;
+            }
+
+            .custom-sidebar.show {
+                transform: translateX(0);
+            }
+
+            .custom-sidebar .sidebar-logo {
+                display: block;
+            }
+
+            .custom-sidebar .sidebar-nav {
+                flex-direction: column;
+                gap: 0.25rem;
+                padding: 1rem 0.5rem 1rem 0.5rem;
+            }
+
+            .custom-sidebar .sidebar-link {
+                justify-content: flex-start;
+                padding: 0.6rem 0.75rem;
+                font-size: 1rem;
+            }
+
+            .main-dashboard-content {
+                margin-left: 0;
+            }
+
+            /* Toggle button */
+            #counselorSidebarToggle {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1100;
+                background: var(--forest-green);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                padding: 0.5rem 0.75rem;
+                box-shadow: var(--shadow-sm);
+            }
+        }
+
+        .main-dashboard-content {
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+            min-height: 100vh;
+            padding: 1rem 1.5rem;
+            margin-left: 240px;
+            transition: margin-left 0.2s;
+        }
+
+        /* Constrain inner content and center it within the available area */
+        .main-dashboard-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        /* Custom Styles for Guidance Module */
+        .page-header {
+            background: var(--hero-gradient);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+
+        .content-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: none;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header-custom {
+            background: #fff;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--light-green);
+        }
+
+        .btn-secondary-custom {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            color: var(--text-dark);
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #f8f9fa;
+            border-color: #d6d8db;
+            color: var(--primary-green);
+        }
+    </style>
+
+    <div class="home-zoom">
+        <div class="d-flex">
+            <!-- Mobile Sidebar Toggle -->
+            <button id="counselorSidebarToggle" class="d-md-none">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <!-- Sidebar -->
+            @include('counselor.sidebar')
+
+            <!-- Main Content -->
+            <div class="main-dashboard-content flex-grow-1">
+                <div class="main-dashboard-inner">
+                    <div class="mb-6">
+                        <a href="{{ route('counselor.students.index') }}" class="btn-secondary-custom">
+                            <i class="bi bi-arrow-left"></i> Back to Student List
+                        </a>
+                    </div>
+
+                    <!-- Student Profile Header -->
+                    <div class="page-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="bg-white/20 p-3 rounded-full">
+                                <i class="bi bi-person-fill text-4xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold m-0">{{ $student->name }}</h2>
+                                <p class="opacity-90 m-0 mt-1">{{ $student->email }} • ID:
+                                    {{ $student->student_id ?? 'N/A' }}</p>
+                                <div class="mt-2 text-sm opacity-80 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">
+                                    <span><i class="bi bi-mortarboard-fill mr-1"></i>
+                                        {{ $student->course ?? 'No Course' }}</span>
+                                    <span><i class="bi bi-building-fill mr-1"></i>
+                                        {{ $student->college ?? 'No College' }}</span>
+                                    <span><i class="bi bi-gender-ambiguous mr-1"></i>
+                                        {{ ucfirst($student->gender ?? 'N/A') }}</span>
+                                    <span><i class="bi bi-telephone-fill mr-1"></i>
+                                        {{ $student->contact_number ?? 'N/A' }}</span>
+                                </div>
+
+                                <!-- Seminar Badges -->
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    @php
+                                        $badges = [
+                                            'IDREAMS' => ['color' => 'bg-blue-100 text-blue-800 border-blue-200', 'icon' => 'bi-clouds-fill', 'year' => 1],
+                                            '10C' => ['color' => 'bg-orange-100 text-orange-800 border-orange-200', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
+                                            'LEADS' => ['color' => 'bg-purple-100 text-purple-800 border-purple-200', 'icon' => 'bi-people-fill', 'year' => 3],
+                                            'IMAGE' => ['color' => 'bg-teal-100 text-teal-800 border-teal-200', 'icon' => 'bi-person-badge-fill', 'year' => 4],
+                                        ];
+                                    @endphp
+                                    
+                                    @foreach($badges as $seminarName => $style)
+                                        @php
+                                            $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]);
+                                        @endphp
+                                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border {{ $isAttended ? $style['color'] : 'bg-gray-100 text-gray-400 border-gray-200' }} transition-all">
+                                            @if($isAttended)
+                                                <i class="bi {{ $style['icon'] }}"></i>
+                                                <span class="font-bold text-xs tracking-wide">{{ $seminarName }}</span>
+                                                <i class="bi bi-check-circle-fill text-xs ml-1 opacity-75"></i>
+                                            @else
+                                                <i class="bi bi-lock-fill text-xs"></i>
+                                                <span class="font-medium text-xs tracking-wide">{{ $seminarName }}</span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right d-none d-md-block">
+                            <div class="text-sm opacity-75 uppercase tracking-wider">Current Year</div>
+                            <div class="text-3xl font-bold">{{ $student->year_level ?? 'N/A' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Assessments Card -->
+                        <div class="content-card">
+                            <div class="card-header-custom">
+                                <h3 class="text-lg font-bold text-gray-800 m-0">Recent Assessments</h3>
+                            </div>
+                            <div class="p-4">
+                                @forelse($assessments as $assessment)
+                                    <div class="border-b border-gray-100 last:border-0 pb-3 mb-3 last:pb-0 last:mb-0">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <div class="font-semibold text-gray-800">{{ ucfirst($assessment->type) }}
+                                                    Assessment</div>
+                                                <div class="text-sm text-gray-500">
+                                                    {{ $assessment->created_at ? $assessment->created_at->format('M d, Y') : 'Date not set' }}</div>
+                                            </div>
+                                            <a href="{{ route('counselor.assessments.show', $assessment) }}"
+                                                class="text-sm text-primary-green hover:underline">View</a>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="text-center text-gray-500 py-4">No assessments found.</div>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <!-- Appointments Card -->
+                        <div class="content-card">
+                            <div class="card-header-custom">
+                                <h3 class="text-lg font-bold text-gray-800 m-0">Recent Appointments</h3>
+                            </div>
+                            <div class="p-4">
+                                @forelse($appointments as $appointment)
+                                    <div class="border-b border-gray-100 last:border-0 pb-3 mb-3 last:pb-0 last:mb-0">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <div class="font-semibold text-gray-800">{{ $appointment->appointment_type }}
+                                                </div>
+                                                <div class="text-sm text-gray-500">
+                                                    {{ $appointment->scheduled_at ? $appointment->scheduled_at->format('M d, Y \a\t h:i A') : 'Date not set' }}</div>
+                                                <div class="text-xs mt-1">
+                                                    <span
+                                                        class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{{ ucfirst($appointment->status) }}</span>
+                                                </div>
+                                            </div>
+                                            <a href="{{ route('counselor.appointments.show', $appointment->id) }}"
+                                                class="text-sm text-primary-green hover:underline">View</a>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="text-center text-gray-500 py-4">No appointments found.</div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Sidebar toggle for mobile
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('counselorSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function () {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+@endsection

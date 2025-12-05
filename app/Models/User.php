@@ -249,8 +249,27 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Check if user can access the system (active and approved)
      */
+    /**
+     * Check if user can access the system (active and approved)
+     */
     public function canAccessSystem(): bool
     {
         return $this->is_active && $this->isApproved();
+    }
+
+    /**
+     * Scope a query to only include users with a given role.
+     */
+    public function scopeRole($query, $role)
+    {
+        return $query->where('role', $role);
+    }
+
+    /**
+     * Check if user has a specific role
+     */
+    public function hasRole($role)
+    {
+        return $this->role === $role;
     }
 }

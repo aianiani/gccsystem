@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use App\Models\Announcement;
+use App\Models\SeminarAttendance;
 
 class DashboardController extends Controller
 {
@@ -43,7 +44,18 @@ class DashboardController extends Controller
                     ->take(3)
                     ->get();
                 $recentMessages = $this->getRecentMessages($user);
-                return view('dashboard_student', compact('user', 'recentActivities', 'studentStats', 'recentAnnouncements', 'upcomingAppointments', 'recentMessages'));
+
+                // Fetch Seminar Attendance
+                $attendances = SeminarAttendance::where('user_id', $user->id)->get();
+                $attendanceMatrix = [];
+                foreach ($attendances as $attendance) {
+                    $attendanceMatrix[$attendance->year_level][$attendance->seminar_name] = [
+                        'attended' => true,
+                        'schedule_id' => $attendance->seminar_schedule_id,
+                    ];
+                }
+
+                return view('dashboard_student', compact('user', 'recentActivities', 'studentStats', 'recentAnnouncements', 'upcomingAppointments', 'recentMessages', 'attendanceMatrix'));
             default:
                 return view('dashboard', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
         }
@@ -58,45 +70,45 @@ class DashboardController extends Controller
         $totalSessions = $user->appointments()->where('status', 'completed')->count();
         $totalScheduled = $user->appointments()->whereIn('status', ['accepted', 'pending', 'completed'])->count();
         $sessionProgress = $totalScheduled > 0 ? round(($totalSessions / $totalScheduled) * 100) : 0;
-        
+
         // Assessment Progress
         $completedAssessments = $user->assessments()->count();
         $totalAssessments = 3; // DASS-42, Academic, Wellness
         $assessmentProgress = round(($completedAssessments / $totalAssessments) * 100);
-        
+
         // Attendance Rate
         $attendedSessions = $user->appointments()->where('status', 'completed')->count();
         $totalBookedSessions = $user->appointments()->whereIn('status', ['completed', 'declined'])->count();
         $attendanceRate = $totalBookedSessions > 0 ? round(($attendedSessions / $totalBookedSessions) * 100) : 100;
-        
+
         // Wellness Status
         $latestAssessment = $user->assessments()->latest()->first();
         $currentRiskLevel = $latestAssessment ? $latestAssessment->risk_level : 'normal';
-        
+
         // Communication Status
-        $recentMessages = \App\Models\Message::where(function($query) use ($user) {
+        $recentMessages = \App\Models\Message::where(function ($query) use ($user) {
             $query->where('sender_id', $user->id)
-                  ->orWhere('recipient_id', $user->id);
+                ->orWhere('recipient_id', $user->id);
         })->where('created_at', '>=', now()->subDays(7))->count();
-        
+
         $communicationStatus = $recentMessages > 0 ? 'Active' : 'Quiet';
-        
+
         // Consecutive Sessions (weekly streak)
         $consecutiveSessions = $user->appointments()
             ->where('status', 'completed')
             ->orderBy('scheduled_at', 'desc')
             ->get()
-            ->groupBy(function($appointment) {
+            ->groupBy(function ($appointment) {
                 return $appointment->scheduled_at->format('W'); // Group by week
             })
             ->count();
-        
+
         // Sessions with Notes
         $sessionsWithNotes = $user->appointments()
             ->where('status', 'completed')
             ->whereHas('sessionNotes')
             ->count();
-        
+
         return [
             'sessionProgress' => $sessionProgress,
             'totalSessions' => $totalSessions,
@@ -118,28 +130,28 @@ class DashboardController extends Controller
      */
     private function getRecentMessages($user)
     {
-        return \App\Models\Message::where(function($query) use ($user) {
+        return \App\Models\Message::where(function ($query) use ($user) {
             $query->where('sender_id', $user->id)
-                  ->orWhere('recipient_id', $user->id);
+                ->orWhere('recipient_id', $user->id);
         })
-        ->with(['sender', 'recipient'])
-        ->orderBy('created_at', 'desc')
-        ->take(3)
-        ->get()
-        ->map(function($message) use ($user) {
-            // Determine if this user is the sender or recipient
-            $isSender = $message->sender_id === $user->id;
-            $otherUser = $isSender ? $message->recipient : $message->sender;
-            
-            return [
-                'id' => $message->id,
-                'content' => $message->content,
-                'sender_name' => $otherUser ? $otherUser->name : 'Unknown',
-                'is_self' => $isSender,
-                'created_at' => $message->created_at,
-                'time_ago' => $message->created_at->diffForHumans()
-            ];
-        });
+            ->with(['sender', 'recipient'])
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get()
+            ->map(function ($message) use ($user) {
+                // Determine if this user is the sender or recipient
+                $isSender = $message->sender_id === $user->id;
+                $otherUser = $isSender ? $message->recipient : $message->sender;
+
+                return [
+                    'id' => $message->id,
+                    'content' => $message->content,
+                    'sender_name' => $otherUser ? $otherUser->name : 'Unknown',
+                    'is_self' => $isSender,
+                    'created_at' => $message->created_at,
+                    'time_ago' => $message->created_at->diffForHumans()
+                ];
+            });
     }
 
     /**
@@ -149,7 +161,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $activities = $user->activities()->latest()->paginate(10);
-        
+
         return view('profile', compact('user', 'activities'));
     }
 
@@ -159,7 +171,7 @@ class DashboardController extends Controller
     public function activities()
     {
         $activities = UserActivity::with('user')->latest()->paginate(15);
-        
+
         return view('activities', compact('activities'));
     }
 }

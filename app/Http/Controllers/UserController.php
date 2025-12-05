@@ -20,10 +20,10 @@ class UserController extends Controller
         // Search by name, email, or student_id
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%')
-                  ->orWhere('student_id', 'like', '%' . $search . '%');
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('student_id', 'like', '%' . $search . '%');
             });
         }
 
@@ -48,9 +48,9 @@ class UserController extends Controller
 
         // Order by role (admin first), then by created_at descending (newest first)
         $users = $query->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
-                       ->orderBy('created_at', 'desc')
-                       ->paginate(10)
-                       ->withQueryString();
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return view('users.index', compact('users'));
     }
@@ -218,10 +218,10 @@ class UserController extends Controller
 
         $oldStatus = $user->is_active;
         $user->update(['is_active' => !$user->is_active]);
-        
+
         $status = $user->is_active ? 'activated' : 'deactivated';
         $statusText = $user->is_active ? 'active' : 'inactive';
-        
+
         // Log activity
         UserActivity::log(auth()->id(), 'toggle_user_status', "{$status} user: {$user->name}", [
             'user_id' => $user->id,
@@ -240,12 +240,25 @@ class UserController extends Controller
     {
         $user = auth()->user();
         $activities = $user->activities()->latest()->paginate(10);
-        
+
         // Return different views based on role
         if ($user->role === 'counselor') {
             return view('counselor.profile', compact('user', 'activities'));
         }
-        
+
+        // Fetch Seminar Attendance for students
+        if ($user->role === 'student') {
+            $attendances = \App\Models\SeminarAttendance::where('user_id', $user->id)->get();
+            $attendanceMatrix = [];
+            foreach ($attendances as $attendance) {
+                $attendanceMatrix[$attendance->year_level][$attendance->seminar_name] = [
+                    'attended' => true,
+                    'schedule_id' => $attendance->seminar_schedule_id,
+                ];
+            }
+            return view('profile', compact('user', 'activities', 'attendanceMatrix'));
+        }
+
         return view('profile', compact('user', 'activities'));
     }
 
@@ -255,7 +268,7 @@ class UserController extends Controller
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
-        
+
         // Base validation rules for all users
         $rules = [
             'name' => 'required|string|max:255',
@@ -263,7 +276,7 @@ class UserController extends Controller
             'contact_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
         ];
-        
+
         // Add role-specific validation rules
         if ($user->role === 'student') {
             $rules = array_merge($rules, [
@@ -280,23 +293,23 @@ class UserController extends Controller
                 'education' => 'nullable|string|max:1000',
             ]);
         }
-        
+
         $request->validate($rules);
-        
+
         // Base update data for all users
         $updateData = $request->only([
-            'name', 
-            'email', 
-            'contact_number', 
+            'name',
+            'email',
+            'contact_number',
             'address'
         ]);
-        
+
         // Add role-specific fields
         if ($user->role === 'student') {
             $updateData = array_merge($updateData, $request->only([
-                'student_id', 
-                'college', 
-                'course', 
+                'student_id',
+                'college',
+                'course',
                 'year_level'
             ]));
         } elseif ($user->role === 'counselor') {
@@ -307,7 +320,7 @@ class UserController extends Controller
                 'education'
             ]));
         }
-        
+
         $user->update($updateData);
         UserActivity::log($user->id, 'update_profile', 'Updated profile information');
         return back()->with('success', 'Profile updated successfully.');
@@ -360,23 +373,24 @@ class UserController extends Controller
 
         try {
             $originalName = $file->getClientOriginalName();
-            $avatarName = $user->id . '_' . $originalName;
-            $destinationDir = storage_path('app/public/avatars');
-            $destination = $destinationDir . DIRECTORY_SEPARATOR . $avatarName;
+            $avatarName = $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
 
-            // Ensure the directory exists
-            if (!file_exists($destinationDir)) {
-                mkdir($destinationDir, 0777, true);
-                \Log::info('Created avatars directory', ['dir' => $destinationDir]);
+            // Use Storage facade to store the file
+            $path = $file->storeAs('avatars', $avatarName, 'public');
+
+            if ($path) {
+                // Delete old avatar if it exists and is not the default
+                if ($user->avatar && \Storage::disk('public')->exists('avatars/' . $user->avatar)) {
+                    \Storage::disk('public')->delete('avatars/' . $user->avatar);
+                }
+
+                $user->update(['avatar' => $avatarName]);
+                \Log::info('User updated with avatar', ['user' => $user]);
+                UserActivity::log($user->id, 'upload_avatar', 'Uploaded new profile avatar');
+                return back()->with('success', 'Avatar updated successfully.');
+            } else {
+                throw new \Exception('Failed to store file.');
             }
-
-            $file->move($destinationDir, $avatarName);
-            \Log::info('Avatar manually moved', ['destination' => $destination]);
-
-            $user->update(['avatar' => $avatarName]);
-            \Log::info('User updated with avatar', ['user' => $user]);
-            UserActivity::log($user->id, 'upload_avatar', 'Uploaded new profile avatar');
-            return back()->with('success', 'Avatar updated successfully.');
         } catch (\Exception $e) {
             \Log::error('Avatar upload failed', ['error' => $e->getMessage()]);
             return back()->with('error', 'Avatar upload failed: ' . $e->getMessage());

@@ -1,27 +1,29 @@
 @extends('layouts.app')
 
 @push('scripts')
-<script>
-    // Force cache refresh
-    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
-        window.location.reload();
-    }
-</script>
+    <script>
+        // Force cache refresh
+        if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
+            window.location.reload();
+        }
+    </script>
 @endpush
 
 @section('content')
     <style>
         /* Homepage theme variables (mapped into existing dashboard vars) */
         :root {
-            --primary-green: #1f7a2d; /* Homepage forest green */
-            --primary-green-2: #13601f; /* darker stop */
+            --primary-green: #1f7a2d;
+            /* Homepage forest green */
+            --primary-green-2: #13601f;
+            /* darker stop */
             --accent-green: #2e7d32;
             --light-green: #eaf5ea;
             --accent-orange: #FFCB05;
             --text-dark: #16321f;
             --text-light: #6c757d;
             --bg-light: #f6fbf6;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 
             /* Map dashboard-specific names to homepage palette for compatibility */
             --forest-green: var(--primary-green);
@@ -48,39 +50,43 @@
         .home-zoom {
             zoom: 0.85;
         }
+
         @supports not (zoom: 1) {
             .home-zoom {
                 transform: scale(0.85);
                 transform-origin: top center;
             }
         }
-        
-        body, .profile-card, .stats-card, .main-content-card {
+
+        body,
+        .profile-card,
+        .stats-card,
+        .main-content-card {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .custom-sidebar {
             position: fixed;
             top: 0;
             left: 0;
             bottom: 0;
             width: 240px;
-            background: var(--forest-green) ;
+            background: var(--forest-green);
             color: #fff;
             z-index: 1040;
             display: flex;
             flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0,0,0,0.08);
+            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
             overflow-y: auto;
             padding-bottom: 1rem;
         }
-        
+
         .custom-sidebar .sidebar-logo {
             text-align: center;
             padding: 2rem 1rem 1rem 1rem;
             border-bottom: 1px solid #4a7c59;
         }
-        
+
         .custom-sidebar .sidebar-nav {
             flex: 1;
             padding: 1.5rem 0.5rem 0 0.5rem;
@@ -88,7 +94,7 @@
             flex-direction: column;
             gap: 0.5rem;
         }
-        
+
         .custom-sidebar .sidebar-link {
             display: flex;
             align-items: center;
@@ -101,21 +107,22 @@
             transition: background 0.2s, color 0.2s;
             position: relative;
         }
-        
-        .custom-sidebar .sidebar-link.active, .custom-sidebar .sidebar-link:hover {
+
+        .custom-sidebar .sidebar-link.active,
+        .custom-sidebar .sidebar-link:hover {
             background: #4a7c59;
             color: #f4d03f;
         }
-        
+
         .custom-sidebar .sidebar-link .bi {
             font-size: 1.1rem;
         }
-        
+
         .custom-sidebar .sidebar-bottom {
             padding: 1rem 0.5rem;
             border-top: 1px solid #4a7c59;
         }
-        
+
         .custom-sidebar .sidebar-link.logout {
             background: #dc3545;
             color: #fff;
@@ -125,21 +132,24 @@
             font-weight: 600;
             transition: background 0.2s;
         }
-        
+
         .custom-sidebar .sidebar-link.logout:hover {
             background: #b52a37;
             color: #fff;
         }
-        
+
         @media (max-width: 991.98px) {
             .custom-sidebar {
                 width: 200px;
             }
+
             .main-dashboard-content {
                 margin-left: 200px;
             }
         }
+
         @media (max-width: 767.98px) {
+
             /* Off-canvas behavior on mobile */
             .custom-sidebar {
                 position: fixed;
@@ -153,23 +163,31 @@
                 flex-direction: column;
                 padding: 0;
             }
+
             .custom-sidebar.show {
                 transform: translateX(0);
             }
-            .custom-sidebar .sidebar-logo { display: block; }
+
+            .custom-sidebar .sidebar-logo {
+                display: block;
+            }
+
             .custom-sidebar .sidebar-nav {
                 flex-direction: column;
                 gap: 0.25rem;
                 padding: 1rem 0.5rem 1rem 0.5rem;
             }
+
             .custom-sidebar .sidebar-link {
                 justify-content: flex-start;
                 padding: 0.6rem 0.75rem;
                 font-size: 1rem;
             }
+
             .main-dashboard-content {
                 margin-left: 0;
             }
+
             /* Toggle button */
             #studentSidebarToggle {
                 position: fixed;
@@ -184,7 +202,7 @@
                 box-shadow: var(--shadow-sm);
             }
         }
-        
+
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
             min-height: 100vh;
@@ -201,591 +219,771 @@
     </style>
 
     <div class="home-zoom">
-    <div class="d-flex">
-        <!-- Mobile Sidebar Toggle -->
-        <button id="studentSidebarToggle" class="d-md-none">
-            <i class="bi bi-list"></i>
-        </button>
-        <!-- Sidebar -->
-        <div class="custom-sidebar">
-            <div class="sidebar-logo mb-4">
-                <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
-                <h3 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">CMU Guidance and Counseling Center</h3>
-                <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Student Portal</p>
-            </div>
-            <nav class="sidebar-nav flex-grow-1">
-                <a href="{{ route('profile') }}" class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i class="bi bi-person"></i>Profile</a>
-                <a href="{{ route('dashboard') }}" class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i class="bi bi-house-door"></i>Dashboard</a>
-                <a href="{{ route('appointments.index') }}" class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i class="bi bi-calendar-check"></i>Appointments</a>
-                <a href="{{ route('assessments.index') }}" class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i class="bi bi-clipboard-data"></i>Assessments</a>
-                <a href="{{ route('chat.selectCounselor') }}" class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i class="bi bi-chat-dots"></i>Chat with a Counselor</a>
-            </nav>
-            <div class="sidebar-bottom w-100">
-                <a href="{{ route('logout') }}" class="sidebar-link logout"
-                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="bi bi-box-arrow-right"></i>Logout
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-            </div>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="main-dashboard-content flex-grow-1">
-            <div class="main-dashboard-inner">
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-comments me-2"></i>
-                        Chat with {{ $otherUser->name }}
-                    </h5>
+        <div class="d-flex">
+            <!-- Mobile Sidebar Toggle -->
+            <button id="studentSidebarToggle" class="d-md-none">
+                <i class="bi bi-list"></i>
+            </button>
+            <!-- Sidebar -->
+            <div class="custom-sidebar">
+                <div class="sidebar-logo mb-4">
+                    <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
+                        style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
+                    <h3
+                        style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">
+                        CMU Guidance and Counseling Center</h3>
+                    <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Student Portal</p>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="{{ $otherUser->avatar_url }}" 
-                             alt="{{ $otherUser->name }}" 
-                             class="rounded-circle me-3" 
-                             style="width: 50px; height: 50px; object-fit: cover;">
-                        <div>
-                            <h6 class="mb-0">{{ $otherUser->name }}</h6>
-                            <small class="text-muted">{{ $otherUser->email }}</small>
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        @if(auth()->user()->role === 'student')
-                            <a href="{{ route('chat.selectCounselor') }}" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-users me-2"></i>Chat with Another Counselor
-                            </a>
-                        @else
-                            <a href="{{ route('chat.selectStudent') }}" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-users me-2"></i>Chat with Another Student
-                            </a>
-                        @endif
-                    </div>
+                <nav class="sidebar-nav flex-grow-1">
+                    <a href="{{ route('profile') }}"
+                        class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
+                            class="bi bi-person"></i>Profile</a>
+                    <a href="{{ route('dashboard') }}"
+                        class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
+                            class="bi bi-house-door"></i>Dashboard</a>
+                    <a href="{{ route('appointments.index') }}"
+                        class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i
+                            class="bi bi-calendar-check"></i>Appointments</a>
+                    <a href="{{ route('assessments.index') }}"
+                        class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i
+                            class="bi bi-clipboard-data"></i>Assessments</a>
+                    <a href="{{ route('chat.selectCounselor') }}"
+                        class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i
+                            class="bi bi-chat-dots"></i>Chat with a Counselor</a>
+                </nav>
+                <div class="sidebar-bottom w-100">
+                    <a href="{{ route('logout') }}" class="sidebar-link logout"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="bi bi-box-arrow-right"></i>Logout
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
                 </div>
             </div>
-        </div>
 
-        <!-- Chat Area -->
-        <div class="col-md-9">
-            <div class="card h-100">
-                <div class="card-header bg-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-comment-dots me-2"></i>
-                            Messages
-                        </h5>
-                        <div class="text-muted">
-                            <small id="last-seen"></small>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Messages Container -->
-                <div class="card-body p-0" style="height: 500px; display: flex; flex-direction: column;">
-                    <!-- Messages List -->
-                    <div id="messages-container" class="flex-grow-1 overflow-auto p-3" style="background: #f8f9fa;">
-                        @forelse($messages as $msg)
-                            @php
-                                $isSelf = $msg->sender_id === auth()->id();
-                                $messageClass = $isSelf ? 'message-own' : 'message-other';
-                                $alignment = $isSelf ? 'justify-content-end' : 'justify-content-start';
-                            @endphp
-                            
-                            <div class="d-flex {{ $alignment }} mb-3">
-                                <div class="message {{ $messageClass }}" style="max-width: 70%;">
-                                    @if(!$isSelf)
-                                        <div class="message-sender mb-1">
-                                            <small class="text-muted">{{ $msg->sender->name }}</small>
-                                        </div>
-                                    @endif
-                                    
-                                    <div class="message-content p-3 rounded">
-                                        @if($msg->content)
-                                            <div class="message-text">{{ $msg->content }}</div>
-                                        @endif
-                                        
-                                        @if($msg->image)
-                                            <div class="message-image mt-2">
-                                                <img src="{{ asset('storage/' . $msg->image) }}" 
-                                                     alt="Message image" 
-                                                     class="img-fluid rounded shadow-sm" 
-                                                     style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;"
-                                                     onclick="openImageModal('{{ asset('storage/' . $msg->image) }}')">
+            <!-- Main Content -->
+            <div class="main-dashboard-content flex-grow-1">
+                <div class="main-dashboard-inner" style="max-width: 100%;">
+                    <div class="container-fluid p-0">
+                        <div class="row g-0">
+                            <div class="col-12">
+                                <div class="card chat-card">
+                                    <div class="row g-0 h-100">
+                                        <!-- Sidebar -->
+                                        <div class="col-md-4 col-lg-3 inbox-sidebar">
+                                            <div class="inbox-header">
+                                                <h5 class="mb-0 font-weight-bold text-dark">Inbox</h5>
                                             </div>
-                                        @endif
-                                        
-                                        <div class="message-time mt-1">
-                                            <small class="text-muted">{{ $msg->created_at->format('M j, g:i A') }}</small>
+                                            <div class="inbox-list">
+                                                @forelse($activeConversations as $conversationUser)
+                                                    <a href="{{ route('chat.index', $conversationUser->id) }}"
+                                                        class="inbox-item {{ $otherUser->id === $conversationUser->id ? 'active' : '' }}">
+                                                        <div class="avatar-container">
+                                                            <img src="{{ $conversationUser->avatar_url }}" class="avatar-img">
+                                                            <!-- Optional status dot if we had online status -->
+                                                        </div>
+                                                        <div class="text-truncate">
+                                                            <div class="fw-bold mb-1">{{ $conversationUser->name }}</div>
+                                                            <small class="text-muted d-block text-truncate">
+                                                                @if($conversationUser->last_message)
+                                                                    @if($conversationUser->last_message->sender_id === auth()->id())
+                                                                        <span class="fw-bold text-dark">You:</span>
+                                                                    @endif
+                                                                    {{ $conversationUser->last_message->content ?: ($conversationUser->last_message->image ? 'Sent an image' : '') }}
+                                                                @else
+                                                                    {{ $conversationUser->email }}
+                                                                @endif
+                                                            </small>
+                                                        </div>
+                                                    </a>
+                                                @empty
+                                                    <div class="p-4 text-center text-muted">
+                                                        <i class="bi bi-chat-square-text display-6 mb-3 d-block opacity-50"></i>
+                                                        No active conversations.
+                                                    </div>
+                                                @endforelse
+                                            </div>
+                                            <div class="p-3 border-top">
+                                                @if(auth()->user()->role === 'student')
+                                                    <a href="{{ route('chat.selectCounselor') }}"
+                                                        class="btn btn-outline-success w-100 rounded-pill">
+                                                        <i class="bi bi-plus-lg me-1"></i> New Chat
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('chat.selectStudent') }}"
+                                                        class="btn btn-outline-success w-100 rounded-pill">
+                                                        <i class="bi bi-plus-lg me-1"></i> New Chat
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <!-- Chat Area -->
+                                        <div class="col-md-8 col-lg-9 chat-main">
+                                            <div class="chat-header">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="{{ $otherUser->avatar_url }}" class="rounded-circle me-3"
+                                                        style="width: 40px; height: 40px; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                                    <div>
+                                                        <h6 class="mb-0 font-weight-bold">{{ $otherUser->name }}</h6>
+                                                        <small class="text-muted">{{ $otherUser->email }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Messages Container -->
+                                            <div id="messages-container" class="messages-area">
+                                                @forelse($messages as $msg)
+                                                    @php
+                                                        $isSelf = $msg->sender_id === auth()->id();
+                                                        $wrapperClass = $isSelf ? 'own' : 'other';
+                                                    @endphp
+
+                                                    <div class="message-wrapper {{ $wrapperClass }}">
+                                                        @if(!$isSelf)
+                                                            <img src="{{ $msg->sender->avatar_url }}"
+                                                                class="rounded-circle me-2 align-self-end mb-1"
+                                                                style="width: 28px; height: 28px; object-fit: cover;">
+                                                        @endif
+
+                                                        <div class="message-bubble">
+                                                            @if(!$isSelf)
+                                                                <div class="message-sender">{{ $msg->sender->name }}</div>
+                                                            @endif
+
+                                                            @if($msg->content)
+                                                                <div class="message-text">{{ $msg->content }}</div>
+                                                            @endif
+
+                                                            @if($msg->image)
+                                                                <div class="message-image mt-2">
+                                                                    <img src="{{ asset('storage/' . $msg->image) }}"
+                                                                        class="img-fluid rounded shadow-sm"
+                                                                        style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;"
+                                                                        onclick="openImageModal('{{ asset('storage/' . $msg->image) }}')">
+                                                                </div>
+                                                            @endif
+
+                                                            <span
+                                                                class="message-time">{{ $msg->created_at->format('g:i A') }}</span>
+                                                        </div>
+                                                    </div>
+                                                @empty
+                                                    <div class="text-center text-muted mt-5 opacity-75">
+                                                        <div class="mb-3">
+                                                            <i class="bi bi-chat-dots display-4 text-success opacity-25"></i>
+                                                        </div>
+                                                        <p class="mb-1">No messages yet.</p>
+                                                        <small>Start the conversation!</small>
+                                                    </div>
+                                                @endforelse
+
+                                                <div id="scroll-anchor"></div>
+                                            </div>
+
+                                            <!-- Input Area -->
+                                            <div class="chat-input-wrapper">
+                                                <form id="chat-form" method="POST"
+                                                    action="{{ route('chat.store', $otherUser->id) }}"
+                                                    enctype="multipart/form-data">
+                                                    @csrf
+
+                                                    <!-- Image preview -->
+                                                    <div id="image-preview" style="display: none;">
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <div class="d-flex align-items-center">
+                                                                <img id="preview-img" src="" alt="Preview" class="me-3"
+                                                                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                                                <div>
+                                                                    <div id="file-name" class="fw-bold text-dark small">
+                                                                    </div>
+                                                                    <div id="file-size" class="text-muted small"
+                                                                        style="font-size: 0.75rem;"></div>
+                                                                </div>
+                                                            </div>
+                                                            <button type="button" class="btn btn-sm btn-link text-danger"
+                                                                onclick="removeImage()">
+                                                                <i class="bi bi-x-circle-fill"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex align-items-end">
+                                                        <div class="chat-input-group flex-grow-1">
+                                                            <button type="button" class="btn-attach"
+                                                                onclick="document.getElementById('image-input').click()"
+                                                                title="Attach image">
+                                                                <i class="bi bi-paperclip"></i>
+                                                            </button>
+                                                            <input type="text" name="message" id="message-input"
+                                                                class="chat-input" placeholder="Type a message..."
+                                                                autocomplete="off">
+                                                        </div>
+                                                        <button type="submit" class="btn-send" id="send-button">
+                                                            <i class="bi bi-send-fill"></i>
+                                                        </button>
+                                                    </div>
+                                                    <input type="file" name="image" id="image-input" accept="image/*"
+                                                        style="display: none;">
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @empty
-                            <div class="text-center text-muted mt-5">
-                                <i class="fas fa-comments fa-3x mb-3" style="color: #dee2e6;"></i>
-                                <p class="mb-2">No messages yet.</p>
-                                <small>Start the conversation by typing a message below!</small>
-                            </div>
-                        @endforelse
-                        
-                        <!-- Scroll anchor -->
-                        <div id="scroll-anchor"></div>
-                    </div>
-                    
-                    <!-- Message Input -->
-                    <div class="border-top bg-white p-3" id="message-input-area">
-                        <form id="chat-form" method="POST" action="{{ route('chat.store', $otherUser->id) }}" enctype="multipart/form-data">
-                            @csrf
-                            <div class="row g-2">
-                                <div class="col">
-                                    <div class="input-group">
-                                        <input type="text" 
-                                               name="message" 
-                                               id="message-input" 
-                                               class="form-control" 
-                                               placeholder="Type your message..." 
-                                               autocomplete="off">
-                                        <button type="button" 
-                                                class="btn btn-outline-secondary" 
-                                                onclick="document.getElementById('image-input').click()"
-                                                title="Attach image (max 2MB)">
-                                            <i class="fas fa-paperclip"></i>
-                                        </button>
-                                        <button type="submit" 
-                                                class="btn btn-primary" 
-                                                id="send-button">
-                                            <i class="fas fa-paper-plane" id="send-icon"></i>
-                                            <span id="send-text">Send</span>
-                                        </button>
-                                    </div>
-                                    <input type="file" 
-                                           name="image" 
-                                           id="image-input" 
-                                           accept="image/*" 
-                                           style="display: none;">
-                                </div>
-                            </div>
-                            
-                            <!-- Image preview -->
-                            <div id="image-preview" class="mt-2" style="display: none;">
-                                <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded">
-                                    <div class="d-flex align-items-center">
-                                        <img id="preview-img" src="" alt="Preview" class="me-2" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #dee2e6;">
-                                        <div>
-                                            <div id="file-name" class="fw-bold text-dark"></div>
-                                            <div id="file-size" class="text-muted small"></div>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeImage()" title="Remove image">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Image Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Full size image" class="img-fluid">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a id="downloadImage" href="" download class="btn btn-primary">
-                    <i class="fas fa-download me-2"></i>Download
-                </a>
+    <style>
+        /* Chat Layout */
+        .chat-card {
+            border: none;
+            box-shadow: var(--shadow-md);
+            border-radius: 16px;
+            overflow: hidden;
+            height: calc(100vh - 100px);
+            min-height: 600px;
+        }
+
+        /* Sidebar Styles */
+        .inbox-sidebar {
+            background: white;
+            border-right: 1px solid var(--gray-100);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .inbox-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .inbox-list {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .inbox-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-50);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-dark);
+            border-left: 4px solid transparent;
+        }
+
+        .inbox-item:hover {
+            background-color: var(--gray-50);
+            color: var(--text-dark);
+        }
+
+        .inbox-item.active {
+            background-color: var(--light-green);
+            border-left-color: var(--primary-green);
+        }
+
+        .avatar-container {
+            position: relative;
+            margin-right: 1rem;
+        }
+
+        .avatar-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        /* Chat Area Styles */
+        .chat-main {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: #f0f2f5;
+        }
+
+        .chat-header {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            z-index: 10;
+        }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background-image: radial-gradient(#e1e8e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .message-wrapper {
+            display: flex;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-wrapper.own {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .message-wrapper.own .message-bubble {
+            background: var(--primary-green);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-wrapper.other .message-bubble {
+            background: white;
+            color: var(--text-dark);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            display: block;
+            opacity: 0.8;
+            text-align: right;
+        }
+
+        .message-sender {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 4px;
+            margin-left: 12px;
+        }
+
+        /* Input Area */
+        .chat-input-wrapper {
+            background: white;
+            padding: 1.25rem;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .chat-input-group {
+            background: var(--gray-50);
+            border-radius: 24px;
+            padding: 4px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-input-group:focus-within {
+            background: white;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 4px rgba(31, 122, 45, 0.1);
+        }
+
+        .chat-input {
+            border: none;
+            background: transparent;
+            padding: 10px 16px;
+            flex: 1;
+            outline: none;
+        }
+
+        .btn-attach {
+            color: var(--text-light);
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            transition: color 0.2s;
+        }
+
+        .btn-attach:hover {
+            color: var(--primary-green);
+        }
+
+        .btn-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(31, 122, 45, 0.3);
+        }
+
+        .btn-send:hover {
+            background: var(--primary-green-2);
+            transform: scale(1.05);
+        }
+
+        /* Scrollbar */
+        .messages-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-area::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+
+        .messages-area::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Image Preview */
+        #image-preview {
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray-100);
+            border-radius: 12px;
+            padding: 8px;
+            background: var(--gray-50);
+        }
+    </style>
+
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" alt="Full size image" class="img-fluid">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a id="downloadImage" href="" download class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Download
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-</div>
-            </div>
-        </div>
-    </div>
-    </div>
 
-<style>
-.message-own .message-content {
-    background: #007bff;
-    color: white;
-    border-bottom-right-radius: 4px;
-}
+    <script>
+        // Version: {{ time() }} - Force cache refresh
+        document.addEventListener('DOMContentLoaded', function () {
+            const messagesContainer = document.getElementById('messages-container');
+            const messageInput = document.getElementById('message-input');
+            const chatForm = document.getElementById('chat-form');
+            const imageInput = document.getElementById('image-input');
+            const imagePreview = document.getElementById('image-preview');
+            const previewImg = document.getElementById('preview-img');
+            const sendButton = document.getElementById('send-button');
 
-.message-other .message-content {
-    background: white;
-    color: #333;
-    border: 1px solid #e9ecef;
-    border-bottom-left-radius: 4px;
-}
+            // Auto-scroll to bottom on page load
+            scrollToBottom();
 
-
-
-.message-text {
-    word-wrap: break-word;
-    white-space: pre-wrap;
-}
-
-.message-image img:hover {
-    transform: scale(1.02);
-    transition: transform 0.2s ease;
-}
-
-#image-preview {
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-#image-preview:hover {
-    border-color: #007bff;
-}
-
-#messages-container {
-    scroll-behavior: smooth;
-}
-
-#messages-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-#messages-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-#messages-container::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-}
-
-#messages-container::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-
-
-
-</style>
-
-<script>
-// Version: {{ time() }} - Force cache refresh
-document.addEventListener('DOMContentLoaded', function() {
-    const messagesContainer = document.getElementById('messages-container');
-    const messageInput = document.getElementById('message-input');
-    const chatForm = document.getElementById('chat-form');
-    const imageInput = document.getElementById('image-input');
-    const imagePreview = document.getElementById('image-preview');
-    const previewImg = document.getElementById('preview-img');
-    const sendButton = document.getElementById('send-button');
-    const sendIcon = document.getElementById('send-icon');
-    const sendText = document.getElementById('send-text');
-    
-    // Auto-scroll to bottom on page load
-    scrollToBottom();
-    
-    // Scroll to bottom function
-    function scrollToBottom() {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-    
-
-    
-    // Handle form submission
-    chatForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const message = messageInput.value.trim();
-        const imageFile = imageInput.files[0];
-        
-        if (!message && !imageFile) {
-            return;
-        }
-        
-        // Create form data
-        const formData = new FormData();
-        formData.append('message', message);
-        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-        if (imageFile) {
-            formData.append('image', imageFile);
-        }
-        
-        // Send message via AJAX
-        const chatUrl = '/chat/{{ $otherUser->id }}';
-        console.log('Sending to URL:', chatUrl);
-        console.log('Other user ID:', {{ $otherUser->id }});
-        
-        fetch(chatUrl, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+            // Scroll to bottom function
+            function scrollToBottom() {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
-        })
-        .then(response => {
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            
-            // Try to get response text first to debug
-            return response.text().then(text => {
-                console.log('Response text:', text);
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error('Failed to parse JSON:', e);
-                    throw new Error('Invalid JSON response');
+
+            // Handle form submission
+            chatForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const message = messageInput.value.trim();
+                const imageFile = imageInput.files[0];
+
+                if (!message && !imageFile) {
+                    return;
+                }
+
+                // Create form data
+                const formData = new FormData();
+                formData.append('message', message);
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+
+                // Send message via AJAX
+                const chatUrl = '/chat/{{ $otherUser->id }}';
+
+                fetch(chatUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            messageInput.value = '';
+                            removeImage();
+                        } else {
+                            console.log('Message not sent:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+
+            // Handle image selection
+            imageInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Please select a valid image file (JPEG, PNG, or GIF).');
+                        imageInput.value = '';
+                        return;
+                    }
+
+                    // Validate file size (2MB limit)
+                    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+                    if (file.size > maxSize) {
+                        alert('Image size must be less than 2MB.');
+                        imageInput.value = '';
+                        return;
+                    }
+
+                    // Display file information
+                    const fileName = document.getElementById('file-name');
+                    const fileSize = document.getElementById('file-size');
+
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+
+                    // Show preview
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImg.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
                 }
             });
-        })
-        .then(data => {
-            console.log('Response received:', data); // Debug log
-            if (data.success) {
-                // Don't add message to UI here - let polling handle it
-                // Just clear form and reset loading state
-                messageInput.value = '';
-                removeImage();
-                
-                // Message sent successfully
-                console.log('Message sent successfully');
-            } else {
-                // Log error but don't show alert for validation errors
-                console.log('Message not sent:', data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Show specific error message for debugging
-            if (error.message === 'Server returned non-JSON response') {
-                console.error('Server error - likely a Laravel error or validation issue');
-            }
-        });
-    });
-    
-    // Handle image selection
-    imageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            if (!allowedTypes.includes(file.type)) {
-                alert('Please select a valid image file (JPEG, PNG, or GIF).');
+
+            // Remove image function
+            window.removeImage = function () {
                 imageInput.value = '';
-                return;
-            }
-            
-            // Validate file size (2MB limit)
-            const maxSize = 2 * 1024 * 1024; // 2MB in bytes
-            if (file.size > maxSize) {
-                alert('Image size must be less than 2MB.');
-                imageInput.value = '';
-                return;
-            }
-            
-            // Display file information
-            const fileName = document.getElementById('file-name');
-            const fileSize = document.getElementById('file-size');
-            
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            
-            // Show preview
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImg.src = e.target.result;
-                imagePreview.style.display = 'block';
+                imagePreview.style.display = 'none';
             };
-            reader.readAsDataURL(file);
-        }
-    });
-    
-    // Remove image function
-    window.removeImage = function() {
-        imageInput.value = '';
-        imagePreview.style.display = 'none';
-    };
-    
-    // Format file size function
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-    
-    // Open image modal function
-    window.openImageModal = function(imageSrc) {
-        const modalImage = document.getElementById('modalImage');
-        const downloadImage = document.getElementById('downloadImage');
-        
-        modalImage.src = imageSrc;
-        downloadImage.href = imageSrc;
-        
-        const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-        modal.show();
-    };
-    
-    // Append message function
-    function appendMessage(message, isSelf = false) {
-        const messagesContainer = document.getElementById('messages-container');
-        const scrollAnchor = document.getElementById('scroll-anchor');
-        
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `d-flex ${isSelf ? 'justify-content-end' : 'justify-content-start'} mb-3`;
-        
-        const messageClass = isSelf ? 'message-own' : 'message-other';
-        
-        let messageContent = '';
-        if (message.message) {
-            messageContent += `<div class="message-text">${message.message}</div>`;
-        }
-        if (message.image) {
-            messageContent += `<div class="message-image mt-2">
-                <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
-            </div>`;
-        }
-        
-        messageDiv.innerHTML = `
-            <div class="message ${messageClass}" style="max-width: 70%;">
-                ${!isSelf ? `<div class="message-sender mb-1">
-                    <small class="text-muted">${message.sender_name}</small>
-                </div>` : ''}
-                <div class="message-content p-3 rounded">
+
+            // Format file size function
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Open image modal function
+            window.openImageModal = function (imageSrc) {
+                const modalImage = document.getElementById('modalImage');
+                const downloadImage = document.getElementById('downloadImage');
+
+                modalImage.src = imageSrc;
+                downloadImage.href = imageSrc;
+
+                const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+                modal.show();
+            };
+
+            // Append message function
+            function appendMessage(message, isSelf = false) {
+                const messagesContainer = document.getElementById('messages-container');
+                const scrollAnchor = document.getElementById('scroll-anchor');
+
+                const wrapperDiv = document.createElement('div');
+                wrapperDiv.className = `message-wrapper ${isSelf ? 'own' : 'other'}`;
+
+                let messageContent = '';
+                if (message.message) {
+                    messageContent += `<div class="message-text">${message.message}</div>`;
+                }
+                if (message.image) {
+                    messageContent += `<div class="message-image mt-2">
+                    <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
+                </div>`;
+                }
+
+                // Avatar for other user
+                let avatarHtml = '';
+                if (!isSelf) {
+                    avatarHtml = `<img src="{{ $otherUser->avatar_url }}" class="rounded-circle me-2 align-self-end mb-1" style="width: 28px; height: 28px; object-fit: cover;">`;
+                }
+
+                wrapperDiv.innerHTML = `
+                ${avatarHtml}
+                <div class="message-bubble">
+                    ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
                     ${messageContent}
-                    <div class="message-time mt-1">
-                        <small class="text-muted">${message.created_at || new Date().toLocaleString()}</small>
-                    </div>
+                    <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
-            </div>
-        `;
-        
-        messagesContainer.insertBefore(messageDiv, scrollAnchor);
-    }
-    
-    // Poll for new messages
-    let lastMessageId = {{ $messages->count() > 0 ? $messages->last()->id : 0 }};
-    let processedMessageIds = new Set();
-    
-    function pollForMessages() {
-        fetch(`{{ route('chat.messages', $otherUser->id) }}?last_id=${lastMessageId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            `;
+
+                messagesContainer.insertBefore(wrapperDiv, scrollAnchor);
             }
-            return response.json();
-        })
-        .then(data => {
-            if (data.error) {
-                console.error('Server error:', data.error);
-                return;
+
+            // Poll for new messages
+            let lastMessageId = {{ $messages->count() > 0 ? $messages->last()->id : 0 }};
+            let processedMessageIds = new Set();
+
+            function pollForMessages() {
+                fetch(`{{ route('chat.messages', $otherUser->id) }}?last_id=${lastMessageId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Server error:', data.error);
+                            return;
+                        }
+                        if (data.messages && data.messages.length > 0) {
+                            let hasNewMessages = false;
+                            data.messages.forEach(message => {
+                                if (message.id > lastMessageId && !processedMessageIds.has(message.id)) {
+                                    appendMessage(message, message.is_self);
+                                    processedMessageIds.add(message.id);
+                                    lastMessageId = message.id;
+                                    hasNewMessages = true;
+                                }
+                            });
+                            if (hasNewMessages) {
+                                scrollToBottom();
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Polling error:', error);
+                    });
             }
-            if (data.messages && data.messages.length > 0) {
-                let hasNewMessages = false;
-                data.messages.forEach(message => {
-                    if (message.id > lastMessageId && !processedMessageIds.has(message.id)) {
-                        appendMessage(message, message.is_self);
-                        processedMessageIds.add(message.id);
-                        lastMessageId = message.id;
-                        hasNewMessages = true;
+
+            // Start polling
+            setInterval(pollForMessages, 3000);
+
+            // Handle Enter key
+            messageInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatForm.dispatchEvent(new Event('submit'));
+                }
+            });
+
+            // Auto-focus input
+            messageInput.focus();
+
+            // Drag and drop functionality
+            const messageInputArea = document.querySelector('.chat-input-wrapper');
+
+            if (messageInputArea) {
+                messageInputArea.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    messageInputArea.style.backgroundColor = '#f8f9fa';
+                    messageInputArea.style.borderTop = '2px dashed #007bff';
+                });
+
+                messageInputArea.addEventListener('dragleave', function (e) {
+                    e.preventDefault();
+                    messageInputArea.style.backgroundColor = '';
+                    messageInputArea.style.borderTop = '';
+                });
+
+                messageInputArea.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    messageInputArea.style.backgroundColor = '';
+                    messageInputArea.style.borderTop = '';
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const file = files[0];
+                        if (file.type.startsWith('image/')) {
+                            imageInput.files = files;
+                            imageInput.dispatchEvent(new Event('change'));
+                        } else {
+                            alert('Please drop an image file.');
+                        }
                     }
                 });
-                if (hasNewMessages) {
-                    scrollToBottom();
-                }
             }
-        })
-        .catch(error => {
-            console.error('Polling error:', error);
-            // Don't show alert for polling errors as they're expected when offline
         });
-    }
-    
-    // Start polling
-    setInterval(pollForMessages, 3000);
-    
-    // Handle Enter key
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            chatForm.dispatchEvent(new Event('submit'));
-        }
-    });
-    
-
-    
-    // Auto-focus input
-    messageInput.focus();
-    
-    // Drag and drop functionality
-    const messageInputArea = document.getElementById('message-input-area');
-    
-    messageInputArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        messageInputArea.style.backgroundColor = '#f8f9fa';
-        messageInputArea.style.border = '2px dashed #007bff';
-    });
-    
-    messageInputArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        messageInputArea.style.backgroundColor = '';
-        messageInputArea.style.border = '';
-    });
-    
-    messageInputArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        messageInputArea.style.backgroundColor = '';
-        messageInputArea.style.border = '';
-        
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            const file = files[0];
-            if (file.type.startsWith('image/')) {
-                imageInput.files = files;
-                imageInput.dispatchEvent(new Event('change'));
-            } else {
-                alert('Please drop an image file.');
-            }
-        }
-    });
-});
-</script>
+    </script>
     <script>
         // Sidebar toggle for mobile
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.querySelector('.custom-sidebar');
             const toggleBtn = document.getElementById('studentSidebarToggle');
             if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function() {
+                toggleBtn.addEventListener('click', function () {
                     if (window.innerWidth < 768) {
                         sidebar.classList.toggle('show');
                     }
                 });
-                document.addEventListener('click', function(e) {
+                document.addEventListener('click', function (e) {
                     if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
                         const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
                         if (!clickInside) sidebar.classList.remove('show');
                     }
                 });
-                document.addEventListener('keydown', function(e) {
+                document.addEventListener('keydown', function (e) {
                     if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
                         sidebar.classList.remove('show');
                     }
@@ -793,4 +991,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     </script>
-@endsection 
+@endsection

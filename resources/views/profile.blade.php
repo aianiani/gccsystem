@@ -4,15 +4,17 @@
     <style>
         /* Homepage theme variables (mapped into existing dashboard vars) */
         :root {
-            --primary-green: #1f7a2d; /* Homepage forest green */
-            --primary-green-2: #13601f; /* darker stop */
+            --primary-green: #1f7a2d;
+            /* Homepage forest green */
+            --primary-green-2: #13601f;
+            /* darker stop */
             --accent-green: #2e7d32;
             --light-green: #eaf5ea;
             --accent-orange: #FFCB05;
             --text-dark: #16321f;
             --text-light: #6c757d;
             --bg-light: #f6fbf6;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 
             /* Map dashboard-specific names to homepage palette for compatibility */
             --forest-green: var(--primary-green);
@@ -39,17 +41,21 @@
         .home-zoom {
             zoom: 0.85;
         }
+
         @supports not (zoom: 1) {
             .home-zoom {
                 transform: scale(0.85);
                 transform-origin: top center;
             }
         }
-        
-        body, .profile-card, .stats-card, .main-content-card {
+
+        body,
+        .profile-card,
+        .stats-card,
+        .main-content-card {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
             min-height: 100vh;
@@ -62,11 +68,12 @@
             max-width: 1180px;
             margin: 0 auto;
         }
-        
+
         @if(auth()->user()->isAdmin())
-        .main-dashboard-inner {
-            padding: 2rem;
-        }
+            .main-dashboard-inner {
+                padding: 2rem;
+            }
+
         @endif
 
         /* Profile Page Specific Styles */
@@ -88,9 +95,9 @@
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            border: 4px solid rgba(255,255,255,0.3);
+            border: 4px solid rgba(255, 255, 255, 0.3);
             object-fit: cover;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             margin-bottom: 0.75rem;
         }
 
@@ -288,9 +295,9 @@
         }
 
         .avatar-upload-btn {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             padding: 0.5rem 1rem;
             font-size: 0.85rem;
@@ -300,17 +307,17 @@
         }
 
         .avatar-upload-btn:hover {
-            background: rgba(255,255,255,0.3);
-            border-color: rgba(255,255,255,0.5);
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         /* Hero Container Information Styles */
         .hero-info-section {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 1rem;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .hero-section-title {
@@ -322,7 +329,7 @@
             align-items: center;
             gap: 0.5rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .hero-info-item {
@@ -330,7 +337,7 @@
             align-items: flex-start;
             gap: 0.5rem;
             padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .hero-info-item:last-child {
@@ -338,7 +345,7 @@
         }
 
         .hero-info-icon {
-            color: rgba(255,255,255,0.9);
+            color: rgba(255, 255, 255, 0.9);
             font-size: 1rem;
             margin-top: 0.2rem;
             min-width: 18px;
@@ -350,7 +357,7 @@
 
         .hero-info-label {
             font-size: 0.75rem;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
             margin-bottom: 0.2rem;
         }
@@ -365,19 +372,24 @@
             .profile-header-card {
                 padding: 1.25rem;
             }
+
             .profile-avatar {
                 width: 100px;
                 height: 100px;
             }
+
             .profile-name {
                 font-size: 1.25rem;
             }
+
             .hero-info-section {
                 margin-top: 1rem;
             }
+
             .hero-section-title {
                 font-size: 0.95rem;
             }
+
             .hero-info-value {
                 font-size: 0.85rem;
             }
@@ -387,369 +399,362 @@
     @if(auth()->user()->isAdmin())
         <div class="main-dashboard-inner">
     @else
-        <div class="home-zoom">
-        <div class="d-flex">
-            <!-- Mobile Sidebar Toggle -->
-            <button id="studentSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
-            <!-- Sidebar -->
-            <div class="custom-sidebar">
-                <div class="sidebar-logo mb-4">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
-                    <h3 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">CMU Guidance and Counseling Center</h3>
-                    <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">{{ auth()->user()->isCounselor() ? 'Counselor Portal' : 'Student Portal' }}</p>
-                </div>
-                <nav class="sidebar-nav flex-grow-1">
-                    <a href="{{ route('profile') }}" class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i class="bi bi-person"></i>Profile</a>
-                    <a href="{{ route('dashboard') }}" class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i class="bi bi-house-door"></i>Dashboard</a>
-                    @if(auth()->user()->isStudent())
-                        <a href="{{ route('appointments.index') }}" class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i class="bi bi-calendar-check"></i>Appointments</a>
-                        <a href="{{ route('assessments.index') }}" class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i class="bi bi-clipboard-data"></i>Assessments</a>
-                        <a href="{{ route('chat.selectCounselor') }}" class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i class="bi bi-chat-dots"></i>Chat with a Counselor</a>
-                    @endif
-                </nav>
-                <div class="sidebar-bottom w-100">
-                    <a href="{{ route('logout') }}" class="sidebar-link logout"
-                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="bi bi-box-arrow-right"></i>Logout
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Main Content -->
-            <div class="main-dashboard-content flex-grow-1">
-                <div class="main-dashboard-inner">
-    @endif
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px; margin-bottom: 1rem;">
-                            <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="home-zoom">
+                <div class="d-flex">
+                    <!-- Mobile Sidebar Toggle -->
+                    <button id="studentSidebarToggle" class="d-md-none">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <!-- Sidebar -->
+                    <div class="custom-sidebar">
+                        <div class="sidebar-logo mb-4">
+                            <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
+                                style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
+                            <h3
+                                style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">
+                                CMU Guidance and Counseling Center</h3>
+                            <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">
+                                {{ auth()->user()->isCounselor() ? 'Counselor Portal' : 'Student Portal' }}</p>
                         </div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; margin-bottom: 1rem;">
-                            <i class="bi bi-exclamation-circle me-2"></i>{{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <nav class="sidebar-nav flex-grow-1">
+                            <a href="{{ route('profile') }}"
+                                class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
+                                    class="bi bi-person"></i>Profile</a>
+                            <a href="{{ route('dashboard') }}"
+                                class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
+                                    class="bi bi-house-door"></i>Dashboard</a>
+                            @if(auth()->user()->isStudent())
+                                <a href="{{ route('appointments.index') }}"
+                                    class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i
+                                        class="bi bi-calendar-check"></i>Appointments</a>
+                                <a href="{{ route('assessments.index') }}"
+                                    class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i
+                                        class="bi bi-clipboard-data"></i>Assessments</a>
+                                <a href="{{ route('chat.selectCounselor') }}"
+                                    class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i
+                                        class="bi bi-chat-dots"></i>Chat with a Counselor</a>
+                            @endif
+                        </nav>
+                        <div class="sidebar-bottom w-100">
+                            <a href="{{ route('logout') }}" class="sidebar-link logout"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="bi bi-box-arrow-right"></i>Logout
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
                         </div>
-                    @endif
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px; margin-bottom: 1rem;">
-                            <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; margin-bottom: 1rem;">
-                            <i class="bi bi-exclamation-circle me-2"></i>{{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-                    <!-- Profile Header -->
-                    <div class="profile-header-card">
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="main-dashboard-content flex-grow-1">
+                        <div class="main-dashboard-inner">
+        @endif
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert"
+                                style="border-radius: 8px; margin-bottom: 1rem;">
+                                <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                                style="border-radius: 8px; margin-bottom: 1rem;">
+                                <i class="bi bi-exclamation-circle me-2"></i>{{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         <div class="row g-4">
-                            <!-- Left Side - Avatar Section -->
-                            <div class="col-md-4">
-                                <div class="profile-avatar-section">
-                                    <img src="{{ $user->avatar_url }}" alt="Profile Picture" class="profile-avatar">
-                                    <div class="profile-name">{{ $user->name }}</div>
-                                    <div class="profile-email">{{ $user->email }}</div>
-                                    <form method="POST" action="{{ route('profile.avatar') }}" enctype="multipart/form-data" class="avatar-upload-section">
+                            <!-- Left Column: Profile Summary & Account Info -->
+                            <div class="col-lg-4">
+                                <!-- Profile Summary Card -->
+                                <div class="profile-info-card text-center">
+                                    <div class="profile-avatar-section">
+                                        <img src="{{ $user->avatar_url }}" alt="Profile Picture" class="profile-avatar">
+                                        <div class="profile-name">{{ $user->name }}</div>
+                                        <div class="profile-email">{{ $user->email }}</div>
+                                        <form method="POST" action="{{ route('profile.avatar') }}"
+                                            enctype="multipart/form-data" class="avatar-upload-section">
+                                            @csrf
+                                            <input type="file" name="avatar" id="avatarInput" accept="image/*"
+                                                style="display: none;" onchange="this.form.submit()">
+                                            <label for="avatarInput" class="btn btn-sm btn-outline-success mt-2">
+                                                <i class="bi bi-camera me-1"></i>Change Photo
+                                            </label>
+                                        </form>
+                                    </div>
+                                    <hr class="my-3">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <span class="badge-status badge-active">{{ ucfirst($user->role) }}</span>
+                                        <span class="badge-status {{ $user->isActive() ? 'badge-active' : 'badge-inactive' }}">
+                                            {{ $user->isActive() ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Account Information Card -->
+                                <div class="profile-info-card">
+                                    <div class="card-title">
+                                        <i class="bi bi-shield-check"></i>
+                                        Account Details
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="bi bi-file-check info-item-icon"></i>
+                                        <div class="info-item-content">
+                                            <div class="info-item-label">Registration</div>
+                                            <div class="info-item-value">
+                                                @if($user->registration_status === 'approved')
+                                                    <span class="text-success fw-bold">Approved</span>
+                                                @elseif($user->registration_status === 'pending')
+                                                    <span class="text-warning fw-bold">Pending</span>
+                                                @elseif($user->registration_status === 'rejected')
+                                                    <span class="text-danger fw-bold">Rejected</span>
+                                                @else
+                                                    <span class="text-muted">Pending</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="bi bi-calendar-check info-item-icon"></i>
+                                        <div class="info-item-content">
+                                            <div class="info-item-label">Member Since</div>
+                                            <div class="info-item-value">{{ $user->created_at->format('M j, Y') }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="bi bi-clock-history info-item-icon"></i>
+                                        <div class="info-item-content">
+                                            <div class="info-item-label">Last Login</div>
+                                            <div class="info-item-value">{{ $user->updated_at->format('M j, Y g:i A') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Seminar Badges (Student Only) -->
+                                @if(isset($attendanceMatrix))
+                                <div class="profile-info-card">
+                                    <div class="card-title">
+                                        <i class="bi bi-award"></i>
+                                        Seminar Badges
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @php
+                                            $badges = [
+                                                'IDREAMS' => ['color' => 'bg-blue-100 text-blue-800 border-blue-200', 'icon' => 'bi-clouds-fill', 'year' => 1],
+                                                '10C' => ['color' => 'bg-orange-100 text-orange-800 border-orange-200', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
+                                                'LEADS' => ['color' => 'bg-purple-100 text-purple-800 border-purple-200', 'icon' => 'bi-people-fill', 'year' => 3],
+                                                'IMAGE' => ['color' => 'bg-teal-100 text-teal-800 border-teal-200', 'icon' => 'bi-person-badge-fill', 'year' => 4],
+                                            ];
+                                        @endphp
+                                        
+                                        @foreach($badges as $seminarName => $style)
+                                            @php
+                                                $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]);
+                                            @endphp
+                                            <div class="d-flex align-items-center gap-1 px-2 py-1 rounded-pill border {{ $isAttended ? $style['color'] : 'bg-gray-100 text-gray-400 border-gray-200' }}" style="font-size: 0.8rem;">
+                                                @if($isAttended)
+                                                    <i class="bi {{ $style['icon'] }}"></i>
+                                                    <span class="fw-bold">{{ $seminarName }}</span>
+                                                    <i class="bi bi-check-circle-fill opacity-75"></i>
+                                                @else
+                                                    <i class="bi bi-lock-fill"></i>
+                                                    <span class="fw-medium">{{ $seminarName }}</span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+
+                            <!-- Right Column: Edit Forms -->
+                            <div class="col-lg-8">
+                                <!-- Personal Information Form -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-person-lines-fill"></i>
+                                        Personal Information
+                                    </div>
+                                    <form method="POST" action="{{ route('profile.update') }}">
                                         @csrf
-                                        <input type="file" name="avatar" id="avatarInput" accept="image/*" style="display: none;" onchange="this.form.submit()">
-                                        <label for="avatarInput" class="avatar-upload-btn">
-                                            <i class="bi bi-camera me-1"></i>Change Photo
-                                        </label>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="name" class="form-label">Full Name</label>
+                                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                                        id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                                                    @error('name')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="email" class="form-label">Email Address</label>
+                                                    <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                                        id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                                                    @error('email')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="contact_number" class="form-label">Contact Number</label>
+                                                    <input type="tel"
+                                                        class="form-control @error('contact_number') is-invalid @enderror"
+                                                        id="contact_number" name="contact_number"
+                                                        value="{{ old('contact_number', $user->contact_number ?? '') }}"
+                                                        placeholder="e.g., 09XXXXXXXXX">
+                                                    @error('contact_number')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="address" class="form-label">Home Address</label>
+                                                    <input type="text" class="form-control @error('address') is-invalid @enderror"
+                                                        id="address" name="address"
+                                                        value="{{ old('address', $user->address ?? '') }}"
+                                                        placeholder="House/Street, Barangay, City/Province">
+                                                    @error('address')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-primary-custom">
+                                                <i class="bi bi-check-circle me-1"></i>Save Changes
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Student Information Form -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-mortarboard"></i>
+                                        Student Information
+                                    </div>
+                                    <form method="POST" action="{{ route('profile.update') }}">
+                                        @csrf
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="student_id" class="form-label">Student ID</label>
+                                                    <input type="text"
+                                                        class="form-control @error('student_id') is-invalid @enderror"
+                                                        id="student_id" name="student_id"
+                                                        value="{{ old('student_id', $user->student_id ?? '') }}"
+                                                        placeholder="e.g., 2021-12345">
+                                                    @error('student_id')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="college" class="form-label">College</label>
+                                                    <input type="text"
+                                                        class="form-control @error('college') is-invalid @enderror"
+                                                        id="college" name="college"
+                                                        value="{{ old('college', $user->college ?? '') }}"
+                                                        placeholder="e.g., College of Engineering">
+                                                    @error('college')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="course" class="form-label">Course / Program</label>
+                                                    <input type="text" class="form-control @error('course') is-invalid @enderror"
+                                                        id="course" name="course" value="{{ old('course', $user->course ?? '') }}"
+                                                        placeholder="e.g., Bachelor of Science in Computer Science">
+                                                    @error('course')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="year_level" class="form-label">Year Level</label>
+                                                    <select class="form-control @error('year_level') is-invalid @enderror"
+                                                        id="year_level" name="year_level">
+                                                        <option value="">Select</option>
+                                                        <option value="1st Year" {{ old('year_level', $user->year_level ?? '') === '1st Year' ? 'selected' : '' }}>1st Year</option>
+                                                        <option value="2nd Year" {{ old('year_level', $user->year_level ?? '') === '2nd Year' ? 'selected' : '' }}>2nd Year</option>
+                                                        <option value="3rd Year" {{ old('year_level', $user->year_level ?? '') === '3rd Year' ? 'selected' : '' }}>3rd Year</option>
+                                                        <option value="4th Year" {{ old('year_level', $user->year_level ?? '') === '4th Year' ? 'selected' : '' }}>4th Year</option>
+                                                        <option value="5th Year" {{ old('year_level', $user->year_level ?? '') === '5th Year' ? 'selected' : '' }}>5th Year</option>
+                                                    </select>
+                                                    @error('year_level')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-primary-custom">
+                                                <i class="bi bi-check-circle me-1"></i>Save Changes
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Change Password Form -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-key"></i>
+                                        Security
+                                    </div>
+                                    <form method="POST" action="{{ route('profile.password') }}">
+                                        @csrf
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="current_password" class="form-label">Current Password</label>
+                                                    <input type="password" class="form-control @error('current_password') is-invalid @enderror"
+                                                        id="current_password" name="current_password" required>
+                                                    @error('current_password')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="password" class="form-label">New Password</label>
+                                                    <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                                        id="password" name="password" required>
+                                                    @error('password')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="password_confirmation" class="form-label">Confirm New Password</label>
+                                                    <input type="password" class="form-control" id="password_confirmation"
+                                                        name="password_confirmation" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-primary-custom">
+                                                <i class="bi bi-shield-lock me-1"></i>Update Password
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
-                            
-                            <!-- Right Side - Personal & Student Information -->
-                            <div class="col-md-8">
-                                <div class="row g-3">
-                                    <!-- Personal Information -->
-                                    <div class="col-md-6">
-                                        <div class="hero-info-section">
-                                            <div class="hero-section-title">
-                                                <i class="bi bi-person-circle"></i>
-                                                Personal Information
-                                            </div>
-                                            <div class="hero-info-item">
-                                                <i class="bi bi-person hero-info-icon"></i>
-                                                <div class="hero-info-content">
-                                                    <div class="hero-info-label">Full Name</div>
-                                                    <div class="hero-info-value">{{ $user->name }}</div>
-                                                </div>
-                                            </div>
-                                            <div class="hero-info-item">
-                                                <i class="bi bi-envelope hero-info-icon"></i>
-                                                <div class="hero-info-content">
-                                                    <div class="hero-info-label">Email Address</div>
-                                                    <div class="hero-info-value">{{ $user->email }}</div>
-                                                </div>
-                                            </div>
-                                            <div class="hero-info-item">
-                                                <i class="bi bi-telephone hero-info-icon"></i>
-                                                <div class="hero-info-content">
-                                                    <div class="hero-info-label">Contact Number</div>
-                                                    <div class="hero-info-value">{{ $user->contact_number ?? 'Not provided' }}</div>
-                                                </div>
-                                            </div>
-                                            <div class="hero-info-item">
-                                                <i class="bi bi-geo-alt hero-info-icon"></i>
-                                                <div class="hero-info-content">
-                                                    <div class="hero-info-label">Home Address</div>
-                                                    <div class="hero-info-value">{{ $user->address ?? 'Not provided' }}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Student Information -->
-                                    <div class="col-md-6">
-                                        <div class="hero-info-section">
-                                            <div class="hero-section-title">
-                                                <i class="bi bi-graduation-cap"></i>
-                                                Student Information
-                                            </div>
-                                            <div class="hero-info-item">
-                                                <i class="bi bi-id-card hero-info-icon"></i>
-                                                <div class="hero-info-content">
-                                                    <div class="hero-info-label">Student ID</div>
-                                                    <div class="hero-info-value">{{ $user->student_id ?? 'Not provided' }}</div>
-                                                </div>
-                                            </div>
-                                            <div class="hero-info-item">
-                                                <i class="bi bi-building hero-info-icon"></i>
-                                                <div class="hero-info-content">
-                                                    <div class="hero-info-label">College</div>
-                                                    <div class="hero-info-value">{{ $user->college ?? 'Not provided' }}</div>
-                                                </div>
-                                            </div>
-                                            <div class="hero-info-item">
-                                                <i class="bi bi-book hero-info-icon"></i>
-                                                <div class="hero-info-content">
-                                                    <div class="hero-info-label">Course / Program</div>
-                                                    <div class="hero-info-value">{{ $user->course ?? 'Not provided' }}</div>
-                                                </div>
-                                            </div>
-                                            <div class="hero-info-item">
-                                                <i class="bi bi-calendar3 hero-info-icon"></i>
-                                                <div class="hero-info-content">
-                                                    <div class="hero-info-label">Year Level</div>
-                                                    <div class="hero-info-value">{{ $user->year_level ?? 'Not provided' }}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <!-- Left Column - Empty now, can be used for other content if needed -->
-                        <div class="col-lg-6">
-                        </div>
-
-                        <!-- Right Column - Account Information & Edit Forms -->
-                        <div class="col-lg-6">
-                            <!-- Account Information Card -->
-                            <div class="profile-info-card">
-                                <div class="card-title">
-                                    <i class="bi bi-shield-check"></i>
-                                    Account Information
-                                </div>
-                                <div class="info-item">
-                                    <i class="bi bi-person-badge info-item-icon"></i>
-                                    <div class="info-item-content">
-                                        <div class="info-item-label">Role</div>
-                                        <div class="info-item-value">
-                                            <span class="badge-status badge-active">{{ ucfirst($user->role) }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="info-item">
-                                    <i class="bi bi-check-circle info-item-icon"></i>
-                                    <div class="info-item-content">
-                                        <div class="info-item-label">Account Status</div>
-                                        <div class="info-item-value">
-                                            <span class="badge-status {{ $user->isActive() ? 'badge-active' : 'badge-inactive' }}">
-                                                {{ $user->isActive() ? 'Active' : 'Inactive' }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="info-item">
-                                    <i class="bi bi-file-check info-item-icon"></i>
-                                    <div class="info-item-content">
-                                        <div class="info-item-label">Registration Status</div>
-                                        <div class="info-item-value">
-                                            @if($user->registration_status === 'approved')
-                                                <span class="badge-status badge-approved">Approved</span>
-                                            @elseif($user->registration_status === 'pending')
-                                                <span class="badge-status badge-pending">Pending</span>
-                                            @elseif($user->registration_status === 'rejected')
-                                                <span class="badge-status badge-rejected">Rejected</span>
-                                            @else
-                                                <span class="badge-status badge-pending">Pending</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="info-item">
-                                    <i class="bi bi-calendar-check info-item-icon"></i>
-                                    <div class="info-item-content">
-                                        <div class="info-item-label">Member Since</div>
-                                        <div class="info-item-value">{{ $user->created_at->format('F j, Y') }}</div>
-                                    </div>
-                                </div>
-                                <div class="info-item">
-                                    <i class="bi bi-clock-history info-item-icon"></i>
-                                    <div class="info-item-content">
-                                        <div class="info-item-label">Last Login</div>
-                                        <div class="info-item-value">{{ $user->updated_at->format('F j, Y g:i A') }}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Edit Personal Information Form -->
-                            <div class="form-section">
-                                <div class="form-section-title">
-                                    <i class="bi bi-pencil-square"></i>
-                                    Edit Personal Information
-                                </div>
-                                <form method="POST" action="{{ route('profile.update') }}">
-                                    @csrf
-                                    <div class="form-group">
-                                        <label for="name" class="form-label">Full Name</label>
-                                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name) }}" required>
-                                        @error('name')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="email" class="form-label">Email Address</label>
-                                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email) }}" required>
-                                        @error('email')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="contact_number" class="form-label">Contact Number</label>
-                                        <input type="tel" class="form-control @error('contact_number') is-invalid @enderror" id="contact_number" name="contact_number" value="{{ old('contact_number', $user->contact_number ?? '') }}" placeholder="e.g., 09XXXXXXXXX">
-                                        @error('contact_number')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="address" class="form-label">Home Address</label>
-                                        <input type="text" class="form-control @error('address') is-invalid @enderror" id="address" name="address" value="{{ old('address', $user->address ?? '') }}" placeholder="House/Street, Barangay, City/Province">
-                                        @error('address')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <button type="submit" class="btn-primary-custom w-100">
-                                        <i class="bi bi-check-circle me-1"></i>Update Information
-                                    </button>
-                                </form>
-                            </div>
-
-                            <!-- Edit Student Information Form -->
-                            <div class="form-section">
-                                <div class="form-section-title">
-                                    <i class="bi bi-graduation-cap"></i>
-                                    Edit Student Information
-                                </div>
-                                <form method="POST" action="{{ route('profile.update') }}">
-                                    @csrf
-                                    <div class="form-group">
-                                        <label for="student_id" class="form-label">Student ID</label>
-                                        <input type="text" class="form-control @error('student_id') is-invalid @enderror" id="student_id" name="student_id" value="{{ old('student_id', $user->student_id ?? '') }}" placeholder="e.g., 2021-12345">
-                                        @error('student_id')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-7">
-                                            <div class="form-group">
-                                                <label for="college" class="form-label">College</label>
-                                                <input type="text" class="form-control @error('college') is-invalid @enderror" id="college" name="college" value="{{ old('college', $user->college ?? '') }}" placeholder="e.g., College of Engineering">
-                                                @error('college')
-                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-md-5">
-                                            <div class="form-group">
-                                                <label for="year_level" class="form-label">Year Level</label>
-                                                <select class="form-control @error('year_level') is-invalid @enderror" id="year_level" name="year_level">
-                                                    <option value="">Select</option>
-                                                    <option value="1st Year" {{ old('year_level', $user->year_level ?? '') === '1st Year' ? 'selected' : '' }}>1st Year</option>
-                                                    <option value="2nd Year" {{ old('year_level', $user->year_level ?? '') === '2nd Year' ? 'selected' : '' }}>2nd Year</option>
-                                                    <option value="3rd Year" {{ old('year_level', $user->year_level ?? '') === '3rd Year' ? 'selected' : '' }}>3rd Year</option>
-                                                    <option value="4th Year" {{ old('year_level', $user->year_level ?? '') === '4th Year' ? 'selected' : '' }}>4th Year</option>
-                                                    <option value="5th Year" {{ old('year_level', $user->year_level ?? '') === '5th Year' ? 'selected' : '' }}>5th Year</option>
-                                                </select>
-                                                @error('year_level')
-                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="course" class="form-label">Course / Program</label>
-                                        <input type="text" class="form-control @error('course') is-invalid @enderror" id="course" name="course" value="{{ old('course', $user->course ?? '') }}" placeholder="e.g., Bachelor of Science in Computer Science">
-                                        @error('course')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <button type="submit" class="btn-primary-custom w-100">
-                                        <i class="bi bi-check-circle me-1"></i>Update Student Information
-                                    </button>
-                                </form>
-                            </div>
-
-                            <!-- Change Password Form -->
-                            <div class="form-section">
-                                <div class="form-section-title">
-                                    <i class="bi bi-key"></i>
-                                    Change Password
-                                </div>
-                                <form method="POST" action="{{ route('profile.password') }}">
-                                    @csrf
-                                    <div class="form-group">
-                                        <label for="current_password" class="form-label">Current Password</label>
-                                        <input type="password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" required>
-                                        @error('current_password')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="password" class="form-label">New Password</label>
-                                        <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
-                                        @error('password')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="password_confirmation" class="form-label">Confirm New Password</label>
-                                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-                                    </div>
-                                    <button type="submit" class="btn-primary-custom w-100">
-                                        <i class="bi bi-key me-1"></i>Change Password
-                                    </button>
-                                </form>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
     @if(!auth()->user()->isAdmin())
         </div>
         </div>
@@ -780,4 +785,3 @@
         </script>
     @endif
 @endsection
-
