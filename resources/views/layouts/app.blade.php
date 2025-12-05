@@ -40,6 +40,33 @@
             --input-radius: 10px;
             --transition: 0.2s;
         }
+        /* Centralized home-zoom variables and behavior
+           Ensures scaled pages correctly account for the fixed sidebar width
+           so the sidebar does not overlap content when zooming. */
+        :root {
+            --sidebar-width: 240px;
+            --home-zoom: 0.85; /* adjust this value to change overall zoom */
+        }
+        .home-zoom { --zoom: var(--home-zoom); zoom: var(--zoom); }
+        /* For browsers that don't support `zoom` use CSS transform as fallback */
+        @supports not (zoom: 1) {
+            .home-zoom { transform: scale(var(--zoom)); transform-origin: top center; }
+        }
+        /* When the page is scaled, reduce the left margin of main content proportionally
+           so the fixed sidebar remains beside the content instead of overlapping it. */
+        .home-zoom .main-dashboard-content, .home-zoom #mainContent {
+            margin-left: calc(var(--sidebar-width) * var(--zoom)) !important;
+        }
+        @media (max-width: 991.98px) {
+            .home-zoom .main-dashboard-content, .home-zoom #mainContent {
+                margin-left: calc(200px * var(--zoom)) !important;
+            }
+        }
+        @media (max-width: 767.98px) {
+            /* Disable zoom on small screens to avoid layout issues */
+            .home-zoom { zoom: 1 !important; transform: none !important; }
+            .home-zoom .main-dashboard-content, .home-zoom #mainContent { margin-left: 0 !important; }
+        }
         html { font-size: 18px; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

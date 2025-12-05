@@ -40,7 +40,12 @@ class CounselorDashboardController extends Controller
         } else {
             $appointment = Appointment::where('counselor_id', auth()->id())->with('student')->findOrFail($id);
         }
-        return view('counselor.appointments.show', compact('appointment'));
+        // Load the student's latest assessment (if any)
+        $latestAssessment = \App\Models\Assessment::where('user_id', $appointment->student_id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return view('counselor.appointments.show', compact('appointment', 'latestAssessment'));
     }
 
     // Toggle counselor availability (AJAX)

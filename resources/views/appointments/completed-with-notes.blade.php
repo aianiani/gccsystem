@@ -242,7 +242,11 @@
                                         <div class="mb-3">
                                             <strong>Session Summary:</strong>
                                             <div class="mt-2 p-3 bg-white border rounded">
-                                                {!! nl2br(e($sessionNote->content)) !!}
+                                                @if(auth()->check() && auth()->user()->role === 'counselor')
+                                                    {!! nl2br(e($sessionNote->content)) !!}
+                                                @else
+                                                    <div class="text-muted"><em>Private note — visible only to your counselor.</em></div>
+                                                @endif
                                             </div>
                                         </div>
                                     @endif

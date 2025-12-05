@@ -254,7 +254,11 @@
                                             <small class="text-muted">{{ $sessionNote->created_at->format('F j, Y') }}</small>
                                         </div>
                                         @if($sessionNote->content)
-                                            <p class="mb-1 small">{{ Str::limit($sessionNote->content, 150) }}</p>
+                                            @if(auth()->check() && auth()->user()->role === 'counselor')
+                                                <p class="mb-1 small">{{ Str::limit($sessionNote->content, 150) }}</p>
+                                            @else
+                                                <p class="mb-1 small text-muted"><em>Private note — visible only to your counselor.</em></p>
+                                            @endif
                                         @endif
                                         @if($sessionNote->recommendations)
                                             <p class="mb-0 small text-muted">

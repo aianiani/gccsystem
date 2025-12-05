@@ -226,11 +226,27 @@
         <div class="main-dashboard-content flex-grow-1">
             <div class="main-dashboard-inner">
 <div class="container py-1">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="section-title mb-0"><i class="bi bi-calendar-check me-2"></i>My Appointments</h2>
-        <a href="{{ route('appointments.create') }}" class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-circle me-1"></i> Book Appointment
-        </a>
+    <style>
+        /* Appointments page specific tweaks */
+        .appointments-hero { background: var(--hero-gradient); color: white; padding: 1rem; border-radius: 12px; box-shadow: var(--shadow-md); margin-bottom: 1rem; }
+        .appointments-hero .title { font-size: 1.25rem; font-weight: 700; }
+        .appointment-card-header { background: linear-gradient(90deg, rgba(31,122,45,0.06), rgba(31,122,45,0.02)); border-bottom: none; padding: 0.9rem 1rem; display:flex; align-items:center; gap:0.75rem; }
+        .appointment-card-header .avatar { width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid rgba(31,122,45,0.08); }
+        .appointment-status-badge { padding: 0.45rem 0.85rem; border-radius: 999px; font-weight:700; box-shadow: var(--shadow-sm); }
+        .session-notes-panel { margin-top:0.75rem; padding:0.9rem; border-radius:10px; background:#fff; box-shadow:0 4px 14px rgba(18,52,22,0.03); }
+        .appointment-card .card-body { padding: 1rem; }
+    </style>
+
+    <div class="appointments-hero d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <div class="title"><i class="bi bi-calendar-check me-2"></i>My Appointments</div>
+            <div class="text-muted small">You have <strong>{{ $appointments->count() }}</strong> appointments</div>
+        </div>
+        <div>
+            <a href="{{ route('appointments.create') }}" class="btn btn-light btn-lg shadow-sm text-success">
+                <i class="bi bi-plus-circle me-1"></i> Book Appointment
+            </a>
+        </div>
     </div>
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -246,20 +262,21 @@
                     $end = $availability ? \Carbon\Carbon::parse($availability->end) : $start->copy()->addMinutes(30);
                 @endphp
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-header d-flex align-items-center gap-2" style="background: var(--primary-light); color: var(--primary);">
-                            <img src="{{ $appointment->counselor->avatar_url }}" 
-                                 alt="{{ $appointment->counselor->name }}" 
-                                 class="rounded-circle" 
-                                 style="width: 40px; height: 40px; object-fit: cover; border: 2px solid var(--primary);">
-                            <span class="fw-bold">{{ $appointment->counselor->name ?? 'N/A' }}</span>
+                    <div class="card h-100 appointment-card shadow-sm">
+                        <div class="appointment-card-header">
+                            <img src="{{ $appointment->counselor->avatar_url }}" alt="{{ $appointment->counselor->name }}" class="avatar">
+                            <div>
+                                <div class="fw-bold">{{ $appointment->counselor->name ?? 'N/A' }}</div>
+                                <div class="small text-muted">Counselor</div>
+                            </div>
                             @php
-                                // Get the session note for this appointment (if any)
                                 $sessionNoteForThisAppointment = $appointment->sessionNotes->first();
                             @endphp
-                            @if($sessionNoteForThisAppointment)
-                                <span class="badge bg-primary ms-auto">Session {{ $sessionNoteForThisAppointment->session_number }}</span>
-                            @endif
+                            <div class="ms-auto">
+                                @if($sessionNoteForThisAppointment)
+                                    <span class="badge bg-primary appointment-status-badge">Session {{ $sessionNoteForThisAppointment->session_number }}</span>
+                                @endif
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="mb-2">
@@ -267,17 +284,15 @@
                                 <span class="fw-semibold">{{ $start->format('M d, Y - g:i A') }} – {{ $end->format('g:i A') }}</span>
                             </div>
                             <div class="mb-2">
-                                <span class="badge 
-                                    @if($appointment->status === 'pending') bg-warning text-dark
-                                    @elseif($appointment->status === 'accepted') bg-success
-                                    @elseif($appointment->status === 'completed') bg-primary
-                                    @elseif($appointment->status === 'declined' || $appointment->status === 'cancelled') bg-danger
-                                    @elseif($appointment->status === 'rescheduled_pending') bg-info text-dark
-                                    @else bg-secondary
-                                    @endif
-                                    px-3 py-2 fs-6 shadow-sm">
-                                    <i class="bi bi-info-circle me-1"></i>{{ ucfirst($appointment->status) }}
-                                </span>
+                                @php
+                                    $statusClass = 'bg-secondary';
+                                    if($appointment->status === 'pending') $statusClass = 'bg-warning text-dark';
+                                    elseif($appointment->status === 'accepted') $statusClass = 'bg-success';
+                                    elseif($appointment->status === 'completed') $statusClass = 'bg-primary';
+                                    elseif($appointment->status === 'declined' || $appointment->status === 'cancelled') $statusClass = 'bg-danger';
+                                    elseif($appointment->status === 'rescheduled_pending') $statusClass = 'bg-info text-dark';
+                                @endphp
+                                <span class="badge {{ $statusClass }} appointment-status-badge"><i class="bi bi-info-circle me-1"></i>{{ ucfirst($appointment->status) }}</span>
                             </div>
                             <div class="mb-2">
                                 @if($appointment->status === 'accepted')
@@ -307,7 +322,7 @@
                             
                             {{-- Display Session Notes for Completed Appointments --}}
                             @if($appointment->status === 'completed' && $appointment->sessionNotes->count() > 0)
-                                <div class="mt-3 p-3 bg-light rounded border-start border-3 border-primary">
+                                <div class="session-notes-panel">
                                     <h6 class="fw-bold text-primary mb-2">
                                         <i class="bi bi-journal-text me-1"></i>Session Notes
                                     </h6>
@@ -319,9 +334,12 @@
                                                 </div>
                                             @endif
                                             <div class="bg-white p-3 rounded border">
-                                                <p class="mb-0">{{ $sessionNote->note }}</p>
+                                                @if(auth()->check() && auth()->user()->role === 'counselor')
+                                                    <p class="mb-0">{{ $sessionNote->note }}</p>
+                                                @else
+                                                    <p class="mb-0 text-muted"><em>Private note — visible only to your counselor.</em></p>
+                                                @endif
                                             </div>
-                                            {{-- Show the session's own completion date if completed --}}
                                             @if($sessionNote->session_status === 'completed')
                                                 <div class="mt-2">
                                                     <small class="text-success">
@@ -330,11 +348,9 @@
                                                     </small>
                                                 </div>
                                             @endif
-                                            {{-- Show the next session date if it exists and is not completed --}}
                                             @if($sessionNote->next_session)
                                                 @php
                                                     $sessionDate = \Carbon\Carbon::parse($sessionNote->next_session);
-                                                    // Check if there is a session note for this appointment and date with status completed
                                                     $nextCompleted = $appointment->sessionNotes->where('session_number', $sessionNote->session_number + 1)
                                                         ->where('session_status', 'completed')
                                                         ->first();
@@ -365,8 +381,6 @@
                                             @endif
                                         </div>
                                     @endforeach
-                                    
-
                                 </div>
                             @elseif($appointment->status === 'completed')
                                 <div class="mt-3 p-3 bg-light rounded border-start border-3 border-secondary">

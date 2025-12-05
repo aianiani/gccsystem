@@ -13,18 +13,103 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 
-    // Enhanced confirmation dialogs for destructive actions
+    // Confirmation modal helper (returns a Promise<boolean>)
+    function createConfirmModalIfNeeded() {
+        let modal = document.getElementById('globalConfirmModal');
+        if (modal) return modal;
+        modal = document.createElement('div');
+        modal.id = 'globalConfirmModal';
+        modal.innerHTML = `
+            <div class="modal fade" tabindex="-1" id="globalConfirmModalInner" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body"><p id="globalConfirmModalMessage"></p></div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="globalConfirmModalCancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="globalConfirmModalOk">Confirm</button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+        document.body.appendChild(modal);
+        return modal;
+    }
+
+    function showConfirm(message, title = 'Confirm Action') {
+        return new Promise((resolve) => {
+            const wrapper = createConfirmModalIfNeeded();
+            const inner = document.getElementById('globalConfirmModalInner');
+            const msgEl = document.getElementById('globalConfirmModalMessage');
+            const okBtn = document.getElementById('globalConfirmModalOk');
+            const cancelBtn = document.getElementById('globalConfirmModalCancel');
+            if (!inner || !msgEl || !okBtn || !cancelBtn) {
+                // If modal creation failed unexpectedly, deny action to avoid native confirm()
+                resolve(false);
+                return;
+            }
+            msgEl.textContent = message;
+            // Use Bootstrap modal if available
+            if (typeof bootstrap !== 'undefined') {
+                const bsModal = new bootstrap.Modal(inner, { backdrop: 'static' });
+                okBtn.focus();
+                const clean = () => {
+                    okBtn.removeEventListener('click', onOk);
+                    cancelBtn.removeEventListener('click', onCancel);
+                    inner.addEventListener('hidden.bs.modal', onHidden);
+                };
+                const onOk = () => { bsModal.hide(); resolve(true); };
+                const onCancel = () => { bsModal.hide(); resolve(false); };
+                const onHidden = () => { clean(); };
+                okBtn.addEventListener('click', onOk);
+                cancelBtn.addEventListener('click', onCancel);
+                inner.addEventListener('hidden.bs.modal', onHidden);
+                bsModal.show();
+                return;
+            }
+            // Lightweight fallback if Bootstrap JS not present
+            inner.style.display = 'block';
+            inner.classList.add('show');
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            document.body.appendChild(backdrop);
+            const onOk = () => { cleanup(); resolve(true); };
+            const onCancel = () => { cleanup(); resolve(false); };
+            function cleanup() {
+                okBtn.removeEventListener('click', onOk);
+                cancelBtn.removeEventListener('click', onCancel);
+                inner.classList.remove('show');
+                inner.style.display = 'none';
+                if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+            }
+            okBtn.addEventListener('click', onOk);
+            cancelBtn.addEventListener('click', onCancel);
+        });
+    }
+
+    // Attach to elements with data-confirm using the modal helper
     const confirmButtons = document.querySelectorAll('[data-confirm]');
     confirmButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const message = this.getAttribute('data-confirm');
-            const title = this.getAttribute('data-confirm-title') || 'Confirm Action';
-            
-            if (!confirm(`${title}\n\n${message}\n\nAre you sure you want to continue?`)) {
+        // If it's a form, intercept submit; otherwise intercept click
+        if (button.tagName === 'FORM') {
+            button.addEventListener('submit', function(e) {
                 e.preventDefault();
-                return false;
-            }
-        });
+                const message = this.getAttribute('data-confirm');
+                const title = this.getAttribute('data-confirm-title') || 'Confirm Action';
+                showConfirm(message, title).then(ok => { if (ok) { button.removeAttribute('data-confirm'); button.submit(); } });
+            });
+        } else {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const message = this.getAttribute('data-confirm');
+                const title = this.getAttribute('data-confirm-title') || 'Confirm Action';
+                const el = this;
+                showConfirm(message, title).then(ok => { if (ok) { const href = el.getAttribute('href'); if (href) window.location = href; } });
+            });
+        }
     });
 
     // Enhanced form validation feedback
@@ -54,11 +139,9 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteBtn.addEventListener('click', function(e) {
                 const userName = this.getAttribute('data-user-name');
                 const userEmail = this.getAttribute('data-user-email');
-                
-                if (!confirm(`⚠️ Delete User\n\nAre you sure you want to permanently delete:\n\nName: ${userName}\nEmail: ${userEmail}\n\nThis action cannot be undone and will remove all associated data.`)) {
-                    e.preventDefault();
-                    return false;
-                }
+                const msg = `⚠️ Delete User\n\nAre you sure you want to permanently delete:\n\nName: ${userName}\nEmail: ${userEmail}\n\nThis action cannot be undone and will remove all associated data.`;
+                e.preventDefault();
+                showConfirm(msg, 'Delete User').then(ok => { if (ok) { const href = this.getAttribute('href'); if (href) window.location = href; else { const form = this.closest('form'); if (form) form.submit(); } } });
             });
         }
 
@@ -68,11 +151,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const userName = this.getAttribute('data-user-name');
                 const currentStatus = this.getAttribute('data-current-status');
                 const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-                
-                if (!confirm(`🔄 Change User Status\n\nAre you sure you want to change the status of:\n\nName: ${userName}\nFrom: ${currentStatus}\nTo: ${newStatus}\n\nThis will ${newStatus === 'inactive' ? 'prevent' : 'allow'} the user from logging in.`)) {
-                    e.preventDefault();
-                    return false;
-                }
+                const msg = `🔄 Change User Status\n\nAre you sure you want to change the status of:\n\nName: ${userName}\nFrom: ${currentStatus}\nTo: ${newStatus}\n\nThis will ${newStatus === 'inactive' ? 'prevent' : 'allow'} the user from logging in.`;
+                e.preventDefault();
+                showConfirm(msg, 'Change User Status').then(ok => { if (ok) { const href = this.getAttribute('href'); if (href) window.location = href; else { const form = this.closest('form'); if (form) form.submit(); } } });
             });
         }
     });

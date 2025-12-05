@@ -72,10 +72,10 @@
                         @auth
                             @if(auth()->user()->isAdmin())
                                 <a href="{{ route('announcements.edit', $announcement->id) }}" class="btn btn-warning">Edit</a>
-                                <form action="{{ route('announcements.destroy', $announcement->id) }}" method="POST" style="display:inline-block;">
+                                <form action="{{ route('announcements.destroy', $announcement->id) }}" method="POST" style="display:inline-block;" data-confirm="Are you sure you want to delete this announcement?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this announcement?')">Delete</button>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
                             @endif
                         @endauth
@@ -87,4 +87,44 @@
 
 </div>
 </div>
+<!-- Confirmation modal + handler (lightweight) -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Please confirm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"><p id="confirmModalMessage"></p></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmModalOk">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+        const confirmModalEl = document.getElementById('confirmModal');
+        let bsConfirm = (typeof bootstrap !== 'undefined' && confirmModalEl) ? new bootstrap.Modal(confirmModalEl, {backdrop:'static'}) : null;
+        let confirmTarget = null;
+        function showConfirm(message, target) {
+                document.getElementById('confirmModalMessage').textContent = message;
+                confirmTarget = target;
+                if (bsConfirm) { bsConfirm.show(); return; }
+                confirmModalEl.classList.add('show'); confirmModalEl.style.display='block';
+                let bd = document.getElementById('confirmModalBackdrop');
+                if (!bd) { bd = document.createElement('div'); bd.id='confirmModalBackdrop'; bd.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1050'; document.body.appendChild(bd);} else bd.style.display='block';
+        }
+        document.querySelectorAll('[data-confirm]').forEach(function(el){
+                if (el.tagName==='FORM') {
+                        el.addEventListener('submit', function(e){ e.preventDefault(); showConfirm(el.getAttribute('data-confirm')||'Are you sure?', el); });
+                } else {
+                        el.addEventListener('click', function(e){ e.preventDefault(); showConfirm(el.getAttribute('data-confirm')||'Are you sure?', el); });
+                }
+        });
+        const ok = document.getElementById('confirmModalOk');
+        if (ok) ok.addEventListener('click', function(){ if (!confirmTarget) return; if (confirmTarget.tagName==='FORM') { confirmTarget.removeAttribute('data-confirm'); confirmTarget.submit(); } else if (confirmTarget.tagName==='A') { const href=confirmTarget.getAttribute('href'); if (href) window.location.href=href;} if (bsConfirm) bsConfirm.hide(); else { confirmModalEl.classList.remove('show'); confirmModalEl.style.display='none'; const bd=document.getElementById('confirmModalBackdrop'); if (bd) bd.style.display='none'; } });
+});
+</script>
 @endsection 

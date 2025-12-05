@@ -102,12 +102,23 @@
             overflow: hidden;
         }
         
+            /* Filter button sizing */
+            .filter-btn, .reset-btn { padding: 0.38rem 0.45rem; min-width: 40px; display:inline-flex; align-items:center; justify-content:center; }
+            .filter-btn i, .reset-btn i { font-size: 1rem; }
         .main-content-card .card-header {
             background: var(--forest-green-lighter);
             color: var(--forest-green);
             padding: 1rem 1.25rem;
             border-bottom: 1px solid var(--gray-100);
             font-weight: 600;
+                                        @php
+                                            $studentMeta = [];
+                                            if(!empty($appointment->student->college)) $studentMeta[] = $appointment->student->college;
+                                            if(!empty($appointment->student->course)) $studentMeta[] = $appointment->student->course;
+                                        @endphp
+                                        @if(!empty($studentMeta))
+                                                <div class="small text-muted">{{ implode(' • ', $studentMeta) }}</div>
+                                        @endif
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -145,6 +156,16 @@
             box-shadow: var(--shadow-md);
             transform: translateY(-2px);
         }
+        .appointment-avatar { width:40px; height:40px; object-fit:cover; border:2px solid var(--forest-green); }
+        /* Welcome header avatar */
+        .welcome-avatar { width:72px; height:72px; border-radius:50%; overflow:hidden; flex:0 0 auto; border:4px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; }
+        .welcome-avatar-img { width:100%; height:100%; object-fit:cover; display:block; }
+        .appointment-main .name { font-size:1rem; margin:0; }
+        .appointment-right { min-width:110px; }
+        .appointment-card .time { color: #6c757d; }
+        .appointment-card .appointment-left { flex: 1 1 auto; min-width: 220px; }
+        .appointment-card .appointment-right { flex: 0 0 auto; }
+        .action-btn { padding: 0.45rem 0.75rem; }
     .status-badge {
         border-radius: 12px;
         padding: 0.25rem 0.75rem;
@@ -253,7 +274,7 @@
                 <div class="welcome-avatar">
                     <img src="{{ auth()->user()->avatar_url }}" 
                          alt="{{ auth()->user()->name }}" 
-                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                         class="welcome-avatar-img rounded-circle">
                 </div>
             </div>
             
@@ -266,45 +287,38 @@
                 </div>
                 <div class="card-body">
             <!-- Filter/Search -->
-            <form method="GET" class="row g-3 mb-4">
+            <form method="GET" class="row g-2 mb-4 align-items-center">
                 <div class="col-md-3">
-                    <input type="text" name="student" class="form-control" placeholder="Search by student" value="{{ request('student') }}">
+                    <input type="text" name="student" class="form-control" placeholder="Search by student name or email" value="{{ request('student') }}">
                 </div>
-                <div class="col-md-3">
-                    <input type="date" name="date" class="form-control" value="{{ request('date') }}">
+                <div class="col-md-2">
+                    <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                </div>
+                <div class="col-md-2">
                     <select name="status" class="form-control">
                         <option value="">All Statuses</option>
                         <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>Accepted</option>
                         <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                         <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                        <option value="declined" {{ request('status') == 'declined' ? 'selected' : '' }}>Declined</option>
                     </select>
                 </div>
-                <div class="col-md-3 d-flex align-items-center">
-                    <button type="submit" class="btn btn-success w-100"><i class="bi bi-funnel"></i> Filter</button>
+                <div class="col-md-2">
+                    <select name="mode" class="form-control">
+                        <option value="">All Modes</option>
+                        <option value="online" {{ request('mode') == 'online' ? 'selected' : '' }}>Online</option>
+                        <option value="in_person" {{ request('mode') == 'in_person' ? 'selected' : '' }}>In-person</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex gap-1">
+                    <button type="submit" class="btn btn-success w-100" title="Apply filters"><i class="bi bi-funnel"></i></button>
+                    <a href="{{ route('counselor.appointments.index') }}" class="btn btn-outline-secondary w-100" title="Clear filters"><i class="bi bi-x-lg"></i></a>
                 </div>
             </form>
-                    <!-- Filter/Search -->
-                    <form method="GET" class="row g-3 mb-4">
-                        <div class="col-md-3">
-                            <input type="text" name="student" class="form-control" placeholder="Search by student" value="{{ request('student') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <input type="date" name="date" class="form-control" value="{{ request('date') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <select name="status" class="form-control">
-                                <option value="">All Statuses</option>
-                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 d-flex align-items-center">
-                            <button type="submit" class="btn btn-success w-100"><i class="bi bi-funnel"></i> Filter</button>
-                        </div>
-                    </form>
                     
                     <!-- Appointments List -->
                     @forelse($appointments as $appointment)
@@ -317,17 +331,14 @@
                         $end = $availability ? \Carbon\Carbon::parse($availability->end) : $start->copy()->addMinutes(30);
                     @endphp
                     <div class="appointment-card">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap">
-                            <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap">
+                            <div class="d-flex align-items-center gap-3 appointment-left">
                                 <img src="{{ $appointment->student->avatar_url }}" 
                                      alt="{{ $appointment->student->name }}" 
-                                     class="rounded-circle" 
-                                     style="width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--forest-green);">
-                                <div>
-                                    <h5 class="mb-1 fw-bold" style="color: var(--forest-green);">{{ $appointment->student->name ?? 'N/A' }}</h5>
-                                    <div class="text-muted small">
-                                        <i class="bi bi-clock me-1"></i> {{ $start->format('M d, Y - g:i A') }} – {{ $end->format('g:i A') }}
-                                    </div>
+                                     class="appointment-avatar rounded-circle">
+                                <div class="appointment-main">
+                                    <h5 class="mb-1 fw-bold name" style="color: var(--forest-green);">{{ $appointment->student->name ?? 'N/A' }}</h5>
+                                    <div class="text-muted small time"><i class="bi bi-clock me-1"></i> {{ $start->format('M d, Y - g:i A') }} – {{ $end->format('g:i A') }}</div>
                                 </div>
                                 @php
                                     // Get the session note for this appointment (if any)
@@ -337,22 +348,24 @@
                                     <span class="badge bg-primary ms-2">Session {{ $sessionNoteForThisAppointment->session_number }}</span>
                                 @endif
                             </div>
-                            <div>
-                                <span class="status-badge status-{{ $appointment->status }}">
-                                    {{ ucfirst($appointment->status) }}
-                                </span>
+                            <div class="appointment-right text-end">
+                                <div>
+                                    <span class="status-badge status-{{ $appointment->status }}">
+                                        {{ ucfirst($appointment->status) }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <div class="mt-3 d-flex flex-wrap gap-2">
                             @if($appointment->status === 'pending')
                                 <div class="btn-group" role="group">
                                     <a href="{{ route('counselor.appointments.show', $appointment->id) }}" class="action-btn view"><i class="bi bi-eye"></i> View</a>
-                                    <form action="{{ route('counselor.appointments.accept', $appointment->id) }}" method="POST" style="display:inline;">
+                                    <form action="{{ route('counselor.appointments.accept', $appointment->id) }}" method="POST" style="display:inline;" data-confirm="Accept this appointment?">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="action-btn complete"><i class="bi bi-check-circle"></i> Accept</button>
                                     </form>
-                                    <form action="{{ route('counselor.appointments.decline', $appointment->id) }}" method="POST" style="display:inline;">
+                                    <form action="{{ route('counselor.appointments.decline', $appointment->id) }}" method="POST" style="display:inline;" data-confirm="Decline this appointment?">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="action-btn cancel"><i class="bi bi-x-circle"></i> Decline</button>
@@ -363,10 +376,10 @@
                                 <a href="{{ route('counselor.appointments.show', $appointment->id) }}" class="action-btn view">
                                     <i class="bi bi-eye"></i> View
                                 </a>
-                                <a href="{{ route('counselor.appointments.edit', $appointment->id) }}" class="action-btn edit">
+                                <a href="{{ route('counselor.appointments.edit', $appointment->id) }}" class="action-btn edit" data-confirm="Reschedule this appointment?">
                                     <i class="bi bi-calendar2-week"></i> Reschedule
                                 </a>
-                                <form action="{{ route('counselor.appointments.complete', $appointment->id) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('counselor.appointments.complete', $appointment->id) }}" method="POST" style="display:inline;" data-confirm="Mark this appointment as complete?">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="action-btn complete"><i class="bi bi-check-circle"></i> Mark Complete</button>
@@ -381,19 +394,19 @@
                                         <i class="bi bi-eye"></i> View Session Note
                                     </a>
                                 @endif
-                                <form action="{{ route('counselor.appointments.destroy', $appointment->id) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('counselor.appointments.destroy', $appointment->id) }}" method="POST" style="display:inline;" data-confirm="Permanently delete this appointment?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="action-btn cancel" onclick="return confirm('Are you sure you want to permanently delete this appointment?')">
+                                    <button type="submit" class="action-btn cancel">
                                         <i class="bi bi-trash"></i> Delete
                                     </button>
                                 </form>
                             @endif
                             @if($appointment->status === 'declined')
-                                <form action="{{ route('counselor.appointments.destroy', $appointment->id) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('counselor.appointments.destroy', $appointment->id) }}" method="POST" style="display:inline;" data-confirm="Permanently delete this appointment?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="action-btn cancel" onclick="return confirm('Are you sure you want to permanently delete this appointment?')">
+                                    <button type="submit" class="action-btn cancel">
                                         <i class="bi bi-trash"></i> Delete
                                     </button>
                                 </form>
@@ -470,6 +483,99 @@
                     }
                 });
             }
+            // Confirmation handler for actions with data-confirm using Bootstrap modal
+            const confirmModalEl = document.getElementById('confirmModal');
+            let bsConfirmModal = null;
+            if (confirmModalEl && typeof bootstrap !== 'undefined') {
+                bsConfirmModal = new bootstrap.Modal(confirmModalEl, { backdrop: 'static' });
+            }
+            let confirmTarget = null;
+            // Helper to show the modal; prefers Bootstrap if available, otherwise uses a lightweight JS fallback
+            function showConfirmModal(message, target) {
+                document.getElementById('confirmModalMessage').textContent = message;
+                confirmTarget = target;
+                if (bsConfirmModal) {
+                    bsConfirmModal.show();
+                    return;
+                }
+                // Lightweight fallback: toggle modal classes/styles without Bootstrap JS
+                confirmModalEl.classList.add('show');
+                confirmModalEl.style.display = 'block';
+                // add backdrop
+                let backdrop = document.getElementById('confirmModalBackdrop');
+                if (!backdrop) {
+                    backdrop = document.createElement('div');
+                    backdrop.id = 'confirmModalBackdrop';
+                    backdrop.style.position = 'fixed';
+                    backdrop.style.inset = '0';
+                    backdrop.style.background = 'rgba(0,0,0,0.5)';
+                    backdrop.style.zIndex = 1050;
+                    document.body.appendChild(backdrop);
+                } else {
+                    backdrop.style.display = 'block';
+                }
+                document.body.classList.add('modal-open');
+            }
+
+            document.querySelectorAll('[data-confirm]').forEach(function(el) {
+                if (el.tagName === 'FORM') {
+                    el.addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        var msg = el.getAttribute('data-confirm') || 'Are you sure?';
+                        showConfirmModal(msg, el);
+                    });
+                } else {
+                    el.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        var msg = el.getAttribute('data-confirm') || 'Are you sure?';
+                        showConfirmModal(msg, el);
+                    });
+                }
+            });
+
+            // Confirm button behavior
+            const confirmBtn = document.getElementById('confirmModalOk');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function() {
+                    if (!confirmTarget) return;
+                    if (confirmTarget.tagName === 'FORM') {
+                        // submit the form programmatically
+                        confirmTarget.removeAttribute('data-confirm');
+                        confirmTarget.submit();
+                    } else if (confirmTarget.tagName === 'A') {
+                        const href = confirmTarget.getAttribute('href');
+                        if (href) window.location.href = href;
+                    }
+                    // hide modal (bootstrap or fallback)
+                    if (bsConfirmModal) {
+                        bsConfirmModal.hide();
+                    } else {
+                        confirmModalEl.classList.remove('show');
+                        confirmModalEl.style.display = 'none';
+                        const backdrop = document.getElementById('confirmModalBackdrop');
+                        if (backdrop) backdrop.style.display = 'none';
+                        document.body.classList.remove('modal-open');
+                    }
+                });
+            }
         });
     </script>
+        <!-- Confirmation Modal -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmModalLabel">Please confirm</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="confirmModalMessage"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="confirmModalOk">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 @endsection 

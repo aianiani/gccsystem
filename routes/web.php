@@ -12,6 +12,15 @@ Route::get('/', function () {
     return view('home', compact('announcements'));
 })->name('home');
 
+// Redirect legacy standalone auth pages to homepage which hosts modal login/signup.
+Route::get('/login', function () {
+    return redirect()->route('home', ['showLogin' => 1]);
+})->name('login');
+
+Route::get('/register', function () {
+    return redirect()->route('home', ['showRegister' => 1]);
+})->name('register');
+
 // Public Announcements routes (viewable by guests)
 Route::get('announcements', [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
 // Constrain the wildcard so it doesn't capture "create" or other non-ID paths
@@ -21,9 +30,9 @@ Route::get('announcements/{announcement}', [App\Http\Controllers\AnnouncementCon
 
 // Guest routes
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    // We only expose POST endpoints for login/register because authentication
+    // is handled via the modal on the homepage. Remove standalone pages.
     Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 });
 

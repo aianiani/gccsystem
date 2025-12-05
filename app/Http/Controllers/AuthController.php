@@ -52,32 +52,61 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
         $user = User::where('email', $request->email)->first();
-        
+
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            
-            // Check if user is active and approved (for students)
-            if (!$user->isActive()) {
-                Auth::logout();
-                \App\Models\UserActivity::log($user->id, 'login_failed', 'Login attempt for deactivated account');
-                return redirect()->route('home')
-                    ->with('error', 'Your account has been deactivated. Please contact an administrator for assistance.');
-            }
 
-            // For students, check if registration is approved
+            // For students, check if registration is approved FIRST (before active check)
             if ($user->role === 'student' && !$user->isApproved()) {
                 Auth::logout();
                 \App\Models\UserActivity::log($user->id, 'login_failed', 'Login attempt for unapproved student registration');
+
+                $message = 'The GCC admin is reviewing your account. You will be notified via email once your registration is approved.';
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => $message,
+                    ], 403);
+                }
+
                 return redirect()->route('home')
-                    ->with('error', 'Your registration is pending approval. You will be notified via email once your account is approved by an administrator.');
+                    ->with('error', $message);
+            }
+
+            // Check if user is active
+            if (!$user->isActive()) {
+                Auth::logout();
+                \App\Models\UserActivity::log($user->id, 'login_failed', 'Login attempt for deactivated account');
+
+                $message = 'Your account has been deactivated. Please contact an administrator for assistance.';
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => $message,
+                    ], 403);
+                }
+
+                return redirect()->route('home')->with('error', $message);
             }
 
             // Check if email is verified
             if (!$user->hasVerifiedEmail()) {
                 Auth::logout();
                 \App\Models\UserActivity::log($user->id, 'login_failed', 'Login attempt with unverified email');
+
+                $message = 'Please verify your email address before logging in.';
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => $message,
+                    ], 403);
+                }
+
                 return redirect()->route('home')
-                    ->with('error', 'Please verify your email address before logging in. <a href="' . route('verification.resend') . '" class="underline">Click here to resend verification email</a>.');
+                    ->with('error', $message . ' <a href="' . route('verification.resend') . '" class="underline">Click here to resend verification email</a>.');
             }
 
             if ($user->two_factor_enabled) {
@@ -181,6 +210,14 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Please correct the errors below and try again.',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput($request->except('password', 'password_confirmation'))
@@ -204,13 +241,13 @@ class AuthController extends Controller
             $extension = $file->getClientOriginalExtension();
             // Create unique filename: timestamp_userid_originalname
             $corFileName = time() . '_' . uniqid() . '.' . $extension;
-            
+
             // Store in storage/app/public/cor_files
             $destinationPath = storage_path('app/public/cor_files');
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0755, true);
             }
-            
+
             $file->move($destinationPath, $corFileName);
         }
 
@@ -317,7 +354,7 @@ class AuthController extends Controller
             $userName = Auth::user()->name;
             // Log logout activity
             UserActivity::log(Auth::id(), 'logout', 'User logged out');
-            
+
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -409,14 +446,15 @@ class AuthController extends Controller
     }
 
     /**
-     * Show the 2FA code entry form.
+     * Show the 2FA code entry form (redirect to home with modal).
      */
     public function showTwoFactorForm(Request $request)
     {
         if (!$request->session()->has('2fa:user:id')) {
             return redirect()->route('home')->with('error', '2FA session expired. Please log in again.');
         }
-        return view('auth.twofactor');
+        // Redirect to home and open 2FA modal instead of showing separate page
+        return redirect()->route('home')->with('show_2fa_modal', true);
     }
 
     /**

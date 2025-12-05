@@ -54,6 +54,8 @@
         background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
         min-height: 100vh;
         padding: 1rem 1.5rem;
+        margin-left: 240px; /* space for fixed sidebar */
+        transition: margin-left 0.2s;
     }
 
     .main-dashboard-inner {
@@ -189,9 +191,23 @@
             width: 150px;
         }
     }
+    /* Responsive sidebar adjustments to avoid overlap */
+    @media (max-width: 991.98px) {
+        .main-dashboard-content { margin-left: 200px; }
+    }
+    @media (max-width: 767.98px) {
+        .main-dashboard-content { margin-left: 0; }
+    }
 </style>
 <div class="home-zoom">
-<div class="main-dashboard-content">
+<div class="d-flex">
+    <!-- Mobile Sidebar Toggle -->
+    <button id="counselorSidebarToggle" class="d-md-none">
+        <i class="bi bi-list"></i>
+    </button>
+    <!-- Sidebar -->
+    @include('counselor.sidebar')
+    <div class="main-dashboard-content flex-grow-1">
     <div class="main-dashboard-inner">
         <a href="{{ route('counselor.appointments.index') }}" class="btn btn-secondary mb-3" style="border-radius: 8px; display: inline-flex; align-items: center; gap: 0.5rem;"><i class="bi bi-arrow-left"></i> Back to Appointments</a>
         
@@ -220,20 +236,27 @@
             <!-- Action Buttons -->
             <div class="d-flex flex-wrap gap-2 mb-4">
                 @if($appointment->status === 'pending')
-                    <form method="POST" action="{{ route('counselor.appointments.accept', $appointment->id) }}" onsubmit="return confirm('Accept this appointment?');" style="display:inline;">
+                    <form method="POST" action="{{ route('counselor.appointments.accept', $appointment->id) }}" data-confirm="Accept this appointment?" style="display:inline;">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> Accept</button>
                     </form>
-                    <a href="{{ route('counselor.appointments.reschedule', $appointment->id) }}" class="btn btn-warning"><i class="bi bi-arrow-repeat me-1"></i> Reschedule</a>
-                    <form method="POST" action="{{ route('counselor.appointments.decline', $appointment->id) }}" onsubmit="return confirm('Decline this appointment?');" style="display:inline;">
+                    <a href="{{ route('counselor.appointments.reschedule', $appointment->id) }}" class="btn btn-warning" data-confirm="Reschedule this appointment?"><i class="bi bi-arrow-repeat me-1"></i> Reschedule</a>
+                    <form method="POST" action="{{ route('counselor.appointments.decline', $appointment->id) }}" data-confirm="Decline this appointment?" style="display:inline;">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle me-1"></i> Decline</button>
                     </form>
                 @else
                     <a href="{{ route('counselor.appointments.reschedule', $appointment->id) }}" class="btn btn-warning"><i class="bi bi-arrow-repeat me-1"></i> Reschedule</a>
-                    <form method="POST" action="{{ route('counselor.appointments.cancel', $appointment->id) }}" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                    @if($appointment->status === 'accepted')
+                        <form method="POST" action="{{ route('counselor.appointments.complete', $appointment->id) }}" data-confirm="Mark this appointment as complete?" style="display:inline;">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-success"><i class="bi bi-check2-square me-1"></i> Mark as Complete</button>
+                        </form>
+                    @endif
+                    <form method="POST" action="{{ route('counselor.appointments.cancel', $appointment->id) }}" data-confirm="Cancel this appointment?">
                         @csrf
                         <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle me-1"></i> Cancel</button>
                     </form>
@@ -320,6 +343,61 @@
                 </div>
             </div>
 
+            @if(!empty($latestAssessment))
+            <div class="info-section">
+                <div class="appointment-section-title"><i class="bi bi-clipboard-data"></i>Latest Assessment</div>
+                <div class="info-row">
+                    <div class="info-label">Assessment Type:</div>
+                    <div class="info-value">{{ $latestAssessment->type }} • {{ $latestAssessment->created_at->format('M d, Y h:i A') }}</div>
+                </div>
+                @php
+                    // Normalize score payload
+                    $laScores = is_array($latestAssessment->score) ? $latestAssessment->score : (is_string($latestAssessment->score) ? json_decode($latestAssessment->score, true) : []);
+                @endphp
+                @if($latestAssessment->type === 'DASS-42')
+                    @php
+                        $studentAnswers = [];
+                        if (!empty($laScores) && is_array($laScores)) {
+                            foreach ($laScores as $k => $v) {
+                                if (is_numeric($k)) {
+                                    $ik = (int)$k;
+                                    if ($ik >= 0 && $ik <= 41) {
+                                        $studentAnswers[$ik + 1] = (int)$v;
+                                        continue;
+                                    }
+                                }
+                                $studentAnswers[$k] = $v;
+                            }
+                        }
+                        $depressionItems = [3,5,10,13,16,17,21,24,26,31,34,37,38,42];
+                        $anxietyItems = [2,4,7,9,15,19,20,23,25,28,30,36,40,41];
+                        $stressItems = [1,6,8,11,12,14,18,22,27,29,32,33,35,39];
+                        $dep = 0; $anx = 0; $str = 0;
+                        foreach ($depressionItems as $it) { $dep += (int)($studentAnswers[$it] ?? 0); }
+                        foreach ($anxietyItems as $it) { $anx += (int)($studentAnswers[$it] ?? 0); }
+                        foreach ($stressItems as $it) { $str += (int)($studentAnswers[$it] ?? 0); }
+                    @endphp
+                    <div class="card border-0 bg-light p-3 mb-2">
+                        <div class="d-flex justify-content-between small mb-1"><div>Depression</div><div>{{ $dep }}/42</div></div>
+                        <div class="progress mb-2" style="height:8px;"><div class="progress-bar" role="progressbar" style="width: {{ min($dep/42*100,100) }}%; background-color:#0d6efd;"></div></div>
+                        <div class="d-flex justify-content-between small mb-1"><div>Anxiety</div><div>{{ $anx }}/42</div></div>
+                        <div class="progress mb-2" style="height:8px;"><div class="progress-bar" role="progressbar" style="width: {{ min($anx/42*100,100) }}%; background-color:#0099ff;"></div></div>
+                        <div class="d-flex justify-content-between small mb-1"><div>Stress</div><div>{{ $str }}/42</div></div>
+                        <div class="progress" style="height:8px;"><div class="progress-bar" role="progressbar" style="width: {{ min($str/42*100,100) }}%; background-color:#6c757d;"></div></div>
+                    </div>
+                @else
+                    <div class="info-row">
+                        <div class="info-label">Score:</div>
+                        <div class="info-value">{{ is_array($laScores) ? ($laScores['score'] ?? json_encode($laScores)) : ($latestAssessment->score ?? 'N/A') }}</div>
+                    </div>
+                @endif
+
+                <div class="mt-2">
+                    <a href="{{ route('counselor.assessments.show', $latestAssessment->id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-eye me-1"></i> View full assessment</a>
+                </div>
+            </div>
+            @endif
+
             <!-- Nature of Problem -->
             <div class="info-section">
                 <div class="appointment-section-title"><i class="bi bi-question-circle"></i>Nature of Problem</div>
@@ -377,8 +455,26 @@
                                 <div>
                                     <div class="fw-semibold">{{ $note->created_at->format('M d, Y h:i A') }}</div>
                                     <div>{{ $note->content }}</div>
+                                        <!-- Confirmation Modal -->
+                                        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="confirmModalLabel">Please confirm</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p id="confirmModalMessage"></p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="button" class="btn btn-primary" id="confirmModalOk">Confirm</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                 </div>
-                                <a href="{{ route('counselor.session_notes.edit', [$appointment->id, $note->id]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                </div>
                             </li>
                         @endforeach
                     </ul>
@@ -406,7 +502,103 @@
                 @endif
             </div>
         </div>
-    </div>
+                <script>
+                    // Sidebar toggle and confirmation handler for mobile
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const sidebar = document.querySelector('.custom-sidebar');
+                        const toggleBtn = document.getElementById('counselorSidebarToggle');
+                        if (toggleBtn && sidebar) {
+                            toggleBtn.addEventListener('click', function() {
+                                if (window.innerWidth < 768) {
+                                    sidebar.classList.toggle('show');
+                                }
+                            });
+                            document.addEventListener('click', function(e) {
+                                if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                                    const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                                    if (!clickInside) sidebar.classList.remove('show');
+                                }
+                            });
+                            document.addEventListener('keydown', function(e) {
+                                if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                                    sidebar.classList.remove('show');
+                                }
+                            });
+                        }
+                        // Confirmation handler for actions with data-confirm using Bootstrap modal
+                        const confirmModalEl = document.getElementById('confirmModal');
+                        let bsConfirmModal = null;
+                        if (confirmModalEl && typeof bootstrap !== 'undefined') {
+                            bsConfirmModal = new bootstrap.Modal(confirmModalEl, { backdrop: 'static' });
+                        }
+                        let confirmTarget = null;
+                        function showConfirmModal(message, target) {
+                            document.getElementById('confirmModalMessage').textContent = message;
+                            confirmTarget = target;
+                            if (bsConfirmModal) {
+                                bsConfirmModal.show();
+                                return;
+                            }
+                            confirmModalEl.classList.add('show');
+                            confirmModalEl.style.display = 'block';
+                            let backdrop = document.getElementById('confirmModalBackdrop');
+                            if (!backdrop) {
+                                backdrop = document.createElement('div');
+                                backdrop.id = 'confirmModalBackdrop';
+                                backdrop.style.position = 'fixed';
+                                backdrop.style.inset = '0';
+                                backdrop.style.background = 'rgba(0,0,0,0.5)';
+                                backdrop.style.zIndex = 1050;
+                                document.body.appendChild(backdrop);
+                            } else {
+                                backdrop.style.display = 'block';
+                            }
+                            document.body.classList.add('modal-open');
+                        }
+
+                        document.querySelectorAll('[data-confirm]').forEach(function(el) {
+                            if (el.tagName === 'FORM') {
+                                el.addEventListener('submit', function(event) {
+                                    event.preventDefault();
+                                    var msg = el.getAttribute('data-confirm') || 'Are you sure?';
+                                    showConfirmModal(msg, el);
+                                });
+                            } else {
+                                el.addEventListener('click', function(event) {
+                                    event.preventDefault();
+                                    var msg = el.getAttribute('data-confirm') || 'Are you sure?';
+                                    showConfirmModal(msg, el);
+                                });
+                            }
+                        });
+
+                        // Confirm button behavior
+                        const confirmBtn = document.getElementById('confirmModalOk');
+                        if (confirmBtn) {
+                            confirmBtn.addEventListener('click', function() {
+                                if (!confirmTarget) return;
+                                if (confirmTarget.tagName === 'FORM') {
+                                    confirmTarget.removeAttribute('data-confirm');
+                                    confirmTarget.submit();
+                                } else if (confirmTarget.tagName === 'A') {
+                                    const href = confirmTarget.getAttribute('href');
+                                    if (href) window.location.href = href;
+                                }
+                                if (bsConfirmModal) {
+                                    bsConfirmModal.hide();
+                                } else {
+                                    confirmModalEl.classList.remove('show');
+                                    confirmModalEl.style.display = 'none';
+                                    const backdrop = document.getElementById('confirmModalBackdrop');
+                                    if (backdrop) backdrop.style.display = 'none';
+                                    document.body.classList.remove('modal-open');
+                                }
+                            });
+                        }
+                    });
+                </script>
+            </div>
+            </div>
 </div>
 </div>
 @endsection 
