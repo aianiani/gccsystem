@@ -830,89 +830,169 @@
 <!-- Notification Bell Dropdown at Top Right -->
 <style>
     .notification-bell {
-        background: transparent;
+        background: white;
         border: none;
         outline: none;
-        box-shadow: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         position: relative;
-        transition: color 0.2s;
+        transition: all 0.3s ease;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .notification-bell:hover {
+        background: var(--yellow-maize);
+        box-shadow: 0 6px 20px rgba(255, 203, 5, 0.4);
+        transform: translateY(-2px);
     }
     .notification-bell .bi-bell {
         color: var(--forest-green);
-        font-size: 2.2rem;
-        transition: color 0.2s;
-    }
-    .notification-bell.pulse .bi-bell {
-        animation: bell-pulse 1.2s infinite;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
     }
     .notification-bell:hover .bi-bell {
-        color: var(--yellow-maize);
+        color: var(--forest-green);
+        transform: scale(1.1);
     }
-    @keyframes bell-pulse {
-        0% { filter: drop-shadow(0 0 0 var(--yellow-maize)); }
-        70% { filter: drop-shadow(0 0 8px var(--yellow-maize)); }
-        100% { filter: drop-shadow(0 0 0 var(--yellow-maize)); }
+    .notification-bell.pulse {
+        animation: bell-shake 0.5s ease-in-out infinite;
+    }
+    @keyframes bell-shake {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-10deg); }
+        75% { transform: rotate(10deg); }
     }
     .notification-bell-badge {
-        background: var(--yellow-maize);
-        color: var(--forest-green);
+        background: var(--danger);
+        color: white;
         font-weight: bold;
-        font-size: 0.9rem;
+        font-size: 0.75rem;
         border: 2px solid #fff;
-        box-shadow: 0 2px 8px rgba(244, 208, 63, 0.25);
-        padding: 0.2em 0.7em;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+        padding: 0.2em 0.5em;
         border-radius: 999px;
-        top: 0;
-        right: 0;
+        top: -4px;
+        right: -4px;
     }
     .notification-dropdown-menu {
-        min-width: 340px;
+        min-width: 400px;
         max-width: 95vw;
-        border-radius: 16px;
-        box-shadow: 0 1px 3px var(--shadow-sm), 0 20px 40px var(--shadow-md), 0 0 0 1px rgba(0,0,0,0.02);
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         border: none;
-        padding: 0.5rem 0;
-        margin-top: 0.5rem;
-        background: var(--gray-100);
+        padding: 0;
+        margin-top: 0.75rem;
+        background: white;
+        overflow: hidden;
     }
     .notification-dropdown-header {
-        background: var(--forest-green-lighter);
-        color: var(--forest-green);
+        background: linear-gradient(135deg, var(--forest-green), var(--forest-green-light));
+        color: white;
         font-weight: 700;
-        border-radius: 16px 16px 0 0;
-        padding: 1rem 1.5rem;
-        font-size: 1.08rem;
-        border-bottom: 1px solid var(--gray-100);
+        padding: 1.25rem 1.5rem;
+        font-size: 1.1rem;
+        border-bottom: none;
         font-family: inherit;
     }
     .notification-item {
         display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 1rem 1.5rem;
-        font-size: 1rem;
-        background: transparent;
-        transition: background 0.18s;
-        border-bottom: 1px solid var(--gray-50);
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        font-size: 0.95rem;
+        background: white;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f0f0f0;
         font-family: inherit;
+        position: relative;
     }
     .notification-item:last-child {
         border-bottom: none;
     }
     .notification-item:hover {
-        background: var(--yellow-maize-light);
+        background: #f8f9fa;
+    }
+    .notification-item .notification-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .notification-item .notification-icon i {
+        color: #1976d2;
+        font-size: 1.1rem;
+    }
+    .notification-item .notification-content {
+        flex: 1;
+        line-height: 1.5;
+        color: #333;
+    }
+    .notification-item .notification-content strong {
+        color: var(--forest-green);
+        font-weight: 600;
+    }
+    .notification-item .notification-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        align-items: center !important;
+    }
+    .notification-item .btn-view {
+        background: var(--forest-green);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        transition: all 0.2s;
+        padding: 0;
+    }
+    .notification-item .btn-view:hover {
+        background: var(--forest-green-light);
+        transform: scale(1.1);
     }
     .notification-item .btn-link {
-        color: var(--danger);
-        font-size: 1.1rem;
-        margin-left: 0.5rem;
+        color: #dc3545;
+        font-size: 1rem;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: all 0.2s;
+        background: none;
+        border: none;
+        border-radius: 50%;
+    }
+    .notification-item .btn-link:hover {
+        color: #c82333;
+        background: rgba(220, 53, 69, 0.1);
+        transform: scale(1.1);
     }
     .notification-empty {
-        padding: 1.2rem 1.5rem;
-        color: var(--gray-600);
+        padding: 2.5rem 1.5rem;
+        color: #999;
         text-align: center;
-        font-size: 1rem;
+        font-size: 0.95rem;
         font-family: inherit;
+    }
+    .notification-empty i {
+        font-size: 2.5rem;
+        color: #ddd;
+        margin-bottom: 0.75rem;
+        display: block;
     }
     @media (max-width: 500px) {
         .notification-dropdown-menu {
@@ -934,41 +1014,64 @@
 @endphp
 <div class="dropdown me-3" style="position: fixed; top: 1.5rem; right: 2.5rem; z-index: 2000;">
     <button class="btn notification-bell position-relative p-0{{ $unreadCount > 0 ? ' pulse' : '' }}" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="bi bi-bell fs-4" style="color: var(--yellow-maize);"></i>
+        <i class="bi bi-bell"></i>
         @if($unreadCount > 0)
-            <span class="position-absolute top-0 start-100 translate-middle badge notification-bell-badge" style="background: var(--yellow-maize); color: var(--forest-green); font-weight: bold; font-size: 0.85rem; border: 2px solid #fff;">
+            <span class="position-absolute top-0 start-100 translate-middle badge notification-bell-badge">
                 {{ $unreadCount }}
             </span>
         @endif
     </button>
-    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" style="min-width: 320px;">
-        <li class="dropdown-header fw-bold">Notifications</li>
+    <ul class="dropdown-menu dropdown-menu-end notification-dropdown-menu" aria-labelledby="notificationDropdown">
+        <li class="notification-dropdown-header">Notifications</li>
         @forelse($recentNotifications as $notification)
-            <li class="px-3 py-2 border-bottom small d-flex align-items-center gap-2">
-                @if(isset($notification->data['appointment_id']))
-                    <i class="bi bi-calendar-event text-primary"></i>
-                @else
-                    <i class="bi bi-info-circle text-info"></i>
-                @endif
-                <div class="flex-grow-1">
-                    {{ $notification->data['message'] ?? 'You have a new notification.' }}
+            <li class="notification-item">
+                <div class="notification-icon">
                     @if(isset($notification->data['appointment_id']))
-                        <a href="{{ route('counselor.appointments.show', $notification->data['appointment_id']) }}" class="ms-2 fw-bold">View</a>
+                        <i class="bi bi-calendar-check"></i>
+                    @else
+                        <i class="bi bi-info-circle"></i>
                     @endif
                 </div>
-                <form method="POST" action="{{ route('notifications.markAsRead', $notification->id) }}">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Mark as read"><i class="bi bi-x-circle"></i></button>
-                </form>
+                <div class="notification-content">
+                    {{ $notification->data['message'] ?? 'You have a new notification.' }}
+                </div>
+                <div class="notification-actions">
+                    @if(isset($notification->data['appointment_id']))
+                        <a href="{{ route('counselor.appointments.show', $notification->data['appointment_id']) }}" class="btn-view" title="View Details">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    @endif
+                    <form method="POST" action="{{ route('notifications.markAsRead', $notification->id) }}" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-link" title="Dismiss">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </form>
+                </div>
             </li>
         @empty
-            <li class="px-3 py-2 text-muted small">No new notifications</li>
+            <li class="notification-empty">
+                <i class="bi bi-bell-slash"></i>
+                <div>No new notifications</div>
+            </li>
         @endforelse
     </ul>
 </div>
 
     </style>
     
+    <script>
+        // Shake notification bell only once on page load if there are unread notifications
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationBell = document.getElementById('notificationDropdown');
+            if (notificationBell && notificationBell.classList.contains('pulse')) {
+                // Shake for 2 seconds then remove the pulse class
+                setTimeout(function() {
+                    notificationBell.classList.remove('pulse');
+                }, 2000);
+            }
+        });
+    </script>
 
     <div class="home-zoom">
     <div class="d-flex">
@@ -982,33 +1085,6 @@
         <!-- Main Content -->
         <div class="main-dashboard-content flex-grow-1">
             <div class="main-dashboard-inner">
-        {{-- Notification Section --}}
-        @php
-            $unreadNotifications = auth()->user()->unreadNotifications()->take(5)->get();
-        @endphp
-        @if($unreadNotifications->count())
-            <div class="mb-4">
-                @foreach($unreadNotifications as $notification)
-                    <div class="alert alert-info alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
-                        @if(isset($notification->data['appointment_id']))
-                            <i class="bi bi-calendar-event fs-5"></i>
-                        @else
-                            <i class="bi bi-info-circle fs-5"></i>
-                        @endif
-                        <div>
-                            {{ $notification->data['message'] ?? 'You have a new notification.' }}
-                            @if(isset($notification->data['appointment_id']))
-                                <a href="{{ route('counselor.appointments.show', $notification->data['appointment_id']) }}" class="ms-2 fw-bold">View</a>
-                            @endif
-                        </div>
-                        <form method="POST" action="{{ route('notifications.markAsRead', $notification->id) }}" class="ms-auto">
-                            @csrf
-                            <button type="submit" class="btn-close" aria-label="Close"></button>
-                        </form>
-                    </div>
-                @endforeach
-            </div>
-        @endif
             <div class="welcome-card">
                 <div>
                     <div class="welcome-date">{{ now()->format('F j, Y') }}</div>

@@ -54,38 +54,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', UserController::class);
         Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::get('/activities', [DashboardController::class, 'activities'])->name('activities');
-        Route::get('/admin/logs', function () {
-            return view('admin.logs');
-        })->name('admin.logs');
 
-        // Individual log sections
-        Route::get('/admin/logs/users', function () {
-            return view('admin.logs.users');
-        })->name('admin.logs.users');
-
-        Route::get('/admin/logs/appointments', function () {
-            return view('admin.logs.appointments');
-        })->name('admin.logs.appointments');
-
-        Route::get('/admin/logs/session-notes', function () {
-            return view('admin.logs.session-notes');
-        })->name('admin.logs.session-notes');
-
-        Route::get('/admin/logs/session-feedbacks', function () {
-            return view('admin.logs.session-feedbacks');
-        })->name('admin.logs.session-feedbacks');
-
-        Route::get('/admin/logs/assessments', function () {
-            return view('admin.logs.assessments');
-        })->name('admin.logs.assessments');
-
-        Route::get('/admin/logs/messages', function () {
-            return view('admin.logs.messages');
-        })->name('admin.logs.messages');
-
-        Route::get('/admin/logs/activities', function () {
-            return view('admin.logs.activities');
-        })->name('admin.logs.activities');
 
         // Registration Approval Routes
         Route::prefix('admin/registration-approvals')->name('admin.registration-approvals.')->group(function () {
@@ -99,6 +68,7 @@ Route::middleware('auth')->group(function () {
         Route::get('announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
         Route::post('announcements', [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
         Route::get('announcements/{announcement}/edit', [App\Http\Controllers\AnnouncementController::class, 'edit'])->name('announcements.edit');
+        Route::delete('announcements/{announcement}/images/{index}', [App\Http\Controllers\AnnouncementController::class, 'deleteImage'])->name('announcements.deleteImage');
         Route::put('announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     });
@@ -127,8 +97,9 @@ Route::middleware('auth')->group(function () {
         Route::get('assessments', [App\Http\Controllers\AssessmentController::class, 'index'])->name('assessments.index');
         Route::get('assessments/dass42', [App\Http\Controllers\AssessmentController::class, 'dass42Page'])->name('assessments.dass42');
         Route::post('assessments/dass42', [App\Http\Controllers\AssessmentController::class, 'submitDass42'])->name('assessments.dass42.submit');
-        Route::post('assessments/academic', [App\Http\Controllers\AssessmentController::class, 'submitAcademicSurvey'])->name('assessments.academic.submit');
-        Route::post('assessments/wellness', [App\Http\Controllers\AssessmentController::class, 'submitWellnessCheck'])->name('assessments.wellness.submit');
+        Route::post('assessments/grit', [App\Http\Controllers\AssessmentController::class, 'submitGrit'])->name('assessments.grit.submit');
+        Route::post('assessments/neo', [App\Http\Controllers\AssessmentController::class, 'submitNeo'])->name('assessments.neo.submit');
+        Route::post('assessments/wvi', [App\Http\Controllers\AssessmentController::class, 'submitWvi'])->name('assessments.wvi.submit');
 
         // Consent routes
         Route::get('consent', [App\Http\Controllers\ConsentController::class, 'show'])->name('consent.show');
@@ -248,11 +219,9 @@ Route::middleware('admin')->get('test-admin', function () {
 Route::get('/counselor/assessments/{assessment}/export', [App\Http\Controllers\AssessmentController::class, 'exportPdf'])->name('counselor.assessments.export');
 Route::post('/counselor/assessments/{assessment}/save-notes', [App\Http\Controllers\AssessmentController::class, 'saveNotes'])->name('counselor.assessments.saveNotes');
 
-// Admin Logs Export & Reset
-Route::middleware(['auth', 'admin'])->prefix('admin/logs')->name('admin.logs.')->group(function () {
-    Route::get('export/{format}', [App\Http\Controllers\AdminLogsController::class, 'export'])->name('export');
-    Route::post('reset', [App\Http\Controllers\AdminLogsController::class, 'reset'])->name('reset');
+// Admin Reports
+Route::middleware(['auth', 'admin'])->prefix('admin/reports')->name('admin.reports.')->group(function () {
+    Route::get('/', [App\Http\Controllers\AdminReportsController::class, 'index'])->name('index');
+    Route::get('/export/{format}', [App\Http\Controllers\AdminReportsController::class, 'export'])->name('export');
 });
-
-Route::post('admin/logs/{type}/reset', [App\Http\Controllers\AdminLogsController::class, 'reset'])->name('admin.logs.reset');
 

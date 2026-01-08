@@ -27,7 +27,14 @@ class AppointmentBookedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        $channels = ['mail', 'database'];
+
+        // Add SMS channel if user has SMS enabled
+        if ($notifiable->sms_notifications_enabled && !empty($notifiable->contact_number)) {
+            $channels[] = \App\Notifications\Channels\SmsChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -36,15 +43,20 @@ class AppointmentBookedNotification extends Notification
     public function toMail($notifiable)
     {
         $student = $this->appointment->student;
-        $start = $this->appointment->scheduled_at->format('M d, Y');
-        $time = $this->appointment->scheduled_at->format('g:i A');
-        return (new MailMessage)
+        $counselor = $notifiable;
+        $appointment = $this->appointment;
+
+        $message = (new MailMessage)
             ->subject('New Appointment Booked')
-            ->greeting('Hello!')
-            ->line("A new appointment has been booked by {$student->name}.")
-            ->line("Date: {$start}")
-            ->line("Time: {$time}")
-            ->action('View Appointment', url('/counselor/appointments/' . $this->appointment->id));
+            ->view('emails.appointments.booked', compact('student', 'counselor', 'appointment'));
+
+        // Embed logo
+        $logoPath = public_path('images/logo.jpg');
+        if (file_exists($logoPath)) {
+            $message->embed($logoPath, 'logo');
+        }
+
+        return $message;
     }
 
     /**
@@ -60,4 +72,20 @@ class AppointmentBookedNotification extends Notification
             'url' => url('/counselor/appointments/' . $this->appointment->id),
         ];
     }
-} 
+
+    /**
+     * Get the SMS representation of the notification.
+     */
+    public function toSms($notifiable)
+    {
+        $student = $this->appointment->student;
+        $date = $this->appointment->scheduled_at->format('M d');
+        $time = $this->appointment->scheduled_at->format('g:iA');
+        $ref = $this->appointment->reference_number;
+
+        return [
+            'message' => "New appointment: {$student->name} on {$date} at {$time}. Ref: {$ref}",
+            'type' => 'appointment_booked',
+        ];
+    }
+}

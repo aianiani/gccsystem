@@ -44,16 +44,21 @@ class AppointmentRescheduleAcceptedNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        $student = $this->appointment->student;
-        $newDate = $this->appointment->scheduled_at->format('F j, Y');
-        $newTime = $this->appointment->scheduled_at->format('g:i A');
-        return (new MailMessage)
-            ->subject('Rescheduled Appointment Accepted by Student')
-            ->greeting('Hello ' . $notifiable->name . ',')
-            ->line('The rescheduled date of ' . $this->oldDateTime . ' has been accepted by ' . ($student ? $student->name : 'the student') . '.')
-            ->line('New scheduled appointment date and time is: ' . $newDate . ' at ' . $newTime)
-            ->action('View Appointment', url('/counselor/appointments/' . $this->appointment->id))
-            ->line('Thank you for using our counseling services!');
+        $recipient = $notifiable;
+        $appointment = $this->appointment;
+        $isStudent = $notifiable->role === 'student';
+        $otherParty = $isStudent ? $appointment->counselor : $appointment->student;
+
+        $message = (new MailMessage)
+            ->subject('Reschedule Confirmed')
+            ->view('emails.appointments.reschedule_accepted', compact('recipient', 'appointment', 'isStudent', 'otherParty'));
+
+        $logoPath = public_path('images/logo.jpg');
+        if (file_exists($logoPath)) {
+            $message->embed($logoPath, 'logo');
+        }
+
+        return $message;
     }
 
     /**
@@ -72,4 +77,4 @@ class AppointmentRescheduleAcceptedNotification extends Notification
             'url' => url('/counselor/appointments/' . $this->appointment->id),
         ];
     }
-} 
+}

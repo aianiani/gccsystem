@@ -12,8 +12,9 @@ class AssessmentController extends Controller
     {
         return view('assessments', [
             'dass42_questions' => $this->getDass42Questions(),
-            'academic_questions' => $this->getAcademicQuestions(),
-            'wellness_questions' => $this->getWellnessQuestions(),
+            'grit_questions' => $this->getGritQuestions(),
+            'neo_questions' => $this->getNeoQuestions(),
+            'wvi_questions' => $this->getWviQuestions(),
         ]);
     }
 
@@ -89,11 +90,11 @@ class AssessmentController extends Controller
         foreach ($answers as $k => $v) {
             // If answers come as 0-indexed numeric array (keys may be strings), shift to 1-indexed
             if (is_numeric($k)) {
-                $idx = (int)$k + 1;
+                $idx = (int) $k + 1;
             } else {
                 $idx = $k;
             }
-            $answers_assoc[$idx] = (int)$v;
+            $answers_assoc[$idx] = (int) $v;
         }
 
         // Merge per-question answers with the computed subscale totals so existing views
@@ -110,75 +111,171 @@ class AssessmentController extends Controller
             'risk_level' => $risk_level,
             'student_comment' => $comment,
         ]);
-        
+
         // After completing the assessment send user to booking (appointments.create)
         return redirect()->route('appointments.create')
             ->with('success', 'DASS-42 assessment completed successfully. You may now continue to booking.');
     }
 
     // Counselor: View all DASS-42 assessment results
-    public function counselorIndex()
+    public function counselorIndex(Request $request)
     {
         // Only allow counselors
         if (!auth()->user()->isCounselor()) {
             abort(403);
         }
-        $assessments = \App\Models\Assessment::with('user')
-            ->orderByDesc('created_at')
-            ->paginate(20);
+
+        $query = \App\Models\Assessment::with('user')
+            ->orderByDesc('created_at');
+
+        // Filter by Assessment Type
+        if ($request->filled('type')) {
+            $query->where('type', $request->input('type'));
+        }
+
+        // Filter by Date Range
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->input('date_from'));
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->input('date_to'));
+        }
+
+        // Filter by Student Name or Email
+        if ($request->filled('student')) {
+            $search = $request->input('student');
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Filter by College
+        if ($request->filled('college')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                // Assuming 'college' is a column on the users table
+                $q->where('college', $request->input('college'));
+            });
+        }
+
+        // Filter by Year Level
+        if ($request->filled('year')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                // Assuming 'year_level' or 'year' is the column
+                $q->where(function ($sub) use ($request) {
+                    $sub->where('year_level', $request->input('year'))
+                        ->orWhere('year', $request->input('year'));
+                });
+            });
+        }
+
+        // Filter by Gender
+        if ($request->filled('gender')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('gender', $request->input('gender'));
+            });
+        }
+
+        $assessments = $query->paginate(20)->withQueryString();
+
         return view('counselor.assessments.index', compact('assessments'));
     }
 
-    // Handle Academic Stress Survey submission
-    public function submitAcademicSurvey(Request $request)
+    // Handle GRIT Scale submission
+    public function submitGrit(Request $request)
     {
+        $questions = $this->getGritQuestions();
         $request->validate([
-            'academic_answers' => 'required|array|size:15',
-            'academic_answers.*' => 'required|in:0,1,2,3',
+            'grit_answers' => 'required|array|size:' . count($questions),
+            'grit_answers.*' => 'required|in:1,2,3,4,5',
         ]);
-        $score = array_sum($request->input('academic_answers'));
-        $risk_level = 'normal';
-        if ($score >= 30) {
-            $risk_level = 'high';
-        } elseif ($score >= 20) {
-            $risk_level = 'moderate';
+
+        // GRIT Scoring (Reverse scored items: 1, 3, 5, 6 in 8-item scale)
+        // 1=Not at all like me, 5=Very much like me
+        $reverse_items = [0, 2, 4, 5]; // 0-indexed indices for Q1, Q3, Q5, Q6
+        $score = 0;
+        $answers = $request->input('grit_answers');
+
+        foreach ($answers as $idx => $val) {
+            $val = (int) $val;
+            if (in_array($idx, $reverse_items)) {
+                // Reverse: 1->5, 2->4, 3->3, 4->2, 5->1
+                $score += (6 - $val);
+            } else {
+                $score += $val;
+            }
         }
+        $final_score = $score / count($questions); // Average score 1-5
+
+        $risk_level = 'low'; // High grit = low risk? Or just categorized.
+        // Interpretation: 
+        // 4.5-5: Extremely Gritty
+        // 4.0-4.4: Very Gritty
+        // 3.5-3.9: Gritty
+        // 3.0-3.4: Somewhat Gritty
+        // <3.0: Not Gritty
+
+        // Mapping to system "risk_level" (used for flagging purposes)
+        // perhaps "high" risk if low grit?
+        if ($final_score < 3.0)
+            $risk_level = 'high';
+        elseif ($final_score < 3.5)
+            $risk_level = 'moderate';
+
         $comment = $request->input('student_comment');
 
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
-            'type' => 'Academic Stress Survey',
-            'score' => $score,
+            'type' => 'GRIT Scale',
+            'score' => number_format($final_score, 2),
             'risk_level' => $risk_level,
             'student_comment' => $comment,
         ]);
-        return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'Academic Stress Survey']);
+        return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'GRIT Scale']);
     }
 
-    // Handle Wellness Check submission
-    public function submitWellnessCheck(Request $request)
+    // Handle NEO-FFI submission
+    public function submitNeo(Request $request)
     {
+        $questions = $this->getNeoQuestions();
         $request->validate([
-            'wellness_answers' => 'required|array|size:12',
-            'wellness_answers.*' => 'required|in:0,1,2,3',
+            'neo_answers' => 'required|array|size:' . count($questions),
+            'neo_answers.*' => 'required|in:1,2,3,4,5',
         ]);
-        $score = array_sum($request->input('wellness_answers'));
-        $risk_level = 'normal';
-        if ($score >= 24) {
-            $risk_level = 'high';
-        } elseif ($score >= 16) {
-            $risk_level = 'moderate';
-        }
-        $comment = $request->input('student_comment');
+
+        // Simple aggregate for demo purposes (real scoring is complex)
+        $answers = $request->input('neo_answers');
+        $scorePayload = $answers;
 
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
-            'type' => 'Wellness Check',
-            'score' => $score,
-            'risk_level' => $risk_level,
-            'student_comment' => $comment,
+            'type' => 'NEO-PI-R',
+            'score' => json_encode($scorePayload),
+            'risk_level' => 'normal', // Personality has no inherent risk
+            'student_comment' => $request->input('student_comment'),
         ]);
-        return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'Wellness Check']);
+        return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'NEO-PI-R']);
+    }
+
+    // Handle Work Values Inventory submission
+    public function submitWvi(Request $request)
+    {
+        $questions = $this->getWviQuestions();
+        $request->validate([
+            'wvi_answers' => 'required|array|size:' . count($questions),
+            'wvi_answers.*' => 'required|in:1,2,3,4,5',
+        ]);
+
+        $scorePayload = $request->input('wvi_answers');
+
+        $assessment = \App\Models\Assessment::create([
+            'user_id' => auth()->id(),
+            'type' => 'Work Values Inventory',
+            'score' => json_encode($scorePayload),
+            'risk_level' => 'normal',
+            'student_comment' => $request->input('student_comment'),
+        ]);
+        return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'Work Values Inventory']);
     }
 
     // Helper for DASS-42 questions
@@ -229,43 +326,53 @@ class AssessmentController extends Controller
             'I found it difficult to work up the initiative to do things',
         ];
     }
-    // Helper for Academic Stress Survey questions
-    private function getAcademicQuestions()
+
+    // Helper for GRIT questions (Short Grit Scale)
+    private function getGritQuestions()
     {
         return [
-            'I feel overwhelmed by my academic workload.',
-            'I have trouble meeting assignment deadlines.',
-            'I worry about my grades and academic performance.',
-            'I find it hard to balance school and personal life.',
-            'I feel pressure to succeed academically.',
-            'I have difficulty concentrating on my studies.',
-            'I feel anxious before exams or presentations.',
-            'I struggle to keep up with class material.',
-            'I feel unsupported by teachers or peers.',
-            'I have trouble sleeping due to academic stress.',
-            'I feel like giving up on my studies.',
-            'I avoid academic tasks because of stress.',
-            'I feel isolated or alone in my academic journey.',
-            'I experience physical symptoms (e.g., headaches) due to stress.',
-            'I find it hard to relax after schoolwork.',
+            'New ideas and projects sometimes distract me from previous ones.',
+            'Setbacks don\'t discourage me. I don\'t give up easily.',
+            'I have been obsessed with a certain idea or project for a short time but later lost interest.',
+            'I am a hard worker.',
+            'I often set a goal but later choose to pursue a different one.',
+            'I have difficulty maintaining my focus on projects that take more than a few months to complete.',
+            'I finish whatever I begin.',
+            'I am diligent. I never give up.',
         ];
     }
-    // Helper for Wellness Check questions
-    private function getWellnessQuestions()
+
+    // Helper for NEO questions (Short Big Five)
+    private function getNeoQuestions()
     {
         return [
-            'I feel energetic and motivated most days.',
-            'I am able to manage my emotions effectively.',
-            'I have a strong support system of friends or family.',
-            'I feel satisfied with my personal relationships.',
-            'I am able to cope with daily stressors.',
-            'I feel confident in my ability to handle challenges.',
-            'I take time for self-care and relaxation.',
-            'I feel a sense of purpose in my life.',
-            'I am able to maintain a healthy work-life balance.',
-            'I feel optimistic about my future.',
-            'I am able to adapt to changes in my life.',
-            'I feel content and at peace with myself.',
+            'I am the life of the party.',
+            'I feel little concern for others.',
+            'I am always prepared.',
+            'I get stressed out easily.',
+            'I have a rich vocabulary.',
+            'I don\'t talk a lot.',
+            'I am interested in people.',
+            'I leave my belongings around.',
+            'I am relaxed most of the time.',
+            'I have difficulty understanding abstract ideas.',
+        ];
+    }
+
+    // Helper for WVI questions
+    private function getWviQuestions()
+    {
+        return [
+            'It is important to me to have a secure job.',
+            'I want to help others in my work.',
+            'High income is my top priority.',
+            'I want to be creative and original in my work.',
+            'I prefer to work independently.',
+            'I want a job with prestige and status.',
+            'I value variety and change in my work.',
+            'I want to have authority over others.',
+            'I want to work in a pleasant environment.',
+            'I want a job that contributes to society.',
         ];
     }
 
@@ -325,6 +432,6 @@ class AssessmentController extends Controller
         }
 
         $pdf = Pdf::loadView('counselor.assessments.export', $viewData);
-        return $pdf->download('assessment-summary-'.$assessment->id.'.pdf');
+        return $pdf->download('assessment-summary-' . $assessment->id . '.pdf');
     }
-} 
+}

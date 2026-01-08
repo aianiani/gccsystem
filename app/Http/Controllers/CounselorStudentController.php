@@ -60,13 +60,7 @@ class CounselorStudentController extends Controller
             ->sort()
             ->values();
 
-        $courses = User::where('role', 'student')
-            ->whereNotNull('course')
-            ->distinct()
-            ->pluck('course')
-            ->filter()
-            ->sort()
-            ->values();
+
 
         $yearLevels = User::where('role', 'student')
             ->whereNotNull('year_level')
@@ -76,7 +70,36 @@ class CounselorStudentController extends Controller
             ->sort()
             ->values();
 
-        return view('counselor.students.index', compact('students', 'colleges', 'courses', 'yearLevels'));
+        // Summary Statistics
+        $totalStudents = User::where('role', 'student')->count();
+
+        // Year Level Counts
+        $rawYearStats = User::where('role', 'student')
+            ->selectRaw('year_level, count(*) as count')
+            ->groupBy('year_level')
+            ->pluck('count', 'year_level')
+            ->toArray();
+
+        // Normalize keys (e.g., "1st Year" -> 1)
+        $yearStats = [];
+        foreach ($rawYearStats as $key => $value) {
+            // Extract the first digit
+            if (preg_match('/(\d+)/', $key, $matches)) {
+                $yearStats[$matches[1]] = $value;
+            } else {
+                // specific fallback or ignore nulls
+                // For now, let's assume if it has a number, that's the year.
+            }
+        }
+
+        // Gender Counts
+        $genderStats = User::where('role', 'student')
+            ->selectRaw('gender, count(*) as count')
+            ->groupBy('gender')
+            ->pluck('count', 'gender')
+            ->toArray();
+
+        return view('counselor.students.index', compact('students', 'colleges', 'yearLevels', 'totalStudents', 'yearStats', 'genderStats'));
     }
 
     /**

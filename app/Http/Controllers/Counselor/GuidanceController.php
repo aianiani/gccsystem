@@ -18,7 +18,7 @@ class GuidanceController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('id_number', 'like', "%{$search}%");
+                    ->orWhere('student_id', 'like', "%{$search}%");
             });
         }
 
@@ -27,7 +27,7 @@ class GuidanceController extends Controller
         }
 
         if ($request->has('college') && $request->college) {
-            $query->where('college', $request->college);
+            $query->where('college', 'like', '%' . $request->college . '%');
         }
 
         $students = $query->paginate(10)->withQueryString();

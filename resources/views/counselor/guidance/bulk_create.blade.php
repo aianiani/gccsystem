@@ -330,20 +330,26 @@
                                         <label for="college" class="block text-sm font-medium text-gray-700 mb-2">College (Optional)</label>
                                         <select name="college" id="college" class="form-select-custom w-full">
                                             <option value="">All Colleges</option>
-                                            @foreach($colleges as $college)
-                                                <option value="{{ $college }}" {{ request('college') == $college ? 'selected' : '' }}>{{ $college }}</option>
-                                            @endforeach
+                                            <option value="College of Arts and Sciences" {{ request('college') == 'College of Arts and Sciences' ? 'selected' : '' }}>College of Arts and Sciences</option>
+                                            <option value="College of Veterinary Medicine" {{ request('college') == 'College of Veterinary Medicine' ? 'selected' : '' }}>College of Veterinary Medicine</option>
+                                            <option value="College of Forestry and Environmental Sciences" {{ request('college') == 'College of Forestry and Environmental Sciences' ? 'selected' : '' }}>College of Forestry and Environmental Sciences</option>
+                                            <option value="College of Business and Management" {{ request('college') == 'College of Business and Management' ? 'selected' : '' }}>College of Business and Management</option>
+                                            <option value="College of Nursing" {{ request('college') == 'College of Nursing' ? 'selected' : '' }}>College of Nursing</option>
+                                            <option value="College of Human Ecology" {{ request('college') == 'College of Human Ecology' ? 'selected' : '' }}>College of Human Ecology</option>
+                                            <option value="College of Agriculture" {{ request('college') == 'College of Agriculture' ? 'selected' : '' }}>College of Agriculture</option>
+                                            <option value="College of Information Science and Computing" {{ request('college') == 'College of Information Science and Computing' ? 'selected' : '' }}>College of Information Science and Computing</option>
+                                            <option value="College of Education" {{ request('college') == 'College of Education' ? 'selected' : '' }}>College of Education</option>
+                                            <option value="College of Engineering" {{ request('college') == 'College of Engineering' ? 'selected' : '' }}>College of Engineering</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label for="seminar_id" class="block text-sm font-medium text-gray-700 mb-2">Seminar</label>
-                                        <select name="seminar_id" id="seminar_id" class="form-select-custom w-full" required>
+                                        <label for="seminar_name" class="block text-sm font-medium text-gray-700 mb-2">Seminar</label>
+                                        <select name="seminar_name" id="seminar_name" class="form-select-custom w-full" required>
                                             <option value="">Select Seminar</option>
-                                            @foreach($seminars as $seminar)
-                                                <option value="{{ $seminar->id }}" {{ request('seminar_id') == $seminar->id ? 'selected' : '' }}>
-                                                    {{ $seminar->name }} (Year {{ $seminar->target_year_level }})
-                                                </option>
-                                            @endforeach
+                                            <option value="IDREAMS" {{ request('seminar_name') == 'IDREAMS' ? 'selected' : '' }}>IDREAMS (Year 1)</option>
+                                            <option value="10C" {{ request('seminar_name') == '10C' ? 'selected' : '' }}>10C (Year 2)</option>
+                                            <option value="LEADS" {{ request('seminar_name') == 'LEADS' ? 'selected' : '' }}>LEADS (Year 3)</option>
+                                            <option value="IMAGE" {{ request('seminar_name') == 'IMAGE' ? 'selected' : '' }}>IMAGE (Year 4)</option>
                                         </select>
                                     </div>
                                     <div>
@@ -354,7 +360,7 @@
                         </div>
                     </div>
 
-                    @if(request('year_level') && request('seminar_id'))
+                    @if(request('year_level') && request('seminar_name'))
                         <div class="content-card mb-6">
                             <div class="card-header-custom d-flex justify-content-between align-items-center">
                                 <h3 class="text-lg font-bold text-gray-800 m-0">Step 2: Select Students</h3>
@@ -368,7 +374,7 @@
                             <form action="{{ route('counselor.guidance.bulk.store') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="year_level" value="{{ request('year_level') }}">
-                                <input type="hidden" name="seminar_id" value="{{ request('seminar_id') }}">
+                                <input type="hidden" name="seminar_name" value="{{ request('seminar_name') }}">
 
                                 <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
                                     <table class="min-w-full table-custom">
@@ -387,7 +393,7 @@
                                         <tbody>
                                             @forelse ($students as $student)
                                                 @php
-                                                    $seminarName = \App\Models\Seminar::find(request('seminar_id'))->name;
+                                                    $seminarName = request('seminar_name');
                                                     $isAttended = \App\Models\SeminarAttendance::where('user_id', $student->id)
                                                         ->where('seminar_name', $seminarName)
                                                         ->where('year_level', request('year_level'))
@@ -453,14 +459,13 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label for="import_seminar_id" class="block text-sm font-medium text-gray-700 mb-2">Seminar</label>
-                                        <select name="seminar_id" id="import_seminar_id" class="form-select-custom w-full" required>
+                                        <label for="import_seminar_name" class="block text-sm font-medium text-gray-700 mb-2">Seminar</label>
+                                        <select name="seminar_name" id="import_seminar_name" class="form-select-custom w-full" required>
                                             <option value="">Select Seminar</option>
-                                            @foreach($seminars as $seminar)
-                                                <option value="{{ $seminar->id }}">
-                                                    {{ $seminar->name }} (Year {{ $seminar->target_year_level }})
-                                                </option>
-                                            @endforeach
+                                            <option value="IDREAMS">IDREAMS (Year 1)</option>
+                                            <option value="10C">10C (Year 2)</option>
+                                            <option value="LEADS">LEADS (Year 3)</option>
+                                            <option value="IMAGE">IMAGE (Year 4)</option>
                                         </select>
                                     </div>
                                     <div>
@@ -504,6 +509,35 @@
                     }
                 });
             }
+
+            // Seminar <-> Year Level Mapping Logic
+            const mappings = {
+                yearToSeminar: { '1': 'IDREAMS', '2': '10C', '3': 'LEADS', '4': 'IMAGE' },
+                seminarToYear: { 'IDREAMS': '1', '10C': '2', 'LEADS': '3', 'IMAGE': '4' }
+            };
+
+            function setupSync(yearId, seminarId) {
+                const yearSelect = document.getElementById(yearId);
+                const seminarSelect = document.getElementById(seminarId);
+
+                if (yearSelect && seminarSelect) {
+                    yearSelect.addEventListener('change', function() {
+                        const seminar = mappings.yearToSeminar[this.value];
+                        if (seminar) seminarSelect.value = seminar;
+                    });
+
+                    seminarSelect.addEventListener('change', function() {
+                        const year = mappings.seminarToYear[this.value];
+                        if (year) yearSelect.value = year;
+                    });
+                }
+            }
+
+            // Apply to Manual Form
+            setupSync('year_level', 'seminar_name');
+
+            // Apply to Import Form
+            setupSync('import_year_level', 'import_seminar_name');
         });
     </script>
 @endsection

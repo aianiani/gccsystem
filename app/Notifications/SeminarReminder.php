@@ -36,13 +36,23 @@ class SeminarReminder extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $user = $notifiable;
+        // Note: This notification currently only has seminar name, not full seminar object
+        // If you have a full seminar object, pass it instead
+        $seminar = (object) [
+            'title' => $this->seminarName,
+            'date' => now()->addDays(7), // Placeholder
+            'start_time' => 'TBA',
+            'end_time' => 'TBA',
+            'venue' => 'TBA',
+            'speaker' => null,
+            'description' => null,
+            'id' => null,
+        ];
+
         return (new MailMessage)
-            ->subject('Urgent: Missing Seminar Attendance')
-            ->greeting('Hello ' . $notifiable->name . ',')
-            ->line('Our records indicate that you have not yet attended the required seminar for your year level: **' . $this->seminarName . '**.')
-            ->line('Please visit the Guidance Office or check the portal for upcoming schedules.')
-            ->action('View Guidance Portal', url('/guidance'))
-            ->line('Thank you for your attention to this matter.');
+            ->subject('Seminar Reminder: ' . $this->seminarName)
+            ->view('emails.seminars.reminder', compact('user', 'seminar'));
     }
 
     /**

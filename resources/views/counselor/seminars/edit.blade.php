@@ -422,48 +422,72 @@
 
                             <!-- Schedules List -->
                             <div class="overflow-x-auto">
-                                <table class="min-w-full table-custom">
+                                <table class="min-w-full table-custom text-sm">
                                     <thead>
                                         <tr>
-                                            <th>Date / Session</th>
-                                            <th>Location</th>
-                                            <th>Colleges</th>
-                                            <th>Actions</th>
+                                            <th class="w-1/4">Date & Time</th>
+                                            <th class="w-1/4">Location</th>
+                                            <th class="w-1/3">Target Colleges</th>
+                                            <th class="w-1/6 text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse ($seminar->schedules as $schedule)
                                             <tr>
-                                                <td>
-                                                    <div class="font-medium">{{ $schedule->date->format('F d, Y') }}</div>
-                                                    <div class="text-xs text-gray-500">{{ $schedule->session_type }} Session</div>
-                                                    <div class="text-xs text-gray-400">{{ $schedule->academic_year }}</div>
+                                                <td class="align-top">
+                                                    <div class="font-bold text-gray-800 text-base mb-1">{{ $schedule->date->format('F d, Y') }}</div>
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <span class="px-2 py-1 rounded text-xs font-semibold {{ $schedule->session_type === 'Morning' ? 'bg-yellow-100 text-yellow-800' : 'bg-orange-100 text-orange-800' }}">
+                                                            {{ $schedule->session_type }} Session
+                                                        </span>
+                                                        <span class="text-xs text-gray-500 font-medium">
+                                                            @if($schedule->session_type === 'Morning')
+                                                                (8:00 AM - 12:00 PM)
+                                                            @else
+                                                                (1:00 PM - 5:00 PM)
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                    <div class="text-xs text-gray-400">AY {{ $schedule->academic_year }}</div>
                                                 </td>
-                                                <td>{{ $schedule->location ?? 'N/A' }}</td>
-                                                <td>
+                                                <td class="align-top font-medium text-gray-700">
+                                                    <div class="flex items-start gap-2">
+                                                        <i class="bi bi-geo-alt-fill text-gray-400 mt-1"></i>
+                                                        <span>{{ $schedule->location ?? 'N/A' }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="align-top">
                                                     @if($schedule->colleges)
-                                                        <ul class="list-disc list-inside text-xs text-gray-600">
+                                                        <div class="flex flex-wrap gap-1">
                                                             @foreach($schedule->colleges as $college)
-                                                                <li>{{ $college }}</li>
+                                                                <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs border border-gray-200">
+                                                                    {{-- Abbreviate common college names if needed, or just show full --}}
+                                                                    {{ $college }}
+                                                                </span>
                                                             @endforeach
-                                                        </ul>
+                                                        </div>
                                                     @else
-                                                        <span class="text-gray-400 text-xs">All Colleges</span>
+                                                        <span class="px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-medium border border-green-100">All Colleges</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-right align-top">
                                                     <form action="{{ route('counselor.seminars.schedules.destroy', $schedule) }}"
                                                         method="POST" onsubmit="return confirm('Delete this schedule?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"
-                                                            class="text-red-600 hover:text-red-900 btn btn-sm btn-outline-danger">Delete</button>
+                                                            class="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors" title="Delete Schedule">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
                                                     </form>
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center py-4 text-gray-500">No schedules added yet.</td>
+                                                <td colspan="4" class="text-center py-8 text-gray-400 italic">
+                                                    <div class="mb-2"><i class="bi bi-calendar-x" style="font-size: 2rem;"></i></div>
+                                                    No schedules configured yet.
+                                                </td>
                                             </tr>
                                         @endforelse
                                     </tbody>

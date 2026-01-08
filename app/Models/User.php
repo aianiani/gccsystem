@@ -27,6 +27,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_active',
         'avatar',
         'email_verified_at',
+        'sms_notifications_enabled',
+        'phone_verified_at',
         'registration_status',
         'registration_notes',
         'approved_by',
@@ -63,8 +65,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'sms_notifications_enabled' => 'boolean',
             'approved_at' => 'datetime',
             'consent_agreed' => 'boolean',
             'consent_agreed_at' => 'datetime',

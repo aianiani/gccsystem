@@ -27,4 +27,9 @@ class SeminarSchedule extends Model
     {
         return $this->belongsTo(Seminar::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(SeminarAttendance::class, 'seminar_schedule_id');
+    }
 }

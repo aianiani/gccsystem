@@ -369,45 +369,53 @@
                             <h3 class="text-lg font-bold text-gray-800 m-0">Student List</h3>
 
                             <form method="GET" action="{{ route('counselor.guidance.index') }}"
-                                class="flex flex-wrap gap-3 items-center">
+                                class="row g-2 align-items-center">
                                 <!-- Filter by Year -->
-                                <select name="year_level" class="form-select-custom" onchange="this.form.submit()">
-                                    <option value="">All Years</option>
-                                    <option value="1" {{ request('year_level') == '1' ? 'selected' : '' }}>1st Year</option>
-                                    <option value="2" {{ request('year_level') == '2' ? 'selected' : '' }}>2nd Year</option>
-                                    <option value="3" {{ request('year_level') == '3' ? 'selected' : '' }}>3rd Year</option>
-                                    <option value="4" {{ request('year_level') == '4' ? 'selected' : '' }}>4th Year</option>
-                                </select>
+                                <div class="col-auto">
+                                    <select name="year_level" class="form-select-custom" onchange="this.form.submit()">
+                                        <option value="">All Years</option>
+                                        <option value="1" {{ request('year_level') == '1' ? 'selected' : '' }}>1st Year</option>
+                                        <option value="2" {{ request('year_level') == '2' ? 'selected' : '' }}>2nd Year</option>
+                                        <option value="3" {{ request('year_level') == '3' ? 'selected' : '' }}>3rd Year</option>
+                                        <option value="4" {{ request('year_level') == '4' ? 'selected' : '' }}>4th Year</option>
+                                    </select>
+                                </div>
 
                                 <!-- Filter by College -->
-                                <select name="college" class="form-select-custom" onchange="this.form.submit()" style="max-width: 200px;">
-                                    <option value="">All Colleges</option>
-                                    <option value="College of Arts and Sciences" {{ request('college') == 'College of Arts and Sciences' ? 'selected' : '' }}>CAS</option>
-                                    <option value="College of Veterinary Medicine" {{ request('college') == 'College of Veterinary Medicine' ? 'selected' : '' }}>CVM</option>
-                                    <option value="College of Forestry and Environmental Sciences" {{ request('college') == 'College of Forestry and Environmental Sciences' ? 'selected' : '' }}>CFES</option>
-                                    <option value="College of Business and Management" {{ request('college') == 'College of Business and Management' ? 'selected' : '' }}>CBM</option>
-                                    <option value="College of Nursing" {{ request('college') == 'College of Nursing' ? 'selected' : '' }}>CON</option>
-                                    <option value="College of Human Ecology" {{ request('college') == 'College of Human Ecology' ? 'selected' : '' }}>CHE</option>
-                                    <option value="College of Agriculture" {{ request('college') == 'College of Agriculture' ? 'selected' : '' }}>CA</option>
-                                    <option value="College of Information Science and Computing" {{ request('college') == 'College of Information Science and Computing' ? 'selected' : '' }}>CISC</option>
-                                    <option value="College of Education" {{ request('college') == 'College of Education' ? 'selected' : '' }}>CED</option>
-                                    <option value="College of Engineering" {{ request('college') == 'College of Engineering' ? 'selected' : '' }}>COE</option>
-                                </select>
+                                <div class="col-auto">
+                                    <select name="college" class="form-select-custom" onchange="this.form.submit()" style="max-width: 300px;">
+                                        <option value="">All Colleges</option>
+                                        <option value="College of Arts and Sciences" {{ request('college') == 'College of Arts and Sciences' ? 'selected' : '' }}>College of Arts and Sciences</option>
+                                        <option value="College of Veterinary Medicine" {{ request('college') == 'College of Veterinary Medicine' ? 'selected' : '' }}>College of Veterinary Medicine</option>
+                                        <option value="College of Forestry and Environmental Sciences" {{ request('college') == 'College of Forestry and Environmental Sciences' ? 'selected' : '' }}>College of Forestry and Environmental Sciences</option>
+                                        <option value="College of Business and Management" {{ request('college') == 'College of Business and Management' ? 'selected' : '' }}>College of Business and Management</option>
+                                        <option value="College of Nursing" {{ request('college') == 'College of Nursing' ? 'selected' : '' }}>College of Nursing</option>
+                                        <option value="College of Human Ecology" {{ request('college') == 'College of Human Ecology' ? 'selected' : '' }}>College of Human Ecology</option>
+                                        <option value="College of Agriculture" {{ request('college') == 'College of Agriculture' ? 'selected' : '' }}>College of Agriculture</option>
+                                        <option value="College of Information Science and Computing" {{ request('college') == 'College of Information Science and Computing' ? 'selected' : '' }}>College of Information Science and Computing</option>
+                                        <option value="College of Education" {{ request('college') == 'College of Education' ? 'selected' : '' }}>College of Education</option>
+                                        <option value="College of Engineering" {{ request('college') == 'College of Engineering' ? 'selected' : '' }}>College of Engineering</option>
+                                    </select>
+                                </div>
 
                                 <!-- Search -->
-                                <div class="flex">
-                                    <input type="text" name="search" placeholder="Search student..." value="{{ request('search') }}"
-                                        class="form-control-custom rounded-r-none"
-                                        style="width: auto; border-top-right-radius: 0; border-bottom-right-radius: 0;">
-                                    <button type="submit" class="btn-primary-custom rounded-l-none"
-                                        style="border-top-left-radius: 0; border-bottom-left-radius: 0;">Search</button>
+                                <div class="col-auto flex-grow-1">
+                                    <div class="d-flex w-100">
+                                        <input type="text" name="search" placeholder="Search student..." value="{{ request('search') }}"
+                                            class="form-control-custom rounded-r-none w-100"
+                                            style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                        <button type="submit" class="btn-primary-custom rounded-l-none"
+                                            style="border-top-left-radius: 0; border-bottom-left-radius: 0;">Search</button>
+                                    </div>
                                 </div>
 
                                 <!-- Bulk Actions Link -->
-                                <a href="{{ route('counselor.guidance.bulk.create') }}"
-                                    class="btn-outline-custom no-underline flex items-center gap-2">
-                                    <i class="bi bi-check2-all"></i> Bulk Attendance
-                                </a>
+                                <div class="col-auto border-start ps-3">
+                                    <a href="{{ route('counselor.guidance.bulk.create') }}"
+                                        class="btn-outline-custom no-underline d-flex align-items-center gap-2 text-nowrap">
+                                        <i class="bi bi-check2-all"></i> Bulk Attendance
+                                    </a>
+                                </div>
                             </form>
                         </div>
 

@@ -23,7 +23,33 @@ class SessionReminderNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['database'];
+        $channels = ['mail', 'database'];
+
+        // Add SMS channel if user has SMS enabled
+        if ($notifiable->sms_notifications_enabled && !empty($notifiable->contact_number)) {
+            $channels[] = \App\Notifications\Channels\SmsChannel::class;
+        }
+
+        return $channels;
+    }
+
+    public function toMail($notifiable)
+    {
+        $user = $notifiable;
+        $appointment = $this->sessionNote->appointment;
+        $isStudent = $notifiable->role === 'student';
+        $otherParty = $isStudent ? $appointment->counselor : $appointment->student;
+
+        $message = (new MailMessage)
+            ->subject('Upcoming Appointment Reminder')
+            ->view('emails.appointments.reminder', compact('user', 'appointment', 'isStudent', 'otherParty'));
+
+        $logoPath = public_path('images/logo.jpg');
+        if (file_exists($logoPath)) {
+            $message->embed($logoPath, 'logo');
+        }
+
+        return $message;
     }
 
     public function toArray($notifiable)
@@ -71,5 +97,27 @@ class SessionReminderNotification extends Notification
                     'url' => route('appointments.index'),
                 ];
         }
+    }
+
+    /**
+     * Get the SMS representation of the notification.
+     */
+    public function toSms($notifiable)
+    {
+        $nextSessionDate = $this->sessionNote->next_session ? $this->sessionNote->next_session->format('M d, g:iA') : 'TBA';
+        $isCounselor = $notifiable->role === 'counselor';
+
+        $message = match ($this->reminderType) {
+            'upcoming' => $isCounselor
+            ? "Session reminder: {$this->sessionNote->appointment->student->name} on {$nextSessionDate}"
+            : "Reminder: Your session is on {$nextSessionDate}. Please be on time.",
+            'missed' => "Session on {$nextSessionDate} was missed. Please contact your counselor.",
+            default => "Session update: {$nextSessionDate}",
+        };
+
+        return [
+            'message' => $message,
+            'type' => 'session_reminder',
+        ];
     }
 }

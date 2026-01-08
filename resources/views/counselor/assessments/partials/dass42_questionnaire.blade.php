@@ -44,32 +44,37 @@
         41 => "I experienced trembling (e.g. in the hands).",
         42 => "I found it difficult to work up the initiative to do things.",
     ];
-    
+
     // Get student answers from assessment->score
     $studentAnswers = [];
     if ($assessment->score) {
         if (is_array($assessment->score)) {
             $studentAnswers = $assessment->score;
         } elseif (is_string($assessment->score)) {
-            $studentAnswers = json_decode($assessment->score, true) ?? [];
+            $decoded = json_decode($assessment->score, true);
+            $studentAnswers = is_array($decoded) ? $decoded : [];
         }
     }
 
     // Normalize keys: if answers were saved with 0-based numeric keys (0..41),
     // convert them to 1-based keys (1..42) so the view can use question numbers.
-    $normalized = [];
-    foreach ($studentAnswers as $k => $v) {
-        if (is_numeric($k)) {
-            $ik = (int)$k;
-            // if original keys were 0..41, convert to 1..42
-            if ($ik >= 0 && $ik <= 41) {
-                $normalized[$ik + 1] = (int)$v;
-                continue;
+    // Normalize keys: ONLY if answers utilize 0-based numeric keys (0..41).
+    // If the data is already 1-based (which is how we save it now), we skip this to avoid shifting keys incorrectly.
+    if (isset($studentAnswers[0])) {
+        $normalized = [];
+        foreach ($studentAnswers as $k => $v) {
+            if (is_numeric($k)) {
+                $ik = (int) $k;
+                // if original keys were 0..41, convert to 1..42
+                if ($ik >= 0 && $ik <= 41) {
+                    $normalized[$ik + 1] = (int) $v;
+                    continue;
+                }
             }
+            $normalized[$k] = $v;
         }
-        $normalized[$k] = $v;
+        $studentAnswers = $normalized;
     }
-    $studentAnswers = $normalized;
 @endphp
 
 <div class="dass42-questionnaire">
@@ -96,11 +101,11 @@
                         <td style="text-align: center; font-weight: bold; background: #f8f9fa;">
                             @if($answer !== null)
                                 <span class="badge 
-                                    @if($answer === 0 || $answer === '0') bg-success
-                                    @elseif($answer === 1 || $answer === '1') bg-info
-                                    @elseif($answer === 2 || $answer === '2') bg-warning text-dark
-                                    @elseif($answer === 3 || $answer === '3') bg-danger
-                                    @endif">
+                                                    @if($answer === 0 || $answer === '0') bg-success
+                                                    @elseif($answer === 1 || $answer === '1') bg-info
+                                                    @elseif($answer === 2 || $answer === '2') bg-warning text-dark
+                                                    @elseif($answer === 3 || $answer === '3') bg-danger
+                                                    @endif">
                                     {{ $answer }}
                                 </span>
                             @else
@@ -126,32 +131,32 @@
     .dass42-questionnaire .table {
         margin-bottom: 0;
     }
-    
+
     .dass42-questionnaire .table th {
         background-color: #f0f0f0;
         color: #1f7a2d;
         font-weight: 700;
         border-color: #ddd;
     }
-    
+
     .dass42-questionnaire .table td {
         vertical-align: middle;
         border-color: #ddd;
     }
-    
+
     .dass42-questionnaire .table tbody tr:hover {
         background-color: #f9f9f9;
     }
-    
+
     @media (max-width: 768px) {
         .dass42-questionnaire .table {
             font-size: 0.85rem;
         }
-        
+
         .dass42-questionnaire .table thead th {
             padding: 0.5rem 0.25rem;
         }
-        
+
         .dass42-questionnaire .table td {
             padding: 0.5rem 0.25rem;
         }

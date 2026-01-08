@@ -35,17 +35,20 @@ class AppointmentDeclinedNotification extends Notification implements ShouldQueu
      */
     public function toMail($notifiable)
     {
-        $student = $this->appointment->student;
-        $start = $this->appointment->scheduled_at->format('M d, Y');
-        $time = $this->appointment->scheduled_at->format('g:i A');
-        return (new MailMessage)
-            ->subject('Appointment Declined by Student')
-            ->greeting('Hello!')
-            ->line("The student {$student->name} has declined the rescheduled appointment slot.")
-            ->line("Date: {$start}")
-            ->line("Time: {$time}")
-            ->line('You may offer a new slot or contact the student for further arrangements.')
-            ->action('View Appointment', url('/counselor/appointments/' . $this->appointment->id));
+        $student = $notifiable;
+        $appointment = $this->appointment;
+        $reason = $appointment->decline_reason ?? null;
+
+        $message = (new MailMessage)
+            ->subject('Appointment Update')
+            ->view('emails.appointments.declined', compact('student', 'appointment', 'reason'));
+
+        $logoPath = public_path('images/logo.jpg');
+        if (file_exists($logoPath)) {
+            $message->embed($logoPath, 'logo');
+        }
+
+        return $message;
     }
 
     /**
@@ -60,4 +63,4 @@ class AppointmentDeclinedNotification extends Notification implements ShouldQueu
             'url' => route('appointments.index'),
         ];
     }
-} 
+}

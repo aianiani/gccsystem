@@ -1,34 +1,31 @@
-@php
-    $title = 'Password Reset Request';
-@endphp
-
 @component('emails.layouts.base', [
-    'title' => $title,
+    'title' => 'Password Reset Request',
     'heading' => 'Reset Your Password',
-    'preheader' => 'You requested a password reset for your CMU GCC account',
-    'intro' => 'Use the secure link below to update your password.',
 ])
-    <h2 style="margin-top: 0; margin-bottom: 16px; font-size: 20px; color: #1f2933;">
-        Hello {{ $userName }},
-    </h2>
+    <h2>Hello {{ $userName }},</h2>
 
-    <p style="margin-bottom: 12px;">
-        You’re receiving this email because we received a <strong>password reset request</strong> for your account.
-    </p>
+    <p>You're receiving this email because we received a password reset request for your account.</p>
 
-    <p style="text-align: center; margin: 18px 0;">
-        <a href="{{ $resetLink }}" class="button-primary">
+    <div class="button-center">
+        <a href="{{ $resetLink }}" class="button">
             Reset Password
         </a>
+    </div>
+
+    <p style="font-size: 13px; color: #888;">
+        If the button doesn't work, copy and paste this link into your browser:
+    </p>
+    <p style="word-break: break-all; font-size: 13px; color: #228B22;">
+        {{ $resetLink }}
     </p>
 
-    <p style="margin-bottom: 10px;">
+    <div class="info-box" style="background-color: #fff9e6; border-color: #ffd700;">
+        <p style="margin: 0; font-size: 14px; color: #856404;">
+            <strong>Security Notice:</strong> This password reset link will expire in 60 minutes.
+        </p>
+    </div>
+
+    <p style="font-size: 13px; color: #888;">
         If you did not request a password reset, no further action is required and you can safely ignore this email.
     </p>
-
-    <p style="margin-top: 18px; margin-bottom: 0;">
-        Thanks,<br>
-        <strong>{{ config('app.name') }}</strong>
-    </p>
 @endcomponent
-

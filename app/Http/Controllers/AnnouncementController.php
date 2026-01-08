@@ -106,27 +106,57 @@ class AnnouncementController extends Controller
             $data['attachment'] = $request->file('attachment')->store('attachments', 'public');
         }
 
-        // Handle multiple images
+        // Handle multiple images - append new images to existing ones
         if ($request->hasFile('images')) {
-            // Delete old images if exists
-            if ($announcement->images) {
-                foreach ($announcement->images as $oldImage) {
-                    if (Storage::disk('public')->exists($oldImage)) {
-                        Storage::disk('public')->delete($oldImage);
-                    }
-                }
+            // Get existing images or start with empty array
+            $existingImages = $announcement->images ?? [];
+
+            // Add new images
+            $newImagePaths = [];
+            foreach ($request->file('images') as $image) {
+                $newImagePaths[] = $image->store('announcements', 'public');
             }
 
-            $imagePaths = [];
-            foreach ($request->file('images') as $image) {
-                $imagePaths[] = $image->store('announcements', 'public');
-            }
-            $data['images'] = $imagePaths;
+            // Merge existing and new images
+            $data['images'] = array_merge($existingImages, $newImagePaths);
         }
 
         $announcement->update($data);
 
         return redirect()->route('announcements.index')->with('success', 'Announcement updated successfully.');
+    }
+
+    /**
+     * Delete a specific image from an announcement.
+     */
+    public function deleteImage($id, $index)
+    {
+        $announcement = Announcement::findOrFail($id);
+
+        if (!$announcement->images || !isset($announcement->images[$index])) {
+            return response()->json(['success' => false, 'message' => 'Image not found.'], 404);
+        }
+
+        // Get the image path
+        $imagePath = $announcement->images[$index];
+
+        // Delete the image from storage
+        if (Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
+        }
+
+        // Remove the image from the array
+        $images = $announcement->images;
+        unset($images[$index]);
+
+        // Re-index the array to maintain sequential indices
+        $images = array_values($images);
+
+        // Update the announcement
+        $announcement->images = $images;
+        $announcement->save();
+
+        return response()->json(['success' => true, 'message' => 'Image deleted successfully.']);
     }
 
     /**

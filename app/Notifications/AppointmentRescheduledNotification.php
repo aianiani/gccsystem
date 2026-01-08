@@ -41,17 +41,22 @@ class AppointmentRescheduledNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        $old = $this->appointment->previous_scheduled_at;
-        $new = $this->appointment->scheduled_at;
-        $oldStr = $old ? $old->format('F j, Y \a\t g:i A') : 'N/A';
-        $newStr = $new->format('F j, Y \a\t g:i A');
-        return (new MailMessage)
+        $recipient = $notifiable;
+        $appointment = $this->appointment;
+        $originalDate = $appointment->previous_scheduled_at;
+        $rescheduleReason = $appointment->reschedule_reason ?? null;
+        $requiresConfirmation = true;
+
+        $message = (new MailMessage)
             ->subject('Your Appointment Has Been Rescheduled')
-            ->greeting('Hello ' . $notifiable->name . ',')
-            ->line('Your appointment on ' . $oldStr . ' has been rescheduled to ' . $newStr . '.')
-            ->line('Please accept or decline the new schedule in your dashboard.')
-            ->action('View Appointment', url('/appointments'))
-            ->line('Thank you for using our counseling services!');
+            ->view('emails.appointments.rescheduled', compact('recipient', 'appointment', 'originalDate', 'rescheduleReason', 'requiresConfirmation'));
+
+        $logoPath = public_path('images/logo.jpg');
+        if (file_exists($logoPath)) {
+            $message->embed($logoPath, 'logo');
+        }
+
+        return $message;
     }
 
     /**
@@ -71,4 +76,4 @@ class AppointmentRescheduledNotification extends Notification
             'url' => route('appointments.index'),
         ];
     }
-} 
+}

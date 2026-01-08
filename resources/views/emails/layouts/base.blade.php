@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,152 +10,176 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #f8fafc;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Arial, sans-serif;
-            color: #1f2933;
+            background-color: #f4f4f4;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333333;
             -webkit-font-smoothing: antialiased;
         }
+
         table {
             border-collapse: collapse;
         }
+
         img {
             border: 0;
             line-height: 100%;
             outline: none;
             text-decoration: none;
-            display: block;
         }
+
         a {
-            color: #2d5016;
+            color: #228B22;
             text-decoration: none;
         }
+
         .wrapper {
             width: 100%;
-            table-layout: fixed;
-            background-color: #f8f9fa; /* homepage bg-light */
-            padding: 0;
+            background-color: #f4f4f4;
+            padding: 20px 0;
         }
+
         .main {
             width: 100%;
-            max-width: 720px;
+            max-width: 600px;
             margin: 0 auto;
             background-color: #ffffff;
-            border-radius: 0;
-            box-shadow: none;
+            border-radius: 8px;
             overflow: hidden;
         }
+
         .header {
-            background-color: #228B22; /* primary-green */
-            padding: 14px 28px 14px 28px;
-            color: #ffffff;
+            padding: 30px 40px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5e5;
         }
-        .header-inner {
-            max-width: 640px;
-            margin: 0 auto;
-            display: table;
-            width: 100%;
-        }
-        .header-logo {
-            display: table-cell;
-            vertical-align: middle;
-            width: 64px;
-        }
-        .header-logo img {
-            display: block;
-            width: 56px;
-            height: auto;
-            border-radius: 50%;
-        }
-        .header-text {
-            display: table-cell;
-            vertical-align: middle;
-            padding-left: 12px;
-            text-align: left;
-        }
-        .header-title {
-            font-size: 17px;
-            font-weight: 600;
-            margin: 0 0 2px 0;
-        }
-        .header-subtitle {
-            font-size: 12px;
+
+        .header h1 {
             margin: 0;
-            opacity: 0.9;
-        }
-        .body {
-            padding: 24px 28px 26px 28px;
-            background-color: #ffffff;
-        }
-        .content-inner {
-            max-width: 520px;
-            margin: 0 auto;
-            text-align: left;
-        }
-        .body h1,
-        .body h2,
-        .body h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #1f2933;
+            font-size: 24px;
             font-weight: 600;
+            color: #1a1a1a;
         }
-        .body p,
-        .body li {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #4b5563;
-            font-size: 14px;
+
+        .body {
+            padding: 40px;
+        }
+
+        .body h2 {
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .body p {
+            margin: 0 0 15px 0;
+            color: #555555;
+            font-size: 15px;
             line-height: 1.6;
         }
-        .footer {
-            padding: 18px 32px 24px 32px;
-            font-size: 12px;
-            color: #6b7280;
-            background-color: #f9fafb;
+
+        .body ul,
+        .body ol {
+            margin: 0 0 15px 0;
+            padding-left: 20px;
+        }
+
+        .body li {
+            margin-bottom: 8px;
+            color: #555555;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background-color: #f9f9f9;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .info-box strong {
+            color: #1a1a1a;
+        }
+
+        .code-box {
+            background-color: #f9f9f9;
+            border: 2px solid #228B22;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
             text-align: center;
         }
-        .badge-label {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background-color: #fef9e7;
-            color: #2d5016;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
+
+        .code-box .code {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #1a1a1a;
+            font-family: "Courier New", monospace;
         }
-        .button-primary {
+
+        .button {
             display: inline-block;
-            padding: 12px 28px;
-            border-radius: 999px;
-            background-color: #2d5016;
+            padding: 14px 32px;
+            background-color: #228B22;
             color: #ffffff !important;
-            font-weight: 600;
-            font-size: 14px;
             text-decoration: none;
-            margin: 12px 0;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            margin: 10px 0;
+            text-align: center;
         }
-        .button-primary:hover {
-            background-color: #4a7c59;
+
+        .button:hover {
+            background-color: #1a6b1a;
         }
-        .muted {
-            color: #6b7280;
+
+        .button-center {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .footer {
+            padding: 30px 40px;
+            text-align: center;
+            background-color: #f9f9f9;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .footer p {
+            margin: 5px 0;
             font-size: 13px;
+            color: #888888;
         }
+
+        .divider {
+            height: 1px;
+            background-color: #e5e5e5;
+            margin: 20px 0;
+        }
+
         @media (max-width: 640px) {
             .main {
                 border-radius: 0;
             }
+
             .header,
             .body,
             .footer {
-                padding-left: 20px !important;
-                padding-right: 20px !important;
+                padding: 25px 20px !important;
             }
         }
     </style>
 </head>
+
 <body>
     <table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
         <tr>
@@ -162,37 +187,18 @@
                 <table class="main" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                     <tr>
                         <td class="header">
-                            <div class="header-inner">
-                                <div class="header-logo">
-                                    <img src="{{ asset('images/logo.jpg') }}" alt="CMU GCC Logo">
-                                </div>
-                                <div class="header-text">
-                                    <span class="badge-label">{{ $preheader ?? 'CMU Guidance & Counseling Center' }}</span>
-                                    <h1 class="header-title">
-                                        {{ $heading ?? ($title ?? config('app.name', 'GCC System')) }}
-                                    </h1>
-                                    @isset($intro)
-                                        <p class="header-subtitle">{{ $intro }}</p>
-                                    @endisset
-                                </div>
-                            </div>
+                            <h1>{{ $heading ?? ($title ?? config('app.name', 'GCC System')) }}</h1>
                         </td>
                     </tr>
                     <tr>
                         <td class="body">
-                            <div class="content-inner">
-                                {{ $slot }}
-                            </div>
+                            {{ $slot }}
                         </td>
                     </tr>
                     <tr>
                         <td class="footer">
-                            <p class="muted" style="margin: 0 0 4px 0;">
-                                This is an automated message from the CMU Guidance & Counseling Center system.
-                            </p>
-                            <p class="muted" style="margin: 0;">
-                                &copy; {{ date('Y') }} {{ config('app.name', 'GCC System') }}. All rights reserved.
-                            </p>
+                            <p>This is an automated message from the CMU Guidance & Counseling Center.</p>
+                            <p>&copy; {{ date('Y') }} CMU Guidance & Counseling Center. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
@@ -200,6 +206,5 @@
         </tr>
     </table>
 </body>
+
 </html>
-
-

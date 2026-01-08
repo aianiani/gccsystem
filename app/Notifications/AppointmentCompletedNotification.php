@@ -35,17 +35,20 @@ class AppointmentCompletedNotification extends Notification
      */
     public function toMail($notifiable)
     {
+        $student = $notifiable;
         $counselor = $this->appointment->counselor;
-        $start = $this->appointment->scheduled_at->format('M d, Y');
-        $time = $this->appointment->scheduled_at->format('g:i A');
-        return (new MailMessage)
+        $appointment = $this->appointment;
+
+        $message = (new MailMessage)
             ->subject('Appointment Completed')
-            ->greeting('Hello!')
-            ->line("Your appointment with {$counselor->name} has been marked as completed.")
-            ->line("Date: {$start}")
-            ->line("Time: {$time}")
-            ->line('You may now view your session notes if available.')
-            ->action('View Appointments', url('/appointments'));
+            ->view('emails.appointments.completed', compact('student', 'counselor', 'appointment'));
+
+        $logoPath = public_path('images/logo.jpg');
+        if (file_exists($logoPath)) {
+            $message->embed($logoPath, 'logo');
+        }
+
+        return $message;
     }
 
     /**
@@ -61,4 +64,4 @@ class AppointmentCompletedNotification extends Notification
             'url' => route('appointments.index'),
         ];
     }
-} 
+}

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -22,7 +21,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('assessments', function (Blueprint $table) {
-            $table->dropColumn('case_notes');
+            if (Schema::hasColumn('assessments', 'case_notes')) {
+                $table->dropColumn('case_notes');
+            }
         });
     }
 };

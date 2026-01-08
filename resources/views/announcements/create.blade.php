@@ -15,17 +15,7 @@
             --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
         }
 
-        /* Apply the same page zoom used on the homepage */
-        .home-zoom {
-            zoom: 0.85;
-        }
 
-        @supports not (zoom: 1) {
-            .home-zoom {
-                transform: scale(0.85);
-                transform-origin: top center;
-            }
-        }
 
         .main-dashboard-inner {
             padding: 2rem;
@@ -203,8 +193,7 @@
         }
     </style>
 
-    <div class="home-zoom">
-        <div class="main-dashboard-inner">
+<div class="main-dashboard-inner">
             <div class="page-header-card">
                 <div>
                     <h1><i class="bi bi-megaphone me-2"></i>Create Announcement</h1>
@@ -344,6 +333,5 @@
                     </form>
                 </div>
             </div>
-        </div>
     </div>
 @endsection

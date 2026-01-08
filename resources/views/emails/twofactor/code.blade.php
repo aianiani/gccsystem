@@ -1,36 +1,24 @@
-@php
-    $title = 'Two-Factor Authentication Code';
-@endphp
-
 @component('emails.layouts.base', [
-    'title' => $title,
+    'title' => 'Two-Factor Authentication Code',
     'heading' => 'Two-Factor Authentication',
-    'preheader' => 'Complete your secure login to CMU GCC',
-    'intro' => 'Use the code below to finish signing in to your account.',
 ])
-    <h2 style="margin-top: 0; margin-bottom: 16px; font-size: 20px; color: #1f2933;">
-        Hello {{ $userName }},
-    </h2>
+    <h2>Hello {{ $userName }},</h2>
 
-    <p style="margin-bottom: 12px;">
-        Your Two-Factor Authentication (2FA) code is:
-    </p>
+    <p>Your Two-Factor Authentication (2FA) code is:</p>
 
-    <p style="font-size: 24px; font-weight: 700; letter-spacing: 0.1em; margin: 6px 0 18px 0; color: #111827;">
-        {{ $code }}
-    </p>
+    <div class="code-box">
+        <div class="code">{{ $code }}</div>
+    </div>
 
-    <p style="margin-bottom: 10px;">
-        Please enter this code to complete your login. This code will expire in <strong>5 minutes</strong>.
-    </p>
+    <p>Please enter this code to complete your login.</p>
 
-    <p style="margin-bottom: 10px; font-size: 13px;">
+    <div class="info-box" style="background-color: #fff9e6; border-color: #ffd700;">
+        <p style="margin: 0; font-size: 14px; color: #856404;">
+            <strong>Security Notice:</strong> This code will expire in 5 minutes.
+        </p>
+    </div>
+
+    <p style="font-size: 13px; color: #888;">
         If you did not request this code, you can safely ignore this email.
     </p>
-
-    <p style="margin-top: 18px; margin-bottom: 0;">
-        Thanks,<br>
-        <strong>{{ config('app.name') }}</strong>
-    </p>
 @endcomponent
-

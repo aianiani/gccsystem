@@ -286,54 +286,106 @@
                         </a>
                     </div>
 
-                    <!-- Student Profile Header -->
-                    <div class="page-header d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-4">
-                            <div class="bg-white/20 p-3 rounded-full">
-                                <i class="bi bi-person-fill text-4xl"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-2xl font-bold m-0">{{ $student->name }}</h2>
-                                <p class="opacity-90 m-0 mt-1">{{ $student->email }} • ID: {{ $student->student_id ?? 'N/A' }}</p>
-                                <div class="mt-2 text-sm opacity-80 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">
-                                    <span><i class="bi bi-mortarboard-fill mr-1"></i> {{ $student->course ?? 'No Course' }}</span>
-                                    <span><i class="bi bi-building-fill mr-1"></i> {{ $student->college ?? 'No College' }}</span>
-                                    <span><i class="bi bi-gender-ambiguous mr-1"></i> {{ ucfirst($student->gender ?? 'N/A') }}</span>
-                                    <span><i class="bi bi-telephone-fill mr-1"></i> {{ $student->contact_number ?? 'N/A' }}</span>
-                                </div>
-
-                                <!-- Seminar Badges -->
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    @php
-                                        $badges = [
-                                            'IDREAMS' => ['color' => 'bg-blue-100 text-blue-800 border-blue-200', 'icon' => 'bi-clouds-fill', 'year' => 1],
-                                            '10C' => ['color' => 'bg-orange-100 text-orange-800 border-orange-200', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
-                                            'LEADS' => ['color' => 'bg-purple-100 text-purple-800 border-purple-200', 'icon' => 'bi-people-fill', 'year' => 3],
-                                            'IMAGE' => ['color' => 'bg-teal-100 text-teal-800 border-teal-200', 'icon' => 'bi-person-badge-fill', 'year' => 4],
-                                        ];
-                                    @endphp
-
-                                    @foreach($badges as $seminarName => $style)
-                                        @php
-                                            $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]);
-                                        @endphp
-                                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border {{ $isAttended ? $style['color'] : 'bg-gray-100 text-gray-400 border-gray-200' }} transition-all">
-                                            @if($isAttended)
-                                                <i class="bi {{ $style['icon'] }}"></i>
-                                                <span class="font-bold text-xs tracking-wide">{{ $seminarName }}</span>
-                                                <i class="bi bi-check-circle-fill text-xs ml-1 opacity-75"></i>
-                                            @else
-                                                <i class="bi bi-lock-fill text-xs"></i>
-                                                <span class="font-medium text-xs tracking-wide">{{ $seminarName }}</span>
-                                            @endif
+                    <!-- Student Profile Header (Seminar Highlight Version) -->
+                    <div class="page-header py-4 px-4">
+                        <div class="row g-4 align-items-center">
+                            
+                            <!-- Left: Identity (Wider Column) -->
+                            <div class="col-xl-5 col-lg-6 border-end-xl border-white/10">
+                                <div class="d-flex align-items-center gap-4">
+                                    <div class="position-relative flex-shrink-0">
+                                        <div class="rounded-circle bg-white p-1 shadow-sm" style="width: 100px; height: 100px;">
+                                            <img src="{{ $student->avatar_url }}" alt="{{ $student->name }}" 
+                                                class="rounded-circle w-100 h-100 object-fit-cover">
                                         </div>
-                                    @endforeach
+                                        <div class="position-absolute bottom-0 end-0 p-1">
+                                            <span class="badge rounded-circle p-1 bg-warning border border-white text-dark shadow-sm" 
+                                                  style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;" 
+                                                  title="{{ ucfirst($student->role ?? 'Student') }}">
+                                                <i class="bi bi-star-fill" style="font-size: 10px;"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h1 class="h2 mb-1 fw-bold text-white lh-sm">{{ $student->name }}</h1>
+                                        <div class="d-flex flex-column gap-1 text-white-50" style="font-size: 0.95rem;">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-envelope opacity-75"></i> 
+                                                <span class="text-truncate">{{ $student->email }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="font-monospace bg-white/10 px-2 rounded text-white-75 small text-nowrap">
+                                                    ID: {{ $student->student_id ?? 'N/A' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="text-right d-none d-md-block">
-                            <div class="text-sm opacity-75 uppercase tracking-wider">Current Year</div>
-                            <div class="text-3xl font-bold">{{ $student->year_level }}</div>
+
+                            <!-- Right: Details & Seminars -->
+                            <div class="col-xl-7 col-lg-6 ps-xl-4">
+                                <div class="d-flex flex-column gap-4">
+                                    
+                                    <!-- Top Row: Academic Info & Year Level -->
+                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
+                                        <div class="text-white">
+                                            <div class="d-flex align-items-start gap-2 mb-2">
+                                                <i class="bi bi-mortarboard-fill mt-1 opacity-75 flex-shrink-0"></i>
+                                                <div class="fw-medium text-white lh-sm" style="font-size: 1rem;">{{ $student->course ?? 'No Course Assigned' }}</div>
+                                            </div>
+                                            <div class="d-flex align-items-start gap-2 mb-2">
+                                                <i class="bi bi-building-fill mt-1 opacity-75 flex-shrink-0"></i>
+                                                <div class="text-white-75 lh-sm" style="font-size: 0.95rem;">{{ $student->college ?? 'No College Assigned' }}</div>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-telephone-fill opacity-75 flex-shrink-0"></i>
+                                                <span class="font-monospace text-white-75">{{ $student->contact_number ?? 'N/A' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-3 bg-white/5 rounded-4 p-3 border border-white/5 ms-md-auto text-nowrap">
+                                            <div class="text-end">
+                                                <div class="text-white-50 text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">Year Level</div>
+                                            </div>
+                                            <div class="display-5 fw-bold text-white lh-1">{{ preg_replace('/[^0-9]/', '', $student->year_level ?? '0') }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bottom Row: Seminar Badges (Highlighted) -->
+                                    <div>
+                                        <div class="text-white-50 text-uppercase fw-bold mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">Seminar Progress</div>
+                                        <div class="row g-2">
+                                            @php
+                                                $badges = [
+                                                    'IDREAMS' => ['color' => 'bg-info bg-opacity-25 text-white border-info', 'icon' => 'bi-clouds-fill', 'year' => 1],
+                                                    '10C' => ['color' => 'bg-warning bg-opacity-25 text-white border-warning', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
+                                                    'LEADS' => ['color' => 'bg-primary bg-opacity-25 text-white border-primary', 'icon' => 'bi-people-fill', 'year' => 3],
+                                                    'IMAGE' => ['color' => 'bg-teal bg-opacity-25 text-white border-teal', 'icon' => 'bi-person-badge-fill', 'year' => 4],
+                                                ];
+                                            @endphp
+                                            @foreach($badges as $seminarName => $style)
+                                                @php $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]); @endphp
+                                                <div class="col-6 col-sm-3">
+                                                    <div class="d-flex align-items-center justify-content-center gap-2 py-2 rounded-3 border transition-all text-center
+                                                        {{ $isAttended ? $style['color'] . ' shadow-sm' : 'bg-white/5 border-white/10 text-white-50' }}"
+                                                        style="backdrop-filter: blur(4px);">
+                                                        @if($isAttended)
+                                                            <i class="bi {{ $style['icon'] }}"></i>
+                                                            <span class="fw-bold small">{{ $seminarName }}</span>
+                                                        @else
+                                                            <i class="bi bi-lock-fill opacity-50"></i>
+                                                            <span class="small opacity-75">{{ $seminarName }}</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -345,36 +397,55 @@
                         </div>
 
                         <div class="overflow-x-auto">
-                            <table class="min-w-full table-custom">
+                            <table class="w-100 table-custom" style="table-layout: fixed;">
                                 <thead>
                                     <tr>
-                                        <th>Year Level</th>
-                                        @foreach(['IDREAMS', '10C', 'LEADS', 'IMAGE'] as $seminar)
-                                            <th class="text-center">{{ $seminar }}</th>
+                                        <th style="width: 20%;">Year Level</th>
+                                        @foreach([
+                                            'IDREAMS' => ['icon' => 'bi-clouds-fill', 'color' => 'text-info'], 
+                                            '10C' => ['icon' => 'bi-lightbulb-fill', 'color' => 'text-warning'], 
+                                            'LEADS' => ['icon' => 'bi-people-fill', 'color' => 'text-primary'], 
+                                            'IMAGE' => ['icon' => 'bi-person-badge-fill', 'color' => 'text-success']
+                                        ] as $seminar => $details)
+                                            <th class="text-center" style="width: 20%;">
+                                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                                    <i class="bi {{ $details['icon'] }} {{ $details['color'] }}"></i>
+                                                    {{ $seminar }}
+                                                </div>
+                                            </th>
                                         @endforeach
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @for ($year = 1; $year <= 4; $year++)
-                                        <tr>
-                                            <td class="font-bold text-gray-700">
+                                        <tr class="transition-colors hover:bg-gray-50 {{ $student->year_level == $year ? 'bg-green-50/50' : '' }}">
+                                            <td class="font-bold text-gray-700 py-4">
                                                 @php
                                                     $suffixes = [1 => 'st', 2 => 'nd', 3 => 'rd', 4 => 'th'];
                                                 @endphp
-                                                {{ $year }}{{ $suffixes[$year] ?? 'th' }} Year
-                                                @if($student->year_level == $year)
-                                                    <span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">Current</span>
-                                                @endif
+                                                <div class="d-flex align-items-center justify-content-between pe-4">
+                                                    <span>{{ $year }}{{ $suffixes[$year] ?? 'th' }} Year</span>
+                                                    @if($student->year_level == $year)
+                                                        <span class="badge bg-green-100 text-green-800 border border-green-200 shadow-sm rounded-pill px-3">Current</span>
+                                                    @endif
+                                                </div>
                                             </td>
                                             @foreach(['IDREAMS', '10C', 'LEADS', 'IMAGE'] as $index => $seminar)
-                                                <td class="text-center">
-                                                    <div class="flex justify-center">
+                                                <td class="text-center py-4">
+                                                    <div class="flex justify-center h-100 align-items-center">
                                                         @if($year == $index + 1)
-                                                            <input type="checkbox" 
-                                                                   class="attendance-checkbox checkbox-custom form-check-input"
-                                                                   data-year="{{ $year }}"
-                                                                   data-seminar="{{ $seminar }}"
-                                                                   {{ isset($attendanceMatrix[$year][$seminar]) ? 'checked' : '' }}>
+                                                            <div class="form-check d-flex justify-content-center m-0">
+                                                                <input type="checkbox" 
+                                                                       class="attendance-checkbox checkbox-custom form-check-input shadow-sm"
+                                                                       style="width: 1.5rem; height: 1.5rem; border-color: #adb5bd;"
+                                                                       data-year="{{ $year }}"
+                                                                       data-seminar="{{ $seminar }}"
+                                                                       {{ isset($attendanceMatrix[$year][$seminar]) ? 'checked' : '' }}>
+                                                            </div>
+                                                        @else
+                                                            <div class="opacity-25 text-gray-300">
+                                                                <i class="bi bi-dash-lg" style="font-size: 1.5rem;"></i>
+                                                            </div>
                                                         @endif
                                                     </div>
                                                 </td>

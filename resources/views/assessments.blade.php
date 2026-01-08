@@ -2,827 +2,405 @@
 
 @section('content')
     <style>
-        /* Homepage theme variables (mapped into existing dashboard vars) */
+        /* Homepage theme variables */
         :root {
-            --primary-green: #1f7a2d; /* Homepage forest green */
-            --primary-green-2: #13601f; /* darker stop */
-            --accent-green: #2e7d32;
-            --light-green: #eaf5ea;
-            --accent-orange: #FFCB05;
-            --text-dark: #16321f;
-            --text-light: #6c757d;
-            --bg-light: #f6fbf6;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
-
-            /* Map dashboard-specific names to homepage palette for compatibility */
+            --primary-green: #1f7a2d;
             --forest-green: var(--primary-green);
-            --forest-green-dark: var(--primary-green-2);
-            --forest-green-light: var(--accent-green);
-            --forest-green-lighter: var(--light-green);
-            --yellow-maize: var(--accent-orange);
-            --yellow-maize-light: #fef9e7;
-            --white: #ffffff;
-            --gray-50: var(--bg-light);
-            --gray-100: #eef6ee;
-            --gray-600: var(--text-light);
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --success: #28a745;
-            --info: #17a2b8;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
-            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply the same page zoom used on the homepage */
         .home-zoom {
             zoom: 0.85;
         }
-        @supports not (zoom: 1) {
-            .home-zoom {
-                transform: scale(0.85);
-                transform-origin: top center;
-            }
-        }
-        
-        body, .profile-card, .stats-card, .main-content-card {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green) ;
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0,0,0,0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
-        
-        .custom-sidebar .sidebar-logo {
+
+        .assessment-header {
+            color: #2d5016;
+            font-weight: 700;
+            font-size: 1.75rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
             text-align: center;
-            padding: 2rem 1rem 1rem 1rem;
-            border-bottom: 1px solid #4a7c59;
-        }
-        
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.5rem 0.5rem 0 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-            position: relative;
-        }
-        
-        .custom-sidebar .sidebar-link.active, .custom-sidebar .sidebar-link:hover {
-            background: #4a7c59;
-            color: #f4d03f;
-        }
-        
-        .custom-sidebar .sidebar-link .bi {
-            font-size: 1.1rem;
-        }
-        
-        .custom-sidebar .sidebar-bottom {
-            padding: 1rem 0.5rem;
-            border-top: 1px solid #4a7c59;
-        }
-        
-        .custom-sidebar .sidebar-link.logout {
-            background: #dc3545;
-            color: #fff;
-            border-radius: 8px;
-            text-align: center;
-            padding: 0.75rem 1rem;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        
-        .custom-sidebar .sidebar-link.logout:hover {
-            background: #b52a37;
-            color: #fff;
-        }
-        
-        @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
-        @media (max-width: 767.98px) {
-            /* Off-canvas behavior on mobile */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.2s ease;
-                flex-direction: column;
-                padding: 0;
-            }
-            .custom-sidebar.show {
-                transform: translateX(0);
-            }
-            .custom-sidebar .sidebar-logo { display: block; }
-            .custom-sidebar .sidebar-nav {
-                flex-direction: column;
-                gap: 0.25rem;
-                padding: 1rem 0.5rem 1rem 0.5rem;
-            }
-            .custom-sidebar .sidebar-link {
-                justify-content: flex-start;
-                padding: 0.6rem 0.75rem;
-                font-size: 1rem;
-            }
-            .main-dashboard-content {
-                margin-left: 0;
-            }
-            /* Toggle button */
-            #studentSidebarToggle {
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1100;
-                background: var(--forest-green);
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 0.5rem 0.75rem;
-                box-shadow: var(--shadow-sm);
-            }
-        }
-        
-        .main-dashboard-content {
-            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
-            min-height: 100vh;
-            padding: 1rem 1.5rem;
-            margin-left: 240px;
-            transition: margin-left 0.2s;
         }
 
-        /* Constrain inner content and center it within the available area */
-        .main-dashboard-inner {
-            max-width: 1180px;
+        .assessment-subtitle {
+            color: #3d5c2d;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .assessment-cards-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .assessment-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(44, 80, 22, 0.08);
+            padding: 1.5rem 1.25rem;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.2s;
+            position: relative;
+        }
+
+        .assessment-card:hover {
+            box-shadow: 0 8px 32px rgba(44, 80, 22, 0.13);
+        }
+
+        /* Year badge to guide students */
+        .year-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .badge-1st {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .badge-2nd {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .badge-3rd {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .badge-4th {
+            background: #f3e5f5;
+            color: #4a148c;
+        }
+
+        .assessment-icon {
+            font-size: 2rem;
+            color: #2d5016;
+            margin-bottom: 0.75rem;
+        }
+
+        .assessment-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            text-align: center;
+        }
+
+        .assessment-desc {
+            color: #3d5c2d;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            min-height: 3rem;
+            /* Align buttons */
+        }
+
+        .assessment-btn {
+            background: #2d9a36;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 0;
+            width: 100%;
+            margin-top: auto;
+            transition: background 0.2s;
+        }
+
+        .assessment-btn:hover {
+            background: #237728;
+            color: #fff;
+        }
+
+        /* Form container styles */
+        .assessment-form-container {
+            display: none;
+            /* hidden by default */
+            max-width: 700px;
             margin: 0 auto;
         }
 
-    .assessment-header {
-        color: #2d5016;
-        font-weight: 700;
-        font-size: 1.75rem;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-        text-align: center;
-    }
-    .assessment-subtitle {
-        color: #3d5c2d;
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-        text-align: center;
-    }
-    .assessment-cards-row {
-        display: flex;
-        justify-content: center;
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-    }
-    .assessment-card {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 24px rgba(44, 80, 22, 0.08);
-        padding: 1.5rem 1.25rem;
-        width: 340px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 1rem;
-        transition: box-shadow 0.2s;
-    }
-    .assessment-card:hover {
-        box-shadow: 0 8px 32px rgba(44, 80, 22, 0.13);
-    }
-    .assessment-icon {
-        font-size: 2rem;
-        color: #2d5016;
-        margin-bottom: 0.75rem;
-    }
-    .assessment-title {
-        font-size: 1.15rem;
-        font-weight: 700;
-        margin-bottom: 0.25rem;
-        text-align: center;
-    }
-    .assessment-desc {
-        color: #3d5c2d;
-        font-size: 1.05rem;
-        margin-bottom: 1.2rem;
-        text-align: center;
-    }
-    .assessment-list {
-        list-style: none;
-        padding: 0;
-        margin-bottom: 1.5rem;
-        width: 100%;
-    }
-    .assessment-list li {
-        display: flex;
-        align-items: center;
-        color: #2d5016;
-        font-size: 1.08rem;
-        margin-bottom: 0.5rem;
-        gap: 0.5rem;
-    }
-    .assessment-list .bi {
-        color: #2d9a36;
-        font-size: 1.5rem;
-    }
-    .assessment-btn {
-        background: #2d9a36;
-        color: #fff;
-        font-weight: 700;
-        font-size: 1.1rem;
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 0;
-        width: 100%;
-        margin-top: 0.5rem;
-        transition: background 0.2s;
-    }
-    .assessment-btn:hover {
-        background: #237728;
-        color: #fff;
-    }
-    @media (max-width: 1100px) {
-        .assessment-cards-row {
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-        }
-    }
-</style>
-
-    <div class="home-zoom">
-    <div class="d-flex">
-        <!-- Mobile Sidebar Toggle -->
-        <button id="studentSidebarToggle" class="d-md-none">
-            <i class="bi bi-list"></i>
-        </button>
-        <!-- Sidebar -->
-        <div class="custom-sidebar">
-            <div class="sidebar-logo mb-4">
-                <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
-                <h3 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">CMU Guidance and Counseling Center</h3>
-                <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Student Portal</p>
-            </div>
-            <nav class="sidebar-nav flex-grow-1">
-                <a href="{{ route('profile') }}" class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i class="bi bi-person"></i>Profile</a>
-                <a href="{{ route('dashboard') }}" class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i class="bi bi-house-door"></i>Dashboard</a>
-                <a href="{{ route('appointments.index') }}" class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i class="bi bi-calendar-check"></i>Appointments</a>
-                <a href="{{ route('assessments.index') }}" class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i class="bi bi-clipboard-data"></i>Assessments</a>
-                <a href="{{ route('chat.selectCounselor') }}" class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i class="bi bi-chat-dots"></i>Chat with a Counselor</a>
-            </nav>
-            <div class="sidebar-bottom w-100">
-                <a href="{{ route('logout') }}" class="sidebar-link logout"
-                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="bi bi-box-arrow-right"></i>Logout
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-            </div>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="main-dashboard-content flex-grow-1">
-            <div class="main-dashboard-inner">
-<div class="container py-1">
-    <div class="assessment-header">Mental Health Assessment</div>
-    <div class="assessment-subtitle">
-        Take a moment to assess your mental well-being. Choose an assessment type below to get started.
-    </div>
-    <div class="assessment-cards-row" id="assessment-cards">
-        <!-- DASS-42 removed from hub: moved to its own dedicated flow -->
-        <!-- Academic Stress Survey Card -->
-        <div class="assessment-card">
-            <div class="assessment-icon"><i class="bi bi-heart-pulse"></i></div>
-            <div class="assessment-title">Academic Stress Survey</div>
-            <div class="assessment-desc">Academic and Personal Stress Evaluation</div>
-            <ul class="assessment-list">
-                <li><i class="bi bi-check2"></i>15 questions</li>
-                <li><i class="bi bi-check2"></i>3-5 minutes</li>
-                <li><i class="bi bi-check2"></i>Focused on academic life</li>
-            </ul>
-            <button class="assessment-btn" id="start-academic">START SURVEY</button>
-        </div>
-        <!-- Wellness Check Card -->
-        <div class="assessment-card">
-            <div class="assessment-icon"><i class="bi bi-flower2"></i></div>
-            <div class="assessment-title">Wellness Check</div>
-            <div class="assessment-desc">Overall Mental Wellness Assessment</div>
-            <ul class="assessment-list">
-                <li><i class="bi bi-check2"></i>12 questions</li>
-                <li><i class="bi bi-check2"></i>3-5 minutes</li>
-                <li><i class="bi bi-check2"></i>Holistic approach</li>
-            </ul>
-            <button class="assessment-btn" id="start-wellness">START CHECK</button>
-        </div>
-    </div>
-    <!-- DASS-42 form removed from hub: moved to its own dedicated flow -->
-    <!-- Academic Stress Survey Form (hidden by default) -->
-    <div id="academic-form-container" style="display:none;">
-        <form method="POST" action="{{ route('assessments.academic.submit') }}" class="card p-0 shadow-sm dass42-form" style="max-width: 700px; margin: 0 auto;">
-            @csrf
-            <div class="dass42-sticky-header" style="position:sticky;top:0;z-index:10;background:#f8f9fa;padding:1.2rem 1.5rem 0.5rem 1.5rem;border-radius:18px 18px 0 0;box-shadow:0 2px 8px rgba(44,80,22,0.04);">
-                <h3 class="mb-2 text-center" style="color: #2d5016;">Academic Stress Survey</h3>
-                <div class="progress mb-0" style="height: 18px;">
-                    <div id="academic-progress" class="progress-bar bg-success" role="progressbar" style="width: 0%; font-weight: bold;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="15">0/15</div>
-                </div>
-            </div>
-            <div id="academic-question-wrapper" class="p-4 pb-0">
-                <ol class="dass42-questions-list" style="padding-left: 0;">
-                    @foreach($academic_questions as $idx => $question)
-                        <li class="mb-4 academic-question-item" data-question="{{ $idx }}" style="list-style: none; display: none;">
-                            <div class="fw-bold mb-2">{{ ($idx+1) . ". " . $question }}</div>
-                            <div class="row g-2 align-items-center dass42-options-row">
-                                @for($i=0; $i<=3; $i++)
-                                    <div class="col-12 col-md-6 col-lg-3">
-                                        <div class="form-check dass42-option-check w-100">
-                                            <input class="form-check-input" type="radio" name="academic_answers[{{ $idx }}]" id="aq{{ $idx }}_{{ $i }}" value="{{ $i }}" required tabindex="-1">
-                                            <label class="form-check-label w-100" for="aq{{ $idx }}_{{ $i }}" style="font-size: 0.98rem;">
-                                                {{ [0=>'Never', 1=>'Sometimes', 2=>'Often', 3=>'Always'][$i] }}
-                                            </label>
-                                        </div>
-                                    </div>
-                                @endfor
-                            </div>
-                        </li>
-                    @endforeach
-                </ol>
-            </div>
-            <div class="dass42-nav-controls d-flex justify-content-between align-items-center px-4 pb-4 pt-2" style="background:#f8f9fa;border-radius:0 0 18px 18px;">
-                <button type="button" class="btn btn-outline-secondary px-4 py-2" id="academic-prev" style="visibility:hidden;">Previous</button>
-                <button type="button" class="btn btn-outline-success px-4 py-2" id="academic-next">Next</button>
-                <button type="submit" class="btn btn-success px-5 py-2" id="academic-submit" style="display:none;">Submit Survey</button>
-            </div>
-            <!-- Free-text field -->
-            <div class="px-4 pb-4">
-                <label for="academic_comment" class="form-label">How are you feeling? (Optional)</label>
-                <textarea class="form-control" name="student_comment" id="academic_comment" rows="2" placeholder="Share anything you'd like with your counselor..."></textarea>
-            </div>
-            <div id="academic-summary" style="display:none;" class="p-4">
-                <h4 class="mb-3 text-center" style="color:#2d5016;">Review Your Answers</h4>
-                <div class="dass42-review-list mb-3">
-                    @foreach($academic_questions as $idx => $question)
-                        <div class="dass42-review-item d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-2 p-3">
-                            <div class="dass42-review-question flex-grow-1 mb-2 mb-md-0"><span class="fw-semibold text-dark">{{ ($idx+1) . ". " . $question }}</span></div>
-                            <div class="dass42-review-answer text-end">
-                                <span class="badge academic-summary-answer px-3 py-2" data-summary="{{ $idx }}" style="font-size:1rem;">Not answered</span>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="text-center">
-                    <button type="button" class="btn btn-outline-secondary px-4 py-2" id="academic-edit">Edit Answers</button>
-                    <button type="submit" class="btn btn-success px-5 py-2 ms-2">Submit Survey</button>
-                </div>
-            </div>
-        </form>
-    </div>
-    <!-- Wellness Check Form (hidden by default) -->
-    <div id="wellness-form-container" style="display:none;">
-        <form method="POST" action="{{ route('assessments.wellness.submit') }}" class="card p-0 shadow-sm dass42-form" style="max-width: 700px; margin: 0 auto;">
-            @csrf
-            <div class="dass42-sticky-header" style="position:sticky;top:0;z-index:10;background:#f8f9fa;padding:1.2rem 1.5rem 0.5rem 1.5rem;border-radius:18px 18px 0 0;box-shadow:0 2px 8px rgba(44,80,22,0.04);">
-                <h3 class="mb-2 text-center" style="color: #2d5016;">Wellness Check</h3>
-                <div class="progress mb-0" style="height: 18px;">
-                    <div id="wellness-progress" class="progress-bar bg-success" role="progressbar" style="width: 0%; font-weight: bold;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="12">0/12</div>
-                </div>
-            </div>
-            <div id="wellness-question-wrapper" class="p-4 pb-0">
-                <ol class="dass42-questions-list" style="padding-left: 0;">
-                    @foreach($wellness_questions as $idx => $question)
-                        <li class="mb-4 wellness-question-item" data-question="{{ $idx }}" style="list-style: none; display: none;">
-                            <div class="fw-bold mb-2">{{ ($idx+1) . ". " . $question }}</div>
-                            <div class="row g-2 align-items-center dass42-options-row">
-                                @for($i=0; $i<=3; $i++)
-                                    <div class="col-12 col-md-6 col-lg-3">
-                                        <div class="form-check dass42-option-check w-100">
-                                            <input class="form-check-input" type="radio" name="wellness_answers[{{ $idx }}]" id="wq{{ $idx }}_{{ $i }}" value="{{ $i }}" required tabindex="-1">
-                                            <label class="form-check-label w-100" for="wq{{ $idx }}_{{ $i }}" style="font-size: 0.98rem;">
-                                                {{ [0=>'Never', 1=>'Sometimes', 2=>'Often', 3=>'Always'][$i] }}
-                                            </label>
-                                        </div>
-                                    </div>
-                                @endfor
-                            </div>
-                        </li>
-                    @endforeach
-                </ol>
-            </div>
-            <div class="dass42-nav-controls d-flex justify-content-between align-items-center px-4 pb-4 pt-2" style="background:#f8f9fa;border-radius:0 0 18px 18px;">
-                <button type="button" class="btn btn-outline-secondary px-4 py-2" id="wellness-prev" style="visibility:hidden;">Previous</button>
-                <button type="button" class="btn btn-outline-success px-4 py-2" id="wellness-next">Next</button>
-                <button type="submit" class="btn btn-success px-5 py-2" id="wellness-submit" style="display:none;">Submit Wellness Check</button>
-            </div>
-            <!-- Free-text field -->
-            <div class="px-4 pb-4">
-                <label for="wellness_comment" class="form-label">How are you feeling? (Optional)</label>
-                <textarea class="form-control" name="student_comment" id="wellness_comment" rows="2" placeholder="Share anything you'd like with your counselor..."></textarea>
-            </div>
-            <div id="wellness-summary" style="display:none;" class="p-4">
-                <h4 class="mb-3 text-center" style="color:#2d5016;">Review Your Answers</h4>
-                <div class="dass42-review-list mb-3">
-                    @foreach($wellness_questions as $idx => $question)
-                        <div class="dass42-review-item d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-2 p-3">
-                            <div class="dass42-review-question flex-grow-1 mb-2 mb-md-0"><span class="fw-semibold text-dark">{{ ($idx+1) . ". " . $question }}</span></div>
-                            <div class="dass42-review-answer text-end">
-                                <span class="badge wellness-summary-answer px-3 py-2" data-summary="{{ $idx }}" style="font-size:1rem;">Not answered</span>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="text-center">
-                    <button type="button" class="btn btn-outline-secondary px-4 py-2" id="wellness-edit">Edit Answers</button>
-                    <button type="submit" class="btn btn-success px-5 py-2 ms-2">Submit Wellness Check</button>
-                </div>
-            </div>
-        </form>
-    </div>
-    <style>
-        .dass42-form {
+        .form-card {
             background: #f8f9fa;
             border-radius: 18px;
             box-shadow: 0 4px 24px rgba(44, 80, 22, 0.08);
+            overflow: hidden;
         }
-        .dass42-questions-list {
-            margin-bottom: 0;
+
+        .form-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
         }
-        .dass42-question-item {
+
+        .question-item {
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44, 80, 22, 0.06);
-            padding: 1.2rem 1rem 0.7rem 1rem;
-            margin-bottom: 1.2rem;
-            border: 2px solid transparent;
-            transition: border 0.2s;
-        }
-        .dass42-question-item.active {
-            border: 2px solid #2d9a36;
-            box-shadow: 0 4px 16px rgba(44, 80, 22, 0.13);
-        }
-        .dass42-options-row {
-            margin-top: 0.5rem;
-        }
-        .dass42-option-check {
-            background: #e8f5e8;
-            border-radius: 8px;
-            padding: 0.5rem 0.7rem;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            min-height: 44px;
-            margin-bottom: 0.3rem;
-        }
-        .dass42-option-check input[type="radio"] {
-            margin-right: 0.7em;
-            margin-top: 0;
-            margin-bottom: 0;
-            flex-shrink: 0;
-            width: 1.2em;
-            height: 1.2em;
-        }
-        .dass42-option-check label {
-            margin-bottom: 0;
-            flex: 1 1 0%;
-            display: flex;
-            align-items: center;
-            font-size: 0.98rem;
-            cursor: pointer;
-        }
-        .dass42-option-check input[type="radio"]:checked + label {
-            font-weight: bold;
-            color: #2d5016;
-        }
-        .dass42-nav-controls {
-            border-top: 1px solid #e0e0e0;
-        }
-        .dass42-review-list {
-            width: 100%;
-        }
-        .dass42-review-item {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 1px 4px rgba(44,80,22,0.06);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
             border: 1px solid #e0e0e0;
-            min-height: 56px;
-            transition: box-shadow 0.2s;
+        }
+
+        .option-radio {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .dass42-review-question {
-            font-size: 1.04rem;
-            color: #2d5016;
-            flex: 0 0 60%;
-            word-break: break-word;
+
+        .option-radio:hover {
+            background: #f1f8e9;
         }
-        .dass42-review-answer {
-            flex: 0 0 40%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            min-width: 0;
-        }
-        .dass42-review-answer .badge {
-            font-size: 1rem;
-            min-width: 120px;
-            text-align: center;
-            background: #e8f5e8;
-            color: #2d5016;
-            border: 1px solid #c3e6cb;
-            max-width: 100%;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            white-space: normal;
-        }
-        .dass42-review-answer .badge.bg-success {
-            background: #2d9a36;
-            color: #fff;
-            border: none;
-        }
-        .dass42-review-answer .badge.bg-danger {
-            background: #dc3545;
-            color: #fff;
-            border: none;
-        }
-        @media (max-width: 900px) {
-            .dass42-review-question { flex-basis: 100%; }
-            .dass42-review-answer { flex-basis: 100%; justify-content: flex-start; margin-top: 0.5rem; }
-            .dass42-review-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-        }
-        @media (max-width: 600px) {
-            .dass42-form { padding: 0.5rem !important; }
-            .dass42-question-item { padding: 0.7rem 0.5rem; }
-            .dass42-sticky-header { padding: 1rem 0.5rem 0.5rem 0.5rem; }
-            .dass42-nav-controls { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
-            .dass42-options-row > div { margin-bottom: 0.5rem; }
+
+        .option-radio input {
+            margin-right: 10px;
+            transform: scale(1.2);
         }
     </style>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    // DASS-42 removed from hub: start button and inline flow were moved to a dedicated page/flow.
-    // Initialize Academic and Wellness start buttons safely (only if present).
-    const startAcademicBtn = document.getElementById('start-academic');
-    if (startAcademicBtn) {
-        startAcademicBtn.addEventListener('click', function() {
-            document.getElementById('assessment-cards').style.display = 'none';
-            document.getElementById('academic-form-container').style.display = 'block';
-            showAcademicQuestion(0); // Ensure first question is shown
-        });
-    }
-    const startWellnessBtn = document.getElementById('start-wellness');
-    if (startWellnessBtn) {
-        startWellnessBtn.addEventListener('click', function() {
-            document.getElementById('assessment-cards').style.display = 'none';
-            document.getElementById('wellness-form-container').style.display = 'block';
-            showWellnessQuestion(0);
-        });
-    }
 
-    // Academic Survey Navigation
-    const academicTotal = {{ count($academic_questions) }};
-    let academicCurrent = 0;
-    const academicQuestions = document.querySelectorAll('.academic-question-item');
-    const academicPrevBtn = document.getElementById('academic-prev');
-    const academicNextBtn = document.getElementById('academic-next');
-    const academicSubmitBtn = document.getElementById('academic-submit');
-    const academicSummaryDiv = document.getElementById('academic-summary');
-    const academicWrapper = document.getElementById('academic-question-wrapper');
-    const academicRadios = document.querySelectorAll('input[name^="academic_answers"]');
-    const academicProgressBar = document.getElementById('academic-progress');
-    function showAcademicQuestion(idx) {
-        academicQuestions.forEach((q, i) => {
-            q.style.display = (i === idx) ? '' : 'none';
-            q.classList.toggle('active', i === idx);
-        });
-        academicPrevBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
-        academicNextBtn.style.display = idx === academicTotal-1 ? 'none' : '';
-        academicSubmitBtn.style.display = idx === academicTotal-1 ? '' : 'none';
-        academicSummaryDiv.style.display = 'none';
-        academicWrapper.style.display = '';
-        updateAcademicProgress();
-        const firstRadio = academicQuestions[idx].querySelector('input[type="radio"]');
-        if(firstRadio) firstRadio.focus();
-    }
-    academicPrevBtn.onclick = () => { if(academicCurrent>0) showAcademicQuestion(--academicCurrent); };
-    academicNextBtn.onclick = () => {
-        const checked = academicQuestions[academicCurrent].querySelector('input[type="radio"]:checked');
-        if(!checked) {
-            academicQuestions[academicCurrent].scrollIntoView({behavior:'smooth',block:'center'});
-            academicQuestions[academicCurrent].classList.add('border-danger');
-            setTimeout(()=>academicQuestions[academicCurrent].classList.remove('border-danger'), 1000);
-            return;
-        }
-        if(academicCurrent<academicTotal-1) showAcademicQuestion(++academicCurrent);
-    };
-    function updateAcademicProgress() {
-        const answered = new Set();
-        academicRadios.forEach(r => { if(r.checked) answered.add(r.name); });
-        const count = answered.size;
-        const percent = Math.round((count/academicTotal)*100);
-        academicProgressBar.style.width = percent + '%';
-        academicProgressBar.setAttribute('aria-valuenow', count);
-        academicProgressBar.textContent = count + '/15';
-    }
-    academicRadios.forEach(r => r.addEventListener('change', updateAcademicProgress));
-    academicSubmitBtn.onclick = function(e) {
-        e.preventDefault();
-        document.querySelectorAll('.academic-summary-answer').forEach(span => {
-            const idx = span.getAttribute('data-summary');
-            const checked = document.querySelector('input[name="academic_answers['+idx+']"]:checked');
-            if(checked) {
-                span.textContent = checked.nextElementSibling.textContent;
-                span.className = 'badge bg-success academic-summary-answer';
-            } else {
-                span.textContent = 'Not answered';
-                span.className = 'badge bg-danger academic-summary-answer';
-            }
-        });
-        academicSummaryDiv.style.display = '';
-        academicWrapper.style.display = 'none';
-        academicPrevBtn.style.display = academicNextBtn.style.display = academicSubmitBtn.style.display = 'none';
-    };
-    var academicEditBtn = document.getElementById('academic-edit');
-    if (academicEditBtn) {
-        academicEditBtn.onclick = function() {
-        academicSummaryDiv.style.display = 'none';
-        academicWrapper.style.display = '';
-        showAcademicQuestion(academicCurrent);
-        academicPrevBtn.style.display = academicNextBtn.style.display = '';
-        academicSubmitBtn.style.display = academicCurrent === academicTotal-1 ? '' : 'none';
-    };
-    }
-    if(document.getElementById('academic-form-container').style.display !== 'none') showAcademicQuestion(0);
+    <div class="home-zoom">
+        <div class="d-flex">
+            <!-- Sidebar (Simplified for brevity, assuming existing sidebar structure is handled by layout/include if not, use the previous one) -->
+            <div class="custom-sidebar d-none d-md-block">
+                <!-- reusing existing sidebar structure/styles from previous file view -->
+                <div class="sidebar-logo mb-4">
+                    <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
+                        style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 0.75rem auto; display: block;">
+                    <h3 style="text-align:center; font-size: 1.1rem; color: #f4d03f;">CMU Guidance</h3>
+                </div>
+                <nav class="sidebar-nav flex-grow-1">
+                    <a href="{{ route('profile') }}"
+                        class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
+                            class="bi bi-person"></i> Profile</a>
+                    <a href="{{ route('dashboard') }}"
+                        class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
+                            class="bi bi-house-door"></i> Dashboard</a>
+                    <a href="{{ route('appointments.index') }}" class="sidebar-link"><i class="bi bi-calendar-check"></i>
+                        Appointments</a>
+                    <a href="{{ route('assessments.index') }}" class="sidebar-link active"><i
+                            class="bi bi-clipboard-data"></i> Assessments</a>
+                </nav>
+            </div>
 
-    // Wellness Check Navigation
-    const wellnessTotal = {{ count($wellness_questions) }};
-    let wellnessCurrent = 0;
-    const wellnessQuestions = document.querySelectorAll('.wellness-question-item');
-    const wellnessPrevBtn = document.getElementById('wellness-prev');
-    const wellnessNextBtn = document.getElementById('wellness-next');
-    const wellnessSubmitBtn = document.getElementById('wellness-submit');
-    const wellnessSummaryDiv = document.getElementById('wellness-summary');
-    const wellnessWrapper = document.getElementById('wellness-question-wrapper');
-    const wellnessRadios = document.querySelectorAll('input[name^="wellness_answers"]');
-    const wellnessProgressBar = document.getElementById('wellness-progress');
-    function showWellnessQuestion(idx) {
-        wellnessQuestions.forEach((q, i) => {
-            q.style.display = (i === idx) ? '' : 'none';
-            q.classList.toggle('active', i === idx);
-        });
-        wellnessPrevBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
-        wellnessNextBtn.style.display = idx === wellnessTotal-1 ? 'none' : '';
-        wellnessSubmitBtn.style.display = idx === wellnessTotal-1 ? '' : 'none';
-        wellnessSummaryDiv.style.display = 'none';
-        wellnessWrapper.style.display = '';
-        updateWellnessProgress();
-        const firstRadio = wellnessQuestions[idx].querySelector('input[type="radio"]');
-        if(firstRadio) firstRadio.focus();
-    }
-    wellnessPrevBtn.onclick = () => { if(wellnessCurrent>0) showWellnessQuestion(--wellnessCurrent); };
-    wellnessNextBtn.onclick = () => {
-        const checked = wellnessQuestions[wellnessCurrent].querySelector('input[type="radio"]:checked');
-        if(!checked) {
-            wellnessQuestions[wellnessCurrent].scrollIntoView({behavior:'smooth',block:'center'});
-            wellnessQuestions[wellnessCurrent].classList.add('border-danger');
-            setTimeout(()=>wellnessQuestions[wellnessCurrent].classList.remove('border-danger'), 1000);
-            return;
-        }
-        if(wellnessCurrent<wellnessTotal-1) showWellnessQuestion(++wellnessCurrent);
-    };
-    function updateWellnessProgress() {
-        const answered = new Set();
-        wellnessRadios.forEach(r => { if(r.checked) answered.add(r.name); });
-        const count = answered.size;
-        const percent = Math.round((count/wellnessTotal)*100);
-        wellnessProgressBar.style.width = percent + '%';
-        wellnessProgressBar.setAttribute('aria-valuenow', count);
-        wellnessProgressBar.textContent = count + '/12';
-    }
-    wellnessRadios.forEach(r => r.addEventListener('change', updateWellnessProgress));
-    wellnessSubmitBtn.onclick = function(e) {
-        e.preventDefault();
-        document.querySelectorAll('.wellness-summary-answer').forEach(span => {
-            const idx = span.getAttribute('data-summary');
-            const checked = document.querySelector('input[name="wellness_answers['+idx+']"]:checked');
-            if(checked) {
-                span.textContent = checked.nextElementSibling.textContent;
-                span.className = 'badge bg-success wellness-summary-answer';
-            } else {
-                span.textContent = 'Not answered';
-                span.className = 'badge bg-danger wellness-summary-answer';
-            }
-        });
-        wellnessSummaryDiv.style.display = '';
-        wellnessWrapper.style.display = 'none';
-        wellnessPrevBtn.style.display = wellnessNextBtn.style.display = wellnessSubmitBtn.style.display = 'none';
-    };
-    var wellnessEditBtn = document.getElementById('wellness-edit');
-    if (wellnessEditBtn) {
-        wellnessEditBtn.onclick = function() {
-        wellnessSummaryDiv.style.display = 'none';
-        wellnessWrapper.style.display = '';
-        showWellnessQuestion(wellnessCurrent);
-        wellnessPrevBtn.style.display = wellnessNextBtn.style.display = '';
-        wellnessSubmitBtn.style.display = wellnessCurrent === wellnessTotal-1 ? '' : 'none';
-    };
-    }
-    if(document.getElementById('wellness-form-container').style.display !== 'none') showWellnessQuestion(0);
-    });
-    </script>
-@if(session('show_thank_you'))
-<!-- Thank You Modal -->
-<div class="modal fade" id="thankYouModal" tabindex="-1" aria-labelledby="thankYouModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header border-0">
-        <h5 class="modal-title w-100 text-center" id="thankYouModalLabel">Thank You!</h5>
-      </div>
-      <div class="modal-body text-center">
-        @php $type = session('last_assessment_type', 'DASS-42'); @endphp
-        @if($type === 'DASS-42')
-        <p class="mb-3">Thank you for completing the DASS-42 assessment.<br>Your responses have been submitted for review by a counselor.<br><span class="text-muted small">If you have any urgent concerns, please reach out to the guidance office directly.</span></p>
-        @elseif($type === 'Academic Stress Survey')
-        <p class="mb-3">Thank you for completing the Academic Stress Survey.<br>Your responses have been submitted for review by a counselor.<br><span class="text-muted small">If you have any urgent concerns, please reach out to the guidance office directly.</span></p>
-        @elseif($type === 'Wellness Check')
-        <p class="mb-3">Thank you for completing the Wellness Check.<br>Your responses have been submitted for review by a counselor.<br><span class="text-muted small">If you have any urgent concerns, please reach out to the guidance office directly.</span></p>
-        @else
-        <p class="mb-3">Thank you for completing the assessment.<br>Your responses have been submitted for review by a counselor.<br><span class="text-muted small">If you have any urgent concerns, please reach out to the guidance office directly.</span></p>
-        @endif
-        <a href="{{ route('dashboard') }}" class="btn btn-success px-3">Return to Dashboard</a>
-      </div>
-    </div>
-  </div>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var thankYouModal = new bootstrap.Modal(document.getElementById('thankYouModal'));
-    thankYouModal.show();
-});
-</script>
-@endif
+            <!-- Main Content -->
+            <div class="main-dashboard-content flex-grow-1" id="mainContent">
+                <div class="container py-1">
+                    <div class="assessment-header">Student Assessments</div>
+                    <div class="assessment-subtitle">
+                        Select the assessment corresponding to your year level.
+                    </div>
+
+                    <!-- Card Selection Grid -->
+                    <div class="assessment-cards-row" id="assessment-cards">
+
+                        <!-- 1st Year: GRIT -->
+                        <div class="assessment-card">
+                            <span class="year-badge badge-1st">1st Year</span>
+                            <div class="assessment-icon"><i class="bi bi-lightning-charge"></i></div>
+                            <div class="assessment-title">GRIT Scale</div>
+                            <div class="assessment-desc">Measure your passion and perseverance for long-term goals.</div>
+                            <button class="assessment-btn" onclick="openAssessment('grit')">START GRIT TEST</button>
+                        </div>
+
+                        <!-- 2nd Year: DASS-42 -->
+                        <!-- Redirects to dedicated page -->
+                        <div class="assessment-card">
+                            <span class="year-badge badge-2nd">2nd Year</span>
+                            <div class="assessment-icon"><i class="bi bi-activity"></i></div>
+                            <div class="assessment-title">DASS-42</div>
+                            <div class="assessment-desc">Depression, Anxiety, and Stress Scale assessment.</div>
+                            <a href="{{ route('assessments.dass42') }}"
+                                class="assessment-btn text-decoration-none text-center">START DASS-42</a>
+                        </div>
+
+                        <!-- 3rd Year: NEO -->
+                        <div class="assessment-card">
+                            <span class="year-badge badge-3rd">3rd Year</span>
+                            <div class="assessment-icon"><i class="bi bi-person-lines-fill"></i></div>
+                            <div class="assessment-title">NEO Personality</div>
+                            <div class="assessment-desc">Understand your personality traits (Big Five).</div>
+                            <button class="assessment-btn" onclick="openAssessment('neo')">START NEO TEST</button>
+                        </div>
+
+                        <!-- 4th Year: WVI -->
+                        <div class="assessment-card">
+                            <span class="year-badge badge-4th">4th Year</span>
+                            <div class="assessment-icon"><i class="bi bi-briefcase"></i></div>
+                            <div class="assessment-title">Work Values</div>
+                            <div class="assessment-desc">Identify what matters most to you in your career.</div>
+                            <button class="assessment-btn" onclick="openAssessment('wvi')">START WVI TEST</button>
+                        </div>
+
+                    </div>
+
+                    <!-- FORMS (Hidden by default) -->
+
+                    <!-- GRIT FORM -->
+                    <div id="grit-form-container" class="assessment-form-container">
+                        <form method="POST" action="{{ route('assessments.grit.submit') }}" class="form-card">
+                            @csrf
+                            <div class="form-header text-center">
+                                <h3>GRIT Scale</h3>
+                                <p class="text-muted mb-0">Please respond to the following statements truthfully.</p>
+                            </div>
+                            <div class="p-4">
+                                @foreach($grit_questions as $idx => $q)
+                                    <div class="question-item">
+                                        <p class="fw-bold mb-3">{{ $idx + 1 }}. {{ $q }}</p>
+                                        <div class="d-flex flex-wrap gap-3">
+                                            @foreach(['Not at all like me', 'Not much like me', 'Somewhat like me', 'Mostly like me', 'Very much like me'] as $key => $label)
+                                                <label class="option-radio">
+                                                    <input type="radio" name="grit_answers[{{ $idx }}]" value="{{ $key + 1 }}"
+                                                        required>
+                                                    {{ $label }}
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                                <label class="form-label mt-3">Comments (Optional)</label>
+                                <textarea class="form-control mb-4" name="student_comment" rows="2"></textarea>
+
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary"
+                                        onclick="closeAssessment()">Cancel</button>
+                                    <button type="submit" class="btn btn-success px-5">Submit GRIT Scale</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- NEO FORM -->
+                    <div id="neo-form-container" class="assessment-form-container">
+                        <form method="POST" action="{{ route('assessments.neo.submit') }}" class="form-card">
+                            @csrf
+                            <div class="form-header text-center">
+                                <h3>NEO Personality Inventory</h3>
+                                <p class="text-muted mb-0">Rate how accurately each statement describes you.</p>
+                            </div>
+                            <div class="p-4">
+                                @foreach($neo_questions as $idx => $q)
+                                    <div class="question-item">
+                                        <p class="fw-bold mb-3">{{ $idx + 1 }}. {{ $q }}</p>
+                                        <div class="d-flex flex-wrap gap-3">
+                                            @foreach(['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'] as $key => $label)
+                                                <label class="option-radio">
+                                                    <input type="radio" name="neo_answers[{{ $idx }}]" value="{{ $key + 1 }}"
+                                                        required>
+                                                    {{ $label }}
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                                <label class="form-label mt-3">Comments (Optional)</label>
+                                <textarea class="form-control mb-4" name="student_comment" rows="2"></textarea>
+
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary"
+                                        onclick="closeAssessment()">Cancel</button>
+                                    <button type="submit" class="btn btn-success px-5">Submit NEO Test</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- WVI FORM -->
+                    <div id="wvi-form-container" class="assessment-form-container">
+                        <form method="POST" action="{{ route('assessments.wvi.submit') }}" class="form-card">
+                            @csrf
+                            <div class="form-header text-center">
+                                <h3>Work Values Inventory (WVI)</h3>
+                                <p class="text-muted mb-0">How important are these values to you in your career?</p>
+                            </div>
+                            <div class="p-4">
+                                @foreach($wvi_questions as $idx => $q)
+                                    <div class="question-item">
+                                        <p class="fw-bold mb-3">{{ $idx + 1 }}. {{ $q }}</p>
+                                        <div class="d-flex flex-wrap gap-3">
+                                            @foreach(['Unimportant', 'Of Little Importance', 'Moderately Important', 'Important', 'Very Important'] as $key => $label)
+                                                <label class="option-radio">
+                                                    <input type="radio" name="wvi_answers[{{ $idx }}]" value="{{ $key + 1 }}"
+                                                        required>
+                                                    {{ $label }}
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                                <label class="form-label mt-3">Comments (Optional)</label>
+                                <textarea class="form-control mb-4" name="student_comment" rows="2"></textarea>
+
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary"
+                                        onclick="closeAssessment()">Cancel</button>
+                                    <button type="submit" class="btn btn-success px-5">Submit WVI</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
-    </div>
+
+    @if(session('show_thank_you'))
+        <div class="modal fade show" id="thankYouModal" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);"
+            aria-modal="true" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title w-100 text-center">Assessment Completed</h5>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p class="mb-4">Thank you for completing the <strong>{{ session('last_assessment_type') }}</strong>.</p>
+                        <p class="text-muted small mb-4">Your results have been submitted to the guidance counselor review.</p>
+                        <a href="{{ route('dashboard') }}" class="btn btn-success px-4">Back to Dashboard</a>
+                        <button type="button" class="btn btn-outline-secondary px-4 ms-2"
+                            onclick="document.getElementById('thankYouModal').style.display='none'">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <script>
-        // Sidebar toggle for mobile
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('studentSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function() {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function(e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        sidebar.classList.remove('show');
-                    }
-                });
-            }
-        });
+        function openAssessment(type) {
+            document.getElementById('assessment-cards').style.display = 'none';
+            // Hide all forms first
+            document.querySelectorAll('.assessment-form-container').forEach(el => el.style.display = 'none');
+            // Show selected form
+            document.getElementById(type + '-form-container').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function closeAssessment() {
+            document.querySelectorAll('.assessment-form-container').forEach(el => el.style.display = 'none');
+            document.getElementById('assessment-cards').style.display = 'flex';
+        }
     </script>
-@endsection 
+@endsection

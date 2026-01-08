@@ -317,51 +317,75 @@
                             <table class="min-w-full table-custom">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Target Year</th>
-                                        <th>Schedules</th>
-                                        <th>Actions</th>
+                                        <th class="w-[22%]">Name</th>
+                                        <th class="w-[8%] text-center">Year</th>
+                                        <th class="w-[55%]">Schedules</th>
+                                        <th class="w-[15%] text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($seminars as $seminar)
-                                        <tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
                                             <td>
-                                                <div class="font-bold text-gray-900">{{ $seminar->name }}</div>
-                                                <div class="text-sm text-gray-500">{{ Str::limit($seminar->description, 50) }}
+                                                <div class="font-bold text-gray-900 text-base">{{ $seminar->name }}</div>
+                                                <div class="text-sm text-gray-500 mt-1">
+                                                    {{ Str::limit($seminar->description, 60) }}</div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 font-bold text-sm border border-blue-100">
+                                                    {{ $seminar->target_year_level }}
+                                                </span>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="flex flex-wrap gap-2">
+                                                    @forelse($seminar->schedules as $schedule)
+                                                        <div
+                                                            class="inline-flex flex-col bg-white border border-gray-200 rounded px-2 py-1 shadow-sm text-xs">
+                                                            <div class="font-semibold text-gray-800">
+                                                                {{ $schedule->date->format('M d, Y') }}
+                                                            </div>
+                                                            <div class="flex items-center gap-1 text-gray-500">
+                                                                <span>{{ $schedule->session_type }}</span>
+                                                                @if($schedule->location)
+                                                                    <span>&bull;</span>
+                                                                    <span>{{ $schedule->location }}</span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @empty
+                                                        <span class="text-gray-400 italic text-sm">No schedules configured</span>
+                                                    @endforelse
                                                 </div>
                                             </td>
-                                            <td class="text-sm font-medium">{{ $seminar->target_year_level }}</td>
-                                            <td class="text-sm text-gray-500">
-                                                @foreach($seminar->schedules as $schedule)
-                                                    <div
-                                                        class="text-xs mb-1 bg-gray-50 p-1 rounded border border-gray-100 inline-block mr-1">
-                                                        <span
-                                                            class="font-semibold text-gray-700">{{ $schedule->date->format('M d, Y') }}</span>
-                                                        @if($schedule->location) <span class="text-gray-400">|</span>
-                                                        {{ $schedule->location }} @endif
-                                                    </div>
-                                                @endforeach
-                                                @if($seminar->schedules->isEmpty())
-                                                    <span class="text-gray-400 italic text-xs">No schedules</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-sm font-medium">
-                                                <a href="{{ route('counselor.seminars.edit', $seminar) }}"
-                                                    class="text-indigo-600 hover:text-indigo-900 mr-3 btn btn-sm btn-outline-warning">Edit</a>
-                                                <form action="{{ route('counselor.seminars.destroy', $seminar) }}" method="POST"
-                                                    class="inline-block" onsubmit="return confirm('Are you sure?');"
-                                                    style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                        class="text-red-600 hover:text-red-900 btn btn-sm btn-outline-danger">Delete</button>
-                                                </form>
+                                            <td class="text-right whitespace-nowrap">
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <a href="{{ route('counselor.seminars.edit', $seminar) }}"
+                                                        class="text-amber-600 hover:text-amber-700 font-medium text-sm px-3 py-1.5 rounded hover:bg-amber-50 transition-colors">
+                                                        Edit
+                                                    </a>
+                                                    <form action="{{ route('counselor.seminars.destroy', $seminar) }}"
+                                                        method="POST" class="inline-block"
+                                                        onsubmit="return confirm('Are you sure you want to delete this seminar?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                            class="text-red-600 hover:text-red-700 font-medium text-sm px-3 py-1.5 rounded hover:bg-red-50 transition-colors">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center py-8 text-gray-500">No seminars found.</td>
+                                            <td colspan="4" class="text-center py-12 text-gray-400">
+                                                <div class="mb-3">
+                                                    <i class="bi bi-calendar-x" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                                                </div>
+                                                <p class="text-lg font-medium text-gray-500">No seminars found</p>
+                                                <p class="text-sm">Get started by creating a new seminar.</p>
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>

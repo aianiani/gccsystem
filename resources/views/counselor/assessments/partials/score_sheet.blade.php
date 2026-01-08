@@ -5,41 +5,46 @@
         if (is_array($assessment->score)) {
             $studentAnswers = $assessment->score;
         } elseif (is_string($assessment->score)) {
-            $studentAnswers = json_decode($assessment->score, true) ?? [];
+            $decoded = json_decode($assessment->score, true);
+            $studentAnswers = is_array($decoded) ? $decoded : [];
         }
     }
     // Normalize 0-based keys (0..41) to 1-based (1..42) for compatibility
-    $normalized = [];
-    foreach ($studentAnswers as $k => $v) {
-        if (is_numeric($k)) {
-            $ik = (int)$k;
-            if ($ik >= 0 && $ik <= 41) {
-                $normalized[$ik + 1] = (int)$v;
-                continue;
+    // Check if 0-based keys are used
+    if (isset($studentAnswers[0])) {
+        $normalized = [];
+        foreach ($studentAnswers as $k => $v) {
+            if (is_numeric($k)) {
+                $ik = (int) $k;
+                if ($ik >= 0 && $ik <= 41) {
+                    $normalized[$ik + 1] = (int) $v;
+                    continue;
+                }
             }
+            $normalized[$k] = $v;
         }
-        $normalized[$k] = $v;
+        $studentAnswers = $normalized;
     }
-    $studentAnswers = $normalized;
-    
+    // Else assume already 1-based or proper keys
+
     // DASS-42 Scoring items
     $depressionItems = [3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38];
     $anxietyItems = [2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41];
     $stressItems = [1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39, 42];
-    
+
     // Calculate scores (raw sums of item values)
     $depressionScore = 0;
     $anxietyScore = 0;
     $stressScore = 0;
 
     foreach ($depressionItems as $item) {
-        $depressionScore += (int)($studentAnswers[$item] ?? 0);
+        $depressionScore += (int) ($studentAnswers[$item] ?? 0);
     }
     foreach ($anxietyItems as $item) {
-        $anxietyScore += (int)($studentAnswers[$item] ?? 0);
+        $anxietyScore += (int) ($studentAnswers[$item] ?? 0);
     }
     foreach ($stressItems as $item) {
-        $stressScore += (int)($studentAnswers[$item] ?? 0);
+        $stressScore += (int) ($studentAnswers[$item] ?? 0);
     }
 @endphp
 
@@ -100,10 +105,13 @@
                     $stressScore = $stressRaw;
 
                     // Helper to get category color
-                    $getCategoryColor = function($qNum) use ($depressionItems, $anxietyItems, $stressItems) {
-                        if (in_array($qNum, $depressionItems)) return '#0d6efd';
-                        if (in_array($qNum, $anxietyItems)) return '#0099ff';
-                        if (in_array($qNum, $stressItems)) return '#666';
+                    $getCategoryColor = function ($qNum) use ($depressionItems, $anxietyItems, $stressItems) {
+                        if (in_array($qNum, $depressionItems))
+                            return '#0d6efd';
+                        if (in_array($qNum, $anxietyItems))
+                            return '#0099ff';
+                        if (in_array($qNum, $stressItems))
+                            return '#666';
                         return '#ccc';
                     };
                 @endphp
@@ -112,31 +120,37 @@
                     @php
                         $q1 = $i;
                         $q2 = $i + 21;
-                        
+
                         // Check which category each question belongs to
                         $q1_isD = in_array($q1, $depressionItems) ? 1 : 0;
                         $q1_isA = in_array($q1, $anxietyItems) ? 1 : 0;
                         $q1_isS = in_array($q1, $stressItems) ? 1 : 0;
-                        
+
                         $q2_isD = in_array($q2, $depressionItems) ? 1 : 0;
                         $q2_isA = in_array($q2, $anxietyItems) ? 1 : 0;
                         $q2_isS = in_array($q2, $stressItems) ? 1 : 0;
-                        
+
                         // Calculate row scores
                         $rowDepression = 0;
                         $rowAnxiety = 0;
                         $rowStress = 0;
-                        
+
                         $q1_ans = $studentAnswers[$q1] ?? 0;
                         $q2_ans = $studentAnswers[$q2] ?? 0;
-                        
-                        if ($q1_isD) $rowDepression += $q1_ans;
-                        if ($q1_isA) $rowAnxiety += $q1_ans;
-                        if ($q1_isS) $rowStress += $q1_ans;
-                        
-                        if ($q2_isD) $rowDepression += $q2_ans;
-                        if ($q2_isA) $rowAnxiety += $q2_ans;
-                        if ($q2_isS) $rowStress += $q2_ans;
+
+                        if ($q1_isD)
+                            $rowDepression += $q1_ans;
+                        if ($q1_isA)
+                            $rowAnxiety += $q1_ans;
+                        if ($q1_isS)
+                            $rowStress += $q1_ans;
+
+                        if ($q2_isD)
+                            $rowDepression += $q2_ans;
+                        if ($q2_isA)
+                            $rowAnxiety += $q2_ans;
+                        if ($q2_isS)
+                            $rowStress += $q2_ans;
                     @endphp
                     <tr class="text-center align-middle">
                         {{-- First column: Questions 1-21 --}}

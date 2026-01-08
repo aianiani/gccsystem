@@ -8,27 +8,48 @@ use Illuminate\Http\Request;
 class CounselorDashboardController extends Controller
 {
     // Show all appointments assigned to the authenticated counselor
-    public function index()
+    public function index(Request $request)
     {
-        // Allow admins to view all appointments, counselors can only view their own
-        if (auth()->user()->isAdmin()) {
-            $appointments = Appointment::with('student', 'counselor')
-                ->orderBy('scheduled_at', 'desc')
-                ->paginate(10);
-            $allAppointments = Appointment::with('student', 'counselor')
-                ->orderBy('scheduled_at', 'desc')
-                ->get();
-        } else {
-            $appointments = Appointment::where('counselor_id', auth()->id())
-                ->with('student')
-                ->orderBy('scheduled_at', 'desc')
-                ->paginate(10);
-            $allAppointments = Appointment::where('counselor_id', auth()->id())
-                ->with('student')
-                ->orderBy('scheduled_at', 'desc')
-                ->get();
+        // Base query
+        $query = Appointment::where('counselor_id', auth()->id())
+            ->with('student');
+
+        // Search Filter
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->whereHas('student', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('student_id', 'like', "%{$search}%");
+            });
         }
-        return view('counselor.appointments.index', compact('appointments', 'allAppointments'));
+
+        // Status Filter
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        // Get paginated results
+        $appointments = $query->orderBy('scheduled_at', 'desc')->paginate(10);
+
+        // Calculate Stats (based on all data, not just filtered)
+        $totalAppointments = Appointment::where('counselor_id', auth()->id())->count();
+        $pendingAppointments = Appointment::where('counselor_id', auth()->id())->where('status', 'pending')->count();
+        $completedAppointments = Appointment::where('counselor_id', auth()->id())->where('status', 'completed')->count();
+
+        // Month stats (current month)
+        $currentMonthCount = Appointment::where('counselor_id', auth()->id())
+            ->whereMonth('scheduled_at', now()->month)
+            ->whereYear('scheduled_at', now()->year)
+            ->count();
+
+        return view('counselor.appointments.index', compact(
+            'appointments',
+            'totalAppointments',
+            'pendingAppointments',
+            'completedAppointments',
+            'currentMonthCount'
+        ));
     }
 
     // Show details for a specific appointment

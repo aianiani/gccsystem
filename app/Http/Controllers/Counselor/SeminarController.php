@@ -11,7 +11,25 @@ class SeminarController extends Controller
 {
     public function index()
     {
-        $seminars = Seminar::with('schedules')->get();
+        // Ensure default seminars exist
+        $defaults = [
+            ['name' => 'IDREAMS', 'target_year_level' => 1, 'description' => 'Seminar for 1st Year Students'],
+            ['name' => '10C', 'target_year_level' => 2, 'description' => 'Seminar for 2nd Year Students'],
+            ['name' => 'LEADS', 'target_year_level' => 3, 'description' => 'Seminar for 3rd Year Students'],
+            ['name' => 'IMAGE', 'target_year_level' => 4, 'description' => 'Seminar for 4th Year Students'],
+        ];
+
+        foreach ($defaults as $default) {
+            Seminar::firstOrCreate(
+                ['name' => $default['name']],
+                [
+                    'target_year_level' => $default['target_year_level'],
+                    'description' => $default['description']
+                ]
+            );
+        }
+
+        $seminars = Seminar::with('schedules')->orderBy('target_year_level')->get();
         return view('counselor.seminars.index', compact('seminars'));
     }
 
