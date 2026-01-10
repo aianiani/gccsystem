@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'GCC System') }} - Forgot Password</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.css') }}" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ asset('vendor/fonts/inter/inter.css') }}" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             min-height: 100vh;
@@ -24,18 +30,31 @@
             position: relative;
             overflow-x: hidden;
         }
+
         body::before {
             content: '';
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="grad1" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1);stop-opacity:1" /><stop offset="100%" style="stop-color:rgba(255,255,255,0);stop-opacity:1" /></radialGradient></defs><circle cx="20" cy="20" r="2" fill="url(%23grad1)"/><circle cx="80" cy="40" r="3" fill="url(%23grad1)"/><circle cx="40" cy="80" r="2" fill="url(%23grad1)"/><circle cx="90" cy="90" r="2" fill="url(%23grad1)"/><circle cx="10" cy="60" r="2" fill="url(%23grad1)"/></svg>');
             animation: float 8s ease-in-out infinite;
             z-index: 1;
         }
+
         @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
         }
+
         .main-container {
             max-width: 900px;
             width: 100%;
@@ -48,6 +67,7 @@
             z-index: 2;
             overflow: hidden;
         }
+
         .back-button {
             position: absolute;
             top: 1.5rem;
@@ -63,6 +83,7 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
+
         .back-button:hover {
             background: white;
             transform: translateY(-2px);
@@ -70,13 +91,16 @@
             color: #1e7e34;
             text-decoration: none;
         }
+
         .content-wrapper {
             padding: 3rem;
             text-align: center;
         }
+
         .logo-section {
             margin-bottom: 3rem;
         }
+
         .logo {
             width: 100px;
             height: 100px;
@@ -89,16 +113,26 @@
             box-shadow: 0 15px 35px rgba(30, 126, 52, 0.3);
             animation: pulse 2s ease-in-out infinite;
         }
+
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
+
         .logo-text {
             font-size: 1.5rem;
             font-weight: 700;
             color: white;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .brand-title {
             font-size: 2.5rem;
             font-weight: 700;
@@ -109,6 +143,7 @@
             margin-bottom: 1rem;
             line-height: 1.2;
         }
+
         .brand-subtitle {
             font-size: 1.1rem;
             color: #6c757d;
@@ -118,6 +153,7 @@
             margin-right: auto;
             line-height: 1.6;
         }
+
         .form-section {
             background: white;
             border-radius: 20px;
@@ -126,10 +162,12 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(30, 126, 52, 0.1);
         }
+
         .form-header {
             text-align: center;
             margin-bottom: 2rem;
         }
+
         .form-title {
             font-size: 2rem;
             font-weight: 700;
@@ -139,15 +177,18 @@
             background-clip: text;
             margin-bottom: 0.5rem;
         }
+
         .form-subtitle {
             font-size: 1rem;
             color: #6c757d;
             font-weight: 400;
         }
+
         .form-group {
             margin-bottom: 1.5rem;
             text-align: left;
         }
+
         .form-label {
             display: block;
             font-size: 0.9rem;
@@ -155,6 +196,7 @@
             color: #333;
             margin-bottom: 0.5rem;
         }
+
         .form-control {
             width: 100%;
             padding: 1rem 1.25rem;
@@ -165,17 +207,21 @@
             background: white;
             color: #333;
         }
+
         .form-control:focus {
             outline: none;
             border-color: #1e7e34;
             box-shadow: 0 0 0 3px rgba(30, 126, 52, 0.1);
         }
+
         .form-control.is-invalid {
             border-color: #dc3545;
         }
+
         .form-control::placeholder {
             color: #6c757d;
         }
+
         .login-button {
             width: 100%;
             padding: 1rem;
@@ -191,18 +237,29 @@
             letter-spacing: 0.5px;
             box-shadow: 0 4px 15px rgba(30, 126, 52, 0.3);
         }
+
         .login-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(30, 126, 52, 0.4);
         }
-        .login-button:active { transform: translateY(0); }
-        .login-button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .login-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .invalid-feedback {
             display: block;
             color: #dc3545;
             font-size: 0.875rem;
             margin-top: 0.375rem;
         }
+
         .info-card {
             background: #e8f5e8;
             border: 1px solid #b2dfdb;
@@ -213,21 +270,51 @@
             text-align: left;
             font-size: 1rem;
         }
+
         @media (max-width: 768px) {
-            .content-wrapper { padding: 2rem 1.5rem; }
-            .brand-title { font-size: 2rem; }
-            .form-section { padding: 2rem 1.5rem; }
-            .back-button { padding: 0.5rem 1rem; font-size: 0.9rem; }
+            .content-wrapper {
+                padding: 2rem 1.5rem;
+            }
+
+            .brand-title {
+                font-size: 2rem;
+            }
+
+            .form-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .back-button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
         }
+
         @media (max-width: 480px) {
-            .content-wrapper { padding: 1.5rem 1rem; }
-            .brand-title { font-size: 1.8rem; }
-            .brand-subtitle { font-size: 1rem; }
-            .form-section { padding: 1.5rem 1rem; }
-            .back-button { top: 1rem; left: 1rem; }
+            .content-wrapper {
+                padding: 1.5rem 1rem;
+            }
+
+            .brand-title {
+                font-size: 1.8rem;
+            }
+
+            .brand-subtitle {
+                font-size: 1rem;
+            }
+
+            .form-section {
+                padding: 1.5rem 1rem;
+            }
+
+            .back-button {
+                top: 1rem;
+                left: 1rem;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="main-container">
         <a href="{{ route('home') }}" class="back-button">
@@ -240,7 +327,8 @@
                     <div class="logo-text">GCC</div>
                 </div>
                 <h1 class="brand-title">CMU Guidance and<br>Counseling Center</h1>
-                <p class="brand-subtitle">Welcome to the Web-Based Appointment Scheduling and Counseling Information System. Schedule appointments, access resources, and connect with counselors easily.</p>
+                <p class="brand-subtitle">Welcome to the Web-Based Appointment Scheduling and Counseling Information
+                    System. Schedule appointments, access resources, and connect with counselors easily.</p>
             </div>
             <!-- Form Section -->
             <div class="form-section">
@@ -260,7 +348,8 @@
                     @csrf
                     <div class="form-group">
                         <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="Enter your email" required autofocus>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                            name="email" value="{{ old('email') }}" placeholder="Enter your email" required autofocus>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -270,10 +359,10 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}"></script>
     <script>
         // SweetAlert2 Toast Notification
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             @if(session('success'))
                 Swal.fire({
                     toast: true,
@@ -318,4 +407,5 @@
         });
     </script>
 </body>
-</html> 
+
+</html>

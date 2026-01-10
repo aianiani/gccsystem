@@ -50,12 +50,6 @@ class AppointmentBookedNotification extends Notification
             ->subject('New Appointment Booked')
             ->view('emails.appointments.booked', compact('student', 'counselor', 'appointment'));
 
-        // Embed logo
-        $logoPath = public_path('images/logo.jpg');
-        if (file_exists($logoPath)) {
-            $message->embed($logoPath, 'logo');
-        }
-
         return $message;
     }
 

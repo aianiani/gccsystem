@@ -100,18 +100,21 @@
       <div class="col-12">
         <div class="student-header rounded mb-3 p-3">
           <div class="d-flex align-items-start gap-3">
-            <img src="{{ $avatarUrl }}" class="rounded-circle summary-avatar" width="64" height="64" alt="Avatar">
+            <img src="{{ $avatarUrl }}" class="rounded-circle summary-avatar" width="80" height="80" alt="Avatar">
             <div class="flex-grow-1">
-              <div class="d-flex justify-content-between align-items-start">
+              <div class="d-flex justify-content-between align-items-start mb-2">
                 <div>
                   <div class="d-flex align-items-center gap-2">
-                    <h5 class="mb-0 fw-semibold text-white" style="font-size:1.03rem;margin:0;">
-                      {{ $assessment->user->name ?? 'N/A' }}</h5>
+                    <h5 class="mb-0 fw-semibold text-white" style="font-size:1.1rem;margin:0;">
+                      {{ $assessment->user->name ?? 'N/A' }}
+                    </h5>
                     <span class="badge bg-white text-success"
-                      style="font-size:0.72rem;padding:.28rem .45rem;">Student</span>
+                      style="font-size:0.7rem;padding:.25rem .4rem;">Student</span>
                   </div>
-                  <div class="small text-white-50">{{ $assessment->user->email ?? 'N/A' }}</div>
-                  <div class="small text-white-50">{{ $assessment->type }} • {{ $createdAt }}</div>
+                  <div class="small text-white-50" style="font-size:0.85rem;">{{ $assessment->user->email ?? 'N/A' }}
+                  </div>
+                  <div class="small text-white-50" style="font-size:0.85rem;">{{ $assessment->type }} • {{ $createdAt }}
+                  </div>
                 </div>
 
                 <div class="d-flex align-items-center">
@@ -121,8 +124,8 @@
                 </div>
               </div>
 
-              <div class="student-meta-grid mt-3 small text-white-50">
-                <div><span class="fw-semibold">Student ID:</span> <span
+              <div class="student-meta-grid-enhanced mt-2 small text-white-50">
+                <div><span class="fw-semibold">ID:</span> <span
                     class="text-white">{{ $assessment->user->student_id ?? '-' }}</span></div>
                 <div><span class="fw-semibold">College:</span> <span
                     class="text-white">{{ $assessment->user->college ?? '-' }}</span></div>
@@ -132,13 +135,12 @@
                     class="text-white">{{ $assessment->user->year_level ?? ($assessment->user->year ?? '-') }}</span>
                 </div>
                 <div><span class="fw-semibold">Gender:</span> <span
-                    class="text-white">{{ $assessment->user->gender ?? '-' }}</span></div>
+                    class="text-white">{{ ucfirst($assessment->user->gender ?? '-') }}</span></div>
                 <div><span class="fw-semibold">Phone:</span> <span
                     class="text-white">{{ $assessment->user->contact_number ?? '-' }}</span></div>
                 @if(!empty($assessment->user->address))
-                  <div><span class="fw-semibold">Address:</span> <span
-                      class="text-white">{{ \Illuminate\Support\Str::limit($assessment->user->address, 120) }}</span>
-                  </div>
+                  <div class="col-span-2"><span class="fw-semibold">Address:</span> <span
+                      class="text-white">{{ \Illuminate\Support\Str::limit($assessment->user->address, 80) }}</span></div>
                 @endif
               </div>
             </div>
@@ -173,7 +175,7 @@
           <div class="row gx-3">
             <div class="col-md-12">
               <div class="card border-0 bg-light p-3 mb-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="d-flex align-items-center justify-content-between mb-3">
                   <div class="fw-bold">Key Scores</div>
                   <div class="small text-muted">Interpretation based on subscale severity</div>
                 </div>
@@ -184,39 +186,55 @@
                     $anx = $anxietyTotal;
                     $str = $stressTotal;
                   @endphp
-                  <div class="key-scores mt-2">
-                    <div class="score-row d-flex justify-content-between small mb-1">
-                      <div>Depression</div>
-                      <div>{{ $dep ?? '-' }}/42 <span class="badge ms-2 small"
-                          style="background-color:#0d6efd;color:#fff;padding:0.25rem 0.5rem;border-radius:0.375rem;">{{ $severityDep($dep ?? 0) }}</span>
+                  <div class="row g-3">
+                    <!-- Depression Column -->
+                    <div class="col-md-4">
+                      <div class="score-row d-flex justify-content-between small mb-2">
+                        <div class="fw-semibold">Depression</div>
+                        <div>{{ $dep ?? '-' }}/42</div>
                       </div>
-                    </div>
-                    <div class="progress" style="height:10px;">
-                      <div class="progress-bar" role="progressbar"
-                        style="width: {{ isset($dep) ? min($dep / 42 * 100, 100) : 0 }}%; background-color:#0d6efd;"></div>
+                      <div class="progress" style="height:10px; margin-bottom:0.5rem;">
+                        <div class="progress-bar" role="progressbar"
+                          style="width: {{ isset($dep) ? min($dep / 42 * 100, 100) : 0 }}%; background-color:#0d6efd;">
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <span class="badge"
+                          style="background-color:#0d6efd;color:#fff;padding:0.35rem 0.7rem;border-radius:0.375rem;font-size:0.8rem;">{{ $severityDep($dep ?? 0) }}</span>
+                      </div>
                     </div>
 
-                    <div class="score-row d-flex justify-content-between small mb-1 mt-3">
-                      <div>Anxiety</div>
-                      <div>{{ $anx ?? '-' }}/42 <span class="badge ms-2 small"
-                          style="background-color:#0099ff;color:#fff;padding:0.25rem 0.5rem;border-radius:0.375rem;">{{ $severityAnx($anx ?? 0) }}</span>
+                    <!-- Anxiety Column -->
+                    <div class="col-md-4">
+                      <div class="score-row d-flex justify-content-between small mb-2">
+                        <div class="fw-semibold">Anxiety</div>
+                        <div>{{ $anx ?? '-' }}/42</div>
+                      </div>
+                      <div class="progress" style="height:10px; margin-bottom:0.5rem;">
+                        <div class="progress-bar" role="progressbar"
+                          style="width: {{ isset($anx) ? min($anx / 42 * 100, 100) : 0 }}%; background-color:#0099ff;">
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <span class="badge"
+                          style="background-color:#0099ff;color:#fff;padding:0.35rem 0.7rem;border-radius:0.375rem;font-size:0.8rem;">{{ $severityAnx($anx ?? 0) }}</span>
                       </div>
                     </div>
-                    <div class="progress" style="height:10px;">
-                      <div class="progress-bar" role="progressbar"
-                        style="width: {{ isset($anx) ? min($anx / 42 * 100, 100) : 0 }}%; background-color:#0099ff;"></div>
-                    </div>
-                  </div>
-                  <div class="mb-2">
-                    <div class="score-row d-flex justify-content-between small mb-1">
-                      <div>Stress</div>
-                      <div>{{ $str ?? '-' }}/42 <span class="badge ms-2 small"
-                          style="background-color:#666;color:#fff;padding:0.25rem 0.5rem;border-radius:0.375rem;">{{ $severityStr($str ?? 0) }}</span>
+
+                    <!-- Stress Column -->
+                    <div class="col-md-4">
+                      <div class="score-row d-flex justify-content-between small mb-2">
+                        <div class="fw-semibold">Stress</div>
+                        <div>{{ $str ?? '-' }}/42</div>
                       </div>
-                    </div>
-                    <div class="progress" style="height:10px;">
-                      <div class="progress-bar" role="progressbar"
-                        style="width: {{ isset($str) ? min($str / 42 * 100, 100) : 0 }}%; background-color:#666;"></div>
+                      <div class="progress" style="height:10px; margin-bottom:0.5rem;">
+                        <div class="progress-bar" role="progressbar"
+                          style="width: {{ isset($str) ? min($str / 42 * 100, 100) : 0 }}%; background-color:#666;"></div>
+                      </div>
+                      <div class="text-center">
+                        <span class="badge"
+                          style="background-color:#666;color:#fff;padding:0.35rem 0.7rem;border-radius:0.375rem;font-size:0.8rem;">{{ $severityStr($str ?? 0) }}</span>
+                      </div>
                     </div>
                   </div>
                 @else
@@ -225,99 +243,73 @@
               </div>
 
               @if($assessment->type === 'DASS-42')
-                <div class="card shadow-sm p-3 mb-3">
-                  <h6 class="fw-bold">Severity Summary</h6>
-                  <div class="row g-3 mt-2">
-                    <div class="col-md-4 text-center">
-                      <div class="fw-semibold" style="color:#0d6efd;">Depression</div>
-                      <div class="mt-2"><span class="badge"
-                          style="background-color:#0d6efd;padding:0.5rem 1rem;border-radius:20px;color:#fff;">{{ $severityDep($depressionTotal ?? 0) }}</span>
-                      </div>
-                    </div>
-                    <div class="col-md-4 text-center">
-                      <div class="fw-semibold" style="color:#0099ff;">Anxiety</div>
-                      <div class="mt-2"><span class="badge"
-                          style="background-color:#0099ff;padding:0.5rem 1rem;border-radius:20px;color:#fff;">{{ $severityAnx($anxietyTotal ?? 0) }}</span>
-                      </div>
-                    </div>
-                    <div class="col-md-4 text-center">
-                      <div class="fw-semibold" style="color:#666;">Stress</div>
-                      <div class="mt-2"><span class="badge"
-                          style="background-color:#666;padding:0.5rem 1rem;border-radius:20px;color:#fff;">{{ $severityStr($stressTotal ?? 0) }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mb-3">
                   @includeIf('counselor.assessments.partials.dass42_questionnaire')
                 </div>
               @endif
 
-              {{-- Case management notes removed from Appointment Details (kept in Insights) --}}
+            {{-- Case management notes removed from Appointment Details (kept in Insights) --}}
+          </div>
+
+
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="score-{{ $assessment->id }}" role="tabpanel"
+        aria-labelledby="score-tab-{{ $assessment->id }}">
+        <div class="card shadow-sm p-3 dass-score-sheet">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-grid-1x2 me-2"></i> DASS-42 Score Sheet Table</h5>
+          </div>
+          <div class="card-body p-3">
+            @includeIf('counselor.assessments.partials.score_sheet')
+          </div>
+          <div class="card-footer bg-white border-0 pt-3">
+            <div class="interpretation-guide small text-muted">
+              <h6 class="fw-bold">DASS-42 Interpretation Guide</h6>
+              <p class="mb-1">The DASS-42 contains three subscales:</p>
+              <ul class="mb-0">
+                <li><strong>Depression (14 items):</strong> 3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42</li>
+                <li><strong>Anxiety (14 items):</strong> 2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41</li>
+                <li><strong>Stress (14 items):</strong> 1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39</li>
+              </ul>
             </div>
-
-
           </div>
         </div>
+      </div>
 
-        <div class="tab-pane fade" id="score-{{ $assessment->id }}" role="tabpanel"
-          aria-labelledby="score-tab-{{ $assessment->id }}">
-          <div class="card shadow-sm p-3 dass-score-sheet">
-            <div class="card-header">
-              <h5 class="mb-0"><i class="bi bi-grid-1x2 me-2"></i> DASS-42 Score Sheet Table</h5>
-            </div>
-            <div class="card-body p-3">
-              @includeIf('counselor.assessments.partials.score_sheet')
-            </div>
-            <div class="card-footer bg-white border-0 pt-3">
-              <div class="interpretation-guide small text-muted">
-                <h6 class="fw-bold">DASS-42 Interpretation Guide</h6>
-                <p class="mb-1">The DASS-42 contains three subscales:</p>
-                <ul class="mb-0">
-                  <li><strong>Depression (14 items):</strong> 3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42</li>
-                  <li><strong>Anxiety (14 items):</strong> 2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41</li>
-                  <li><strong>Stress (14 items):</strong> 1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39</li>
+      <div class="tab-pane fade" id="insights-{{ $assessment->id }}" role="tabpanel"
+        aria-labelledby="insights-tab-{{ $assessment->id }}">
+        <div class="p-3">
+          <h5 class="fw-bold mb-3"><i class="bi bi-lightbulb me-2"></i>Insights</h5>
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="card border-0 p-3 mb-3" style="background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.04);">
+                <div class="fw-semibold mb-2">Quick Suggestions</div>
+                <ul class="small mb-0">
+                  <li>Review high-severity subscales first.</li>
+                  <li>Consider scheduling a follow-up session.</li>
+                  <li>Share resources for self-care and crisis lines if needed.</li>
                 </ul>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div class="tab-pane fade" id="insights-{{ $assessment->id }}" role="tabpanel"
-          aria-labelledby="insights-tab-{{ $assessment->id }}">
-          <div class="p-3">
-            <h5 class="fw-bold mb-3"><i class="bi bi-lightbulb me-2"></i>Insights</h5>
-            <div class="row g-3">
-              <div class="col-12">
-                <div class="card border-0 p-3 mb-3" style="background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.04);">
-                  <div class="fw-semibold mb-2">Quick Suggestions</div>
-                  <ul class="small mb-0">
-                    <li>Review high-severity subscales first.</li>
-                    <li>Consider scheduling a follow-up session.</li>
-                    <li>Share resources for self-care and crisis lines if needed.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="col-12">
-                <div class="card shadow-sm p-3">
-                  <h6 class="fw-bold">Case Management Notes</h6>
-                  <form method="POST" action="{{ route('counselor.assessments.saveNotes', $assessment->id) }}">
-                    @csrf
-                    <div class="mb-2">
-                      <label for="case_notes_insights_{{ $assessment->id }}" class="form-label small">Add / Update
-                        Notes</label>
-                      <textarea name="case_notes" id="case_notes_insights_{{ $assessment->id }}" rows="5"
-                        class="form-control">{{ old('case_notes', $assessment->case_notes ?? '') }}</textarea>
-                    </div>
-                    <div class="d-flex gap-2">
-                      <button type="submit" class="btn btn-primary btn-sm">Save Notes</button>
-                      <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse"
-                        data-bs-target="#counselorNotes-{{ $assessment->id }}">Private Notes</button>
-                    </div>
-                  </form>
-                </div>
+            <div class="col-12">
+              <div class="card shadow-sm p-3">
+                <h6 class="fw-bold">Case Management Notes</h6>
+                <form method="POST" action="{{ route('counselor.assessments.saveNotes', $assessment->id) }}">
+                  @csrf
+                  <div class="mb-2">
+                    <label for="case_notes_insights_{{ $assessment->id }}" class="form-label small">Add / Update
+                      Notes</label>
+                    <textarea name="case_notes" id="case_notes_insights_{{ $assessment->id }}" rows="5"
+                      class="form-control">{{ old('case_notes', $assessment->case_notes ?? '') }}</textarea>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm">Save Notes</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse"
+                      data-bs-target="#counselorNotes-{{ $assessment->id }}">Private Notes</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -325,27 +317,28 @@
       </div>
     </div>
   </div>
+</div>
 
-  <div class="collapse mt-3" id="counselorNotes-{{ $assessment->id }}">
-    <div class="card card-body">
-      <form id="counselor-note-form-{{ $assessment->id }}" method="POST" action="#">
-        <div class="mb-2">
-          <label for="counselor_note_{{ $assessment->id }}" class="form-label small fw-semibold">Private Note (visible
-            to counselors)</label>
-          <textarea id="counselor_note_{{ $assessment->id }}" class="form-control" rows="4"
-            placeholder="Add a private note..."></textarea>
-        </div>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-primary btn-sm" onclick="saveNote{{ $assessment->id }}()">Save
-            Note</button>
-          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse"
-            data-bs-target="#counselorNotes-{{ $assessment->id }}">Close</button>
-        </div>
-      </form>
-    </div>
+<div class="collapse mt-3" id="counselorNotes-{{ $assessment->id }}">
+  <div class="card card-body">
+    <form id="counselor-note-form-{{ $assessment->id }}" method="POST" action="#">
+      <div class="mb-2">
+        <label for="counselor_note_{{ $assessment->id }}" class="form-label small fw-semibold">Private Note (visible
+          to counselors)</label>
+        <textarea id="counselor_note_{{ $assessment->id }}" class="form-control" rows="4"
+          placeholder="Add a private note..."></textarea>
+      </div>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary btn-sm" onclick="saveNote{{ $assessment->id }}()">Save
+          Note</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse"
+          data-bs-target="#counselorNotes-{{ $assessment->id }}">Close</button>
+      </div>
+    </form>
   </div>
+</div>
 
-  {{-- Download and Close buttons removed per request --}}
+{{-- Download and Close buttons removed per request --}}
 </div>
 </div>
 
@@ -414,7 +407,7 @@
 
   /* Web view layout and alignment fixes */
   .web-view {
-    max-width: 1100px;
+    max-width: 100%;
     margin: 18px auto;
     zoom: 1;
   }
@@ -448,6 +441,30 @@
     .student-meta-grid {
       grid-template-columns: repeat(3, 1fr);
     }
+  }
+
+  /* Enhanced grid for better space utilization */
+  .student-meta-grid-enhanced {
+    display: grid;
+    gap: 0.4rem 1.5rem;
+    grid-template-columns: 1fr;
+    font-size: 0.85rem;
+  }
+
+  @media (min-width: 576px) {
+    .student-meta-grid-enhanced {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .student-meta-grid-enhanced {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .student-meta-grid-enhanced .col-span-2 {
+    grid-column: span 2;
   }
 
   .student-meta-grid .fw-semibold {

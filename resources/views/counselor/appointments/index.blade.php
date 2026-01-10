@@ -36,12 +36,12 @@
 
         /* Apply page zoom */
         .home-zoom {
-            zoom: 0.85;
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
             .home-zoom {
-                transform: scale(0.85);
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
@@ -75,8 +75,9 @@
         }
 
         .main-dashboard-inner {
-            max-width: 1180px;
+            max-width: 100%;
             margin: 0 auto;
+            padding: 0 1rem;
         }
 
         .welcome-card {
@@ -149,16 +150,55 @@
             flex-shrink: 0;
         }
 
-        .stat-icon.primary { background: var(--light-green); color: var(--forest-green); }
-        .stat-icon.info { background: #e0f7fa; color: #00acc1; }
-        .stat-icon.warning { background: #fff8e1; color: #ffc107; }
-        .stat-icon.success { background: #e8f5e9; color: #2e7d32; }
-        .stat-icon.danger { background: #ffebee; color: #c62828; }
+        .stat-icon.primary {
+            background: var(--light-green);
+            color: var(--forest-green);
+        }
 
-        .stat-content { flex-grow: 1; min-width: 0; }
-        .stat-label { font-size: 0.9rem; color: var(--text-light); font-weight: 500; margin-bottom: 0.25rem; }
-        .stat-value { font-size: 1.85rem; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
-        .stat-hint { font-size: 0.8rem; color: #9aa0ac; margin-top: 0.25rem; }
+        .stat-icon.info {
+            background: #e0f7fa;
+            color: #00acc1;
+        }
+
+        .stat-icon.warning {
+            background: #fff8e1;
+            color: #ffc107;
+        }
+
+        .stat-icon.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .stat-icon.danger {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .stat-content {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .stat-hint {
+            font-size: 0.8rem;
+            color: #9aa0ac;
+            margin-top: 0.25rem;
+        }
 
         /* Filter Card */
         .filter-card {
@@ -261,10 +301,15 @@
         }
 
         @media (max-width: 991.98px) {
-            .main-dashboard-content { margin-left: 200px; }
+            .main-dashboard-content {
+                margin-left: 200px;
+            }
         }
+
         @media (max-width: 767.98px) {
-            .main-dashboard-content { margin-left: 0; }
+            .main-dashboard-content {
+                margin-left: 0;
+            }
         }
     </style>
 
@@ -285,7 +330,8 @@
                         <div>
                             <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
                             <div class="welcome-text">Counseling Appointments</div>
-                            <div style="font-size: 0.9rem; margin-top: 0.5rem;">Manage your student appointments and requests</div>
+                            <div style="font-size: 0.9rem; margin-top: 0.5rem;">Manage your student appointments and
+                                requests</div>
                         </div>
                         <div class="welcome-avatar">
                             <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
@@ -348,34 +394,95 @@
                         <h5 class="mb-3" style="color: var(--forest-green); font-weight: 700;">
                             <i class="bi bi-funnel me-2"></i>Filter Appointments
                         </h5>
-                        <form method="GET" action="{{ route('counselor.appointments.index') }}" class="row g-3">
-                            <div class="col-md-5">
-                                <label for="search" class="form-label fw-bold small text-muted">Search Student</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control border-start-0 ps-0" id="search" name="search"
-                                        value="{{ request('search') }}" placeholder="Name, Email, or Student ID">
+                        <form method="GET" action="{{ route('counselor.appointments.index') }}">
+                            <!-- Row 1: All Filter Fields -->
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-3">
+                                    <label for="search" class="form-label fw-bold small text-muted">Search Student</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0 text-muted"><i
+                                                class="bi bi-search"></i></span>
+                                        <input type="text" class="form-control border-start-0 ps-0" id="search"
+                                            name="search" value="{{ request('search') }}"
+                                            placeholder="Name, Email, or Student ID">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="status" class="form-label fw-bold small text-muted">Status</label>
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="">All Statuses</option>
+                                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending
+                                        </option>
+                                        <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>
+                                            Accepted</option>
+                                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>
+                                            Completed</option>
+                                        <option value="rescheduled_pending" {{ request('status') == 'rescheduled_pending' ? 'selected' : '' }}>Reschedule Pending</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="sort_by" class="form-label fw-bold small text-muted">Sort By</label>
+                                    <select class="form-select" id="sort_by" name="sort_by">
+                                        <option value="date_desc" {{ request('sort_by') == 'date_desc' ? 'selected' : '' }}>
+                                            Date: Newest First</option>
+                                        <option value="date_asc" {{ request('sort_by') == 'date_asc' ? 'selected' : '' }}>
+                                            Date: Oldest First</option>
+                                        <option value="name_asc" {{ request('sort_by') == 'name_asc' ? 'selected' : '' }}>
+                                            Student Name: A-Z</option>
+                                        <option value="name_desc" {{ request('sort_by') == 'name_desc' ? 'selected' : '' }}>
+                                            Student Name: Z-A</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="date_from" class="form-label fw-bold small text-muted">Date From</label>
+                                    <input type="date" class="form-control" id="date_from" name="date_from"
+                                        value="{{ request('date_from') }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="date_to" class="form-label fw-bold small text-muted">Date To</label>
+                                    <input type="date" class="form-control" id="date_to" name="date_to"
+                                        value="{{ request('date_to') }}">
+                                </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100"
+                                        style="background: var(--forest-green); border: none;">
+                                        <i class="bi bi-funnel"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <label for="status" class="form-label fw-bold small text-muted">Status</label>
-                                <select class="form-select" id="status" name="status">
-                                    <option value="">All Statuses</option>
-                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>Accepted</option>
-                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                    <option value="declined" {{ request('status') == 'declined' ? 'selected' : '' }}>Declined</option>
-                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                    <option value="rescheduled_pending" {{ request('status') == 'rescheduled_pending' ? 'selected' : '' }}>Reschedule Pending</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary w-100" style="background: var(--forest-green); border: none;">
-                                    <i class="bi bi-funnel me-1"></i>Apply
-                                </button>
-                                <a href="{{ route('counselor.appointments.index') }}" class="btn btn-outline-secondary w-100" title="Clear Filters">
-                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                </a>
+
+                            <!-- Row 2: Nature of Problem and Action Buttons -->
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-3">
+                                    <label for="nature_of_problem" class="form-label fw-bold small text-muted">Nature of
+                                        Problem</label>
+                                    <select class="form-select form-select-sm" id="nature_of_problem"
+                                        name="nature_of_problem">
+                                        <option value="">All Problems</option>
+                                        <option value="Academic" {{ request('nature_of_problem') == 'Academic' ? 'selected' : '' }}>Academic</option>
+                                        <option value="Personal" {{ request('nature_of_problem') == 'Personal' ? 'selected' : '' }}>Personal</option>
+                                        <option value="Social" {{ request('nature_of_problem') == 'Social' ? 'selected' : '' }}>Social</option>
+                                        <option value="Family" {{ request('nature_of_problem') == 'Family' ? 'selected' : '' }}>Family</option>
+                                        <option value="Career" {{ request('nature_of_problem') == 'Career' ? 'selected' : '' }}>Career</option>
+                                        <option value="Mental Health" {{ request('nature_of_problem') == 'Mental Health' ? 'selected' : '' }}>Mental Health</option>
+                                        <option value="Other" {{ request('nature_of_problem') == 'Other' ? 'selected' : '' }}>
+                                            Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('counselor.appointments.index') }}"
+                                            class="btn btn-outline-secondary btn-sm" title="Clear Filters">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i>Clear Filters
+                                        </a>
+                                        @if($completedAppointments > 0)
+                                            <button id="deleteAllCompletedBtn" class="btn btn-danger btn-sm">
+                                                <i class="bi bi-trash me-1"></i>Delete All Completed
+                                                ({{ $completedAppointments }})
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -383,47 +490,63 @@
                     <!-- Appointments List -->
                     <div class="main-content-card">
                         <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-calendar-range me-2"></i>Appointments List ({{ $appointments->total() }})</h5>
+                            <h5 class="mb-0"><i class="bi bi-calendar-range me-2"></i>Appointments List
+                                ({{ $appointments->total() }})</h5>
                         </div>
                         <div class="card-body">
                             @forelse($appointments as $appointment)
                                 <div class="appointment-card">
                                     <div class="row align-items-center gy-3">
-                                        <!-- Student Info (4 columns) -->
-                                        <div class="col-12 col-md-5 col-lg-4">
+                                        <!-- Student Info (5 columns) -->
+                                        <div class="col-12 col-md-6 col-lg-5">
                                             <div class="d-flex align-items-center gap-3">
-                                                <img src="{{ $appointment->student->avatar_url }}" alt="{{ $appointment->student->name }}"
+                                                <img src="{{ $appointment->student->avatar_url }}"
+                                                    alt="{{ $appointment->student->name }}"
                                                     class="student-avatar flex-shrink-0">
-                                                <div class="overflow-hidden">
-                                                    <h6 class="mb-1 fw-bold text-truncate" style="color: var(--forest-green); font-size: 1.1rem;">
-                                                        {{ $appointment->student->name }}
-                                                    </h6>
-                                                    <div class="d-flex flex-column small text-muted">
-                                                        <span class="text-truncate">{{ $appointment->student->email }}</span>
+                                                <div class="overflow-hidden flex-grow-1">
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        <h6 class="mb-0 fw-bold text-truncate"
+                                                            style="color: var(--forest-green); font-size: 1.05rem;">
+                                                            {{ $appointment->student->name }}
+                                                        </h6>
+                                                        <span class="badge bg-info text-dark px-2 py-1"
+                                                            style="font-size: 0.7rem;">
+                                                            <i class="bi bi-hash"></i>{{ $appointment->session_number }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex flex-column small text-muted"
+                                                        style="font-size: 0.85rem;">
+                                                        <span class="text-truncate"><i
+                                                                class="bi bi-building me-1"></i>{{ $appointment->student->college ?? 'N/A' }}</span>
+                                                        <span class="text-truncate"><i
+                                                                class="bi bi-gender-ambiguous me-1"></i>{{ ucfirst($appointment->student->gender ?? 'N/A') }}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Date & Time (3 columns) -->
-                                        <div class="col-12 col-md-3 col-lg-3">
+
+                                        <!-- Date & Time (2 columns) -->
+                                        <div class="col-12 col-md-3 col-lg-2">
                                             <div class="d-none d-md-block border-start border-end px-3 text-center">
-                                                <div class="fw-bold" style="font-size: 1.1rem; color: var(--text-dark);">
+                                                <div class="fw-bold" style="font-size: 1.05rem; color: var(--text-dark);">
                                                     {{ $appointment->scheduled_at->format('M d, Y') }}
                                                 </div>
-                                                <div class="text-secondary fw-semibold">
+                                                <div class="text-secondary fw-semibold" style="font-size: 0.9rem;">
                                                     {{ $appointment->scheduled_at->format('g:i A') }}
                                                 </div>
-                                                <small class="text-muted">{{ $appointment->scheduled_at->diffForHumans() }}</small>
+                                                <small class="text-muted"
+                                                    style="font-size: 0.75rem;">{{ $appointment->scheduled_at->diffForHumans() }}</small>
                                             </div>
                                             <!-- Mobile view -->
                                             <div class="d-md-none text-muted small mb-2">
-                                                <i class="bi bi-calendar-event me-1"></i>{{ $appointment->scheduled_at->format('M d, Y • g:i A') }}
+                                                <i
+                                                    class="bi bi-calendar-event me-1"></i>{{ $appointment->scheduled_at->format('M d, Y • g:i A') }}
                                             </div>
                                         </div>
 
                                         <!-- Status & Problem (3 columns) -->
-                                        <div class="col-12 col-md-4 col-lg-3 text-start text-md-center">
+                                        <div class="col-12 col-md-3 col-lg-3 text-start text-md-center">
                                             @php
                                                 $status = $appointment->status;
                                                 $statusMap = [
@@ -435,11 +558,14 @@
                                                     'rescheduled_pending' => ['class' => 'bg-info text-dark', 'icon' => 'calendar-date'],
                                                 ];
                                             @endphp
-                                            <span class="badge {{ $statusMap[$status]['class'] ?? 'bg-secondary' }} px-3 py-2 mb-2 rounded-pill d-inline-flex align-items-center">
+                                            <span
+                                                class="badge {{ $statusMap[$status]['class'] ?? 'bg-secondary' }} px-3 py-2 mb-2 rounded-pill d-inline-flex align-items-center"
+                                                style="font-size: 0.85rem;">
                                                 <i class="bi bi-{{ $statusMap[$status]['icon'] ?? 'info-circle' }} me-1"></i>
                                                 {{ ucfirst(str_replace('_', ' ', $status)) }}
                                             </span>
-                                            <div class="small text-muted fst-italic text-truncate px-2 mx-auto" style="max-width: 200px;">
+                                            <div class="small text-muted fst-italic text-truncate px-2 mx-auto"
+                                                style="max-width: 200px; font-size: 0.8rem;">
                                                 {{ $appointment->nature_of_problem ?? 'No topic specified' }}
                                             </div>
                                         </div>
@@ -448,38 +574,10 @@
                                         <div class="col-12 col-md-12 col-lg-2">
                                             <div class="d-flex justify-content-md-end justify-content-start gap-2">
                                                 <a href="{{ route('counselor.appointments.show', $appointment->id) }}"
-                                                    class="btn btn-outline-primary btn-sm flex-fill flex-md-grow-0" title="View Details">
+                                                    class="btn btn-outline-primary btn-sm flex-fill flex-md-grow-0"
+                                                    title="View Details">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                
-                                                @if($appointment->status === 'pending')
-                                                    <form action="{{ route('counselor.appointments.accept', $appointment->id) }}" method="POST" class="d-inline flex-fill flex-md-grow-0">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="btn btn-success btn-sm w-100" title="Accept">
-                                                            <i class="bi bi-check-lg"></i>
-                                                        </button>
-                                                    </form>
-                                                    <form action="{{ route('counselor.appointments.decline', $appointment->id) }}" method="POST" class="d-inline flex-fill flex-md-grow-0">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="btn btn-danger btn-sm w-100" title="Decline" onclick="return confirm('Are you sure you want to decline this appointment?');">
-                                                            <i class="bi bi-x-lg"></i>
-                                                        </button>
-                                                    </form>
-                                                @elseif(in_array($appointment->status, ['accepted', 'rescheduled_pending']))
-                                                    <a href="{{ route('counselor.appointments.edit', $appointment->id) }}"
-                                                        class="btn btn-warning btn-sm flex-fill flex-md-grow-0" title="Edit/Reschedule">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <form action="{{ route('counselor.appointments.cancel', $appointment->id) }}" method="POST" class="d-inline flex-fill flex-md-grow-0">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="btn btn-danger btn-sm w-100" title="Cancel" onclick="return confirm('Are you sure you want to cancel this appointment?');">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -525,6 +623,46 @@
                 document.addEventListener('keydown', function (e) {
                     if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
                         sidebar.classList.remove('show');
+                    }
+                });
+            }
+
+            // Bulk delete all completed appointments
+            const deleteAllBtn = document.getElementById('deleteAllCompletedBtn');
+            if (deleteAllBtn) {
+                deleteAllBtn.addEventListener('click', function () {
+                    if (confirm('Are you sure you want to delete all completed appointments? This action cannot be undone.')) {
+                        // Disable button and show loading state
+                        deleteAllBtn.disabled = true;
+                        const originalText = deleteAllBtn.innerHTML;
+                        deleteAllBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Deleting...';
+
+                        // Send DELETE request
+                        fetch('{{ route("counselor.appointments.bulk.deleteCompleted") }}', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert(data.message);
+                                    // Reload page to reflect changes
+                                    window.location.reload();
+                                } else {
+                                    alert(data.message || 'Failed to delete appointments.');
+                                    deleteAllBtn.disabled = false;
+                                    deleteAllBtn.innerHTML = originalText;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while deleting appointments. Please try again.');
+                                deleteAllBtn.disabled = false;
+                                deleteAllBtn.innerHTML = originalText;
+                            });
                     }
                 });
             }

@@ -48,12 +48,12 @@
 
         /* Apply the same page zoom used on the homepage */
         .home-zoom {
-            zoom: 0.85;
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
             .home-zoom {
-                transform: scale(0.85);
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
@@ -213,7 +213,7 @@
 
         /* Constrain inner content and center it within the available area */
         .main-dashboard-inner {
-            max-width: 1180px;
+            max-width: 100%;
             margin: 0 auto;
         }
     </style>
@@ -225,42 +225,46 @@
                 <i class="bi bi-list"></i>
             </button>
             <!-- Sidebar -->
-            <div class="custom-sidebar">
-                <div class="sidebar-logo mb-4">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
-                        style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
-                    <h3
-                        style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">
-                        CMU Guidance and Counseling Center</h3>
-                    <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Student Portal</p>
+            @if(auth()->check() && auth()->user()->isCounselor())
+                @include('counselor.sidebar')
+            @else
+                <div class="custom-sidebar">
+                    <div class="sidebar-logo mb-4">
+                        <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
+                            style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
+                        <h3
+                            style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">
+                            CMU Guidance and Counseling Center</h3>
+                        <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Student Portal</p>
+                    </div>
+                    <nav class="sidebar-nav flex-grow-1">
+                        <a href="{{ route('profile') }}"
+                            class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
+                                class="bi bi-person"></i>Profile</a>
+                        <a href="{{ route('dashboard') }}"
+                            class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
+                                class="bi bi-house-door"></i>Dashboard</a>
+                        <a href="{{ route('appointments.index') }}"
+                            class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i
+                                class="bi bi-calendar-check"></i>Appointments</a>
+                        <a href="{{ route('assessments.index') }}"
+                            class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i
+                                class="bi bi-clipboard-data"></i>Assessments</a>
+                        <a href="{{ route('chat.selectCounselor') }}"
+                            class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i
+                                class="bi bi-chat-dots"></i>Chat with a Counselor</a>
+                    </nav>
+                    <div class="sidebar-bottom w-100">
+                        <a href="{{ route('logout') }}" class="sidebar-link logout"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="bi bi-box-arrow-right"></i>Logout
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    </div>
                 </div>
-                <nav class="sidebar-nav flex-grow-1">
-                    <a href="{{ route('profile') }}"
-                        class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
-                            class="bi bi-person"></i>Profile</a>
-                    <a href="{{ route('dashboard') }}"
-                        class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
-                            class="bi bi-house-door"></i>Dashboard</a>
-                    <a href="{{ route('appointments.index') }}"
-                        class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i
-                            class="bi bi-calendar-check"></i>Appointments</a>
-                    <a href="{{ route('assessments.index') }}"
-                        class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i
-                            class="bi bi-clipboard-data"></i>Assessments</a>
-                    <a href="{{ route('chat.selectCounselor') }}"
-                        class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i
-                            class="bi bi-chat-dots"></i>Chat with a Counselor</a>
-                </nav>
-                <div class="sidebar-bottom w-100">
-                    <a href="{{ route('logout') }}" class="sidebar-link logout"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="bi bi-box-arrow-right"></i>Logout
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </div>
-            </div>
+            @endif
 
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
@@ -858,8 +862,8 @@
                 }
                 if (message.image) {
                     messageContent += `<div class="message-image mt-2">
-                    <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
-                </div>`;
+                            <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
+                        </div>`;
                 }
 
                 // Avatar for other user
@@ -869,13 +873,13 @@
                 }
 
                 wrapperDiv.innerHTML = `
-                ${avatarHtml}
-                <div class="message-bubble">
-                    ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
-                    ${messageContent}
-                    <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
-            `;
+                        ${avatarHtml}
+                        <div class="message-bubble">
+                            ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
+                            ${messageContent}
+                            <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                    `;
 
                 messagesContainer.insertBefore(wrapperDiv, scrollAnchor);
             }

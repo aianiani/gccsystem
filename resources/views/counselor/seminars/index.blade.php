@@ -39,12 +39,12 @@
 
         /* Apply the same page zoom used on the homepage */
         .home-zoom {
-            zoom: 0.85;
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
             .home-zoom {
-                transform: scale(0.85);
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
@@ -204,7 +204,7 @@
 
         /* Constrain inner content and center it within the available area */
         .main-dashboard-inner {
-            max-width: 1180px;
+            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -317,9 +317,10 @@
                             <table class="min-w-full table-custom">
                                 <thead>
                                     <tr>
-                                        <th class="w-[22%]">Name</th>
+                                        <th class="w-[20%]">Name</th>
                                         <th class="w-[8%] text-center">Year</th>
-                                        <th class="w-[55%]">Schedules</th>
+                                        <th class="w-[22%]">Participation</th>
+                                        <th class="w-[35%]">Schedules</th>
                                         <th class="w-[15%] text-right">Actions</th>
                                     </tr>
                                 </thead>
@@ -329,13 +330,25 @@
                                             <td>
                                                 <div class="font-bold text-gray-900 text-base">{{ $seminar->name }}</div>
                                                 <div class="text-sm text-gray-500 mt-1">
-                                                    {{ Str::limit($seminar->description, 60) }}</div>
+                                                    {{ Str::limit($seminar->description, 60) }}
+                                                </div>
                                             </td>
                                             <td class="text-center">
                                                 <span
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 font-bold text-sm border border-blue-100">
                                                     {{ $seminar->target_year_level }}
                                                 </span>
+                                            </td>
+                                            <td class="align-middle px-4">
+                                                <div class="w-full">
+                                                    <div class="flex justify-between items-center mb-1">
+                                                        <span class="text-xs font-semibold text-gray-700">{{ $seminar->stats['completed'] }}/{{ $seminar->stats['total'] }}</span>
+                                                        <span class="text-xs font-bold text-green-700">{{ $seminar->stats['percentage'] }}%</span>
+                                                    </div>
+                                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                                        <div class="bg-green-600 h-2 rounded-full transition-all duration-500" style="width: {{ $seminar->stats['percentage'] }}%"></div>
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td class="align-middle">
                                                 <div class="flex flex-wrap gap-2">
@@ -379,7 +392,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center py-12 text-gray-400">
+                                            <td colspan="5" class="text-center py-12 text-gray-400">
                                                 <div class="mb-3">
                                                     <i class="bi bi-calendar-x" style="font-size: 2.5rem; opacity: 0.5;"></i>
                                                 </div>

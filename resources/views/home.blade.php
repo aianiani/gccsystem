@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CMU Guidance & Counseling Center</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/fontawesome/css/all.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/fonts/inter/inter.css') }}" rel="stylesheet">
     <link href="{{ asset('css/auth-modal.css') }}" rel="stylesheet">
     <style>
         * {
@@ -100,6 +100,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            margin-left: 1.5rem;
         }
 
         .navbar-brand img {
@@ -151,6 +152,8 @@
             align-items: center;
             position: relative;
             overflow: hidden;
+            padding-top: 100px;
+            /* Added padding to prevent navbar overlap */
         }
 
         .hero::before {
@@ -167,9 +170,10 @@
         .hero-content {
             position: relative;
             z-index: 2;
+            padding-left: 1.5rem;
         }
 
-        .hero h1 {
+        .hero-title {
             font-size: 3.5rem;
             font-weight: 700;
             color: white;
@@ -178,11 +182,11 @@
             animation: fadeInUp 1s ease-out;
         }
 
-        .hero p {
+        .hero-description {
             font-size: 1.25rem;
             color: rgba(255, 255, 255, 0.9);
             margin-bottom: 2rem;
-            max-width: 600px;
+            line-height: 1.6;
             animation: fadeInUp 1s ease-out 0.2s both;
         }
 
@@ -193,20 +197,51 @@
             animation: fadeInUp 1s ease-out 0.4s both;
         }
 
+        /* Hero Illustration Styling */
+        .hero-illustration {
+            position: relative;
+            animation: fadeInRight 1s ease-out 0.3s both;
+            max-width: 500px;
+            margin-left: auto;
+        }
+
+        .hero-illustration img {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.2));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
         .btn-primary-custom {
-            background: linear-gradient(135deg, var(--accent-green), #45a049);
+            background: var(--yellow-maize, #f4d03f);
+            color: var(--forest-green, #2d5016);
             border: none;
             border-radius: 25px;
             padding: 1rem 2.5rem;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 1.1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 4px 15px rgba(244, 208, 63, 0.4);
         }
 
         .btn-primary-custom:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(244, 208, 63, 0.6);
+            background: #ffe066;
+            /* Slightly lighter yellow */
+            color: var(--forest-green, #2d5016);
         }
 
         .btn-secondary-custom {
@@ -224,7 +259,8 @@
         .btn-secondary-custom:hover {
             background: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-3px);
+            transform: translateY(-3px) scale(1.02);
+            color: white;
         }
 
         .hero-badge {
@@ -1246,8 +1282,20 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .hero h1 {
+            .hero-title {
                 font-size: 2.5rem;
+            }
+
+            .hero-description {
+                font-size: 1.1rem;
+            }
+
+            .hero-content {
+                text-align: center !important;
+            }
+
+            .hero-buttons {
+                justify-content: center;
             }
 
             .hero-badge {
@@ -1391,6 +1439,172 @@
         #contact {
             scroll-margin-top: 90px;
         }
+
+        /* Daily Motivation Badge */
+        .daily-quote-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.95rem;
+            color: white;
+            font-weight: 500;
+            max-width: 100%;
+            margin-bottom: 1rem;
+            animation: fadeInDown 0.8s ease-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quote-text {
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hero Carousel & Controls */
+        .hero-carousel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
+            /* Let clicks pass through if needed, though buttons are on top */
+        }
+
+        .carousel-image.active {
+            opacity: 1;
+            position: relative;
+            /* Keep relative to maintain container height */
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        /* Adjustments for absolute positioning of inactive images to prevent layout jump if they have different heights, 
+           but 'relative' on active helps define container height. 
+           Ideally images are same size. */
+
+        .hero-carousel-control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(45, 80, 22, 0.4);
+            /* Forest green transparent */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            /* Hidden by default */
+        }
+
+        .hero-carousel:hover .hero-carousel-control {
+            opacity: 1;
+        }
+
+        .hero-carousel-control:hover {
+            background: rgba(45, 80, 22, 0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .hero-carousel-control.prev {
+            left: 0;
+        }
+
+        .hero-carousel-control.next {
+            right: 0;
+        }
+
+        /* Login Modal Adjustments */
+        #loginModal .nav-tabs .nav-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Seamless Input Groups (Modern Design) */
+        .modal-content .input-group {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            /* Ensures child elements don't break rounded corners */
+        }
+
+        .modal-content .input-group:focus-within {
+            border-color: #0f5e1d;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(15, 94, 29, 0.1);
+        }
+
+        .modal-content .input-group .input-group-text {
+            background: transparent;
+            border: none;
+            color: #0f5e1d;
+            padding-left: 1.2rem;
+            padding-right: 0.5rem;
+        }
+
+        .modal-content .input-group .form-control {
+            border: none;
+            background: transparent;
+            box-shadow: none !important;
+            padding-left: 0.5rem;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .modal-content .input-group .form-control::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* Adjust button/icon at the end (like password eye) */
+        .modal-content .input-group .btn {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            padding-right: 1.2rem;
+        }
+
+        .modal-content .input-group .btn:hover {
+            color: #0f5e1d;
+        }
     </style>
 </head>
 
@@ -1399,7 +1613,7 @@
         <!-- Navigation -->
         <div class="navbar-reveal-zone" aria-hidden="true"></div>
         <nav class="navbar navbar-expand-lg navbar-light fixed-top" role="navigation" aria-label="Primary">
-            <div class="container">
+            <div class="container-fluid px-4 px-lg-5">
                 <a class="navbar-brand" href="{{ route('home') }}" aria-label="CMU Guidance & Counseling home">
                     <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo">
                     <span>CMU Guidance & Counseling Center</span>
@@ -1426,7 +1640,7 @@
                         </li>
                         <li class="nav-item ms-3">
                             <a href="#" class="btn btn-auth" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                <i class="fas fa-user-circle me-2"></i>Sign In
+                                <i class="fas fa-user-circle me-2"></i>Login
                             </a>
                         </li>
                     </ul>
@@ -1438,23 +1652,55 @@
 
         <!-- Hero Section -->
         <section id="home" class="hero">
-            <div class="container h-100">
-                <div class="row align-items-center justify-content-center h-100" style="min-height: 70vh;">
-                    <div class="col-lg-8 text-center mt-4">
-                        <div class="hero-content">
-                            <h1 class="mt-4">Empowering Students Through Accessible Counseling</h1>
-                            <p class="text-center mx-auto">Your mental health matters. Connect with professional
-                                counselors, access valuable resources, and take control of your well-being journey with
-                                our comprehensive support system.</p>
-                            <div class="hero-buttons justify-content-center d-flex flex-wrap">
+            <div class="container-fluid h-100">
+                <div class="row align-items-center h-100 g-4px-4 px-lg-5" style="min-height: 70vh;">
+                    <!-- Left Column - Text Content -->
+                    <div class="col-lg-7 col-md-6">
+                        <div class="hero-content" style="text-align: left;">
+                            <!-- Daily Motivation Badge -->
+                            <div class="daily-quote-badge">
+                                <span class="badge-icon">✨</span>
+                                <span class="quote-text" id="dailyQuote">Loading inspiration...</span>
+                            </div>
+
+                            <h1 class="hero-title">Your Mental Health Matters</h1>
+                            <p class="hero-description">Professional counseling support tailored for students. Book
+                                appointments, access resources, and start your wellness journey today.</p>
+                            <div class="hero-buttons d-flex flex-wrap" style="gap: 1rem;">
                                 <a href="{{ auth()->check() ? route('appointments.create') : route('login') }}"
                                     class="btn btn-primary-custom" aria-label="Book appointment">
-                                    <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+                                    <i class="fas fa-calendar-plus me-2"></i>Connect with Us
                                 </a>
                                 <a href="{{ auth()->check() ? route('chat') : route('login') }}"
                                     class="btn btn-secondary-custom" aria-label="Start chat">
-                                    <i class="fas fa-comments me-2"></i>Start Chat
+                                    <i class="fas fa-comments me-2"></i>Let's Talk!
                                 </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Illustration Carousel -->
+                    <div class="col-lg-5 col-md-6 d-none d-md-block">
+                        <div class="hero-illustration">
+                            <div class="hero-carousel">
+                                @forelse($heroImages as $index => $image)
+                                    <img src="{{ asset($image->image_path) }}"
+                                        class="carousel-image {{ $loop->first ? 'active' : '' }}"
+                                        alt="{{ $image->title ?? 'Counseling support image ' . ($index + 1) }}"
+                                        data-index="{{ $index }}">
+                                @empty
+                                    <!-- Fallback to default image if no administrative images are set -->
+                                    <img src="{{ asset('images/hero-illustration.png') }}" class="carousel-image active"
+                                        alt="Students receiving counseling support" data-index="0">
+                                @endforelse
+
+                                <!-- Carousel Controls -->
+                                <button class="hero-carousel-control prev" aria-label="Previous image">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="hero-carousel-control next" aria-label="Next image">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -2120,9 +2366,9 @@
     </div>
 
     <!-- Bootstrap JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- SweetAlert2 for login feedback -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}"></script>
     <script>
         // Detect Chrome browser
         const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
@@ -3002,6 +3248,9 @@
         }
 
         // Initialize announcements carousel
+        let carouselInitRetries = 0;
+        const maxCarouselInitRetries = 50; // Max 5 seconds of retries (50 * 100ms)
+
         function initializeAnnouncementCarousel() {
             console.log('Initializing announcement carousel...');
             initAnnouncementCarousel();
@@ -3028,8 +3277,13 @@
 
             // Check if elements exist, if not, retry after a short delay
             if (!announcementNextBtn || !announcementPrevBtn) {
-                console.log('Navigation buttons not ready, retrying in 100ms...');
-                setTimeout(initializeAnnouncementCarousel, 100);
+                if (carouselInitRetries < maxCarouselInitRetries) {
+                    carouselInitRetries++;
+                    console.log(`Navigation buttons not ready, retrying in 100ms... (attempt ${carouselInitRetries}/${maxCarouselInitRetries})`);
+                    setTimeout(initializeAnnouncementCarousel, 100);
+                } else {
+                    console.log('Navigation buttons not found after maximum retries, skipping carousel initialization');
+                }
                 return;
             }
 
@@ -3988,8 +4242,7 @@
         }
     </style>
     @guest
-        <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
-            data-bs-keyboard="false">
+        <div class="modal fade" id="loginModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content rounded-4 overflow-hidden">
                     <div class="row g-0">
@@ -4022,7 +4275,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="tabs-wrapper">
-                                <ul class="nav nav-tabs mb-1" role="tablist">
+                                <ul class="nav nav-tabs nav-justified mb-3" role="tablist">
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link active" id="tab-login" data-bs-toggle="tab"
                                             data-bs-target="#pane-login" type="button" role="tab" aria-controls="pane-login"
@@ -4073,8 +4326,8 @@
                                                 data-bs-target="#forgotPasswordModal" data-bs-dismiss="modal">Forgot
                                                 Password?</a>
                                         </div>
-                                        <div class="d-flex justify-content-end">
-                                            <button type="submit" class="btn btn-auth-primary">
+                                        <div class="mt-4">
+                                            <button type="submit" class="btn btn-auth-primary w-100">
                                                 <i class="fas fa-sign-in-alt me-2"></i>Login
                                             </button>
                                         </div>
@@ -4326,8 +4579,7 @@
 
     @guest
         <!-- Forgot Password Modal -->
-        <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
-            data-bs-keyboard="false">
+        <div class="modal fade" id="forgotPasswordModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content rounded-4 overflow-hidden">
                     <div class="row g-0">
@@ -4370,7 +4622,7 @@
         </div>
 
         <!-- Resend Verification Modal -->
-        <div class="modal fade" id="resendVerificationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="resendVerificationModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content rounded-4">
                     <div class="modal-header" style="border-bottom: none;">
@@ -4399,8 +4651,7 @@
         </div>
 
         <!-- Two-Factor Authentication Modal -->
-        <div class="modal fade" id="twoFactorModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
-            data-bs-keyboard="false">
+        <div class="modal fade" id="twoFactorModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content rounded-4 overflow-hidden">
                     <div class="row g-0">
@@ -5265,172 +5516,172 @@
                                 });
 
                                 const contentType = resp.headers.get('content-type');
-                                    let data;
-                                    if (contentType && contentType.includes('application/json')) {
-                                        data = await resp.json();
-                                    } else {
-                                        const text = await resp.text();
-                                        console.error('Non-JSON response:', text);
-                                        throw new Error('Server returned an invalid response format (not JSON).');
-                                    }
+                                let data;
+                                if (contentType && contentType.includes('application/json')) {
+                                    data = await resp.json();
+                                } else {
+                                    const text = await resp.text();
+                                    console.error('Non-JSON response:', text);
+                                    throw new Error('Server returned an invalid response format (not JSON).');
+                                }
 
-                                    console.log('Registration response:', data);
+                                console.log('Registration response:', data);
 
-                                    if (resp.ok || data.status === 'success') {
-                                        safeHideModal('loginModal');
-                                        if (window.Swal) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Registration Successful!',
-                                                html: 'Please check your email to verify your account. A verification link has been sent to your email address.',
-                                                confirmButtonText: 'OK, got it',
-                                                allowOutsideClick: false
-                                            }).then(() => {
-                                                window.location.href = '/';
-                                            });
-                                        } else {
-                                            alert('Registration successful! Please check your email.');
-                                            window.location.href = '/';
-                                        }
-                                    } else {
-                                        const errorMsg = data.message || 'Registration failed.';
-
-                                        // Display field-specific errors
-                                        if (data.errors) {
-                                            Object.keys(data.errors).forEach(key => {
-                                                const input = signupForm.querySelector(`[name="${key}"]`);
-                                                if (input) {
-                                                    input.classList.add('is-invalid');
-                                                    const feedback = input.closest('.mb-3')?.querySelector('.invalid-feedback');
-                                                    if (feedback) feedback.textContent = data.errors[key][0];
-
-                                                    // If the input is in a hidden step, we might want to switch to it, 
-                                                    // but for now let's just mark it invalid so if they go back they see it.
-                                                }
-                                            });
-                                        }
-
-                                        if (window.Swal) {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Registration Failed',
-                                                text: errorMsg
-                                            });
-                                        } else {
-                                            alert(errorMsg);
-                                        }
-                                    }
-                                } catch (err) {
-                                    console.error('Registration error:', err);
+                                if (resp.ok || data.status === 'success') {
+                                    safeHideModal('loginModal');
                                     if (window.Swal) {
-                                        Swal.fire({ icon: 'error', title: 'Error', text: 'Network error. Please try again.' });
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Registration Successful!',
+                                            html: 'Please check your email to verify your account. A verification link has been sent to your email address.',
+                                            confirmButtonText: 'OK, got it',
+                                            allowOutsideClick: false
+                                        }).then(() => {
+                                            window.location.href = '/';
+                                        });
                                     } else {
-                                        alert('Network error. Please try again.');
+                                        alert('Registration successful! Please check your email.');
+                                        window.location.href = '/';
                                     }
-                                } finally {
-                                    if (submitBtn) {
-                                        submitBtn.disabled = false;
-                                        submitBtn.innerHTML = originalBtnText;
+                                } else {
+                                    const errorMsg = data.message || 'Registration failed.';
+
+                                    // Display field-specific errors
+                                    if (data.errors) {
+                                        Object.keys(data.errors).forEach(key => {
+                                            const input = signupForm.querySelector(`[name="${key}"]`);
+                                            if (input) {
+                                                input.classList.add('is-invalid');
+                                                const feedback = input.closest('.mb-3')?.querySelector('.invalid-feedback');
+                                                if (feedback) feedback.textContent = data.errors[key][0];
+
+                                                // If the input is in a hidden step, we might want to switch to it, 
+                                                // but for now let's just mark it invalid so if they go back they see it.
+                                            }
+                                        });
+                                    }
+
+                                    if (window.Swal) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Registration Failed',
+                                            text: errorMsg
+                                        });
+                                    } else {
+                                        alert(errorMsg);
                                     }
                                 }
+                            } catch (err) {
+                                console.error('Registration error:', err);
+                                if (window.Swal) {
+                                    Swal.fire({ icon: 'error', title: 'Error', text: 'Network error. Please try again.' });
+                                } else {
+                                    alert('Network error. Please try again.');
+                                }
+                            } finally {
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = originalBtnText;
+                                }
+                            }
+                        });
+
+                        // Ensure the Submit button triggers the form submit event
+                        const doneBtn = document.getElementById('signupSubmitBtn');
+                        if (doneBtn) {
+                            // Remove existing listeners by cloning (if any)
+                            const newBtn = doneBtn.cloneNode(true);
+                            doneBtn.parentNode.replaceChild(newBtn, doneBtn);
+
+                            newBtn.addEventListener('click', function () {
+                                signupForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
                             });
+                        }
+                    }
 
-                            // Ensure the Submit button triggers the form submit event
-                            const doneBtn = document.getElementById('signupSubmitBtn');
-                            if (doneBtn) {
-                                // Remove existing listeners by cloning (if any)
-                                const newBtn = doneBtn.cloneNode(true);
-                                doneBtn.parentNode.replaceChild(newBtn, doneBtn);
+                    // Initialize all enhancements
+                    addPasswordStrengthIndicator();
+                    addPasswordConfirmationValidation();
+                    enhanceStepNavigation();
+                    addRealTimeValidation();
+                    enhanceFormSubmission();
 
-                                newBtn.addEventListener('click', function () {
-                                    signupForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-                                });
+                    // Initialize step progress
+                    updateStepProgress(1);
+                }
+
+                // Initialize enhanced signup when DOM is ready
+                console.log('Checking if should initialize signup..., readyState:', document.readyState);
+                if (document.readyState === 'loading') {
+                    console.log('DOM still loading, adding event listener');
+                    document.addEventListener('DOMContentLoaded', function () {
+                        console.log('DOMContentLoaded fired, initializing signup');
+                        initializeEnhancedSignup();
+                    });
+                } else {
+                    console.log('DOM already ready, initializing signup immediately');
+                    initializeEnhancedSignup();
+                }
+
+                // Enhanced Modal Behavior
+                function enhanceModalBehavior() {
+                    const loginModal = document.getElementById('loginModal');
+                    if (!loginModal) return;
+
+                    // Reset form when modal is hidden
+                    loginModal.addEventListener('hidden.bs.modal', function () {
+                        const forms = this.querySelectorAll('form');
+                        forms.forEach(form => {
+                            form.reset();
+                            // Clear validation states
+                            const inputs = form.querySelectorAll('input, select');
+                            inputs.forEach(input => {
+                                input.classList.remove('is-invalid', 'is-valid');
+                            });
+                            const feedbacks = form.querySelectorAll('.invalid-feedback');
+                            feedbacks.forEach(feedback => {
+                                feedback.textContent = '';
+                            });
+                        });
+
+                        // Reset to first step
+                        const step1 = document.getElementById('signupStep1');
+                        const step2 = document.getElementById('signupStep2');
+                        const step3 = document.getElementById('signupStep3');
+                        const step4 = document.getElementById('signupStep4');
+
+                        if (step1 && step2 && step3 && step4) {
+                            step1.classList.remove('d-none');
+                            step2.classList.add('d-none');
+                            step3.classList.add('d-none');
+                            step4.classList.add('d-none');
+                            updateStepProgress(1);
+                        }
+                    });
+
+                    // Focus management
+                    loginModal.addEventListener('shown.bs.modal', function () {
+                        const activeTab = this.querySelector('.nav-link.active');
+                        if (activeTab) {
+                            const targetPane = this.querySelector(activeTab.getAttribute('data-bs-target'));
+                            const firstInput = targetPane?.querySelector('input, select');
+                            if (firstInput) {
+                                setTimeout(() => firstInput.focus(), 100);
                             }
                         }
+                        // Reattach step navigation handlers when modal is shown (fixes lost listeners)
+                        try { enhanceStepNavigation(); } catch (e) { console.error('enhanceStepNavigation error', e); }
+                    });
+                }
 
-                        // Initialize all enhancements
-                        addPasswordStrengthIndicator();
-                        addPasswordConfirmationValidation();
-                        enhanceStepNavigation();
-                        addRealTimeValidation();
-                        enhanceFormSubmission();
+                // Initialize modal enhancements
+                enhanceModalBehavior();
 
-                        // Initialize step progress
-                        updateStepProgress(1);
-                    }
-
-                    // Initialize enhanced signup when DOM is ready
-                    console.log('Checking if should initialize signup..., readyState:', document.readyState);
-                    if (document.readyState === 'loading') {
-                        console.log('DOM still loading, adding event listener');
-                        document.addEventListener('DOMContentLoaded', function () {
-                            console.log('DOMContentLoaded fired, initializing signup');
-                            initializeEnhancedSignup();
-                        });
-                    } else {
-                        console.log('DOM already ready, initializing signup immediately');
-                        initializeEnhancedSignup();
-                    }
-
-                    // Enhanced Modal Behavior
-                    function enhanceModalBehavior() {
-                        const loginModal = document.getElementById('loginModal');
-                        if (!loginModal) return;
-
-                        // Reset form when modal is hidden
-                        loginModal.addEventListener('hidden.bs.modal', function () {
-                            const forms = this.querySelectorAll('form');
-                            forms.forEach(form => {
-                                form.reset();
-                                // Clear validation states
-                                const inputs = form.querySelectorAll('input, select');
-                                inputs.forEach(input => {
-                                    input.classList.remove('is-invalid', 'is-valid');
-                                });
-                                const feedbacks = form.querySelectorAll('.invalid-feedback');
-                                feedbacks.forEach(feedback => {
-                                    feedback.textContent = '';
-                                });
-                            });
-
-                            // Reset to first step
-                            const step1 = document.getElementById('signupStep1');
-                            const step2 = document.getElementById('signupStep2');
-                            const step3 = document.getElementById('signupStep3');
-                            const step4 = document.getElementById('signupStep4');
-
-                            if (step1 && step2 && step3 && step4) {
-                                step1.classList.remove('d-none');
-                                step2.classList.add('d-none');
-                                step3.classList.add('d-none');
-                                step4.classList.add('d-none');
-                                updateStepProgress(1);
-                            }
-                        });
-
-                        // Focus management
-                        loginModal.addEventListener('shown.bs.modal', function () {
-                            const activeTab = this.querySelector('.nav-link.active');
-                            if (activeTab) {
-                                const targetPane = this.querySelector(activeTab.getAttribute('data-bs-target'));
-                                const firstInput = targetPane?.querySelector('input, select');
-                                if (firstInput) {
-                                    setTimeout(() => firstInput.focus(), 100);
-                                }
-                            }
-                            // Reattach step navigation handlers when modal is shown (fixes lost listeners)
-                            try { enhanceStepNavigation(); } catch (e) { console.error('enhanceStepNavigation error', e); }
-                        });
-                    }
-
-                    // Initialize modal enhancements
-                    enhanceModalBehavior();
-
-                    // Let Bootstrap handle modal opening naturally via data-bs-toggle
-                    // Only add a fallback handler if Bootstrap fails
-                    // Don't interfere with Bootstrap's native event handling
-                });
-            </script>
+                // Let Bootstrap handle modal opening naturally via data-bs-toggle
+                // Only add a fallback handler if Bootstrap fails
+                // Don't interfere with Bootstrap's native event handling
+            });
+        </script>
 
     @endguest
 
@@ -5514,6 +5765,201 @@
             });
         </script>
     @endif
+    <!-- Daily Quote Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const quotes = [
+                "You do not have to face everything alone.",
+                "Asking for help is a strength.",
+                "One message can ease the weight.",
+                "It is okay to pause.",
+                "Your feelings are valid.",
+                "Reaching out is progress.",
+                "You are allowed to rest.",
+                "Small steps matter.",
+                "Someone cares about you.",
+                "You are not a burden.",
+
+                "It is okay to not be okay.",
+                "You deserve support.",
+                "Speaking up is brave.",
+                "You matter today.",
+                "Healing takes time.",
+                "You are not weak for needing help.",
+                "Your voice deserves to be heard.",
+                "You are doing your best.",
+                "Connection starts with honesty.",
+                "You are worthy of care.",
+
+                "One breath at a time is enough.",
+                "You are not alone in this.",
+                "Your struggles are real.",
+                "Help is not failure.",
+                "It is okay to lean on others.",
+                "You deserve understanding.",
+                "Progress can be quiet.",
+                "You are allowed to ask twice.",
+                "Someone wants to listen.",
+                "You do not have to explain everything.",
+
+                "Rest is part of healing.",
+                "Your emotions make sense.",
+                "Reaching out can feel scary—and still be right.",
+                "You are not behind.",
+                "Support exists for you.",
+                "It is okay to take space, then reconnect.",
+                "You are allowed to need reassurance.",
+                "Today is not permanent.",
+                "You are enough as you are.",
+                "You deserve patience.",
+
+                "Talking can lighten the load.",
+                "You are not too much.",
+                "You deserve to be checked on.",
+                "Vulnerability builds connection.",
+                "You are allowed to slow down.",
+                "Asking for help is self-care.",
+                "You are seen, even when quiet.",
+                "You are not failing.",
+                "It is okay to say “I need help.”",
+                "You deserve peace.",
+
+                "One step forward still counts.",
+                "You are allowed to feel deeply.",
+                "Someone understands more than you think.",
+                "You are not alone in your thoughts.",
+                "It is okay to reach out again.",
+                "You deserve compassion.",
+                "You are not broken.",
+                "Support is not a weakness.",
+                "Your mental health matters.",
+                "You are allowed to prioritize yourself.",
+
+                "Sharing is a form of healing.",
+                "You do not need to have all the answers.",
+                "You deserve to be listened to.",
+                "You are doing enough for today.",
+                "It is okay to ask for clarity.",
+                "You are not invisible.",
+                "Your pain is valid.",
+                "You deserve gentle days.",
+                "You are allowed to seek comfort.",
+                "You matter, even when struggling.",
+
+                "Reaching out is an act of courage.",
+                "You deserve emotional safety.",
+                "You are not weak for feeling tired.",
+                "Someone wants to support you.",
+                "You are allowed to be honest.",
+                "You are not a problem to fix.",
+                "Healing happens in connection.",
+                "You deserve care without conditions.",
+                "You are allowed to say “I’m overwhelmed.”",
+                "You are more than your worst days.",
+
+                "It is okay to ask for time.",
+                "You deserve understanding, not judgment.",
+                "You are allowed to feel uncertain.",
+                "You are not alone, even now.",
+                "Support can start with one word.",
+                "You deserve kindness today.",
+                "You are allowed to be human.",
+                "Your mental health comes first.",
+                "You are worthy of help.",
+                "You do not need to suffer silently.",
+
+                "Reaching out can change everything.",
+                "You deserve relief.",
+                "You are not asking for too much.",
+                "Your well-being matters.",
+                "You are allowed to need people.",
+                "You are doing better than you think.",
+                "You deserve support without guilt.",
+                "You are not alone in your healing.",
+                "One honest conversation can help.",
+                "You matter, always."
+            ];
+
+            const quoteElement = document.getElementById('dailyQuote');
+            if (quoteElement) {
+                // Get a random quote
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                quoteElement.textContent = randomQuote;
+            }
+        });
+
+        // Hero Carousel Logic
+        document.addEventListener('DOMContentLoaded', function () {
+            const carousel = document.querySelector('.hero-carousel');
+            if (!carousel) return;
+
+            const images = carousel.querySelectorAll('.carousel-image');
+            const prevBtn = carousel.querySelector('.prev');
+            const nextBtn = carousel.querySelector('.next');
+
+            if (images.length <= 1) {
+                if (prevBtn) prevBtn.style.display = 'none';
+                if (nextBtn) nextBtn.style.display = 'none';
+                return;
+            }
+
+            let currentIndex = 0;
+            let interval;
+
+            function showImage(index) {
+                images.forEach(img => {
+                    img.classList.remove('active');
+                    img.style.position = 'absolute'; // Ensure inactive ones are absolute
+                    img.style.opacity = '0';
+                });
+
+                // Handle wrap-around
+                if (index < 0) index = images.length - 1;
+                if (index >= images.length) index = 0;
+
+                currentIndex = index;
+
+                const activeImg = images[currentIndex];
+                activeImg.classList.add('active');
+                activeImg.style.position = 'relative'; // Active one is relative
+                activeImg.style.opacity = '1';
+            }
+
+            function nextImage() {
+                showImage(currentIndex + 1);
+            }
+
+            function prevImage() {
+                showImage(currentIndex - 1);
+            }
+
+            function startAutoRotate() {
+                interval = setInterval(nextImage, 5000);
+            }
+
+            function resetAutoRotate() {
+                clearInterval(interval);
+                startAutoRotate();
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    nextImage();
+                    resetAutoRotate();
+                });
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    prevImage();
+                    resetAutoRotate();
+                });
+            }
+
+            // Start auto-rotation
+            startAutoRotate();
+        });
+    </script>
 </body>
 
 </html>

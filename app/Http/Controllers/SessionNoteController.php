@@ -28,16 +28,16 @@ class SessionNoteController extends Controller
 
         // Count existing session notes for this appointment
         $existingSessionCount = $appointment->sessionNotes()->count();
-        
+
         // Determine the next session number (1-based, so add 1 to existing count)
         $nextSessionNumber = $existingSessionCount + 1;
-        
+
         // Determine which session options to show
         $availableSessions = [];
         for ($i = $nextSessionNumber; $i <= 4; $i++) {
             $availableSessions[] = $i;
         }
-        
+
         return view('counselor.session_notes.create', compact('appointment', 'nextSessionNumber', 'availableSessions'));
     }
 
@@ -80,13 +80,80 @@ class SessionNoteController extends Controller
     // List all session notes for the counselor
     public function index(Request $request)
     {
-        // Fetch all session notes for the counselor, grouped by appointment, ordered by session_number
-        $sessionNotes = \App\Models\SessionNote::where('counselor_id', auth()->id())
-            ->with(['appointment.student'])
-            ->orderBy('appointment_id')
-            ->orderBy('session_number')
-            ->get();
-        // Optionally, you can group them in the view by appointment if needed
+        // Start query building
+        $query = \App\Models\SessionNote::where('session_notes.counselor_id', auth()->id())
+            ->with(['appointment.student']);
+
+        // Filter by student name
+        if ($request->filled('student')) {
+            $query->whereHas('appointment.student', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->student . '%');
+            });
+        }
+
+        // Filter by session status
+        if ($request->filled('status')) {
+            $query->where('session_status', $request->status);
+        }
+
+        // Filter by attendance
+        if ($request->filled('attendance')) {
+            $query->where('attendance', $request->attendance);
+        }
+
+        // Filter by time period (upcoming/past)
+        if ($request->filled('filter')) {
+            $query->whereHas('appointment', function ($q) use ($request) {
+                if ($request->filter === 'upcoming') {
+                    $q->where('scheduled_at', '>=', now());
+                } elseif ($request->filter === 'past') {
+                    $q->where('scheduled_at', '<', now());
+                }
+            });
+        }
+
+        // Filter by date range
+        if ($request->filled('date_from')) {
+            $query->whereHas('appointment', function ($q) use ($request) {
+                $q->where('scheduled_at', '>=', $request->date_from);
+            });
+        }
+        if ($request->filled('date_to')) {
+            $query->whereHas('appointment', function ($q) use ($request) {
+                $q->where('scheduled_at', '<=', $request->date_to . ' 23:59:59');
+            });
+        }
+
+        // Apply sorting
+        $sort = $request->get('sort', 'date_desc');
+        switch ($sort) {
+            case 'date_asc':
+                $query->join('appointments', 'session_notes.appointment_id', '=', 'appointments.id')
+                    ->orderBy('appointments.scheduled_at', 'asc')
+                    ->select('session_notes.*');
+                break;
+            case 'student_asc':
+                $query->join('appointments', 'session_notes.appointment_id', '=', 'appointments.id')
+                    ->join('users', 'appointments.student_id', '=', 'users.id')
+                    ->orderBy('users.name', 'asc')
+                    ->select('session_notes.*');
+                break;
+            case 'student_desc':
+                $query->join('appointments', 'session_notes.appointment_id', '=', 'appointments.id')
+                    ->join('users', 'appointments.student_id', '=', 'users.id')
+                    ->orderBy('users.name', 'desc')
+                    ->select('session_notes.*');
+                break;
+            case 'date_desc':
+            default:
+                $query->join('appointments', 'session_notes.appointment_id', '=', 'appointments.id')
+                    ->orderBy('appointments.scheduled_at', 'desc')
+                    ->select('session_notes.*');
+                break;
+        }
+
+        $sessionNotes = $query->get();
+
         return view('counselor.session_notes.index', compact('sessionNotes'));
     }
 
@@ -161,12 +228,12 @@ class SessionNoteController extends Controller
     // Show session history timeline for a student
     public function timeline($studentId)
     {
-        $sessionNotes = \App\Models\SessionNote::whereHas('appointment', function($q) use ($studentId) {
+        $sessionNotes = \App\Models\SessionNote::whereHas('appointment', function ($q) use ($studentId) {
             $q->where('student_id', $studentId);
         })
-        ->with(['appointment.student'])
-        ->orderBy('session_number')
-        ->get();
+            ->with(['appointment.student'])
+            ->orderBy('session_number')
+            ->get();
         $student = $sessionNotes->first() ? $sessionNotes->first()->appointment->student : null;
         return view('counselor.session_notes.timeline', compact('sessionNotes', 'student'));
     }

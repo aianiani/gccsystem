@@ -37,14 +37,14 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply page zoom for better readability */
+        /* Apply page zoom consistent with appointments pages */
         .home-zoom {
-            zoom: 0.90;
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
             .home-zoom {
-                transform: scale(0.90);
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
@@ -81,8 +81,9 @@
         }
 
         .main-dashboard-inner {
-            max-width: 1180px;
+            max-width: 100%;
             margin: 0 auto;
+            padding: 0 1rem;
         }
 
         .welcome-card {
@@ -258,31 +259,106 @@
                             </a>
                         </div>
                         <div class="card-body">
-                            <form method="GET" class="row g-2 align-items-center mb-3">
-                                <div class="col-auto">
-                                    <input type="text" name="student" class="form-control"
-                                        placeholder="Filter by student name" value="{{ request('student') }}"
-                                        style="max-width: 250px;">
-                                </div>
-                                <div class="col-auto">
-                                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i>
-                                        Filter</button>
-                                </div>
-                                @if(request('student'))
-                                    <div class="col-auto">
-                                        <a href="{{ route('counselor.session_notes.index') }}"
-                                            class="btn btn-outline-secondary">Clear</a>
+                            <!-- Enhanced Filters -->
+                            <form method="GET" class="mb-3">
+                                <!-- Row 1: Primary Filters -->
+                                <div class="row g-2 mb-2">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-muted">Search Student</label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-white border-end-0"><i
+                                                    class="bi bi-search"></i></span>
+                                            <input type="text" name="student" class="form-control border-start-0 ps-0"
+                                                placeholder="Student name" value="{{ request('student') }}">
+                                        </div>
                                     </div>
-                                @endif
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold text-muted">Status</label>
+                                        <select name="status" class="form-select form-select-sm">
+                                            <option value="">All Status</option>
+                                            <option value="scheduled"
+                                                {{ request('status') == 'scheduled' ? 'selected' : '' }}>Scheduled
+                                            </option>
+                                            <option value="completed"
+                                                {{ request('status') == 'completed' ? 'selected' : '' }}>Completed
+                                            </option>
+                                            <option value="missed" {{ request('status') == 'missed' ? 'selected' : '' }}>
+                                                Missed</option>
+                                            <option value="expired"
+                                                {{ request('status') == 'expired' ? 'selected' : '' }}>Expired
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold text-muted">Attendance</label>
+                                        <select name="attendance" class="form-select form-select-sm">
+                                            <option value="">All</option>
+                                            <option value="attended"
+                                                {{ request('attendance') == 'attended' ? 'selected' : '' }}>Attended
+                                            </option>
+                                            <option value="missed"
+                                                {{ request('attendance') == 'missed' ? 'selected' : '' }}>Missed
+                                            </option>
+                                            <option value="unknown"
+                                                {{ request('attendance') == 'unknown' ? 'selected' : '' }}>Unknown
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold text-muted">Time Period</label>
+                                        <select name="filter" class="form-select form-select-sm">
+                                            <option value="">All Time</option>
+                                            <option value="upcoming"
+                                                {{ request('filter') == 'upcoming' ? 'selected' : '' }}>Upcoming
+                                            </option>
+                                            <option value="past" {{ request('filter') == 'past' ? 'selected' : '' }}>
+                                                Past</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold text-muted">Sort By</label>
+                                        <select name="sort" class="form-select form-select-sm">
+                                            <option value="date_desc"
+                                                {{ request('sort') == 'date_desc' ? 'selected' : '' }}>Date: Newest
+                                            </option>
+                                            <option value="date_asc"
+                                                {{ request('sort') == 'date_asc' ? 'selected' : '' }}>Date: Oldest
+                                            </option>
+                                            <option value="student_asc"
+                                                {{ request('sort') == 'student_asc' ? 'selected' : '' }}>Student: A-Z
+                                            </option>
+                                            <option value="student_desc"
+                                                {{ request('sort') == 'student_desc' ? 'selected' : '' }}>Student: Z-A
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Row 2: Date Range and Actions -->
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-muted">Date From</label>
+                                        <input type="date" name="date_from" class="form-control form-control-sm"
+                                            value="{{ request('date_from') }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-muted">Date To</label>
+                                        <input type="date" name="date_to" class="form-control form-control-sm"
+                                            value="{{ request('date_to') }}">
+                                    </div>
+                                    <div class="col-md-4 d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                                            <i class="bi bi-funnel me-1"></i>Apply
+                                        </button>
+                                        @if(request()->hasAny(['student', 'status', 'attendance', 'filter', 'sort', 'date_from', 'date_to']))
+                                            <a href="{{ route('counselor.session_notes.index') }}"
+                                                class="btn btn-outline-secondary btn-sm flex-grow-1">
+                                                <i class="bi bi-x-circle me-1"></i>Clear
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </form>
-                            <div class="mb-3 d-flex flex-wrap gap-2">
-                                <a href="{{ route('counselor.session_notes.index', array_merge(request()->except('filter'), ['filter' => null])) }}"
-                                    class="btn btn-sm {{ !request('filter') ? 'btn-primary' : 'btn-outline-primary' }}">All</a>
-                                <a href="{{ route('counselor.session_notes.index', array_merge(request()->except('filter'), ['filter' => 'upcoming'])) }}"
-                                    class="btn btn-sm {{ request('filter') === 'upcoming' ? 'btn-primary' : 'btn-outline-primary' }}">Upcoming</a>
-                                <a href="{{ route('counselor.session_notes.index', array_merge(request()->except('filter'), ['filter' => 'past'])) }}"
-                                    class="btn btn-sm {{ request('filter') === 'past' ? 'btn-primary' : 'btn-outline-primary' }}">Past</a>
-                            </div>
                             <div class="table-responsive">
                                 @php
                                     $grouped = $sessionNotes->groupBy('appointment_id');

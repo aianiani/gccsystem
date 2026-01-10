@@ -30,6 +30,25 @@ class SeminarController extends Controller
         }
 
         $seminars = Seminar::with('schedules')->orderBy('target_year_level')->get();
+
+        // Calculate stats for each seminar
+        foreach ($seminars as $seminar) {
+            $totalStudents = \App\Models\User::where('role', 'student')
+                ->where('year_level', $seminar->target_year_level)
+                ->where('is_active', true)
+                ->count();
+
+            $completedStudents = \App\Models\SeminarAttendance::where('seminar_name', $seminar->name)
+                ->distinct('user_id')
+                ->count('user_id');
+
+            $seminar->stats = [
+                'total' => $totalStudents,
+                'completed' => $completedStudents,
+                'percentage' => $totalStudents > 0 ? round(($completedStudents / $totalStudents) * 100) : 0
+            ];
+        }
+
         return view('counselor.seminars.index', compact('seminars'));
     }
 

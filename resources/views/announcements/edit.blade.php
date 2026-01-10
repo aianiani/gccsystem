@@ -1,6 +1,37 @@
 @extends('layouts.app')
 
 @section('content')
+    <style>
+        :root {
+            --forest-green: #1f7a2d;
+            --forest-green-light: #4a7c59;
+            --forest-green-lighter: #e8f5e8;
+            --yellow-maize: #f4d03f;
+            --gray-50: #f8f9fa;
+            --gray-100: #eef6ee;
+            --gray-600: #6c757d;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
+        }
+
+        /* Force sidebar to use the local forest-green variable */
+        .custom-sidebar {
+            background: var(--forest-green) !important;
+        }
+
+        /* Match dashboard zoom */
+        .home-zoom {
+            zoom: 0.75;
+        }
+
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top center;
+            }
+        }
+    </style>
     <div class="container">
         <h1>Edit Announcement</h1>
         <form action="{{ route('announcements.update', $announcement->id) }}" method="POST" enctype="multipart/form-data">
@@ -96,15 +127,15 @@
                                 const col = document.createElement('div');
                                 col.className = 'col-md-2 col-sm-3 col-4';
                                 col.innerHTML = `
-                                            <div class="position-relative">
-                                                <img src="${e.target.result}" 
-                                                     class="img-fluid rounded shadow-sm" 
-                                                     style="width: 100%; height: 120px; object-fit: cover;">
-                                                <div class="position-absolute top-0 start-0 w-100 p-2">
-                                                    <span class="badge bg-success">New ${index + 1}</span>
-                                                </div>
-                                            </div>
-                                        `;
+                                                    <div class="position-relative">
+                                                        <img src="${e.target.result}" 
+                                                             class="img-fluid rounded shadow-sm" 
+                                                             style="width: 100%; height: 120px; object-fit: cover;">
+                                                        <div class="position-absolute top-0 start-0 w-100 p-2">
+                                                            <span class="badge bg-success">New ${index + 1}</span>
+                                                        </div>
+                                                    </div>
+                                                `;
                                 previewContainer.appendChild(col);
                             };
 

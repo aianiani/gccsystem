@@ -15,6 +15,22 @@
             --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
         }
 
+        /* Force sidebar to use the local forest-green variable */
+        .custom-sidebar {
+            background: var(--forest-green) !important;
+        }
+
+        /* Match dashboard zoom */
+        .home-zoom {
+            zoom: 0.75;
+        }
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top center;
+            }
+        }
+
 
 
         @if(auth()->check() && auth()->user()->isAdmin())
@@ -23,6 +39,8 @@
             }
 
         @elseif(auth()->check() && auth()->user()->isCounselor())
+
+
             .main-dashboard-content {
                 background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
                 min-height: 100vh;
@@ -32,7 +50,7 @@
             }
 
             .main-dashboard-inner {
-                max-width: 1180px;
+                max-width: 100%;
                 margin: 0 auto;
             }
 
@@ -203,160 +221,174 @@
     </style>
 
     @if(auth()->check() && auth()->user()->isCounselor())
-        <div class="d-flex">
-            <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
-            <!-- Sidebar -->
-            @include('counselor.sidebar')
+        <div class="home-zoom">
+            <div class="d-flex">
+                <!-- Mobile Sidebar Toggle -->
+                <button id="counselorSidebarToggle" class="d-md-none">
+                    <i class="bi bi-list"></i>
+                </button>
+                <!-- Sidebar -->
+                @include('counselor.sidebar')
 
-            <!-- Main Content -->
-            <div class="main-dashboard-content flex-grow-1">
-                <div class="main-dashboard-inner">
-                    <div class="welcome-card">
-                        <div>
-                            <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
-                            <div class="welcome-text">Announcements</div>
-                            <div style="font-size: 0.9rem; margin-top: 0.5rem;">Stay updated with the latest news and
-                                updates</div>
+                <!-- Main Content -->
+                <div class="main-dashboard-content flex-grow-1">
+                    <div class="main-dashboard-inner home-zoom">
+                        <div class="welcome-card">
+                            <div>
+                                <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
+                                <div class="welcome-text">Announcements</div>
+                                <div style="font-size: 0.9rem; margin-top: 0.5rem;">Stay updated with the latest news and
+                                    updates</div>
+                            </div>
+                            <div class="welcome-avatar">
+                                <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
+                                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            </div>
                         </div>
-                        <div class="welcome-avatar">
-                            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
-                                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                        </div>
-                    </div>
 
-                    <div class="main-content-card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-megaphone me-2"></i>All Announcements</h5>
-                            @if(auth()->check() && method_exists(auth()->user(), 'isAdmin') && auth()->user()->isAdmin())
-                                <a href="{{ route('announcements.create') }}" class="btn btn-outline-success btn-sm">
-                                    <i class="bi bi-plus-circle me-1"></i>Create Announcement
-                                </a>
-                            @endif
-                        </div>
-                        <div class="card-body">
-                            @if(session('success'))
-                                <div class="alert alert-success">{{ session('success') }}</div>
-                            @endif
-                            <div class="row g-4">
+                        <div class="main-content-card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-megaphone me-2"></i>All Announcements</h5>
+                                @if(auth()->check() && method_exists(auth()->user(), 'isAdmin') && auth()->user()->isAdmin())
+                                    <a href="{{ route('announcements.create') }}" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-plus-circle me-1"></i>Create Announcement
+                                    </a>
+                                @endif
+                            </div>
+                            <div class="card-body">
+                                @if(session('success'))
+                                    <div class="alert alert-success">{{ session('success') }}</div>
+                                @endif
+                                <div class="row g-4">
     @elseif(auth()->check() && auth()->user()->isAdmin())
-                                <div class="main-dashboard-inner">
-                                    <div class="page-header-card">
-                                        <div>
-                                            <h1><i class="bi bi-megaphone me-2"></i>Announcements</h1>
-                                            <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.95rem;">Manage and
-                                                create system announcements</p>
+                                    <div class="main-dashboard-inner home-zoom">
+                                        <div class="page-header-card">
+                                            <div>
+                                                <h1><i class="bi bi-megaphone me-2"></i>Announcements</h1>
+                                                <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.95rem;">Manage and
+                                                    create system announcements</p>
+                                            </div>
+                                            <div>
+                                                <a href="{{ route('announcements.create') }}" class="btn btn-light btn-lg">
+                                                    <i class="bi bi-plus-circle me-2"></i>Create Announcement
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <a href="{{ route('announcements.create') }}" class="btn btn-light btn-lg">
-                                                <i class="bi bi-plus-circle me-2"></i>Create Announcement
-                                            </a>
-                                        </div>
-                                    </div>
 
-                                    <div class="main-content-card">
-                                        <div class="card-header">
-                                            <h5 class="mb-0"><i class="bi bi-megaphone me-2"></i>All Announcements</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            @if(session('success'))
-                                                <div class="alert alert-success">{{ session('success') }}</div>
-                                            @endif
-                                            <div class="row g-4">
-                            @else
-                                                <div class="container py-4">
-                                                    <div class="page-header-card">
-                                                        <div>
-                                                            <h1><i class="bi bi-megaphone me-2"></i>Announcements</h1>
-                                                        </div>
-                                                        <div>
-                                                            <a href="{{ route('home') }}" class="btn btn-light">
-                                                                <i class="bi bi-arrow-left me-2"></i>Back to Home
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    @if(session('success'))
-                                                        <div class="alert alert-success">{{ session('success') }}</div>
-                                                    @endif
-                                                    <div class="row g-4">
-                                            @endif
-                                                    @forelse($announcements as $announcement)
-                                                        <div class="col-md-6 col-lg-4">
-                                                            <a href="{{ route('announcements.show', $announcement->id) }}"
-                                                                class="announcement-card">
-                                                                <div class="announcement-icon"><i class="fas fa-bullhorn"></i>
+                                        <div class="main-content-card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0"><i class="bi bi-megaphone me-2"></i>All Announcements</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                @if(session('success'))
+                                                    <div class="alert alert-success">{{ session('success') }}</div>
+                                                @endif
+                                                <div class="row g-4">
+                                @else
+
+                                                    <div class="home-zoom">
+                                                        <div class="container-fluid px-4 py-4">
+                                                            <div class="page-header-card">
+                                                                <div>
+                                                                    <h1><i class="bi bi-megaphone me-2"></i>Announcements</h1>
                                                                 </div>
-                                                                <div class="announcement-title">{{ $announcement->title }}
-                                                                </div>
-                                                                <div class="announcement-meta">
-                                                                    <span
-                                                                        class="announcement-date">{{ optional($announcement->created_at)->format('M d, Y') }}</span>
-                                                                    @if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14)))
-                                                                        <span class="announcement-new">NEW</span>
+                                                                <div>
+                                                                    @if(auth()->check())
+                                                                        <a href="{{ route('dashboard') }}" class="btn btn-light">
+                                                                            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                                                                        </a>
+                                                                    @else
+                                                                        <a href="{{ route('home') }}" class="btn btn-light">
+                                                                            <i class="bi bi-arrow-left me-2"></i>Back to Home
+                                                                        </a>
                                                                     @endif
                                                                 </div>
-                                                                <p class="announcement-excerpt">
-                                                                    {{ \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? ''), 140) }}
-                                                                </p>
-                                                            </a>
-                                                        </div>
-                                                    @empty
-                                                        <div class="col-12">
-                                                            <div class="text-center p-5 bg-white rounded-4 shadow-sm border"
-                                                                style="border-color: rgba(0,0,0,0.06) !important;">
-                                                                <div class="d-inline-flex align-items-center justify-content-center announcement-icon"
-                                                                    style="margin-bottom: .75rem;">
-                                                                    <i class="fas fa-bullhorn"></i>
-                                                                </div>
-                                                                <h5 class="fw-bold mb-2" style="color:#2c3e50;">No
-                                                                    announcements found</h5>
-                                                                <p class="text-muted mb-0">Please check back later for
-                                                                    updates and news.</p>
                                                             </div>
+                                                            @if(session('success'))
+                                                                <div class="alert alert-success">{{ session('success') }}</div>
+                                                            @endif
+                                                            <div class="row g-4">
+                                                @endif
+                                                            @forelse($announcements as $announcement)
+                                                                <div class="col-md-6 col-lg-4">
+                                                                    <a href="{{ route('announcements.show', $announcement->id) }}"
+                                                                        class="announcement-card">
+                                                                        <div class="announcement-icon"><i
+                                                                                class="fas fa-bullhorn"></i>
+                                                                        </div>
+                                                                        <div class="announcement-title">
+                                                                            {{ $announcement->title }}
+                                                                        </div>
+                                                                        <div class="announcement-meta">
+                                                                            <span
+                                                                                class="announcement-date">{{ optional($announcement->created_at)->format('M d, Y') }}</span>
+                                                                            @if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14)))
+                                                                                <span class="announcement-new">NEW</span>
+                                                                            @endif
+                                                                        </div>
+                                                                        <p class="announcement-excerpt">
+                                                                            {{ \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? ''), 140) }}
+                                                                        </p>
+                                                                    </a>
+                                                                </div>
+                                                            @empty
+                                                                <div class="col-12">
+                                                                    <div class="text-center p-5 bg-white rounded-4 shadow-sm border"
+                                                                        style="border-color: rgba(0,0,0,0.06) !important;">
+                                                                        <div class="d-inline-flex align-items-center justify-content-center announcement-icon"
+                                                                            style="margin-bottom: .75rem;">
+                                                                            <i class="fas fa-bullhorn"></i>
+                                                                        </div>
+                                                                        <h5 class="fw-bold mb-2" style="color:#2c3e50;">No
+                                                                            announcements found</h5>
+                                                                        <p class="text-muted mb-0">Please check back later for
+                                                                            updates and news.</p>
+                                                                    </div>
+                                                                </div>
+                                                            @endforelse
                                                         </div>
-                                                    @endforelse
-                                                </div>
-                                                <div class="mt-3">
-                                                    {{ $announcements->links() }}
-                                                </div>
-                                                @if(auth()->check() && auth()->user()->isCounselor())
+                                                        <div class="mt-3">
+                                                            {{ $announcements->links() }}
+                                                        </div>
+                                                        @if(auth()->check() && auth()->user()->isCounselor())
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <script>
-                                                        // Sidebar toggle for mobile
-                                                        document.addEventListener('DOMContentLoaded', function () {
-                                                            const sidebar = document.querySelector('.custom-sidebar');
-                                                            const toggleBtn = document.getElementById('counselorSidebarToggle');
-                                                            if (toggleBtn && sidebar) {
-                                                                toggleBtn.addEventListener('click', function () {
-                                                                    if (window.innerWidth < 768) {
-                                                                        sidebar.classList.toggle('show');
+
+                                                            <script>
+                                                                // Sidebar toggle for mobile
+                                                                document.addEventListener('DOMContentLoaded', function () {
+                                                                    const sidebar = document.querySelector('.custom-sidebar');
+                                                                    const toggleBtn = document.getElementById('counselorSidebarToggle');
+                                                                    if (toggleBtn && sidebar) {
+                                                                        toggleBtn.addEventListener('click', function () {
+                                                                            if (window.innerWidth < 768) {
+                                                                                sidebar.classList.toggle('show');
+                                                                            }
+                                                                        });
+                                                                        document.addEventListener('click', function (e) {
+                                                                            if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                                                                                const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                                                                                if (!clickInside) sidebar.classList.remove('show');
+                                                                            }
+                                                                        });
+                                                                        document.addEventListener('keydown', function (e) {
+                                                                            if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                                                                                sidebar.classList.remove('show');
+                                                                            }
+                                                                        });
                                                                     }
                                                                 });
-                                                                document.addEventListener('click', function (e) {
-                                                                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                                                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                                                                        if (!clickInside) sidebar.classList.remove('show');
-                                                                    }
-                                                                });
-                                                                document.addEventListener('keydown', function (e) {
-                                                                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                                                        sidebar.classList.remove('show');
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
-                                                    </script>
-                                                @elseif(auth()->check() && auth()->user()->isAdmin())
-                        </div>
+                                                            </script>
+                                                        @elseif(auth()->check() && auth()->user()->isAdmin())
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
                     </div>
-                </div>
-                @else
-            </div>
-            @endif
+                @endif
 @endsection

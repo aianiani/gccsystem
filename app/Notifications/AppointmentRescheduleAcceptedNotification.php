@@ -53,11 +53,6 @@ class AppointmentRescheduleAcceptedNotification extends Notification
             ->subject('Reschedule Confirmed')
             ->view('emails.appointments.reschedule_accepted', compact('recipient', 'appointment', 'isStudent', 'otherParty'));
 
-        $logoPath = public_path('images/logo.jpg');
-        if (file_exists($logoPath)) {
-            $message->embed($logoPath, 'logo');
-        }
-
         return $message;
     }
 

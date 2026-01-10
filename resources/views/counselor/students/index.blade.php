@@ -38,13 +38,14 @@
         }
 
         /* Apply the same page zoom used on the homepage */
+        /* Apply the same page zoom used on the homepage */
         .home-zoom {
-            zoom: 0.85;
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
             .home-zoom {
-                transform: scale(0.85);
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
@@ -81,7 +82,7 @@
         }
 
         .main-dashboard-inner {
-            max-width: 1180px;
+            max-width: 100%;
             margin: 0 auto;
         }
 

@@ -12,7 +12,7 @@
             --text-dark: #16321f;
             --text-light: #6c757d;
             --bg-light: #f6fbf6;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 
             /* Map dashboard-specific names */
             --forest-green: var(--primary-green);
@@ -35,7 +35,20 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        body, .main-content-card {
+        /* Match admin zoom standard */
+        .home-zoom {
+            zoom: 0.75;
+        }
+
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top center;
+            }
+        }
+
+        body,
+        .main-content-card {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -162,7 +175,7 @@
         }
 
         .report-table thead th {
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .report-table thead th {
@@ -213,13 +226,15 @@
         }
     </style>
 
-
+    <div class="home-zoom">
         <!-- Welcome Card Header -->
         <div class="welcome-card">
             <div>
                 <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
                 <div class="welcome-text">Monthly Reports</div>
-                <div style="font-size: 0.9rem; margin-top: 0.5rem;">Comprehensive report for Testing, Guidance, and Counseling activities</div>
+                <div style="font-size: 0.9rem; margin-top: 0.5rem;">Comprehensive report for Testing, Guidance, and
+                    Counseling
+                    activities</div>
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <button onclick="window.print()" class="btn btn-light no-print">
@@ -269,9 +284,11 @@
         <!-- Summary Metrics Cards -->
         <div class="row mb-4 no-print">
             <div class="col-md-4">
-                <div class="card shadow-sm h-100 border-0" style="background: linear-gradient(145deg, #e8f5e8 0%, #ffffff 100%);">
+                <div class="card shadow-sm h-100 border-0"
+                    style="background: linear-gradient(145deg, #e8f5e8 0%, #ffffff 100%);">
                     <div class="card-body d-flex align-items-center">
-                        <div class="rounded-circle p-3 me-3" style="background-color: var(--forest-green-lighter); color: var(--forest-green);">
+                        <div class="rounded-circle p-3 me-3"
+                            style="background-color: var(--forest-green-lighter); color: var(--forest-green);">
                             <i class="bi bi-clipboard-check fs-3"></i>
                         </div>
                         <div>
@@ -282,7 +299,8 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card shadow-sm h-100 border-0" style="background: linear-gradient(145deg, #fff7e6 0%, #ffffff 100%);">
+                <div class="card shadow-sm h-100 border-0"
+                    style="background: linear-gradient(145deg, #fff7e6 0%, #ffffff 100%);">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle p-3 me-3" style="background-color: #fff7e6; color: #f4d03f;">
                             <i class="bi bi-people fs-3"></i>
@@ -295,13 +313,15 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card shadow-sm h-100 border-0" style="background: linear-gradient(145deg, #e0f2fe 0%, #ffffff 100%);">
+                <div class="card shadow-sm h-100 border-0"
+                    style="background: linear-gradient(145deg, #e0f2fe 0%, #ffffff 100%);">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle p-3 me-3" style="background-color: #e0f2fe; color: #0369a1;">
                             <i class="bi bi-heart-pulse fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted mb-1 text-uppercase fw-bold" style="font-size: 0.8rem;">Total Counseled</h6>
+                            <h6 class="text-muted mb-1 text-uppercase fw-bold" style="font-size: 0.8rem;">Total Counseled
+                            </h6>
                             <h2 class="mb-0 fw-bold text-dark">{{ $totalCounseled ?? 0 }}</h2>
                         </div>
                     </div>
@@ -367,19 +387,19 @@
                                 </td>
                                 <!-- Administration -->
                                 <td class="text-start">
-                                @if(count($test['administration']['colleges']) > 0)
-                                    <div style="font-size: 0.7rem; line-height: 1.1; max-width: 150px; min-width: 100px;">
-                                        @foreach($test['administration']['colleges'] as $college)
-                                            <div class="mb-1 text-muted fst-italic">{{ $college }}</div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </td>
+                                    @if(count($test['administration']['colleges']) > 0)
+                                        <div style="font-size: 0.7rem; line-height: 1.1; max-width: 150px; min-width: 100px;">
+                                            @foreach($test['administration']['colleges'] as $college)
+                                                <div class="mb-1 text-muted fst-italic">{{ $college }}</div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </td>
                                 <td class="text-center">{{ $test['administration']['male'] }}</td>
                                 <td class="text-center">{{ $test['administration']['female'] }}</td>
                                 <td class="text-center"><strong>{{ $test['administration']['total'] }}</strong></td>
                                 <td class="text-center"><strong>{{ $test['administration']['total_enrolled'] }}</strong></td>
-                                
+
                                 <!-- Checking -->
                                 <td>
                                     @if(count($test['checking_scoring']['colleges']) > 0)
@@ -393,7 +413,7 @@
                                 <td class="text-center">{{ $test['checking_scoring']['male'] }}</td>
                                 <td class="text-center">{{ $test['checking_scoring']['female'] }}</td>
                                 <td class="text-center"><strong>{{ $test['checking_scoring']['total'] }}</strong></td>
-                                
+
                                 <!-- Interpretation -->
                                 <td>
                                     @if(count($test['interpretation']['colleges']) > 0)
@@ -407,7 +427,7 @@
                                 <td class="text-center">{{ $test['interpretation']['male'] }}</td>
                                 <td class="text-center">{{ $test['interpretation']['female'] }}</td>
                                 <td class="text-center"><strong>{{ $test['interpretation']['total'] }}</strong></td>
-                                
+
                                 <!-- Report -->
                                 <td>
                                     @if(count($test['report_result']['colleges']) > 0)
@@ -621,4 +641,5 @@
             </div>
         </div>
 
+    </div>
 @endsection

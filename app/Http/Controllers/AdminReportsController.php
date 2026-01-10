@@ -203,7 +203,12 @@ class AdminReportsController extends Controller
                 $attended = $attendances->count();
 
                 // Get colleges from schedule or seminar target
-                $colleges = collect(explode(',', $schedule->colleges ?? ''))
+                $collegesSource = $schedule->colleges ?? [];
+                if (is_string($collegesSource)) {
+                    $collegesSource = explode(',', $collegesSource);
+                }
+
+                $colleges = collect($collegesSource)
                     ->map(fn($c) => trim($c))
                     ->filter()
                     ->values();

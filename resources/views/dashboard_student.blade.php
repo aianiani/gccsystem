@@ -39,12 +39,12 @@
 
         /* Apply the same page zoom used on the homepage */
         .home-zoom {
-            zoom: 0.85;
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
             .home-zoom {
-                transform: scale(0.85);
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
@@ -268,7 +268,7 @@
 
         /* Constrain inner content and center it within the available area */
         .main-dashboard-inner {
-            max-width: 1180px;
+            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -721,50 +721,78 @@
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
                 <div class="main-dashboard-inner">
-                    <div class="welcome-card">
-                        <div>
-                            <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
-                            <div class="welcome-text">Welcome back,
-                                {{ auth()->user()->first_name ?? auth()->user()->name }}!</div>
-                            <div style="font-size: 0.9rem; margin-top: 0.5rem;">Always stay updated in your student portal
+                    <div class="welcome-card position-relative overflow-hidden">
+                        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100 gap-4 position-relative"
+                            style="z-index: 2;">
+                            <div class="d-flex align-items-center gap-4">
+                                <div class="welcome-avatar flex-shrink-0">
+                                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
+                                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3);">
+                                </div>
+                                <div>
+                                    <div class="welcome-date mb-1 opacity-75"><i
+                                            class="bi bi-calendar-event me-2"></i>{{ now()->format('F j, Y') }}</div>
+                                    <div class="welcome-text mb-2">Welcome back,
+                                        {{ auth()->user()->first_name ?? auth()->user()->name }}!
+                                    </div>
+                                    <div style="font-size: 0.95rem; opacity: 0.9;">Always stay updated in your student
+                                        portal</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="welcome-avatar">
-                            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
-                                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+
+                            <div class="d-flex flex-column align-items-end">
+                                <div class="text-white-50 text-uppercase fw-bold mb-2"
+                                    style="font-size: 0.7rem; letter-spacing: 0.5px;">Seminar Progress</div>
+                                <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                    @php
+                                        $badges = [
+                                            'IDREAMS' => ['color' => 'bg-info bg-opacity-25 text-white border-info', 'icon' => 'bi-clouds-fill', 'year' => 1],
+                                            '10C' => ['color' => 'bg-warning bg-opacity-25 text-white border-warning', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
+                                            'LEADS' => ['color' => 'bg-primary bg-opacity-25 text-white border-primary', 'icon' => 'bi-people-fill', 'year' => 3],
+                                            'IMAGE' => ['color' => 'bg-success bg-opacity-25 text-white border-success', 'icon' => 'bi-person-badge-fill', 'year' => 4],
+                                        ];
+                                    @endphp
+
+                                    @foreach($badges as $seminarName => $style)
+                                        @php
+                                            $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]);
+                                        @endphp
+                                        <div class="d-flex align-items-center justify-content-center gap-2 px-3 py-2 rounded-3 border transition-all text-center
+                                                                                    {{ $isAttended ? $style['color'] . ' shadow-sm' : 'border-white-10 text-white-50' }}"
+                                            style="background: {{ $isAttended ? '' : 'rgba(255, 255, 255, 0.05)' }}; 
+                                                                                           border-color: {{ $isAttended ? '' : 'rgba(255, 255, 255, 0.1)' }};
+                                                                                           backdrop-filter: blur(4px); min-width: 100px;">
+                                            @if($isAttended)
+                                                <i class="bi {{ $style['icon'] }}"></i>
+                                                <span class="fw-bold small">{{ $seminarName }}</span>
+                                            @else
+                                                <i class="bi bi-lock-fill opacity-50"></i>
+                                                <span class="small opacity-75">{{ $seminarName }}</span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Seminar Badges -->
-                    <div class="mb-4">
-                        <h5 class="mb-3 fw-bold text-dark">Seminar Badges</h5>
-                        <div class="d-flex flex-wrap gap-2">
-                            @php
-                                $badges = [
-                                    'IDREAMS' => ['color' => 'bg-blue-100 text-blue-800 border-blue-200', 'icon' => 'bi-clouds-fill', 'year' => 1],
-                                    '10C' => ['color' => 'bg-orange-100 text-orange-800 border-orange-200', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
-                                    'LEADS' => ['color' => 'bg-purple-100 text-purple-800 border-purple-200', 'icon' => 'bi-people-fill', 'year' => 3],
-                                    'IMAGE' => ['color' => 'bg-teal-100 text-teal-800 border-teal-200', 'icon' => 'bi-person-badge-fill', 'year' => 4],
-                                ];
-                            @endphp
-                            
-                            @foreach($badges as $seminarName => $style)
-                                @php
-                                    $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]);
-                                @endphp
-                                <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill border {{ $isAttended ? $style['color'] : 'bg-gray-100 text-gray-400 border-gray-200' }}">
-                                    @if($isAttended)
-                                        <i class="bi {{ $style['icon'] }}"></i>
-                                        <span class="fw-bold small">{{ $seminarName }}</span>
-                                        <i class="bi bi-check-circle-fill small opacity-75"></i>
-                                    @else
-                                        <i class="bi bi-lock-fill small"></i>
-                                        <span class="fw-medium small">{{ $seminarName }}</span>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
+
+
+                    <style>
+                        /* Override for single column layout */
+                        .dashboard-layout {
+                            /* Simply a container now, no grid needed for layout split */
+                            display: block;
+                        }
+
+                        /* Ensure stats grid can accommodate the new card nicely */
+                        .dashboard-stats {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                            gap: 1.25rem;
+                            align-items: stretch;
+                        }
+                    </style>
 
                     <div class="dashboard-layout">
                         <div class="dashboard-stats">
@@ -779,43 +807,18 @@
                                         style="width: {{ $studentStats['sessionProgress'] }}%"></div>
                                 </div>
                             </div>
-                            <div class="dashboard-stat-card wellness-card {{ $studentStats['currentRiskLevel'] }}">
-                                <div class="stat-value">
-                                    <i
-                                        class="bi bi-heart-fill text-{{ $studentStats['currentRiskLevel'] === 'normal' ? 'success' : ($studentStats['currentRiskLevel'] === 'moderate' ? 'warning' : 'danger') }}"></i>
-                                    {{ ucfirst($studentStats['currentRiskLevel']) }}
-                                </div>
-                                <div class="stat-label">Wellness Level</div>
-                                <div class="stat-subtitle">{{ $studentStats['consecutiveSessions'] }} week streak</div>
-                            </div>
+
                             <div class="dashboard-stat-card">
                                 <div class="stat-value">{{ $studentStats['assessmentProgress'] }}%</div>
                                 <div class="stat-label">Assessments Done</div>
                                 <div class="stat-subtitle">
                                     {{ $studentStats['completedAssessments'] }}/{{ $studentStats['totalAssessments'] }}
-                                    completed</div>
+                                    completed
+                                </div>
                                 <div class="stat-progress">
                                     <div class="stat-progress-bar progress-info"
                                         style="width: {{ $studentStats['assessmentProgress'] }}%"></div>
                                 </div>
-                            </div>
-                            <div class="dashboard-stat-card">
-                                <div class="stat-value">
-                                    <i class="bi bi-journal-text text-primary"></i>
-                                    {{ $studentStats['sessionsWithNotes'] }}
-                                </div>
-                                <div class="stat-label">Session Notes</div>
-                                <div class="stat-subtitle">{{ $studentStats['sessionsWithNotes'] }} notes available for
-                                    review</div>
-                                @if($studentStats['sessionsWithNotes'] > 0)
-                                    <div class="stat-progress">
-                                        <div class="stat-progress-bar progress-warning" style="width: 100%"></div>
-                                    </div>
-                                @else
-                                    <div class="stat-progress">
-                                        <div class="stat-progress-bar" style="width: 0%"></div>
-                                    </div>
-                                @endif
                             </div>
 
                             <!-- Seminar Progress Card -->
@@ -838,31 +841,23 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Quick Actions Section - Beside Session Notes -->
-                        <div class="quick-actions-sidebar">
-                            <div class="card-header">
-                                <h6 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex flex-column gap-2">
-                                    <a href="{{ route('assessments.index') }}" class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-clipboard-check me-1"></i>Take Assessment
-                                    </a>
-                                    <a href="{{ route('chat.selectCounselor') }}" class="btn btn-outline-success btn-sm">
-                                        <i class="bi bi-chat-dots me-1"></i>Message Counselor
-                                    </a>
-                                    <a href="#" class="btn btn-outline-info btn-sm js-book-appointment-trigger">
-                                        <i class="bi bi-calendar-plus me-1"></i>Book Session
-                                    </a>
-                                    @if($studentStats['sessionsWithNotes'] > 0)
-                                        <a href="{{ route('appointments.completedWithNotes') }}"
-                                            class="btn btn-outline-warning btn-sm">
-                                            <i class="bi bi-journal-text me-1"></i>View Session Notes
-                                        </a>
-                                    @endif
+                            <!-- Book Appointment CTA (Merged into Grid) -->
+                            <div class="dashboard-stat-card d-flex flex-column align-items-center justify-content-center p-4"
+                                style="background: #fff; border: 1px solid var(--forest-green); box-shadow: var(--shadow-sm); min-height: 200px;">
+
+                                <div class="mb-3">
+                                    <div
+                                        style="width: 48px; height: 48px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                                        <i class="bi bi-calendar-plus-fill"
+                                            style="color: var(--forest-green); font-size: 1.5rem;"></i>
+                                    </div>
                                 </div>
+                                <h5 class="fw-bold mb-4" style="color: var(--forest-green);">Book a Session</h5>
+                                <a href="#" class="btn w-100 fw-bold js-book-appointment-trigger"
+                                    style="background: var(--yellow-maize); color: var(--text-dark); border: none; border-radius: 50px; padding: 0.8rem 1rem; font-size: 1rem; box-shadow: var(--shadow-sm);">
+                                    Book Appointment
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -870,10 +865,6 @@
                     <div class="main-content-card">
                         <div class="card-header">
                             <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Upcoming Appointments</h5>
-                            <a href="#" class="btn btn-success btn-sm js-book-appointment-trigger" data-bs-toggle="tooltip"
-                                title="Book a new appointment">
-                                <i class="bi bi-calendar-plus me-1"></i>Book Appointment
-                            </a>
                         </div>
                         <div class="card-body">
                             @forelse($upcomingAppointments as $appointment)
@@ -970,10 +961,31 @@
                         </div>
                         <div class="card-body">
                             @forelse($recentAnnouncements as $announcement)
-                                <div class="announcement-item">
-                                    <h6 class="mb-1 fw-bold small">{{ $announcement->title }}</h6>
-                                    <p class="mb-1 small text-muted">{{ Str::limit($announcement->content, 80) }}</p>
-                                    <small class="text-muted">{{ $announcement->created_at->format('F j, Y') }}</small>
+                                <div class="announcement-item p-0 mb-4 overflow-hidden border bg-white"
+                                    style="border-radius: 12px; box-shadow: var(--shadow-sm);">
+                                    @if(!empty($announcement->images) && is_array($announcement->images) && count($announcement->images) > 0)
+                                        <div class="announcement-image" style="height: 250px; overflow: hidden;">
+                                            <img src="{{ asset('storage/' . $announcement->images[0]) }}" alt="Announcement Image"
+                                                class="w-100 h-100" style="object-fit: cover; object-position: center;">
+                                        </div>
+                                    @endif
+                                    <div class="p-4">
+                                        <h4 class="mb-3 fw-bold text-success">{{ $announcement->title }}</h4>
+                                        <div class="mb-3 text-dark text-break"
+                                            style="font-size: 1.05rem; line-height: 1.7; opacity: 0.9;">
+                                            {{ Str::limit($announcement->content, 600) }}
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                                            <small class="text-muted">
+                                                <i
+                                                    class="bi bi-calendar-event me-2"></i>{{ $announcement->created_at->format('F j, Y, g:i a') }}
+                                            </small>
+                                            <a href="{{ route('announcements.show', $announcement) }}"
+                                                class="btn btn-sm btn-link text-decoration-none fw-bold text-success">
+                                                Read Full Post <i class="bi bi-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             @empty
                                 <div class="empty-state">
@@ -981,10 +993,11 @@
                                     <p class="mb-0">No announcements available.</p>
                                 </div>
                             @endforelse
-                            <div class="text-center mt-3">
-                                <a href="{{ route('announcements.index') }}" class="btn btn-outline-success btn-sm"
+                            <div class="text-center mt-4 mb-4">
+                                <a href="{{ route('announcements.index') }}"
+                                    class="btn btn-outline-success px-5 py-2 fw-semibold rounded-pill"
                                     data-bs-toggle="tooltip" title="View all announcements">
-                                    <i class="bi bi-eye me-1"></i>View All
+                                    View All Announcements
                                 </a>
                             </div>
                         </div>

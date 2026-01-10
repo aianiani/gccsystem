@@ -57,11 +57,6 @@ class AppointmentAcceptedNotification extends Notification
             ->subject('Your Appointment Has Been Accepted')
             ->view('emails.appointments.accepted', compact('student', 'counselor', 'appointment'));
 
-        $logoPath = public_path('images/logo.jpg');
-        if (file_exists($logoPath)) {
-            $message->embed($logoPath, 'logo');
-        }
-
         return $message;
     }
 

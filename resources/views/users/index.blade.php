@@ -17,12 +17,12 @@
 
         /* Apply the same page zoom used on the homepage */
         .home-zoom {
-            zoom: 0.85;
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
             .home-zoom {
-                transform: scale(0.85);
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
@@ -238,7 +238,7 @@
         }
     </style>
 
-    <div class="main-dashboard-inner">
+    <div class="main-dashboard-inner home-zoom">
         <div class="page-header-card">
             <div>
                 <h1><i class="bi bi-people me-2"></i>Users Management</h1>

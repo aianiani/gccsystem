@@ -15,7 +15,22 @@
             --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
         }
 
+        /* Force sidebar to use the local forest-green variable */
+        .custom-sidebar {
+            background: var(--forest-green) !important;
+        }
 
+        /* Match dashboard zoom */
+        .home-zoom {
+            zoom: 0.75;
+        }
+
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top center;
+            }
+        }
 
         .main-dashboard-inner {
             padding: 2rem;
@@ -193,145 +208,143 @@
         }
     </style>
 
-<div class="main-dashboard-inner">
-            <div class="page-header-card">
-                <div>
-                    <h1><i class="bi bi-megaphone me-2"></i>Create Announcement</h1>
-                    <p>Share important updates and information with all users</p>
-                </div>
-                <div>
-                    <a href="{{ route('announcements.index') }}" class="btn btn-light btn-lg">
-                        <i class="bi bi-arrow-left me-2"></i>Back to Announcements
-                    </a>
-                </div>
+    <div class="main-dashboard-inner home-zoom">
+        <div class="page-header-card">
+            <div>
+                <h1><i class="bi bi-megaphone me-2"></i>Create Announcement</h1>
+                <p>Share important updates and information with all users</p>
             </div>
+            <div>
+                <a href="{{ route('announcements.index') }}" class="btn btn-light btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Announcements
+                </a>
+            </div>
+        </div>
 
-            <div class="main-content-card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Announcement Details</h5>
-                </div>
-                <div class="card-body">
-                    @if($errors->any())
-                        <div class="alert alert-danger mb-4">
-                            <strong>Please correct the following errors:</strong>
-                            <ul class="mb-0 mt-2">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+        <div class="main-content-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Announcement Details</h5>
+            </div>
+            <div class="card-body">
+                @if($errors->any())
+                    <div class="alert alert-danger mb-4">
+                        <strong>Please correct the following errors:</strong>
+                        <ul class="mb-0 mt-2">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form action="{{ route('announcements.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="form-group">
+                        <label for="title" class="form-label">
+                            <i class="bi bi-type me-1"></i>Title <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror"
+                            value="{{ old('title') }}" placeholder="Enter announcement title" required>
+                        @error('title')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content" class="form-label">
+                            <i class="bi bi-text-paragraph me-1"></i>Content <span class="text-danger">*</span>
+                        </label>
+                        <textarea name="content" id="content" class="form-control @error('content') is-invalid @enderror"
+                            rows="8" placeholder="Enter announcement content..." required>{{ old('content') }}</textarea>
+                        @error('content')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="attachment" class="form-label file-input-label">
+                            <i class="bi bi-paperclip me-1"></i>Attachment <span class="text-muted">(Optional)</span>
+                        </label>
+                        <input type="file" name="attachment" id="attachment"
+                            class="form-control @error('attachment') is-invalid @enderror"
+                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        <div class="file-input-info">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Supported formats: PDF, DOC, DOCX, JPG, PNG. Max file size: 5MB
                         </div>
-                    @endif
+                        @error('attachment')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-                    <form action="{{ route('announcements.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-
-                        <div class="form-group">
-                            <label for="title" class="form-label">
-                                <i class="bi bi-type me-1"></i>Title <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" name="title" id="title"
-                                class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}"
-                                placeholder="Enter announcement title" required>
-                            @error('title')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                    <div class="form-group">
+                        <label for="images" class="form-label file-input-label">
+                            <i class="bi bi-images me-1"></i>Images <span class="text-muted">(Optional)</span>
+                        </label>
+                        <input type="file" name="images[]" id="images"
+                            class="form-control @error('images.*') is-invalid @enderror" accept="image/*" multiple
+                            onchange="previewImages(this)">
+                        <div class="file-input-info">
+                            <i class="bi bi-info-circle me-1"></i>
+                            You can select multiple images. Supported formats: JPG, PNG, GIF. Max file size per image:
+                            5MB
                         </div>
-
-                        <div class="form-group">
-                            <label for="content" class="form-label">
-                                <i class="bi bi-text-paragraph me-1"></i>Content <span class="text-danger">*</span>
-                            </label>
-                            <textarea name="content" id="content"
-                                class="form-control @error('content') is-invalid @enderror" rows="8"
-                                placeholder="Enter announcement content..." required>{{ old('content') }}</textarea>
-                            @error('content')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        @error('images.*')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div id="image-preview" class="mt-3" style="display: none;">
+                            <div class="row g-2" id="preview-container"></div>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="attachment" class="form-label file-input-label">
-                                <i class="bi bi-paperclip me-1"></i>Attachment <span class="text-muted">(Optional)</span>
-                            </label>
-                            <input type="file" name="attachment" id="attachment"
-                                class="form-control @error('attachment') is-invalid @enderror"
-                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <div class="file-input-info">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Supported formats: PDF, DOC, DOCX, JPG, PNG. Max file size: 5MB
-                            </div>
-                            @error('attachment')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <script>
+                        function previewImages(input) {
+                            const previewContainer = document.getElementById('preview-container');
+                            const imagePreview = document.getElementById('image-preview');
 
-                        <div class="form-group">
-                            <label for="images" class="form-label file-input-label">
-                                <i class="bi bi-images me-1"></i>Images <span class="text-muted">(Optional)</span>
-                            </label>
-                            <input type="file" name="images[]" id="images"
-                                class="form-control @error('images.*') is-invalid @enderror" accept="image/*" multiple
-                                onchange="previewImages(this)">
-                            <div class="file-input-info">
-                                <i class="bi bi-info-circle me-1"></i>
-                                You can select multiple images. Supported formats: JPG, PNG, GIF. Max file size per image:
-                                5MB
-                            </div>
-                            @error('images.*')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div id="image-preview" class="mt-3" style="display: none;">
-                                <div class="row g-2" id="preview-container"></div>
-                            </div>
-                        </div>
+                            previewContainer.innerHTML = '';
 
-                        <script>
-                            function previewImages(input) {
-                                const previewContainer = document.getElementById('preview-container');
-                                const imagePreview = document.getElementById('image-preview');
+                            if (input.files && input.files.length > 0) {
+                                imagePreview.style.display = 'block';
 
-                                previewContainer.innerHTML = '';
+                                Array.from(input.files).forEach((file, index) => {
+                                    const reader = new FileReader();
 
-                                if (input.files && input.files.length > 0) {
-                                    imagePreview.style.display = 'block';
+                                    reader.onload = function (e) {
+                                        const col = document.createElement('div');
+                                        col.className = 'col-md-2 col-sm-3 col-4';
+                                        col.innerHTML = `
+                                                        <div class="position-relative">
+                                                            <img src="${e.target.result}" 
+                                                                 class="img-fluid rounded shadow-sm" 
+                                                                 style="width: 100%; height: 120px; object-fit: cover;">
+                                                            <div class="position-absolute top-0 start-0 w-100 p-2">
+                                                                <span class="badge bg-dark">${index + 1}</span>
+                                                            </div>
+                                                        </div>
+                                                    `;
+                                        previewContainer.appendChild(col);
+                                    };
 
-                                    Array.from(input.files).forEach((file, index) => {
-                                        const reader = new FileReader();
-
-                                        reader.onload = function (e) {
-                                            const col = document.createElement('div');
-                                            col.className = 'col-md-2 col-sm-3 col-4';
-                                            col.innerHTML = `
-                                            <div class="position-relative">
-                                                <img src="${e.target.result}" 
-                                                     class="img-fluid rounded shadow-sm" 
-                                                     style="width: 100%; height: 120px; object-fit: cover;">
-                                                <div class="position-absolute top-0 start-0 w-100 p-2">
-                                                    <span class="badge bg-dark">${index + 1}</span>
-                                                </div>
-                                            </div>
-                                        `;
-                                            previewContainer.appendChild(col);
-                                        };
-
-                                        reader.readAsDataURL(file);
-                                    });
-                                } else {
-                                    imagePreview.style.display = 'none';
-                                }
+                                    reader.readAsDataURL(file);
+                                });
+                            } else {
+                                imagePreview.style.display = 'none';
                             }
-                        </script>
+                        }
+                    </script>
 
-                        <div class="form-actions">
-                            <a href="{{ route('announcements.index') }}" class="btn btn-secondary">
-                                <i class="bi bi-x-circle me-1"></i>Cancel
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-plus-circle me-1"></i>Create Announcement
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="form-actions">
+                        <a href="{{ route('announcements.index') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Create Announcement
+                        </button>
+                    </div>
+                </form>
             </div>
+        </div>
     </div>
 @endsection

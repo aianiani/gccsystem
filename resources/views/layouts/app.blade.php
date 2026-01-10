@@ -9,14 +9,13 @@
     <title>{{ config('app.name', 'GCC System') }}</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- FontAwesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.css') }}" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="{{ asset('vendor/fontawesome/css/all.min.css') }}" />
+    <!-- Google Fonts (Inter) - Local -->
+    <link href="{{ asset('vendor/fonts/inter/inter.css') }}" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -48,7 +47,7 @@
            so the sidebar does not overlap content when zooming. */
         :root {
             --sidebar-width: 275px;
-            --home-zoom: 0.65;
+            --home-zoom: 0.75;
             /* adjust this value to change overall zoom */
         }
 
@@ -516,27 +515,46 @@
                             <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Admin Portal</p>
                         </div>
                         <nav class="sidebar-nav flex-grow-1">
+                            <!-- Main Navigation -->
                             <a href="{{ route('dashboard') }}"
                                 class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
                                     class="bi bi-speedometer2"></i>Dashboard</a>
                             <a href="{{ route('profile') }}"
                                 class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
                                     class="bi bi-person"></i>Profile</a>
+
+                            <div class="sidebar-divider"></div>
+
+                            <!-- User Management -->
                             <a href="{{ route('users.index') }}"
                                 class="sidebar-link{{ request()->routeIs('users.*') ? ' active' : '' }}"><i
                                     class="bi bi-people"></i>Users</a>
                             <a href="{{ route('admin.registration-approvals.index') }}"
                                 class="sidebar-link{{ request()->routeIs('admin.registration-approvals.*') ? ' active' : '' }}"><i
                                     class="bi bi-person-check"></i>Registration Approvals</a>
+
+                            <div class="sidebar-divider"></div>
+
+                            <!-- Content & Communication -->
                             <a href="{{ route('announcements.index') }}"
                                 class="sidebar-link{{ request()->routeIs('announcements.*') ? ' active' : '' }}"><i
                                     class="bi bi-megaphone"></i>Announcements</a>
+                            <a href="{{ route('admin.hero-images.index') }}"
+                                class="sidebar-link{{ request()->routeIs('admin.hero-images.*') ? ' active' : '' }}"><i
+                                    class="bi bi-images"></i>Hero Images</a>
+
+                            <div class="sidebar-divider"></div>
+
+                            <!-- System & Monitoring -->
                             <a href="{{ route('activities') }}"
                                 class="sidebar-link{{ request()->routeIs('activities') ? ' active' : '' }}"><i
                                     class="bi bi-activity"></i>Activity Logs</a>
                             <a href="{{ route('admin.reports.index') }}"
                                 class="sidebar-link{{ request()->routeIs('admin.reports.*') ? ' active' : '' }}"><i
                                     class="bi bi-file-earmark-bar-graph"></i>Monthly Reports</a>
+                            <a href="{{ route('admin.analytics.index') }}"
+                                class="sidebar-link{{ request()->routeIs('admin.analytics.*') ? ' active' : '' }}"><i
+                                    class="bi bi-graph-up-arrow"></i>Analytics</a>
                         </nav>
                         <div class="sidebar-bottom w-100">
                             <a href="{{ route('logout') }}" class="sidebar-link logout"
@@ -603,6 +621,13 @@
                 .custom-sidebar .sidebar-link.logout:hover {
                     background: #b52a37 !important;
                     color: #fff !important;
+                }
+
+                /* Sidebar Divider */
+                .sidebar-divider {
+                    height: 1px;
+                    background: rgba(255, 255, 255, 0.15);
+                    margin: 0.75rem 1rem;
                 }
 
                 @media (max-width: 991.98px) {
@@ -958,15 +983,15 @@
                                             }
 
                                             li.innerHTML = `
-                                                                                                                                                        <div class="notification-icon ${iconType}">
-                                                                                                                                                            ${icon}
-                                                                                                                                                        </div>
-                                                                                                                                                        <div class="notification-content">
-                                                                                                                                                            <div class="notification-message">${n.data.message || n.type}</div>
-                                                                                                                                                            <div class="notification-time">${n.created_at}</div>
-                                                                                                                                                            ${actionsHtml ? `<div class="notification-actions">${actionsHtml}</div>` : ''}
-                                                                                                                                                        </div>
-                                                                                                                                                    `;
+                                                                                                                                                                                                                    <div class="notification-icon ${iconType}">
+                                                                                                                                                                                                                        ${icon}
+                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                    <div class="notification-content">
+                                                                                                                                                                                                                        <div class="notification-message">${n.data.message || n.type}</div>
+                                                                                                                                                                                                                        <div class="notification-time">${n.created_at}</div>
+                                                                                                                                                                                                                        ${actionsHtml ? `<div class="notification-actions">${actionsHtml}</div>` : ''}
+                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                `;
                                             notifDropdown.appendChild(li);
                                         });
                                     }
@@ -1039,9 +1064,9 @@
     @endguest
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- SweetAlert2 -->
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}"></script>
     <script>
         // SweetAlert2 Toast Notification
         document.addEventListener('DOMContentLoaded', function () {

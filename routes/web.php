@@ -3,13 +3,15 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\AnalyticsController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
 // Homepage route (visible to guests and authenticated users)
 Route::get('/', function () {
     $announcements = \App\Models\Announcement::latest()->take(3)->get();
-    return view('home', compact('announcements'));
+    $heroImages = \App\Models\HeroImage::where('is_active', true)->orderBy('order')->get();
+    return view('home', compact('announcements', 'heroImages'));
 })->name('home');
 
 // Redirect legacy standalone auth pages to homepage which hosts modal login/signup.
@@ -64,6 +66,9 @@ Route::middleware('auth')->group(function () {
             Route::post('/{user}/reject', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'reject'])->name('reject');
             Route::get('/statistics', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'statistics'])->name('statistics');
         });
+
+        // Hero Images Management
+        Route::resource('admin/hero-images', App\Http\Controllers\Admin\HeroImageController::class, ['as' => 'admin']);
         // Only admins can create, edit, update, delete announcements
         Route::get('announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
         Route::post('announcements', [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
@@ -121,6 +126,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('counselor/appointments/{id}/accept', [App\Http\Controllers\AppointmentController::class, 'accept'])->name('counselor.appointments.accept');
         Route::patch('counselor/appointments/{id}/decline', [App\Http\Controllers\AppointmentController::class, 'decline'])->name('counselor.appointments.decline');
         Route::delete('counselor/appointments/{id}', [App\Http\Controllers\AppointmentController::class, 'destroy'])->name('counselor.appointments.destroy');
+        Route::delete('counselor/appointments/bulk/completed', [App\Http\Controllers\CounselorDashboardController::class, 'deleteAllCompleted'])->name('counselor.appointments.bulk.deleteCompleted');
         Route::get('counselor/session-notes', [App\Http\Controllers\SessionNoteController::class, 'index'])->name('counselor.session_notes.index');
         Route::get('counselor/session-notes/{id}', [App\Http\Controllers\SessionNoteController::class, 'show'])->name('counselor.session_notes.show');
         Route::patch('counselor/session-notes/{id}/complete', [App\Http\Controllers\SessionNoteController::class, 'complete'])->name('counselor.session_notes.complete');
@@ -223,5 +229,10 @@ Route::post('/counselor/assessments/{assessment}/save-notes', [App\Http\Controll
 Route::middleware(['auth', 'admin'])->prefix('admin/reports')->name('admin.reports.')->group(function () {
     Route::get('/', [App\Http\Controllers\AdminReportsController::class, 'index'])->name('index');
     Route::get('/export/{format}', [App\Http\Controllers\AdminReportsController::class, 'export'])->name('export');
+});
+
+// Admin Analytics
+Route::middleware(['auth', 'admin'])->prefix('admin/analytics')->name('admin.analytics.')->group(function () {
+    Route::get('/', [AnalyticsController::class, 'index'])->name('index');
 });
 

@@ -28,14 +28,14 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply page zoom for better readability */
+        /* Apply 75% zoom consistent with other counselor pages */
         .home-zoom {
-            zoom: 0.90;
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
             .home-zoom {
-                transform: scale(0.90);
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
@@ -68,28 +68,53 @@
             transition: margin-left 0.2s;
         }
 
-        .timeline-hero {
-            background: var(--hero-gradient);
+        /* Tighter hero layout using grid to utilize horizontal space */
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
             color: #fff;
-            padding: 1.5rem 1.75rem;
             border-radius: 16px;
+            padding: 1.5rem 1.75rem;
             box-shadow: var(--shadow-lg);
             margin-bottom: 1.5rem;
         }
 
-        .timeline-hero-grid {
+        .page-hero-grid {
             display: grid;
-            grid-template-columns: 72px 1fr auto;
+            grid-template-columns: 88px 1fr auto;
             gap: 1.25rem;
             align-items: center;
         }
 
-        .timeline-avatar {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
+        .hero-avatar {
+            width: 88px;
+            height: 88px;
             object-fit: cover;
+            border-radius: 50%;
             border: 3px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .hero-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .hero-meta i {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .hero-right {
+            min-width: 160px;
+        }
+
+        .hero-right .badge {
+            border-radius: 999px;
+            padding: 0.5rem 0.9rem;
         }
 
         .timeline-card {
@@ -141,11 +166,11 @@
                 padding: 1rem;
             }
 
-            .timeline-hero-grid {
-                grid-template-columns: 60px 1fr;
+            .page-hero-grid {
+                grid-template-columns: 72px 1fr;
             }
 
-            .timeline-hero-grid>div:last-child {
+            .hero-right {
                 display: none;
             }
         }
@@ -155,51 +180,54 @@
         <div class="d-flex">
             @include('counselor.sidebar')
             <div class="main-dashboard-content flex-grow-1">
-                <div style="max-width:1200px; margin: 0 auto;">
+                <div style="max-width:100%; margin: 0 auto; padding: 0 1rem;">
 
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                <div class="d-flex align-items-center gap-3">
-                    <a href="{{ route('counselor.session_notes.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a>
-                    <h2 class="mb-0 fw-bold d-flex align-items-center gap-2" style="color: var(--forest-green);"><i class="bi bi-clock-history"></i> Session History Timeline</h2>
-                </div>
-            </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <a href="{{ route('counselor.session_notes.index') }}" class="btn btn-outline-secondary"><i
+                                    class="bi bi-arrow-left me-1"></i> Back</a>
+                            <h2 class="mb-0 fw-bold d-flex align-items-center gap-2" style="color: var(--forest-green);"><i
+                                    class="bi bi-clock-history"></i> Session History Timeline</h2>
+                        </div>
+                    </div>
 
                     @if($student)
-                        <div class="timeline-hero mb-4">
-                            <div class="timeline-hero-grid">
+                        <div class="page-hero mb-4">
+                            <div class="page-hero-grid">
                                 <img src="{{ $student->avatar_url ?? ('https://ui-avatars.com/api/?name=' . urlencode($student->name) . '&background=1f7a2d&color=fff') }}"
-                                    alt="Avatar" class="timeline-avatar">
-                                <div>
-                                    <div class="fw-bold" style="font-size:1.05rem">{{ $student->name }}</div>
+                                    alt="Avatar" class="hero-avatar">
+                                <div class="text-white">
+                                    <div class="fw-bold" style="font-size:1.15rem">{{ $student->name }}</div>
                                     <div class="small">{{ $student->email }}</div>
                                     <div class="mt-2 d-flex gap-2 flex-wrap">
-                                        <div class="badge bg-light text-dark"><i class="bi bi-telephone me-1"></i>
-                                            {{ $student->contact_number ?? 'N/A' }}</div>
-                                        <div class="badge bg-light text-dark"><i class="bi bi-building me-1"></i>
-                                            {{ $student->college ?? 'N/A' }}</div>
-                                        <div class="badge bg-light text-dark"><i class="bi bi-mortarboard me-1"></i>
-                                            {{ $student->course ?? 'N/A' }}</div>
+                                        <div class="hero-meta small"><i
+                                                class="bi bi-telephone"></i><span>{{ $student->contact_number ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="hero-meta small"><i
+                                                class="bi bi-building"></i><span>{{ $student->college ?? 'N/A' }}</span></div>
+                                        <div class="hero-meta small"><i
+                                                class="bi bi-mortarboard"></i><span>{{ $student->course ?? 'N/A' }}</span></div>
+                                        <div class="hero-meta small"><i
+                                                class="bi bi-calendar-check"></i><span>{{ $student->year_level ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="hero-meta small"><i
+                                                class="bi bi-person-badge"></i><span>{{ $student->student_id ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="hero-meta small"><i
+                                                class="bi bi-gender-ambiguous"></i><span>{{ $student->gender ? ucfirst($student->gender) : 'N/A' }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="text-end timeline-meta">
-                                    <div>Sessions: <strong>{{ $sessionNotes->count() }}</strong></div>
-                                    @php
-                                        // Determine appointment id to use for creating a new session note
-                                        $createAppointmentId = request('appointment_id') ?? ($sessionNotes->first()->appointment_id ?? null);
-                                    @endphp
-                                    <div class="mt-1">
-                                        @if($createAppointmentId)
-                                            <a href="{{ route('counselor.session_notes.create', $createAppointmentId) }}?student_id={{ $student->id }}"
-                                                class="btn btn-outline-light btn-sm">Add Note</a>
-                                        @else
-                                            <button class="btn btn-outline-light btn-sm" disabled
-                                                title="No appointment selected">Add Note</button>
-                                        @endif
+                                <div class="hero-right text-end text-white">
+                                    <div class="d-flex flex-column align-items-end justify-content-center">
+                                        <div class="small opacity-75 mb-1">Total Sessions</div>
+                                        <div class="display-5 fw-bold lh-1">{{ $sessionNotes->count() }}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @endif
+
 
                     <div class="timeline-card p-3">
                         @if($sessionNotes->count())
@@ -227,7 +255,8 @@
                                                     <div>
                                                         @if(isset($statusMap[$status]))
                                                             <span
-                                                                class="badge {{ $statusMap[$status]['class'] }} d-inline-flex align-items-center gap-1 px-3 py-2" style="font-size: 0.85rem;">
+                                                                class="badge {{ $statusMap[$status]['class'] }} d-inline-flex align-items-center gap-1 px-3 py-2"
+                                                                style="font-size: 0.85rem;">
                                                                 <i class="bi bi-{{ $statusMap[$status]['icon'] }}"></i>
                                                                 {{ $statusMap[$status]['label'] }}
                                                             </span>
@@ -256,7 +285,8 @@
                     </div>
 
                     <div class="mt-4">
-                        <a href="{{ route('counselor.session_notes.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Back to Session Notes</a>
+                        <a href="{{ route('counselor.session_notes.index') }}" class="btn btn-outline-secondary"><i
+                                class="bi bi-arrow-left me-1"></i> Back to Session Notes</a>
                     </div>
                 </div>
             </div>

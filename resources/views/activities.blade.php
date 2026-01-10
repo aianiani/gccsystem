@@ -15,7 +15,17 @@
             --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
         }
 
+        /* Match admin zoom standard */
+        .home-zoom {
+            zoom: 0.75;
+        }
 
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top center;
+            }
+        }
 
         .main-dashboard-inner {
             padding: 2rem;
@@ -121,7 +131,7 @@
         }
     </style>
 
-    <div class="main-dashboard-inner">
+    <div class="main-dashboard-inner home-zoom">
         <div class="page-header-card">
             <div>
                 <h1><i class="bi bi-activity me-2"></i>Activity Logs</h1>

@@ -51,11 +51,6 @@ class AppointmentRescheduledNotification extends Notification
             ->subject('Your Appointment Has Been Rescheduled')
             ->view('emails.appointments.rescheduled', compact('recipient', 'appointment', 'originalDate', 'rescheduleReason', 'requiresConfirmation'));
 
-        $logoPath = public_path('images/logo.jpg');
-        if (file_exists($logoPath)) {
-            $message->embed($logoPath, 'logo');
-        }
-
         return $message;
     }
 

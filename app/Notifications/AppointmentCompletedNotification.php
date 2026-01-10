@@ -43,11 +43,6 @@ class AppointmentCompletedNotification extends Notification
             ->subject('Appointment Completed')
             ->view('emails.appointments.completed', compact('student', 'counselor', 'appointment'));
 
-        $logoPath = public_path('images/logo.jpg');
-        if (file_exists($logoPath)) {
-            $message->embed($logoPath, 'logo');
-        }
-
         return $message;
     }
 

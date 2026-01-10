@@ -43,11 +43,6 @@ class AppointmentDeclinedNotification extends Notification implements ShouldQueu
             ->subject('Appointment Update')
             ->view('emails.appointments.declined', compact('student', 'appointment', 'reason'));
 
-        $logoPath = public_path('images/logo.jpg');
-        if (file_exists($logoPath)) {
-            $message->embed($logoPath, 'logo');
-        }
-
         return $message;
     }
 

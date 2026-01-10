@@ -28,14 +28,14 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply page zoom for better readability */
+        /* Apply page zoom consistent with other counselor pages */
         .home-zoom {
-            zoom: 0.90;
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
             .home-zoom {
-                transform: scale(0.90);
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
@@ -173,7 +173,7 @@
             @include('counselor.sidebar')
 
             <div class="main-dashboard-content flex-grow-1">
-                <div class="session-note-detail-page" style="max-width:1200px; margin: 0 auto;">
+                <div class="session-note-detail-page" style="max-width:100%; margin: 0 auto; padding: 0 1rem;">
 
                     @php
                         $student = $note->appointment->student ?? null;
@@ -209,6 +209,15 @@
                                             class="bi bi-building"></i><span>{{ $student->college ?? 'N/A' }}</span></div>
                                     <div class="hero-meta small"><i
                                             class="bi bi-mortarboard"></i><span>{{ $student->course ?? 'N/A' }}</span></div>
+                                    <div class="hero-meta small"><i
+                                            class="bi bi-calendar-check"></i><span>{{ $student->year_level ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="hero-meta small"><i
+                                            class="bi bi-person-badge"></i><span>{{ $student->student_id ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="hero-meta small"><i
+                                            class="bi bi-gender-ambiguous"></i><span>{{ $student->gender ? ucfirst($student->gender) : 'N/A' }}</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="hero-right text-end text-white small">
@@ -234,7 +243,8 @@
                                         <div class="fw-bold">#{{ $note->session_number ?? '-' }}</div>
                                     </div>
                                     <div class="text-muted small">Created:
-                                        {{ $note->created_at ? $note->created_at->format('F j, Y g:i A') : '-' }}</div>
+                                        {{ $note->created_at ? $note->created_at->format('F j, Y g:i A') : '-' }}
+                                    </div>
                                 </div>
 
                                 <div class="meta-label mb-2">Counselor</div>
@@ -274,7 +284,8 @@
                                 <div class="meta-label">Appointment Details</div>
                                 <div class="mt-2 small text-muted">Scheduled</div>
                                 <div class="fw-medium">
-                                    {{ optional($appointment->scheduled_at)->format('F j, Y \a\t g:i A') ?? '-' }}</div>
+                                    {{ optional($appointment->scheduled_at)->format('F j, Y \a\t g:i A') ?? '-' }}
+                                </div>
                                 <hr>
                                 <div class="meta-label">Nature of Problem</div>
                                 <div class="small text-muted">{{ $appointment->nature_of_problem ?? 'N/A' }}</div>

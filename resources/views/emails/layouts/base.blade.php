@@ -187,6 +187,18 @@
                 <table class="main" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                     <tr>
                         <td class="header">
+                            @php
+                                $logoPath = public_path('images/logo.jpg');
+                            @endphp
+                            @if(file_exists($logoPath))
+                                @if(isset($message))
+                                    <img src="{{ $message->embed($logoPath) }}" alt="GCC Logo"
+                                        style="max-height: 80px; margin-bottom: 15px;">
+                                @else
+                                    <img src="{{ url('images/logo.jpg') }}" alt="GCC Logo"
+                                        style="max-height: 80px; margin-bottom: 15px;">
+                                @endif
+                            @endif
                             <h1>{{ $heading ?? ($title ?? config('app.name', 'GCC System')) }}</h1>
                         </td>
                     </tr>

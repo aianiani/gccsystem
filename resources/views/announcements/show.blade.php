@@ -2,26 +2,50 @@
 
 @section('content')
     <style>
-        .announcement-zoom {
-            zoom: 0.9;
+        :root {
+            --forest-green: #1f7a2d;
+            --forest-green-light: #4a7c59;
+            --forest-green-lighter: #e8f5e8;
+            --yellow-maize: #f4d03f;
+            --gray-50: #f8f9fa;
+            --gray-100: #eef6ee;
+            --gray-600: #6c757d;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
+        }
+
+        /* Force sidebar to use the local forest-green variable */
+        .custom-sidebar {
+            background: var(--forest-green) !important;
+        }
+
+        /* Match dashboard zoom */
+        .home-zoom {
+            zoom: 0.75;
         }
 
         @supports not (zoom: 1) {
-            .announcement-zoom {
-                transform: scale(0.9);
+            .home-zoom {
+                transform: scale(0.75);
                 transform-origin: top center;
             }
         }
+
+        .home-zoom .container {
+            max-width: 100%;
         }
     </style>
-    <div class="announcement-zoom">
+    <div class="home-zoom">
         <div class="container">
             <div class="py-4 px-4 px-lg-5 mb-4 rounded-4"
                 style="background: linear-gradient(135deg, #228B22, #0f3d1e); color: #fff;">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div>
                         <div class="d-flex align-items-center mb-2">
-                            <a href="{{ route('home') }}" class="text-white-50 text-decoration-none me-3">
+                            <a href="#"
+                                onclick="event.preventDefault(); if (window.history.length > 1) { window.history.back(); } else { window.location.href = '{{ route('announcements.index') }}'; }"
+                                class="text-white-50 text-decoration-none me-3">
                                 <span class="me-1">&larr;</span> Back
                             </a>
                         </div>
