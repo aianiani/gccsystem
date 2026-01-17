@@ -55,16 +55,26 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
         Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::get('/users-export', [UserController::class, 'export'])->name('users.export');
+        // Bulk actions
+        Route::post('/users/bulk-activate', [UserController::class, 'bulkActivate'])->name('users.bulk-activate');
+        Route::post('/users/bulk-deactivate', [UserController::class, 'bulkDeactivate'])->name('users.bulk-deactivate');
+        Route::post('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulk-delete');
+        Route::post('/users/bulk-role-change', [UserController::class, 'bulkRoleChange'])->name('users.bulk-role-change');
+        Route::post('/users/verify-import-delete', [UserController::class, 'verifyImportDelete'])->name('users.verify-import-delete');
         Route::get('/activities', [DashboardController::class, 'activities'])->name('activities');
 
 
         // Registration Approval Routes
         Route::prefix('admin/registration-approvals')->name('admin.registration-approvals.')->group(function () {
             Route::get('/', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'index'])->name('index');
+            Route::get('/statistics', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'statistics'])->name('statistics'); // Moved up to avoid conflict with {user}
+            Route::post('/bulk-approve', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'bulkApprove'])->name('bulk-approve');
+            Route::post('/bulk-reject', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'bulkReject'])->name('bulk-reject');
+            Route::post('/verify-enrollment', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'verifyEnrollment'])->name('verify-enrollment');
             Route::get('/{user}', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'show'])->name('show');
             Route::post('/{user}/approve', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'approve'])->name('approve');
             Route::post('/{user}/reject', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'reject'])->name('reject');
-            Route::get('/statistics', [App\Http\Controllers\Admin\RegistrationApprovalController::class, 'statistics'])->name('statistics');
         });
 
         // Hero Images Management

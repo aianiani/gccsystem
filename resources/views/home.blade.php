@@ -8,6 +8,7 @@
     <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('vendor/fontawesome/css/all.min.css') }}" rel="stylesheet">
     <link href="{{ asset('vendor/fonts/inter/inter.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/auth-modal.css') }}" rel="stylesheet">
     <style>
         * {
@@ -4179,20 +4180,16 @@
             font-weight: 500;
         }
 
-        /* Progress states for different steps */
+        /* Progress states for different steps (3 steps) */
         .progress-fill.step-1 {
-            width: 25%;
+            width: 33%;
         }
 
         .progress-fill.step-2 {
-            width: 50%;
+            width: 66%;
         }
 
         .progress-fill.step-3 {
-            width: 75%;
-        }
-
-        .progress-fill.step-4 {
             width: 100%;
         }
 
@@ -4240,11 +4237,123 @@
         .form-select:focus {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%230f5e1d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
         }
+
+        /* Password Requirements Checklist */
+        .password-requirements {
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .password-requirements .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .password-requirements .requirement:last-child {
+            margin-bottom: 0;
+        }
+
+        .password-requirements .requirement i {
+            font-size: 0.5rem;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .password-requirements .requirement.met i {
+            color: #0f5e1d !important;
+        }
+
+        .password-requirements .requirement.met small {
+            color: #0f5e1d;
+            font-weight: 500;
+        }
+
+        /* File Preview Card */
+        #filePreview .card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        #filePreview .card:hover {
+            border-color: #0f5e1d;
+            box-shadow: 0 4px 12px rgba(15, 94, 29, 0.1);
+        }
+
+        /* Email Availability Feedback */
+        .email-availability-feedback {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .email-availability-feedback.available {
+            color: #0f5e1d;
+        }
+
+        .email-availability-feedback.taken {
+            color: #dc2626;
+        }
+
+        .email-availability-feedback.checking {
+            color: #6b7280;
+        }
+
+        /* Progress Label */
+        #progressLabel {
+            font-size: 0.75rem;
+            font-weight: 400;
+        }
+
+        /* Row gap for form fields */
+        .row.g-2 {
+            margin-bottom: 0.75rem;
+        }
+
+        /* Ensure eye button stays on top and aligns properly */
+        .input-group .btn-eye {
+            z-index: 5;
+            position: relative;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            margin-left: -1px;
+        }
+
+        .input-group .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            z-index: 1;
+        }
+
+        .input-group .form-control:focus {
+            z-index: 3;
+        }
+
+        .input-group:focus-within .btn-eye {
+            z-index: 5;
+            border-color: #0f5e1d;
+        }
+
+        /* Modal Zoom Adjustment */
+        /* Modal Zoom Adjustment */
+        #loginModal .modal-dialog {
+            transform: scale(0.95);
+            transform-origin: center top;
+            transition: transform 0.3s ease-in-out;
+
+        }
+
+        #loginModal .modal-dialog.modal-signup-scale {
+            transform: scale(0.85);
+        }
     </style>
     @guest
         <div class="modal fade" id="loginModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content rounded-4 overflow-hidden">
+                <div class="modal-content rounded-3 overflow-hidden">
                     <div class="row g-0">
                         <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-center p-3 left-pane"
                             style="color:#fff;">
@@ -4339,83 +4448,68 @@
                                         data-ajax-url="{{ url('/register') }}">
                                         @csrf
 
-                                        <!-- Simple Progress Line Indicator -->
+                                        <!-- Enhanced Progress Indicator -->
                                         <div class="progress-line-container mb-4">
                                             <div class="progress-line">
                                                 <div class="progress-fill" id="progressFill"></div>
                                             </div>
                                             <div class="progress-text">
-                                                <span id="progressText">Step 1 of 4</span>
+                                                <span id="progressText">Step 1 of 3</span>
+                                                <span id="progressLabel" class="ms-2 text-muted small">Personal
+                                                    Information</span>
                                             </div>
                                         </div>
 
                                         <div id="signupStep1">
-                                            <h6 class="mb-3 text-muted"><i class="fas fa-user me-2"></i>Name Information
+                                            <h6 class="mb-3 text-muted"><i class="fas fa-user-circle me-2"></i>Personal
+                                                Information
                                             </h6>
-                                            <div class="mb-3">
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                    <input type="text" name="first_name" class="form-control" required
-                                                        placeholder="First Name *" autocomplete="given-name">
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                        <input type="text" name="first_name" class="form-control" required
+                                                            placeholder="First Name *" autocomplete="given-name"
+                                                            id="firstNameInput">
+                                                    </div>
+                                                    <div class="invalid-feedback"></div>
                                                 </div>
-                                                <div class="invalid-feedback"></div>
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                        <input type="text" name="last_name" class="form-control" required
+                                                            placeholder="Last Name *" autocomplete="family-name"
+                                                            id="lastNameInput">
+                                                    </div>
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                                     <input type="text" name="middle_name" class="form-control"
-                                                        placeholder="Middle Name (Optional)" autocomplete="additional-name">
+                                                        placeholder="Middle Name (Optional)" autocomplete="additional-name"
+                                                        id="middleNameInput">
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                    <input type="text" name="last_name" class="form-control" required
-                                                        placeholder="Last Name *" autocomplete="family-name">
-                                                </div>
-                                                <div class="invalid-feedback"></div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Gender <span class="text-danger">*</span></label>
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
                                                     <select class="form-select" name="gender" id="genderSelect" required>
-                                                        <option value="" selected disabled>Select Gender *</option>
+                                                        <option value="" selected disabled>Select Sex *</option>
                                                         <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>
                                                             Male</option>
                                                         <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
-                                                        <option value="prefer_not_to_say" {{ old('gender') == 'prefer_not_to_say' ? 'selected' : '' }}>Prefer
-                                                            not to say</option>
-                                                        <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other (please specify)</option>
                                                     </select>
                                                 </div>
                                                 <div class="invalid-feedback"></div>
                                             </div>
-                                            <div class="mb-3" id="genderOtherField" style="display: none;">
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-edit"></i></span>
-                                                    <input type="text" name="gender_other" class="form-control"
-                                                        placeholder="Please specify your gender" id="genderOtherInput"
-                                                        value="{{ old('gender_other') }}">
-                                                </div>
-                                                <div class="invalid-feedback"></div>
-                                            </div>
-                                            <div class="step-navigation">
-                                                <div></div>
-                                                <button type="button" class="btn btn-auth-primary" id="goToStep2">
-                                                    Next <i class="fas fa-arrow-right ms-2"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div id="signupStep2" class="d-none">
-                                            <h6 class="mb-3 text-muted"><i class="fas fa-phone me-2"></i>Contact Information
-                                            </h6>
                                             <div class="mb-3">
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                                     <input type="tel" name="contact_number" class="form-control" required
-                                                        placeholder="Contact Number * (e.g., 09XXXXXXXXX)"
-                                                        pattern="[0-9]{10,11}" autocomplete="tel">
+                                                        placeholder="Contact Number * (0XXX-XXX-XXXX)" maxlength="13"
+                                                        autocomplete="tel" id="contactNumberInput">
                                                 </div>
                                                 <div class="invalid-feedback"></div>
                                             </div>
@@ -4425,52 +4519,56 @@
                                                             class="fas fa-map-marker-alt"></i></span>
                                                     <input type="text" name="address" class="form-control" required
                                                         placeholder="Home Address * (House/Street, Barangay, City/Province)"
-                                                        autocomplete="address-line1">
+                                                        autocomplete="address-line1" id="addressInput">
                                                 </div>
                                                 <div class="invalid-feedback"></div>
+                                                <small class="form-text text-muted">Format: House/Street, Barangay,
+                                                    City/Province</small>
                                             </div>
                                             <div class="step-navigation">
-                                                <button type="button" class="btn btn-outline-secondary" id="backToStep1">
-                                                    <i class="fas fa-arrow-left me-2"></i>Back
-                                                </button>
-                                                <button type="button" class="btn btn-auth-primary" id="goToStep3">
+                                                <div></div>
+                                                <button type="button" class="btn btn-auth-primary" id="goToStep2">
                                                     Next <i class="fas fa-arrow-right ms-2"></i>
                                                 </button>
                                             </div>
                                         </div>
-                                        <div id="signupStep3" class="d-none">
-                                            <h6 class="mb-3 text-muted"><i class="fas fa-key me-2"></i>Account Credentials
+                                        <div id="signupStep2" class="d-none">
+                                            <h6 class="mb-3 text-muted"><i class="fas fa-user-graduate me-2"></i>Account &
+                                                Student Details
                                             </h6>
+
+                                            <!-- Email -->
                                             <div class="mb-3">
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                                     <input type="email" name="email" class="form-control" required
-                                                        autocomplete="email" placeholder="Email Address *">
+                                                        autocomplete="email" placeholder="Email Address *" id="emailInput">
                                                 </div>
                                                 <div class="invalid-feedback"></div>
+                                                <div class="email-availability-feedback"></div>
                                             </div>
+
+                                            <!-- Password with Requirements Checklist -->
                                             <div class="mb-3">
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                                     <input type="password" name="password" class="form-control" required
-                                                        autocomplete="new-password"
-                                                        placeholder="Password * (min 8 characters)" id="signupPassword">
+                                                        autocomplete="new-password" placeholder="Password *"
+                                                        id="signupPassword_v2">
                                                     <button class="btn btn-outline-secondary btn-eye" type="button"
                                                         id="toggleSignupPassword" style="border-radius:0 12px 12px 0;"
                                                         aria-label="Show password"><i class="fas fa-eye"></i></button>
                                                 </div>
                                                 <div class="invalid-feedback"></div>
-                                                <div class="form-text">
-                                                    <small class="text-muted">Password must be at least 8 characters
-                                                        long</small>
-                                                </div>
                                             </div>
+
+                                            <!-- Confirm Password -->
                                             <div class="mb-3">
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                                     <input type="password" name="password_confirmation" class="form-control"
                                                         required autocomplete="new-password"
-                                                        placeholder="Confirm Password *" id="signupPasswordConfirm">
+                                                        placeholder="Confirm Password *" id="signupPasswordConfirm_v2">
                                                     <button class="btn btn-outline-secondary btn-eye" type="button"
                                                         id="toggleSignupPasswordConfirm"
                                                         style="border-radius:0 12px 12px 0;" aria-label="Show password"><i
@@ -4478,27 +4576,23 @@
                                                 </div>
                                                 <div class="invalid-feedback"></div>
                                             </div>
-                                            <div class="step-navigation">
-                                                <button type="button" class="btn btn-outline-secondary" id="backToStep2">
-                                                    <i class="fas fa-arrow-left me-2"></i>Back
-                                                </button>
-                                                <button type="button" class="btn btn-auth-primary" id="goToStep4">
-                                                    Next <i class="fas fa-arrow-right ms-2"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div id="signupStep4" class="d-none">
-                                            <h6 class="mb-3 text-muted"><i class="fas fa-graduation-cap me-2"></i>Student
-                                                Information</h6>
+
+                                            <!-- Student ID -->
                                             <div class="mb-3">
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                                                     <input type="text" name="student_id" class="form-control" required
-                                                        placeholder="Student ID * (e.g., 2021-12345)">
+                                                        placeholder="Student ID * (e.g., 2022302124)" pattern="[0-9]{10}"
+                                                        maxlength="10" title="Student ID must be exactly 10 digits"
+                                                        id="studentIdInput">
                                                 </div>
                                                 <div class="invalid-feedback"></div>
+                                                <small class="form-text text-muted">Format: 10 digits (e.g.,
+                                                    2022302124)</small>
                                             </div>
-                                            <div class="row g-2">
+
+                                            <!-- College and Year Level -->
+                                            <div class="row g-2 mb-3">
                                                 <div class="col-md-7">
                                                     <div class="input-group">
                                                         <span class="input-group-text"><i
@@ -4526,6 +4620,8 @@
                                                     <div class="invalid-feedback"></div>
                                                 </div>
                                             </div>
+
+                                            <!-- Course -->
                                             <div class="mb-3">
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i
@@ -4536,12 +4632,29 @@
                                                 </div>
                                                 <div class="invalid-feedback"></div>
                                             </div>
+
+                                            <div class="step-navigation">
+                                                <button type="button" class="btn btn-outline-secondary" id="backToStep1">
+                                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                                </button>
+                                                <button type="button" class="btn btn-auth-primary" id="goToStep3">
+                                                    Next <i class="fas fa-arrow-right ms-2"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="signupStep3" class="d-none">
+                                            <h6 class="mb-3 text-muted"><i class="fas fa-file-upload me-2"></i>Verification
+                                                Document
+                                            </h6>
                                             <div class="mb-3">
+                                                <label class="form-label">Certificate of Registration (COR) <span
+                                                        class="text-danger">*</span></label>
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-file-upload"></i></span>
                                                     <input class="form-control" type="file" name="cor_file"
-                                                        accept=".pdf,image/*" required>
+                                                        accept=".pdf,image/*" required id="corFileInput">
                                                 </div>
+                                                <div class="invalid-feedback"></div>
                                                 <div class="form-text">
                                                     <div class="alert alert-info d-flex align-items-center mt-2"
                                                         style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border: 1px solid #2196f3; border-radius: 8px;">
@@ -4554,10 +4667,41 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="invalid-feedback"></div>
+                                                <!-- File Preview -->
+                                                <div id="filePreview" class="mt-3" style="display: none;">
+                                                    <div class="card">
+                                                        <div class="card-body p-3">
+                                                            <div class="text-center mb-2 d-none" id="imagePreviewContainer">
+                                                                <img src="" alt="Preview" class="img-fluid rounded border"
+                                                                    style="max-height: 200px;" id="imagePreview">
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fas fa-file-pdf fa-2x text-danger me-3"
+                                                                    id="fileIcon"></i>
+                                                                <div class="flex-grow-1 overflow-hidden me-3">
+                                                                    <p class="mb-0 fw-bold text-truncate" id="fileName"
+                                                                        style="max-width: 100%;"></p>
+                                                                    <small class="text-muted" id="fileSize"></small>
+                                                                </div>
+                                                                <div class="d-flex gap-2">
+                                                                    <a href="#" target="_blank"
+                                                                        class="btn btn-sm btn-outline-primary" id="viewFile"
+                                                                        title="View Document">
+                                                                        <i class="fas fa-eye"></i>
+                                                                    </a>
+                                                                    <button type="button"
+                                                                        class="btn btn-sm btn-outline-danger"
+                                                                        id="removeFile" title="Remove File">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="step-navigation">
-                                                <button type="button" class="btn btn-outline-secondary" id="backToStep3">
+                                                <button type="button" class="btn btn-outline-secondary" id="backToStep2">
                                                     <i class="fas fa-arrow-left me-2"></i>Back
                                                 </button>
                                                 <button type="button" class="btn btn-auth-primary" id="signupSubmitBtn">
@@ -4681,6 +4825,12 @@
                                     <input class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
                                     <input type="hidden" name="code" id="otpHidden" />
                                 </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="rememberDevice"
+                                        name="remember_device" value="1">
+                                    <label class="form-check-label small text-muted" for="rememberDevice">Don't ask again on
+                                        this device for 30 days</label>
+                                </div>
                                 <button type="submit" class="btn w-100 fw-bold btn-auth-primary">Verify</button>
                             </form>
                             <div class="d-flex justify-content-between align-items-center mt-3 small">
@@ -4703,7 +4853,7 @@
         {{-- @endguest moved to after JavaScript so modals work for everyone --}}
 
         <script>
-            // Auto-open relevant modal based on session flash
+            // Auto-open relevant modal based on session fla            sh
             document.addEventListener('DOMContentLoaded', function () {
                 // Tab indicator alignment
                 // Use simple active border underline to avoid disappearing indicator
@@ -5149,47 +5299,37 @@
                 function initializeEnhancedSignup() {
                     console.log('=== initializeEnhancedSignup START ===');
 
-                    // Gender "Other" field toggle
-                    const genderSelect = document.getElementById('genderSelect');
-                    const genderOtherField = document.getElementById('genderOtherField');
-                    const genderOtherInput = document.getElementById('genderOtherInput');
-
-                    if (genderSelect && genderOtherField) {
-                        genderSelect.addEventListener('change', function () {
-                            if (this.value === 'other') {
-                                genderOtherField.style.display = 'block';
-                                if (genderOtherInput) {
-                                    genderOtherInput.setAttribute('required', 'required');
-                                }
-                            } else {
-                                genderOtherField.style.display = 'none';
-                                if (genderOtherInput) {
-                                    genderOtherInput.removeAttribute('required');
-                                    genderOtherInput.value = '';
-                                }
-                            }
-                        });
-
-                        // Check on page load if "other" is already selected
-                        if (genderSelect.value === 'other') {
-                            genderOtherField.style.display = 'block';
-                            if (genderOtherInput) {
-                                genderOtherInput.setAttribute('required', 'required');
-                            }
-                        }
-                    }
-
+                    // Step Progress Management
+                    // Step Progress Management
+                    // Step Progress Management
                     // Step Progress Management
                     updateStepProgress = function (currentStep) {
                         const progressFill = document.getElementById('progressFill');
                         const progressText = document.getElementById('progressText');
+                        const progressLabel = document.getElementById('progressLabel');
+
+                        const stepLabels = {
+                            1: 'Personal Information',
+                            2: 'Account & Student Details',
+                            3: 'Verification Document'
+                        };
 
                         if (progressFill) {
-                            progressFill.className = `progress-fill step-${currentStep}`;
+                            // Force width using !important to override any CSS specificity issues
+                            const percentage = (currentStep / 3) * 100;
+                            progressFill.style.setProperty('width', `${percentage}%`, 'important');
+
+                            // Remove step classes to avoid conflict, just keep base class
+                            progressFill.className = 'progress-fill';
+                            progressFill.classList.add(`step-${currentStep}`);
                         }
 
                         if (progressText) {
-                            progressText.textContent = `Step ${currentStep} of 4`;
+                            progressText.textContent = `Step ${currentStep} of 3`;
+                        }
+
+                        if (progressLabel && stepLabels[currentStep]) {
+                            progressLabel.textContent = stepLabels[currentStep];
                         }
                     };
 
@@ -5228,19 +5368,10 @@
                                     }
                                 }
 
-                                if (field.type === 'tel') {
-                                    const phoneRegex = /^09\d{9}$/;
-                                    if (!phoneRegex.test(field.value)) {
-                                        field.classList.remove('is-valid');
-                                        field.classList.add('is-invalid');
-                                        if (feedback) feedback.textContent = 'Please enter a valid 11-digit phone number starting with 09';
-                                        isValid = false;
-                                    }
-                                }
-
                                 // Password confirmation matching
                                 if (field.name === 'password_confirmation') {
-                                    const passwordField = document.getElementById('signupPassword');
+                                    // UPDATED ID: Reference the v2 password field
+                                    const passwordField = document.getElementById('signupPassword_v2');
                                     if (passwordField && field.value !== passwordField.value) {
                                         field.classList.remove('is-valid');
                                         field.classList.add('is-invalid');
@@ -5312,8 +5443,8 @@
 
                     // Password Confirmation Validation
                     function addPasswordConfirmationValidation() {
-                        const passwordField = document.getElementById('signupPassword');
-                        const confirmField = document.getElementById('signupPasswordConfirm');
+                        const passwordField = document.getElementById('signupPassword_v2');
+                        const confirmField = document.getElementById('signupPasswordConfirm_v2');
 
                         if (!passwordField || !confirmField) return;
 
@@ -5533,14 +5664,14 @@
                                         Swal.fire({
                                             icon: 'success',
                                             title: 'Registration Successful!',
-                                            html: 'Please check your email to verify your account. A verification link has been sent to your email address.',
+                                            html: 'Please check your email to verify your account.<br><br><b>Note:</b> You must verify your email AND wait for Admin approval before you can log in.',
                                             confirmButtonText: 'OK, got it',
                                             allowOutsideClick: false
                                         }).then(() => {
                                             window.location.href = '/';
                                         });
                                     } else {
-                                        alert('Registration successful! Please check your email.');
+                                        alert('Registration successful! Please verify your email and wait for Admin approval.');
                                         window.location.href = '/';
                                     }
                                 } else {
@@ -5628,6 +5759,42 @@
                     const loginModal = document.getElementById('loginModal');
                     if (!loginModal) return;
 
+                    const signupTab = document.getElementById('tab-signup');
+                    const loginTab = document.getElementById('tab-login');
+                    const modalDialog = loginModal.querySelector('.modal-dialog');
+
+                    // Function to update modal scale based on active tab
+                    const updateModalScale = (targetId) => {
+                        if (targetId === '#pane-signup') {
+                            modalDialog.classList.add('modal-signup-scale');
+                        } else {
+                            modalDialog.classList.remove('modal-signup-scale');
+                        }
+                    };
+
+                    // Initial check
+                    const activeTab = loginModal.querySelector('.nav-link.active');
+                    if (activeTab) {
+                        updateModalScale(activeTab.getAttribute('data-bs-target'));
+                    }
+
+                    // Listen for tab changes
+                    const tabs = loginModal.querySelectorAll('[data-bs-toggle="tab"]');
+                    tabs.forEach(tab => {
+                        tab.addEventListener('shown.bs.tab', function (event) {
+                            updateModalScale(event.target.getAttribute('data-bs-target'));
+                        });
+                    });
+
+                    // Prevent click inside modal from closing it
+                    const modalContent = loginModal.querySelector('.modal-content');
+                    if (modalContent) {
+                        modalContent.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                        });
+                    }
+
+                    // Rest of the logic...
                     // Reset form when modal is hidden
                     loginModal.addEventListener('hidden.bs.modal', function () {
                         const forms = this.querySelectorAll('form');
@@ -5958,6 +6125,609 @@
 
             // Start auto-rotation
             startAutoRotate();
+        });
+
+        // ========================================
+        // OPTIMIZED 3-STEP SIGNUP PROCESS
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function () {
+            const signupForm = document.getElementById('signupForm');
+            if (!signupForm) return;
+
+            // Step labels for progress indicator
+            const stepLabels = {
+                1: 'Personal Information',
+                2: 'Account & Student Details',
+                3: 'Verification Document'
+            };
+
+            // ========================================
+            // AUTO-SAVE TO LOCALSTORAGE
+            // ========================================
+            const STORAGE_KEY = 'gcc_signup_draft';
+            const STORAGE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
+
+            function saveFormData() {
+                const formData = {
+                    first_name: document.querySelector('[name="first_name"]')?.value || '',
+                    middle_name: document.querySelector('[name="middle_name"]')?.value || '',
+                    last_name: document.querySelector('[name="last_name"]')?.value || '',
+                    gender: document.querySelector('[name="gender"]')?.value || '',
+                    contact_number: document.querySelector('[name="contact_number"]')?.value || '',
+                    address: document.querySelector('[name="address"]')?.value || '',
+                    email: document.querySelector('[name="email"]')?.value || '',
+                    student_id: document.querySelector('[name="student_id"]')?.value || '',
+                    college: document.querySelector('[name="college"]')?.value || '',
+                    year_level: document.querySelector('[name="year_level"]')?.value || '',
+                    course: document.querySelector('[name="course"]')?.value || '',
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+            }
+
+            function restoreFormData() {
+                try {
+                    const saved = localStorage.getItem(STORAGE_KEY);
+                    if (!saved) return false;
+
+                    const data = JSON.parse(saved);
+
+                    // Check if data is expired
+                    if (Date.now() - data.timestamp > STORAGE_EXPIRY) {
+                        localStorage.removeItem(STORAGE_KEY);
+                        return false;
+                    }
+
+                    // Restore field values
+                    Object.keys(data).forEach(key => {
+                        if (key === 'timestamp') return;
+                        const field = document.querySelector(`[name="${key}"]`);
+                        if (field && data[key]) {
+                            field.value = data[key];
+                            if (field.tagName === 'SELECT') {
+                                field.dispatchEvent(new Event('change'));
+                            }
+                        }
+                    });
+
+                    // Show notification
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Draft Restored',
+                            text: 'Your previous registration data has been restored.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                    return true;
+                } catch (e) {
+                    console.error('Error restoring form data:', e);
+                    return false;
+                }
+            }
+
+            // Auto-save on input
+            signupForm.addEventListener('input', function (e) {
+                if (e.target.type !== 'file') {
+                    saveFormData();
+                }
+            });
+
+            // Restore on modal open
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) {
+                loginModal.addEventListener('shown.bs.modal', function () {
+                    const signupTab = document.getElementById('tab-signup');
+                    if (signupTab && signupTab.classList.contains('active')) {
+                        restoreFormData();
+                    }
+                });
+            }
+
+            // ========================================
+            // PHONE NUMBER AUTO-FORMATTING - Updated
+            // ========================================
+            const contactNumberInput = document.getElementById('contactNumberInput');
+            if (contactNumberInput) {
+                contactNumberInput.addEventListener('input', function (e) {
+                    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+
+                    if (value.length > 11) {
+                        value = value.substring(0, 11);
+                    }
+
+                    // Format as 0XXX-XXX-XXXX (11 digits total)
+                    if (value.length > 4 && value.length <= 7) {
+                        value = value.substring(0, 4) + '-' + value.substring(4);
+                    } else if (value.length > 7) {
+                        value = value.substring(0, 4) + '-' + value.substring(4, 7) + '-' + value.substring(7);
+                    }
+
+                    e.target.value = value;
+                });
+            }
+
+            // ========================================
+            // PASSWORD REQUIREMENTS CHECKLIST
+            // ========================================
+            const passwordInput = document.getElementById('signupPassword');
+            const passwordRequirements = document.getElementById('passwordRequirements');
+
+            if (passwordInput && passwordRequirements) {
+                // Logic removed as per user request
+            }
+
+            // ========================================
+            // FILE PREVIEW
+            // ========================================
+            const corFileInput = document.getElementById('corFileInput');
+            const filePreview = document.getElementById('filePreview');
+            const fileIcon = document.getElementById('fileIcon');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const removeFileBtn = document.getElementById('removeFile');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            const viewFileBtn = document.getElementById('viewFile');
+
+            if (corFileInput && filePreview) {
+                corFileInput.addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Create object URL for preview
+                        const objectUrl = URL.createObjectURL(file);
+                        viewFileBtn.href = objectUrl;
+
+                        // Update icon and preview based on file type
+                        if (file.type === 'application/pdf') {
+                            fileIcon.className = 'fas fa-file-pdf fa-2x text-danger me-3';
+                            imagePreviewContainer.classList.add('d-none');
+                        } else if (file.type.startsWith('image/')) {
+                            fileIcon.className = 'fas fa-file-image fa-2x text-primary me-3';
+                            imagePreview.src = objectUrl;
+                            imagePreviewContainer.classList.remove('d-none');
+                        } else {
+                            // Fallback
+                            fileIcon.className = 'fas fa-file fa-2x text-muted me-3';
+                            imagePreviewContainer.classList.add('d-none');
+                        }
+
+                        // Update file name and size
+                        fileName.textContent = file.name;
+                        const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                        fileSize.textContent = `${sizeInMB} MB`;
+
+                        // Show preview container
+                        filePreview.style.display = 'block';
+                    }
+                });
+
+                if (removeFileBtn) {
+                    removeFileBtn.addEventListener('click', function () {
+                        corFileInput.value = '';
+                        filePreview.style.display = 'none';
+                        imagePreview.src = '';
+                        viewFileBtn.href = '#';
+                        // Clean up object URL to prevent memory leaks? 
+                        // Note: In a simple SPA/Modal, browsers usually handle this, but good practice.
+                    });
+                }
+            }
+
+            // ========================================
+            // STEP NAVIGATION & PROGRESS
+            // ========================================
+            function updateStepProgress(currentStep) {
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+                const progressLabel = document.getElementById('progressLabel');
+
+                if (progressFill) {
+                    // Force width using !important to override any CSS specificity issues
+                    const percentage = (currentStep / 3) * 100;
+                    progressFill.style.setProperty('width', `${percentage}%`, 'important');
+
+                    // Remove step classes to avoid conflict, just keep base class
+                    progressFill.className = 'progress-fill';
+                }
+
+                if (progressText) {
+                    progressText.textContent = `Step ${currentStep} of 3`;
+                }
+
+                if (progressLabel) {
+                    progressLabel.textContent = stepLabels[currentStep] || '';
+                }
+            }
+
+            function validateStep(stepElement) {
+                let isValid = true;
+                const requiredFields = stepElement.querySelectorAll('input[required], select[required]');
+
+                requiredFields.forEach(field => {
+                    const feedback = field.closest('.mb-3')?.querySelector('.invalid-feedback');
+
+                    // Clear previous validation
+                    field.classList.remove('is-invalid', 'is-valid');
+                    if (feedback) feedback.textContent = '';
+
+                    // Validate field
+                    if (!field.value.trim() && field.type !== 'file') {
+                        field.classList.add('is-invalid');
+                        if (feedback) feedback.textContent = 'This field is required';
+                        isValid = false;
+                    } else if (field.type === 'file' && field.files.length === 0) {
+                        field.classList.add('is-invalid');
+                        if (feedback) feedback.textContent = 'This field is required';
+                        isValid = false;
+                    } else {
+                        field.classList.add('is-valid');
+
+                        if (field.type === 'email') {
+                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (!emailRegex.test(field.value)) {
+                                field.classList.remove('is-valid');
+                                field.classList.add('is-invalid');
+                                if (feedback) feedback.textContent = 'Please enter a valid email address';
+                                isValid = false;
+                            }
+                        }
+
+                        // Password confirmation matching
+                        if (field.name === 'password_confirmation') {
+                            const passwordField = document.getElementById('signupPassword');
+                            if (passwordField && field.value !== passwordField.value) {
+                                field.classList.remove('is-valid');
+                                field.classList.add('is-invalid');
+                                if (feedback) feedback.textContent = 'Passwords do not match';
+                                isValid = false;
+                            }
+                        }
+
+                        // File upload validation
+                        if (field.type === 'file' && field.files.length > 0) {
+                            const file = field.files[0];
+                            const maxSize = 5 * 1024 * 1024; // 5MB
+                            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+
+                            if (file.size > maxSize) {
+                                field.classList.remove('is-valid');
+                                field.classList.add('is-invalid');
+                                if (feedback) feedback.textContent = 'File size must be less than 5MB';
+                                isValid = false;
+                            } else if (!allowedTypes.includes(file.type)) {
+                                field.classList.remove('is-valid');
+                                field.classList.add('is-invalid');
+                                if (feedback) feedback.textContent = 'File must be PDF, JPG, or PNG';
+                                isValid = false;
+                            }
+                        }
+                    }
+                });
+
+                return isValid;
+            }
+
+            // Step navigation buttons
+            const goToStep2Btn = document.getElementById('goToStep2');
+            const goToStep3Btn = document.getElementById('goToStep3');
+            const backToStep1Btn = document.getElementById('backToStep1');
+            const backToStep2Btn = document.getElementById('backToStep2');
+            const submitBtn = document.getElementById('signupSubmitBtn');
+
+            if (goToStep2Btn) {
+                goToStep2Btn.addEventListener('click', function () {
+                    const step1 = document.getElementById('signupStep1');
+                    const step2 = document.getElementById('signupStep2');
+                    if (validateStep(step1)) {
+                        step1.classList.add('d-none');
+                        step2.classList.remove('d-none');
+                        updateStepProgress(2);
+                        step2.querySelector('input, select')?.focus();
+                    }
+                });
+            }
+
+            if (goToStep3Btn) {
+                goToStep3Btn.addEventListener('click', function () {
+                    const step2 = document.getElementById('signupStep2');
+                    const step3 = document.getElementById('signupStep3');
+                    if (validateStep(step2)) {
+                        step2.classList.add('d-none');
+                        step3.classList.remove('d-none');
+                        updateStepProgress(3);
+                        step3.querySelector('input, select')?.focus();
+                    }
+                });
+            }
+
+            if (backToStep1Btn) {
+                backToStep1Btn.addEventListener('click', function () {
+                    const step1 = document.getElementById('signupStep1');
+                    const step2 = document.getElementById('signupStep2');
+                    step2.classList.add('d-none');
+                    step1.classList.remove('d-none');
+                    updateStepProgress(1);
+                });
+            }
+
+            if (backToStep2Btn) {
+                backToStep2Btn.addEventListener('click', function () {
+                    const step2 = document.getElementById('signupStep2');
+                    const step3 = document.getElementById('signupStep3');
+                    step3.classList.add('d-none');
+                    step2.classList.remove('d-none');
+                    updateStepProgress(2);
+                });
+            }
+
+            // ========================================
+            // FORM SUBMISSION
+            // ========================================
+            if (submitBtn) {
+                submitBtn.addEventListener('click', async function () {
+                    const step1 = document.getElementById('signupStep1');
+                    const step2 = document.getElementById('signupStep2');
+                    const step3 = document.getElementById('signupStep3');
+
+                    // Validate all steps
+                    if (!validateStep(step1) || !validateStep(step2) || !validateStep(step3)) {
+                        if (window.Swal) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                text: 'Please fill in all required fields correctly.'
+                            });
+                        }
+                        return;
+                    }
+
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+
+                    try {
+                        const formData = new FormData(signupForm);
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        const url = signupForm.dataset.ajaxUrl || '/register';
+
+                        const resp = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrfToken || '',
+                                'Accept': 'application/json'
+                            },
+                            body: formData,
+                            credentials: 'include'
+                        });
+
+                        const data = await resp.json();
+
+                        if (resp.ok || data.status === 'success') {
+                            // Clear localStorage
+                            localStorage.removeItem(STORAGE_KEY);
+
+                            // Close modal
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+                            if (modal) modal.hide();
+
+                            // Show success message
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Registration Successful!',
+                                    html: 'Please check your email to verify your account. After verification, please wait for the GCC administrator to approve your registration.',
+                                    confirmButtonText: 'OK, got it',
+                                    allowOutsideClick: false
+                                }).then(() => {
+                                    window.location.href = '/';
+                                });
+                            } else {
+                                alert('Registration successful! Please check your email.');
+                                window.location.href = '/';
+                            }
+                        } else {
+                            // Handle errors
+                            let errorMessage = data.message || 'Please correct the errors and try again.';
+                            let errorHtml = '';
+
+                            if (data.errors) {
+                                errorHtml = '<div class="text-start mt-2"><ul class="mb-0 text-danger">';
+                                Object.keys(data.errors).forEach(key => {
+                                    // Highlight fields
+                                    const input = signupForm.querySelector(`[name="${key}"]`);
+                                    if (input) {
+                                        input.classList.add('is-invalid');
+                                        const feedback = input.closest('.mb-3')?.querySelector('.invalid-feedback');
+                                        if (feedback) feedback.textContent = data.errors[key][0];
+                                    }
+                                    // Append to error list
+                                    errorHtml += `<li>${data.errors[key][0]}</li>`;
+                                });
+                                errorHtml += '</ul></div>';
+                            }
+
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Registration Failed',
+                                    html: errorHtml || errorMessage,
+                                    confirmButtonColor: '#d33'
+                                });
+                            } else {
+                                alert(errorMessage);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Registration error:', err);
+                        if (window.Swal) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Network error. Please try again.'
+                            });
+                        } else {
+                            alert('Network error. Please try again.');
+                        }
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                });
+            }
+
+            // ========================================
+            // COLLEGE/COURSE MAPPING
+            // ========================================
+            const collegeToCourses = {
+                'College of Agriculture': [
+                    'BS in Agriculture - Agronomy',
+                    'BS in Agriculture - Agricultural Economics',
+                    'BS in Agriculture - Agricultural Education',
+                    'BS in Agriculture - Agricultural Extension',
+                    'BS in Agriculture - Animal Science',
+                    'BS in Agriculture - Entomology',
+                    'BS in Agriculture - Horticulture',
+                    'BS in Agriculture - Plant Pathology',
+                    'BS in Agriculture - Soil Science',
+                    'BS in Agribusiness Management (Crop Enterprise)',
+                    'BS in Agribusiness Management (Livestock Enterprise)',
+                    'BS in Development Communication'
+                ],
+                'College of Arts and Sciences': [
+                    'BA in English',
+                    'BA in History',
+                    'BA in Political Science',
+                    'BA in Psychology',
+                    'BA in Sociology',
+                    'BS in Biology',
+                    'BS in Chemistry',
+                    'BS in Mathematics',
+                    'BS in Physics'
+                ],
+                'College of Business and Management': [
+                    'BS in Accountancy (5 years)',
+                    'BS in Accounting Technology (4 years)',
+                    'Certificate in Accounting Technology (2 years)',
+                    'BSBA - Marketing Management',
+                    'BSBA - Financial Management',
+                    'BSBA - Operations Management',
+                    'BS in Office Administration',
+                    'BS in Entrepreneurship'
+                ],
+                'College of Education': [
+                    'BSEd - Biology',
+                    'BSEd - English',
+                    'BSEd - Filipino',
+                    'BSEd - General Science',
+                    'BSEd - Mathematics',
+                    'BSEd - Physical Education',
+                    'BSEd - Physics',
+                    'Bachelor of Physical Education (BPEd)'
+                ],
+                'College of Engineering': [
+                    'BS in Agricultural and Biosystems Engineering',
+                    'BS in Civil Engineering',
+                    'BS in Electrical Engineering',
+                    'BS in Information Technology',
+                    'BS in Mechanical Engineering'
+                ],
+                'College of Forestry': [
+                    'BS in Environmental Science',
+                    'BS in Forestry'
+                ],
+                'College of Human Ecology': [
+                    'BS in Home Economics - Home Economics Education',
+                    'BS in Home Economics - Food Business Management (Food Service)',
+                    'BS in Home Economics - Food Business Management (Food Processing)',
+                    'BS in Food Technology',
+                    'BS in Nutrition and Dietetics',
+                    'BS in Hotel and Restaurant Management'
+                ],
+                'College of Nursing': [
+                    'BS in Nursing'
+                ],
+                'College of Veterinary Medicine': [
+                    'Doctor of Veterinary Medicine'
+                ],
+                'College of Information Sciences and Computing': [
+                    'BS in Information Technology'
+                ]
+            };
+
+            const collegeSelect = document.getElementById('collegeSelect');
+            const courseSelect = document.getElementById('courseSelect');
+
+            if (collegeSelect && courseSelect) {
+                // Populate colleges
+                Object.keys(collegeToCourses).forEach(college => {
+                    const option = document.createElement('option');
+                    option.value = college;
+                    option.textContent = college;
+                    collegeSelect.appendChild(option);
+                });
+
+                // Update courses when college changes
+                collegeSelect.addEventListener('change', function () {
+                    courseSelect.innerHTML = '<option value="" disabled selected>Course / Program *</option>';
+                    const courses = collegeToCourses[this.value] || [];
+                    courses.forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course;
+                        option.textContent = course;
+                        courseSelect.appendChild(option);
+                    });
+                });
+            }
+
+            // ========================================
+            // PASSWORD VISIBILITY TOGGLE
+            // ========================================
+            const toggleSignupPassword = document.getElementById('toggleSignupPassword');
+            const toggleSignupPasswordConfirm = document.getElementById('toggleSignupPasswordConfirm');
+            const signupPasswordInput = document.getElementById('signupPassword_v2');
+
+            if (toggleSignupPassword && signupPasswordInput) {
+                toggleSignupPassword.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const type = signupPasswordInput.type === 'password' ? 'text' : 'password';
+                    signupPasswordInput.type = type;
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        if (type === 'text') {
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    }
+                });
+            }
+
+            const passwordConfirmInput = document.getElementById('signupPasswordConfirm_v2');
+            if (toggleSignupPasswordConfirm && passwordConfirmInput) {
+                toggleSignupPasswordConfirm.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const type = passwordConfirmInput.type === 'password' ? 'text' : 'password';
+                    passwordConfirmInput.type = type;
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        if (type === 'text') {
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>

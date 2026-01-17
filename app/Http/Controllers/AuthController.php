@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cookie;
 
 class AuthController extends Controller
 {
@@ -110,6 +111,22 @@ class AuthController extends Controller
             }
 
             if ($user->two_factor_enabled) {
+                // Check if device is trusted (cookie exists)
+                if (Cookie::get('trusted_device_' . $user->id)) {
+                    // Log activity and bypass 2FA
+                    \App\Models\UserActivity::log($user->id, 'login', 'User logged in via trusted device (2FA skipped)');
+                    $request->session()->regenerate();
+                    if ($request->expectsJson()) {
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => "Welcome back, {$user->name}! You have successfully logged in.",
+                            'redirect' => route('dashboard'),
+                        ], 200);
+                    }
+                    return redirect()->intended(route('dashboard'))
+                        ->with('success', "Welcome back, {$user->name}! You have successfully logged in.");
+                }
+
                 // Generate 2FA code
                 $code = random_int(100000, 999999);
                 DB::table('two_factor_codes')->updateOrInsert(
@@ -478,6 +495,12 @@ class AuthController extends Controller
             $user = User::find($userId);
             Auth::login($user);
             $request->session()->forget('2fa:user:id');
+
+            // Handle "Remember this device"
+            if ($request->has('remember_device')) {
+                Cookie::queue('trusted_device_' . $user->id, 'true', 60 * 24 * 30); // 30 days
+            }
+
             // Log login activity
             UserActivity::log($user->id, 'login', 'User logged in with 2FA');
             $request->session()->regenerate();

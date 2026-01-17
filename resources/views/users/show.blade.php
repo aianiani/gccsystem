@@ -1,132 +1,303 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 rounded-4 mb-0" style="background: var(--primary-white);">
-                <div class="card-body py-4 px-4">
-                    <nav aria-label="breadcrumb" class="mb-2">
-                        <ol class="breadcrumb bg-transparent px-0 py-1 mb-0" style="font-size: 1rem;">
-                            <li class="breadcrumb-item"><a href="{{ route('users.index') }}" class="text-decoration-none"
-                                    style="color:var(--primary-black)">Users</a></li>
-                            <li class="breadcrumb-item active text-secondary" aria-current="page">{{ $user->name }}</li>
-                        </ol>
-                    </nav>
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle shadow-sm" width="60"
-                                height="60">
-                            <div>
-                                <h1 class="fw-bold mb-1" style="font-size:2rem; color:var(--primary-black)">
-                                    {{ $user->name }}</h1>
-                                <p class="mb-0 text-secondary" style="font-size:1.1rem;">User details and activity history
-                                </p>
-                            </div>
-                        </div>
-                        <div class="mt-3 mt-md-0">
-                            <a href="{{ route('users.edit', $user) }}" class="btn btn-warning btn-lg px-4 shadow-sm">
-                                <i class="bi bi-pencil me-2"></i>Edit User
-                            </a>
-                        </div>
+    <style>
+        :root {
+            --forest-green: #1f7a2d;
+            --forest-green-light: #4a7c59;
+            --forest-green-lighter: #e8f5e8;
+            --yellow-maize: #f4d03f;
+            --gray-50: #f8f9fa;
+            --gray-100: #eef6ee;
+            --gray-600: #6c757d;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
+        }
+
+        .home-zoom {
+            zoom: 0.75;
+        }
+
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top center;
+            }
+        }
+
+        .main-dashboard-inner {
+            padding: 2rem;
+        }
+
+        .registration-detail {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .registration-detail .card-header {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-weight: 600;
+        }
+
+        .registration-detail .card-body {
+            padding: 1.5rem;
+        }
+
+        .info-row {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--gray-600);
+            display: inline-block;
+            min-width: 140px;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .student-avatar-container {
+            text-align: center;
+        }
+
+        .student-avatar-container img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 3px solid var(--forest-green-lighter);
+        }
+
+        .avatar-placeholder {
+            width: 80px;
+            height: 80px;
+            background: var(--forest-green);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .page-header-card {
+            background: var(--hero-gradient);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .page-header-card h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+            color: #fff;
+        }
+
+        .action-icon-btn {
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .action-icon-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+
+    <div class="home-zoom">
+        <div class="main-dashboard-inner">
+            <!-- Page Header -->
+            <div class="page-header-card">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <h1>
+                            <i class="bi bi-person-lines-fill me-2"></i>
+                            User Details
+                        </h1>
+                        <p class="mb-0">View and manage user information and activity</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('users.index') }}" class="btn btn-light">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </a>
+                        <a href="{{ route('users.edit', $user) }}" class="btn btn-warning">
+                            <i class="bi bi-pencil me-2"></i>Edit User
+                        </a>
+
+                        @if($user->id !== auth()->id())
+                            <form action="{{ route('users.toggle-status', $user) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="btn btn-{{ $user->isActive() ? 'outline-light' : 'success' }}"
+                                    data-bs-toggle="tooltip" title="{{ $user->isActive() ? 'Deactivate' : 'Activate' }}">
+                                    <i class="bi bi-{{ $user->isActive() ? 'pause-circle' : 'play-circle' }} me-1"></i>
+                                    {{ $user->isActive() ? 'Deactivate' : 'Activate' }}
+                                </button>
+                            </form>
+                            <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete-user-form"
+                                data-username="{{ $user->name }}" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger" data-bs-toggle="tooltip" title="Delete User">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card mb-4">
+            <!-- User Information Card -->
+            <div class="registration-detail">
                 <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-person-circle me-2"></i>User Information
-                    </h5>
-                </div>
-                <div class="card-body text-center">
-                    <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle shadow-sm mb-3" width="80"
-                        height="80">
-                    <h5>{{ $user->name }}</h5>
-                    <p class="text-muted">{{ $user->email }}</p>
-
-                    <div class="row text-start">
-                        <div class="col-6">
-                            <strong>Role:</strong>
-                        </div>
-                        <div class="col-6">
-                            <span class="badge bg-{{ $user->isAdmin() ? 'danger' : 'secondary' }}" data-bs-toggle="tooltip"
-                                title="{{ $user->isAdmin() ? 'Administrator with full access' : 'Regular user with limited access' }}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person me-2"></i>
+                            User Information
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <span
+                                class="badge bg-{{ $user->role === 'admin' ? 'danger' : ($user->role === 'counselor' ? 'success' : 'primary') }} status-badge">
                                 {{ ucfirst($user->role) }}
                             </span>
-                        </div>
-                    </div>
-
-                    <div class="row text-start">
-                        <div class="col-6">
-                            <strong>Status:</strong>
-                        </div>
-                        <div class="col-6">
-                            <span class="badge bg-{{ $user->isActive() ? 'success' : 'danger' }}" data-bs-toggle="tooltip"
-                                title="{{ $user->isActive() ? 'User can log in and access the system' : 'User account is deactivated' }}">
+                            <span class="badge bg-{{ $user->isActive() ? 'success' : 'danger' }} status-badge">
                                 {{ $user->isActive() ? 'Active' : 'Inactive' }}
                             </span>
                         </div>
                     </div>
-
-                    <div class="row text-start">
-                        <div class="col-6">
-                            <strong>Joined:</strong>
+                </div>
+                <div class="card-body">
+                    <!-- Avatar and Name Header -->
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <div class="student-avatar-container me-3">
+                            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="rounded-circle">
                         </div>
-                        <div class="col-6">
-                            {{ $user->created_at->format('M d, Y') }}
-                        </div>
-                    </div>
-
-                    <div class="row text-start">
-                        <div class="col-6">
-                            <strong>Last Updated:</strong>
-                        </div>
-                        <div class="col-6">
-                            {{ $user->updated_at->format('M d, Y') }}
+                        <div>
+                            <h4 class="mb-1 fw-bold">{{ $user->name }}</h4>
+                            <p class="text-muted mb-0">{{ $user->email }}</p>
                         </div>
                     </div>
 
-                    @if($user->id !== auth()->id())
-                        <hr>
-                        <div class="d-grid gap-2">
-                            <form action="{{ route('users.toggle-status', $user) }}" method="POST">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit"
-                                    class="btn btn-sm btn-outline-{{ $user->isActive() ? 'warning' : 'success' }} btn-toggle-status"
-                                    data-user-name="{{ $user->name }}"
-                                    data-current-status="{{ $user->isActive() ? 'active' : 'inactive' }}"
-                                    data-bs-toggle="tooltip"
-                                    title="{{ $user->isActive() ? 'Deactivate user account' : 'Activate user account' }}">
-                                    <i class="bi bi-{{ $user->isActive() ? 'pause' : 'play' }} me-2"></i>
-                                    {{ $user->isActive() ? 'Deactivate' : 'Activate' }} User
-                                </button>
-                            </form>
+                    <!-- Information Grid -->
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <span class="info-label">Full Name:</span>
+                                <span class="info-value fw-bold">{{ $user->name }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">{{ $user->email }}</span>
+                            </div>
+                            @if($user->student_id)
+                                <div class="info-row">
+                                    <span class="info-label">Student ID:</span>
+                                    <span class="info-value fw-bold">{{ $user->student_id }}</span>
+                                </div>
+                            @endif
+                            @if($user->college)
+                                <div class="info-row">
+                                    <span class="info-label">College:</span>
+                                    <span class="info-value">{{ $user->college }}</span>
+                                </div>
+                            @endif
+                            @if($user->course)
+                                <div class="info-row">
+                                    <span class="info-label">Course:</span>
+                                    <span class="info-value">{{ $user->course }}</span>
+                                </div>
+                            @endif
+                            @if($user->year_level)
+                                <div class="info-row">
+                                    <span class="info-label">Year Level:</span>
+                                    <span class="info-value">{{ $user->year_level }}</span>
+                                </div>
+                            @endif
+                        </div>
 
-                            <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete-user-form"
-                                data-username="{{ $user->name }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger btn-delete-user"
-                                    data-user-name="{{ $user->name }}" data-user-email="{{ $user->email }}"
-                                    data-bs-toggle="tooltip" title="Permanently delete user account">
-                                    <i class="bi bi-trash me-2"></i>Delete User
-                                </button>
-                            </form>
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <span class="info-label">Role:</span>
+                                <span class="info-value">{{ ucfirst($user->role) }}</span>
+                            </div>
+                            @if($user->gender)
+                                <div class="info-row">
+                                    <span class="info-label">Gender:</span>
+                                    <span class="info-value">{{ ucfirst($user->gender) }}</span>
+                                </div>
+                            @endif
+                            @if($user->contact_number)
+                                <div class="info-row">
+                                    <span class="info-label">Contact:</span>
+                                    <span class="info-value">{{ $user->contact_number }}</span>
+                                </div>
+                            @endif
+                            @if($user->address)
+                                <div class="info-row">
+                                    <span class="info-label">Address:</span>
+                                    <span class="info-value">{{ $user->address }}</span>
+                                </div>
+                            @endif
+                            <div class="info-row">
+                                <span class="info-label">Joined:</span>
+                                <span class="info-value">{{ $user->created_at->format('M d, Y') }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Last Updated:</span>
+                                <span class="info-value">{{ $user->updated_at->format('M d, Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COR File -->
+                    @if($user->cor_file)
+                        <div class="mt-4 p-3 bg-light rounded border">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <i class="bi bi-file-earmark-pdf text-danger me-2 fs-4"></i>
+                                    <span class="fw-bold">Certificate of Registration</span>
+                                </div>
+                                <a href="{{ asset('storage/cor_files/' . $user->cor_file) }}" target="_blank"
+                                    class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye me-1"></i> View COR
+                                </a>
+                            </div>
                         </div>
                     @endif
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
+            <!-- Activity History -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-success">
                         <i class="bi bi-activity me-2"></i>Activity History
                     </h5>
                 </div>
@@ -134,16 +305,17 @@
                     @if($activities->count() > 0)
                         <div class="list-group list-group-flush">
                             @foreach($activities as $activity)
-                                <div class="list-group-item">
+                                <div class="list-group-item px-0">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div class="ms-2 me-auto">
-                                            <div class="fw-bold">{{ ucfirst($activity->action) }}</div>
-                                            <small class="text-muted">{{ $activity->description }}</small>
+                                            <div class="fw-bold text-dark">{{ ucfirst($activity->action) }}</div>
+                                            <small class="text-secondary">{{ $activity->description }}</small>
                                             @if($activity->ip_address)
-                                                <br><small class="text-muted">IP: {{ $activity->ip_address }}</small>
+                                                <br><small class="text-muted"><i class="bi bi-globe me-1"></i>IP:
+                                                    {{ $activity->ip_address }}</small>
                                             @endif
                                             @if($activity->user_agent)
-                                                <br><small class="text-muted">Browser:
+                                                <br><small class="text-muted"><i class="bi bi-browser-chrome me-1"></i>Browser:
                                                     {{ getBrowserName($activity->user_agent) }}</small>
                                             @endif
                                         </div>
@@ -156,16 +328,21 @@
                             {{ $activities->links('vendor.pagination.bootstrap-5') }}
                         </div>
                     @else
-                        <div class="text-center py-4">
-                            <i class="bi bi-activity fs-1 text-muted mb-3"></i>
-                            <h6>No activities found</h6>
-                            <p class="text-muted">This user hasn't performed any actions yet.</p>
+                        <div class="text-center py-5">
+                            <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3"
+                                style="width: 60px; height: 60px;">
+                                <i class="bi bi-activity fs-3 text-muted"></i>
+                            </div>
+                            <h6 class="text-secondary">No activities found</h6>
+                            <p class="text-muted small">This user hasn't performed any actions yet.</p>
                         </div>
                     @endif
                 </div>
             </div>
+
         </div>
     </div>
+
     <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}"></script>
     <script>
         const deleteForm = document.getElementById('delete-user-form');
@@ -174,14 +351,15 @@
                 e.preventDefault();
                 const userName = deleteForm.getAttribute('data-username');
                 Swal.fire({
-                    title: `Are you sure you want to delete user "${userName}"?`,
-                    text: 'This action will permanently delete the user. This cannot be undone!',
+                    title: `Delete user "${userName}"?`,
+                    text: 'This action will permanently delete the user and cannot be undone.',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Yes, delete',
-                    cancelButtonText: 'Cancel'
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
                         deleteForm.submit();

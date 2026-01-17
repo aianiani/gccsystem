@@ -15,7 +15,6 @@
             --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
         }
 
-        /* Match admin zoom standard */
         .home-zoom {
             zoom: 0.75;
         }
@@ -46,13 +45,50 @@
             padding: 1rem 1.25rem;
             border-bottom: 1px solid var(--gray-100);
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
         .registration-detail .card-body {
-            padding: 1.25rem;
+            padding: 1.5rem;
+        }
+
+        .info-row {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--gray-600);
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .student-avatar-container {
+            text-align: center;
+        }
+
+        .student-avatar-container img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 3px solid var(--forest-green-lighter);
+        }
+
+        .avatar-placeholder {
+            width: 80px;
+            height: 80px;
+            background: var(--forest-green);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
         }
 
         .status-badge {
@@ -84,11 +120,6 @@
             padding: 1.5rem 2rem;
             margin-bottom: 1.5rem;
             color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
 
         .page-header-card h1 {
@@ -98,150 +129,67 @@
             color: #fff;
         }
 
-        .page-header-card p {
-            margin: 0.5rem 0 0 0;
-            opacity: 0.9;
-            font-size: 0.95rem;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content-between;
-            align-items: flex-start;
-            padding: 1rem 0;
-            gap: 1rem;
-            border-bottom: 1px solid var(--gray-100);
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: var(--forest-green);
-            min-width: 180px;
-            flex-shrink: 0;
-        }
-
-        .info-value {
-            color: var(--gray-600);
-            text-align: right;
-            flex: 1;
-            word-break: break-word;
-        }
-
         .action-buttons {
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
-            padding: 1.5rem;
             margin-bottom: 1.5rem;
-        }
-
-        .student-avatar-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1.5rem;
-            background: var(--gray-50);
-            border-radius: 12px;
-            margin-bottom: 1rem;
-        }
-
-        .student-avatar-container img,
-        .student-avatar-container .avatar-placeholder {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 1rem;
-        }
-
-        .student-avatar-container .avatar-placeholder {
-            background: var(--forest-green);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-            font-weight: 700;
-        }
-
-        @media (max-width: 768px) {
-            .main-dashboard-inner {
-                padding: 1rem;
-            }
-
-            .page-header-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .info-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
         }
     </style>
 
-    <div class="main-dashboard-inner home-zoom">
-        <!-- Page Header -->
-        <div class="page-header-card">
-            <div>
-                <h1><i class="bi bi-person me-2"></i>Registration Details</h1>
-                <p>Review student registration information</p>
-            </div>
-            <div>
-                <a href="{{ route('admin.registration-approvals.index') }}" class="btn btn-outline-light">
+    <div class="home-zoom">
+        <div class="main-dashboard-inner">
+            <!-- Page Header -->
+            <div class="page-header-card">
+                <div>
+                    <h1>
+                        <i class="bi bi-person-badge me-2"></i>
+                        Registration Details
+                    </h1>
+                    <p class="mb-0">Review and process student registration</p>
+                </div>
+                <a href="{{ route('admin.registration-approvals.index') }}" class="btn btn-light">
                     <i class="bi bi-arrow-left me-2"></i>
                     Back to Approvals
                 </a>
             </div>
-        </div>
 
-        <!-- Action Buttons (for pending registrations) -->
-        @if($user->registration_status === 'pending')
-            <div class="action-buttons">
-                <div class="row">
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-success btn-lg w-100" data-bs-toggle="modal"
-                            data-bs-target="#approveModal">
-                            <i class="bi bi-check-circle me-2"></i>
-                            Approve Registration
-                        </button>
-                    </div>
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-danger btn-lg w-100" data-bs-toggle="modal"
-                            data-bs-target="#rejectModal">
-                            <i class="bi bi-x-circle me-2"></i>
-                            Reject Registration
-                        </button>
+            <!-- Action Buttons -->
+            @if($user->registration_status === 'pending')
+                <div class="action-buttons">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-success btn-lg w-100" data-bs-toggle="modal"
+                                data-bs-target="#approveModal">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Approve Registration
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-danger btn-lg w-100" data-bs-toggle="modal"
+                                data-bs-target="#rejectModal">
+                                <i class="bi bi-x-circle me-2"></i>
+                                Reject Registration
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @endif
+            @endif
 
-        <!-- Registration Details -->
-        <div class="registration-detail">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-person me-2"></i>
-                        Student Information
-                    </h5>
-                    <span class="status-badge status-{{ $user->registration_status }}">
-                        {{ ucfirst($user->registration_status) }}
-                    </span>
+            <!-- Student Information Card -->
+            <div class="registration-detail">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person me-2"></i>
+                            Student Information
+                        </h5>
+                        <span class="status-badge status-{{ $user->registration_status }}">
+                            {{ ucfirst($user->registration_status) }}
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4 mb-4">
-                        <div class="student-avatar-container">
+                <div class="card-body">
+                    <!-- Avatar and Name Header -->
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <div class="student-avatar-container me-3">
                             @if($user->avatar)
                                 <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="rounded-circle">
                             @else
@@ -249,102 +197,29 @@
                                     {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
                                 </div>
                             @endif
+                        </div>
+                        <div>
                             <h4 class="mb-1 fw-bold">{{ $user->name ?? 'N/A' }}</h4>
                             <p class="text-muted mb-0">{{ $user->email ?? 'N/A' }}</p>
                         </div>
                     </div>
-                    <div class="col-md-8">
-                        <div class="info-row">
-                            <span class="info-label">Full Name:</span>
-                            <span class="info-value">{{ $user->name ?? 'N/A' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Email Address:</span>
-                            <span class="info-value">{{ $user->email ?? 'N/A' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Role:</span>
-                            <span class="info-value">{{ ucfirst($user->role ?? 'N/A') }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Registration Status:</span>
-                            <span class="info-value">
-                                <span class="status-badge status-{{ $user->registration_status }}">
-                                    {{ ucfirst($user->registration_status) }}
-                                </span>
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Account Status:</span>
-                            <span class="info-value">
-                                <span class="badge {{ $user->is_active ? 'bg-success' : 'bg-danger' }}">
-                                    {{ $user->is_active ? 'Active' : 'Inactive' }}
-                                </span>
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Email Verified:</span>
-                            <span class="info-value">
-                                <span class="badge {{ $user->email_verified_at ? 'bg-success' : 'bg-warning' }}">
-                                    {{ $user->email_verified_at ? 'Verified' : 'Not Verified' }}
-                                </span>
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Registration Date:</span>
-                            <span
-                                class="info-value">{{ $user->created_at ? $user->created_at->format('F d, Y \a\t g:i A') : 'N/A' }}</span>
-                        </div>
-                        @if($user->approved_at)
-                            <div class="info-row">
-                                <span class="info-label">Processed Date:</span>
-                                <span class="info-value">{{ $user->approved_at->format('F d, Y \a\t g:i A') }}</span>
-                            </div>
-                            @if($user->approvedBy)
-                                <div class="info-row">
-                                    <span class="info-label">Processed By:</span>
-                                    <span class="info-value">{{ $user->approvedBy->name }}</span>
-                                </div>
-                            @endif
-                        @endif
-                        @if($user->registration_notes)
-                            <div class="info-row">
-                                <span class="info-label">Approval Notes:</span>
-                                <span class="info-value">{{ $user->registration_notes }}</span>
-                            </div>
-                        @endif
-                        @if($user->rejection_reason)
-                            <div class="info-row">
-                                <span class="info-label">Rejection Reason:</span>
-                                <span class="info-value">{{ $user->rejection_reason }}</span>
-                            </div>
-                        @endif
-                        <div class="info-row">
-                            <span class="info-label">Last Updated:</span>
-                            <span
-                                class="info-value">{{ $user->updated_at ? $user->updated_at->format('F d, Y \a\t g:i A') : 'N/A' }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Student Details (if student) -->
-        @if($user->role === 'student' && ($user->student_id || $user->college || $user->course || $user->contact_number || $user->address || $user->cor_file))
-            <div class="registration-detail">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-graduation-cap me-2"></i>
-                        Academic & Contact Information
-                    </h5>
-                </div>
-                <div class="card-body">
+                    <!-- Information Grid -->
                     <div class="row">
+                        <!-- Left Column -->
                         <div class="col-md-6">
+                            <div class="info-row">
+                                <span class="info-label">Full Name:</span>
+                                <span class="info-value fw-bold">{{ $user->name ?? 'N/A' }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">{{ $user->email ?? 'N/A' }}</span>
+                            </div>
                             @if($user->student_id)
                                 <div class="info-row">
                                     <span class="info-label">Student ID:</span>
-                                    <span class="info-value">{{ $user->student_id }}</span>
+                                    <span class="info-value fw-bold">{{ $user->student_id }}</span>
                                 </div>
                             @endif
                             @if($user->college)
@@ -355,7 +230,7 @@
                             @endif
                             @if($user->course)
                                 <div class="info-row">
-                                    <span class="info-label">Course/Program:</span>
+                                    <span class="info-label">Course:</span>
                                     <span class="info-value">{{ $user->course }}</span>
                                 </div>
                             @endif
@@ -365,18 +240,20 @@
                                     <span class="info-value">{{ $user->year_level }}</span>
                                 </div>
                             @endif
-                            @if($user->gender)
-                                <div class="info-row">
-                                    <span class="info-label">Gender:</span>
-                                    <span class="info-value">{{ ucfirst(str_replace('_', ' ', $user->gender)) }}</span>
-                                </div>
-                            @endif
                         </div>
+
+                        <!-- Right Column -->
                         <div class="col-md-6">
                             @if($user->contact_number)
                                 <div class="info-row">
-                                    <span class="info-label">Contact Number:</span>
+                                    <span class="info-label">Contact:</span>
                                     <span class="info-value">{{ $user->contact_number }}</span>
+                                </div>
+                            @endif
+                            @if($user->gender)
+                                <div class="info-row">
+                                    <span class="info-label">Gender:</span>
+                                    <span class="info-value">{{ ucfirst($user->gender) }}</span>
                                 </div>
                             @endif
                             @if($user->address)
@@ -385,23 +262,52 @@
                                     <span class="info-value">{{ $user->address }}</span>
                                 </div>
                             @endif
-                            @if($user->cor_file)
+                            <div class="info-row">
+                                <span class="info-label">Registered:</span>
+                                <span
+                                    class="info-value">{{ $user->created_at ? $user->created_at->format('M d, Y') : 'N/A' }}</span>
+                            </div>
+                            @if($user->approved_at)
                                 <div class="info-row">
-                                    <span class="info-label">Certificate of Registration (COR):</span>
-                                    <span class="info-value">
-                                        <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url('cor_files/' . $user->cor_file) }}"
-                                            target="_blank" class="btn btn-sm btn-primary">
-                                            <i class="bi bi-file-earmark-pdf me-1"></i>
-                                            View COR File
-                                        </a>
-                                    </span>
+                                    <span class="info-label">Processed:</span>
+                                    <span class="info-value">{{ $user->approved_at->format('M d, Y') }}</span>
+                                </div>
+                                @if($user->approvedBy)
+                                    <div class="info-row">
+                                        <span class="info-label">By:</span>
+                                        <span class="info-value">{{ $user->approvedBy->name }}</span>
+                                    </div>
+                                @endif
+                            @endif
+                            @if($user->rejection_reason)
+                                <div class="info-row">
+                                    <span class="info-label">Rejection Reason:</span>
+                                    <span class="info-value text-danger">{{ $user->rejection_reason }}</span>
                                 </div>
                             @endif
                         </div>
                     </div>
+
+                    <!-- COR File -->
+                    @if($user->cor_file)
+                        <div class="mt-4 p-3 bg-light rounded border">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <i class="bi bi-file-earmark-pdf text-danger me-2 fs-4"></i>
+                                    <span class="fw-bold">Certificate of Registration</span>
+                                </div>
+                                <a href="{{ asset('storage/cor_files/' . $user->cor_file) }}" target="_blank"
+                                    class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye me-1"></i> View COR
+                                </a>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
-        @endif
+        </div>
+    </div>
+    </div>
     </div>
 
     <!-- Approve Modal -->
@@ -454,7 +360,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-danger">Reject Registration</button>
                         </div>
                     </form>

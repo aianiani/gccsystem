@@ -983,15 +983,15 @@
                                             }
 
                                             li.innerHTML = `
-                                                                                                                                                                                                                    <div class="notification-icon ${iconType}">
-                                                                                                                                                                                                                        ${icon}
-                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                    <div class="notification-content">
-                                                                                                                                                                                                                        <div class="notification-message">${n.data.message || n.type}</div>
-                                                                                                                                                                                                                        <div class="notification-time">${n.created_at}</div>
-                                                                                                                                                                                                                        ${actionsHtml ? `<div class="notification-actions">${actionsHtml}</div>` : ''}
-                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                `;
+                                                                                                                                                                                                                                <div class="notification-icon ${iconType}">
+                                                                                                                                                                                                                                    ${icon}
+                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                <div class="notification-content">
+                                                                                                                                                                                                                                    <div class="notification-message">${n.data.message || n.type}</div>
+                                                                                                                                                                                                                                    <div class="notification-time">${n.created_at}</div>
+                                                                                                                                                                                                                                    ${actionsHtml ? `<div class="notification-actions">${actionsHtml}</div>` : ''}
+                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                            `;
                                             notifDropdown.appendChild(li);
                                         });
                                     }
@@ -1195,6 +1195,8 @@
         });
     </script>
     <!-- Removed problematic external script -->
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 </body>
 
 </html>

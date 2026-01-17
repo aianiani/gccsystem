@@ -7,6 +7,8 @@ use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -17,7 +19,55 @@ class UserController extends Controller
     {
         $query = User::with('activities');
 
-        // Search by name, email, or student_id
+        // Apply filters
+        $this->applyFilters($query, $request);
+
+        // Sorting
+        $sortField = $request->get('sort', 'created_at');
+        // Validate sort field
+        $allowedSorts = ['name', 'email', 'role', 'is_active', 'created_at'];
+        if (!in_array($sortField, $allowedSorts)) {
+            $sortField = 'created_at';
+        }
+        $sortDirection = $request->get('direction', 'desc');
+        $sortDirection = in_array(strtolower($sortDirection), ['asc', 'desc']) ? strtolower($sortDirection) : 'desc';
+
+        // Apply sorting priority
+        $query->orderByRaw("CASE 
+            WHEN role = 'admin' THEN 1 
+            WHEN role = 'counselor' THEN 2 
+            ELSE 3 
+        END ASC");
+
+        $query->orderBy($sortField, $sortDirection);
+
+        // Paginate with dynamic per_page
+        $perPage = $request->get('per_page', 15);
+        $perPage = in_array($perPage, [15, 30, 50, 100]) ? $perPage : 15;
+        $users = $query->paginate($perPage)->withQueryString();
+
+        // Get unique colleges and courses for filter dropdowns (like Registration Approval)
+        $colleges = User::where('role', 'student')->whereNotNull('college')->distinct()->pluck('college');
+        $courses = User::where('role', 'student')->whereNotNull('course')->distinct()->pluck('course');
+        $genders = User::whereNotNull('gender')->distinct()->pluck('gender');
+
+        return view('users.index', compact('users', 'colleges', 'courses', 'genders'));
+    }
+
+    /**
+     * Apply common filters to user query
+     */
+    private function applyFilters($query, Request $request)
+    {
+        // Default: Exclude pending and rejected registrations (only show approved users)
+        if (!$request->filled('registration_status')) {
+            $query->where(function ($q) {
+                $q->where('registration_status', 'approved')
+                    ->orWhereNull('registration_status');
+            });
+        }
+
+        // Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -27,12 +77,12 @@ class UserController extends Controller
             });
         }
 
-        // Filter by role
+        // Role
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
 
-        // Filter by status (active/inactive)
+        // Status
         if ($request->filled('status')) {
             if ($request->status === 'active') {
                 $query->where('is_active', true);
@@ -41,18 +91,32 @@ class UserController extends Controller
             }
         }
 
-        // Filter by registration status
+        // Registration Status
         if ($request->filled('registration_status')) {
             $query->where('registration_status', $request->registration_status);
         }
 
-        // Order by role (admin first), then by created_at descending (newest first)
-        $users = $query->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
-            ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
+        // Student Filters
+        if ($request->filled('college')) {
+            $query->where('college', $request->college);
+        }
+        if ($request->filled('course')) {
+            $query->where('course', $request->course); // Exact match for dropdown
+        }
+        if ($request->filled('year_level')) {
+            $query->where('year_level', $request->year_level);
+        }
+        if ($request->filled('gender')) {
+            $query->where('gender', $request->gender);
+        }
 
-        return view('users.index', compact('users'));
+        // Date Range Filter (Registered)
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
     }
 
     /**
@@ -234,6 +298,152 @@ class UserController extends Controller
     }
 
     /**
+     * Export users to Excel
+     */
+    public function export(Request $request)
+    {
+        // Build the same query as index with filters
+        $query = User::query();
+
+        // Apply filters
+        $this->applyFilters($query, $request);
+
+        // Apply same sorting as index
+        $sortField = $request->get('sort', 'created_at');
+        $sortDirection = $request->get('direction', 'desc');
+        $allowedSorts = ['name', 'email', 'role', 'is_active', 'created_at'];
+        if (!in_array($sortField, $allowedSorts)) {
+            $sortField = 'created_at';
+        }
+        $sortDirection = in_array(strtolower($sortDirection), ['asc', 'desc']) ? strtolower($sortDirection) : 'desc';
+        $query->orderBy($sortField, $sortDirection);
+
+        // Generate filename with timestamp
+        $filename = 'users_' . now()->format('Y-m-d_His') . '.xlsx';
+
+        return Excel::download(new UsersExport($query), $filename);
+    }
+
+    /**
+     * Bulk activate users
+     */
+    public function bulkActivate(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $count = 0;
+        $authId = auth()->id();
+
+        foreach ($request->user_ids as $userId) {
+            if ($userId == $authId)
+                continue; // Skip current user
+
+            $user = User::find($userId);
+            if ($user && !$user->is_active) {
+                $user->update(['is_active' => true]);
+                UserActivity::log($authId, 'bulk_activate_user', "Bulk activated user: {$user->name}", ['user_id' => $userId]);
+                $count++;
+            }
+        }
+
+        return redirect()->back()->with('success', "Successfully activated {$count} user(s).");
+    }
+
+    /**
+     * Bulk deactivate users
+     */
+    public function bulkDeactivate(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $count = 0;
+        $authId = auth()->id();
+
+        foreach ($request->user_ids as $userId) {
+            if ($userId == $authId)
+                continue; // Skip current user
+
+            $user = User::find($userId);
+            if ($user && $user->is_active) {
+                $user->update(['is_active' => false]);
+                UserActivity::log($authId, 'bulk_deactivate_user', "Bulk deactivated user: {$user->name}", ['user_id' => $userId]);
+                $count++;
+            }
+        }
+
+        return redirect()->back()->with('success', "Successfully deactivated {$count} user(s).");
+    }
+
+    /**
+     * Bulk delete users
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $count = 0;
+        $authId = auth()->id();
+
+        foreach ($request->user_ids as $userId) {
+            if ($userId == $authId)
+                continue; // Skip current user
+
+            $user = User::find($userId);
+            if ($user) {
+                $userName = $user->name;
+                $user->delete();
+                UserActivity::log($authId, 'bulk_delete_user', "Bulk deleted user: {$userName}", ['deleted_user_id' => $userId]);
+                $count++;
+            }
+        }
+
+        return redirect()->back()->with('success', "Successfully deleted {$count} user(s).");
+    }
+
+    /**
+     * Bulk change user roles
+     */
+    public function bulkRoleChange(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+            'new_role' => 'required|in:admin,student,counselor',
+        ]);
+
+        $count = 0;
+        $authId = auth()->id();
+
+        foreach ($request->user_ids as $userId) {
+            if ($userId == $authId)
+                continue; // Skip current user (can't change own role)
+
+            $user = User::find($userId);
+            if ($user && $user->role !== $request->new_role) {
+                $oldRole = $user->role;
+                $user->update(['role' => $request->new_role]);
+                UserActivity::log($authId, 'bulk_role_change', "Bulk changed role for: {$user->name} from {$oldRole} to {$request->new_role}", [
+                    'user_id' => $userId,
+                    'old_role' => $oldRole,
+                    'new_role' => $request->new_role
+                ]);
+                $count++;
+            }
+        }
+
+        return redirect()->back()->with('success', "Successfully changed role for {$count} user(s) to " . ucfirst($request->new_role) . ".");
+    }
+
+    /**
      * Show the authenticated user's profile.
      */
     public function profile()
@@ -395,5 +605,148 @@ class UserController extends Controller
             \Log::error('Avatar upload failed', ['error' => $e->getMessage()]);
             return back()->with('error', 'Avatar upload failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Verify import file for bulk deletion
+     */
+    public function verifyImportDelete(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xlsx,xls,csv|max:5120' // Max 5MB
+        ]);
+
+        try {
+            $file = $request->file('import_file');
+            $extension = $file->getClientOriginalExtension();
+
+            // Parse file based on extension
+            if (in_array($extension, ['xlsx', 'xls'])) {
+                $data = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
+                $sheet = $data->getActiveSheet();
+                $rows = $sheet->toArray();
+            } else { // csv
+                $rows = [];
+                if (($handle = fopen($file->getRealPath(), 'r')) !== false) {
+                    while (($row = fgetcsv($handle)) !== false) {
+                        $rows[] = $row;
+                    }
+                    fclose($handle);
+                }
+            }
+
+            if (empty($rows) || count($rows) < 2) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File is empty or has no data rows.'
+                ], 400);
+            }
+
+            // Detect column indices
+            $headers = array_map('trim', array_map('strtolower', $rows[0]));
+            $studentIdCol = $this->findColumn($headers, ['student id', 'student_id', 'id number', 'id', 'student number']);
+            $nameCol = $this->findColumn($headers, ['full name', 'name', 'student name', 'complete name']);
+            $emailCol = $this->findColumn($headers, ['email', 'email address', 'student email']);
+
+            if ($studentIdCol === null && $nameCol === null && $emailCol === null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Could not find Student ID, Name, or Email columns in the file.'
+                ], 400);
+            }
+
+            // Extract file data (skip header row)
+            $fileData = [];
+            for ($i = 1; $i < count($rows); $i++) {
+                $row = $rows[$i];
+                $fileData[] = [
+                    'student_id' => $studentIdCol !== null && isset($row[$studentIdCol]) ? trim($row[$studentIdCol]) : null,
+                    'name' => $nameCol !== null && isset($row[$nameCol]) ? trim($row[$nameCol]) : null,
+                    'email' => $emailCol !== null && isset($row[$emailCol]) ? trim($row[$emailCol]) : null,
+                ];
+            }
+
+            // Get all students to match against
+            // Optimization: In a real large-scale app, we might query only relevant subsets, 
+            // but for typical school usage load all students (id, name, email, student_id) is okay.
+            $students = User::where('role', 'student')->get(['id', 'name', 'email', 'student_id']);
+
+            $matchedIds = [];
+            $matchDetails = [];
+
+            foreach ($fileData as $fileRow) {
+                foreach ($students as $student) {
+                    $matchScore = 0;
+                    $matchReasons = [];
+
+                    // Student ID match (highest priority)
+                    if (!empty($fileRow['student_id']) && $student->student_id == $fileRow['student_id']) {
+                        $matchScore = 100;
+                        $matchReasons[] = 'Student ID';
+                    }
+
+                    // Name match (case-insensitive, partial)
+                    if (!empty($fileRow['name']) && !empty($student->name)) {
+                        $fName = strtolower($fileRow['name']);
+                        $sName = strtolower($student->name);
+                        if ($fName == $sName || strpos($fName, $sName) !== false || strpos($sName, $fName) !== false) {
+                            $matchScore = max($matchScore, 70);
+                            $matchReasons[] = 'Name';
+                        }
+                    }
+
+                    // Email match
+                    if (!empty($fileRow['email']) && strtolower($student->email) == strtolower($fileRow['email'])) {
+                        $matchScore = max($matchScore, 90);
+                        $matchReasons[] = 'Email';
+                    }
+
+                    // Consider it a match if score >= 70
+                    if ($matchScore >= 70) {
+                        if (!in_array($student->id, $matchedIds)) {
+                            $matchedIds[] = $student->id;
+                            $matchDetails[] = [
+                                'id' => $student->id,
+                                'name' => $student->name,
+                                'student_id' => $student->student_id,
+                                'email' => $student->email,
+                                'score' => $matchScore,
+                                'reasons' => implode(' + ', $matchReasons)
+                            ];
+                        }
+                        break; // Stop checking this file row against other students (1-to-1 assumption for row)
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'matched_ids' => $matchedIds,
+                'match_details' => $matchDetails,
+                'total_in_file' => count($fileData),
+                'count' => count($matchedIds)
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Helper to find column index by possible names
+     */
+    private function findColumn($headers, $possibleNames)
+    {
+        foreach ($headers as $index => $header) {
+            foreach ($possibleNames as $name) {
+                if (str_contains($header, $name) || $header === $name) {
+                    return $index;
+                }
+            }
+        }
+        return null;
     }
 }
