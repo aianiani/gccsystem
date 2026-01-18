@@ -8,8 +8,8 @@
     </div>
     <nav class="sidebar-nav flex-grow-1">
         <!-- General -->
-        <div
-            class="sidebar-header text-xs uppercase tracking-wider opacity-50 px-3 mt-2 mb-1 font-bold" style="color: #f4d03f;">
+        <div class="sidebar-header text-xs uppercase tracking-wider opacity-50 px-3 mt-2 mb-1 font-bold"
+            style="color: #f4d03f;">
             General</div>
         <a href="{{ route('dashboard') }}" class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
                 class="bi bi-house-door"></i>Dashboard</a>
@@ -17,8 +17,8 @@
                 class="bi bi-person"></i>Profile</a>
 
         <!-- Counseling -->
-        <div
-            class="sidebar-header text-xs uppercase tracking-wider opacity-50 px-3 mt-4 mb-1 font-bold" style="color: #f4d03f;">
+        <div class="sidebar-header text-xs uppercase tracking-wider opacity-50 px-3 mt-4 mb-1 font-bold"
+            style="color: #f4d03f;">
             Counseling</div>
         <a href="{{ route('counselor.appointments.index') }}"
             class="sidebar-link{{ request()->routeIs('counselor.appointments.*') ? ' active' : '' }}"><i
@@ -26,6 +26,9 @@
         <a href="{{ route('counselor.session_notes.index') }}"
             class="sidebar-link{{ request()->routeIs('counselor.session_notes.*') ? ' active' : '' }}"><i
                 class="bi bi-journal-text"></i>Session Notes</a>
+        <a href="{{ route('counselor.feedback.index') }}"
+            class="sidebar-link{{ request()->routeIs('counselor.feedback.*') ? ' active' : '' }}"><i
+                class="bi bi-star"></i>Student Feedback</a>
         <a href="{{ route('counselor.availability.index') }}"
             class="sidebar-link{{ request()->routeIs('counselor.availability.*') ? ' active' : '' }}"><i
                 class="bi bi-clock"></i>Availability</a>
@@ -37,8 +40,8 @@
                 class="bi bi-clipboard-data"></i>Assessments</a>
 
         <!-- Student Records -->
-        <div
-            class="sidebar-header text-xs uppercase tracking-wider opacity-50 px-3 mt-4 mb-1 font-bold" style="color: #f4d03f;">
+        <div class="sidebar-header text-xs uppercase tracking-wider opacity-50 px-3 mt-4 mb-1 font-bold"
+            style="color: #f4d03f;">
             Student Records</div>
         <a href="{{ route('counselor.students.index') }}"
             class="sidebar-link{{ request()->routeIs('counselor.students.*') ? ' active' : '' }}"><i
@@ -49,8 +52,8 @@
 
 
         <!-- Events -->
-        <div
-            class="sidebar-header text-xs uppercase tracking-wider opacity-50 px-3 mt-4 mb-1 font-bold" style="color: #f4d03f;">
+        <div class="sidebar-header text-xs uppercase tracking-wider opacity-50 px-3 mt-4 mb-1 font-bold"
+            style="color: #f4d03f;">
             Events</div>
         <a href="{{ route('counselor.seminars.index') }}"
             class="sidebar-link{{ request()->routeIs('counselor.seminars.*') ? ' active' : '' }}"><i

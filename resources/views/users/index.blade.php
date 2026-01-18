@@ -775,10 +775,21 @@
 
     <script>
         // Bulk Actions JavaScript
+        // Clear Import Selection Function
+        function clearVerifiedImport() {
+            sessionStorage.removeItem('verified_import_user_ids');
+            window.location.reload();
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             let selectedUsers = [];
             const selectAll = document.getElementById('selectAll');
             const userCheckboxes = document.querySelectorAll('.user-checkbox');
+
+
+            // Apply verified import IDs from previous session
+            // REMOVED: Selections now clear on page reload
+            // Kept in sessionStorage only for verifyImport function to access on same page
 
             // Select All functionality
             if (selectAll) {
@@ -893,27 +904,45 @@
 
         // --- IMPORT MATCH FUNCTIONALITY ---
         window.verifyImport = function (btn) {
+            console.log('verifyImport function called'); // Debug log
+            
             try {
                 const form = document.getElementById('importDeleteForm');
                 const errorDiv = document.getElementById('importError');
                 const fileInput = document.getElementById('import_file');
                 const resultsDiv = document.getElementById('verificationResults');
 
-                if (!form) return;
+                // Validate elements exist
+                if (!form) {
+                    console.error('Form not found');
+                    alert('Form not found. Please refresh the page and try again.');
+                    return;
+                }
+                
+                if (!btn) {
+                    console.error('Button reference lost');
+                    return;
+                }
 
                 // Clear previous state
-                errorDiv.classList.add('d-none');
-                errorDiv.textContent = '';
+                if (errorDiv) {
+                    errorDiv.classList.add('d-none');
+                    errorDiv.textContent = '';
+                }
                 if (resultsDiv) resultsDiv.innerHTML = '';
 
                 // Reset valid/invalid classes on input
-                fileInput.classList.remove('is-invalid');
+                if (fileInput) {
+                    fileInput.classList.remove('is-invalid');
+                }
 
                 // Basic Validation
-                if (!fileInput.files.length) {
-                    fileInput.classList.add('is-invalid');
-                    errorDiv.textContent = 'Please select a file first.';
-                    errorDiv.classList.remove('d-none');
+                if (!fileInput || !fileInput.files.length) {
+                    if (fileInput) fileInput.classList.add('is-invalid');
+                    if (errorDiv) {
+                        errorDiv.textContent = 'Please select a file first.';
+                        errorDiv.classList.remove('d-none');
+                    }
                     return;
                 }
 
@@ -953,26 +982,35 @@
                     })
                     .then(data => {
                         if (data.success) {
-                            // Auto-select matched users
-                            let newlySelectedCount = 0;
+                            // Store matched IDs in sessionStorage for cross-page selection
                             if (data.matched_ids && data.matched_ids.length > 0) {
+                                sessionStorage.setItem('verified_import_user_ids', JSON.stringify(data.matched_ids));
+
+                                // Auto-select matched users on current page
+                                let visibleMatches = 0;
                                 data.matched_ids.forEach(id => {
                                     const checkbox = document.querySelector(`input.user-checkbox[value="${id}"]`);
                                     if (checkbox) {
                                         if (!checkbox.checked) {
                                             checkbox.checked = true;
-                                            newlySelectedCount++;
+                                            visibleMatches++;
                                         }
                                         // Visual highlight
                                         const row = checkbox.closest('tr');
                                         if (row) {
-                                            row.classList.remove('table-success'); // reset first to re-trigger animation if needed
-                                            void row.offsetWidth; // trigger reflow
+                                            row.classList.remove('table-success');
+                                            void row.offsetWidth;
                                             row.classList.add('table-success');
                                             setTimeout(() => row.classList.remove('table-success'), 3000);
                                         }
                                     }
                                 });
+
+                                // Notify about users on other pages
+                                const hiddenMatches = data.matched_ids.length - visibleMatches;
+                                if (hiddenMatches > 0) {
+                                    console.log(`${hiddenMatches} matched user(s) are on other pages and will be auto-selected when you navigate to those pages.`);
+                                }
 
                                 // Trigger update of bulk action bar
                                 updateSelection();
@@ -981,12 +1019,12 @@
                             // Display Results in Modal
                             if (resultsDiv) {
                                 resultsDiv.innerHTML = `
-                                                            <div class="alert alert-success">
-                                                                <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
-                                                                <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
-                                                                <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
-                                                            </div>
-                                                        `;
+                                                                        <div class="alert alert-success">
+                                                                            <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
+                                                                            <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
+                                                                            <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
+                                                                        </div>
+                                                                    `;
                             }
 
 

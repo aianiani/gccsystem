@@ -195,6 +195,7 @@ Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(functi
     //     ->name('counselor.priority-cases.index');
     // Route::get('feedback', [App\Http\Controllers\Counselor\FeedbackController::class, 'index'])
 //     ->name('counselor.feedback.index');
+    Route::get('feedback', [App\Http\Controllers\SessionFeedbackController::class, 'index'])->name('counselor.feedback.index');
     Route::get('feedback/{id}', [App\Http\Controllers\SessionFeedbackController::class, 'show'])->name('counselor.feedback.show');
     Route::get('availability', [App\Http\Controllers\CounselorAvailabilityController::class, 'index'])->name('counselor.availability.index');
     Route::get('students', [App\Http\Controllers\CounselorStudentController::class, 'index'])->name('counselor.students.index');

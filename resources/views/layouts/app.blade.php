@@ -14,6 +14,8 @@
     <link href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.css') }}" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="{{ asset('vendor/fontawesome/css/all.min.css') }}" />
+    <!-- SweetAlert2 -->
+    <link href="{{ asset('vendor/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
     <!-- Google Fonts (Inter) - Local -->
     <link href="{{ asset('vendor/fonts/inter/inter.css') }}" rel="stylesheet">
 
@@ -983,15 +985,15 @@
                                             }
 
                                             li.innerHTML = `
-                                                                                                                                                                                                                                <div class="notification-icon ${iconType}">
-                                                                                                                                                                                                                                    ${icon}
-                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                <div class="notification-content">
-                                                                                                                                                                                                                                    <div class="notification-message">${n.data.message || n.type}</div>
-                                                                                                                                                                                                                                    <div class="notification-time">${n.created_at}</div>
-                                                                                                                                                                                                                                    ${actionsHtml ? `<div class="notification-actions">${actionsHtml}</div>` : ''}
-                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                            <div class="notification-icon ${iconType}">
+                                                                                                                                                                                                                                                ${icon}
+                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                            <div class="notification-content">
+                                                                                                                                                                                                                                                <div class="notification-message">${n.data.message || n.type}</div>
+                                                                                                                                                                                                                                                <div class="notification-time">${n.created_at}</div>
+                                                                                                                                                                                                                                                ${actionsHtml ? `<div class="notification-actions">${actionsHtml}</div>` : ''}
+                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                        `;
                                             notifDropdown.appendChild(li);
                                         });
                                     }

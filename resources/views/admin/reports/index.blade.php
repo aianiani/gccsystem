@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         /* Dashboard theme variables */
         :root {
@@ -80,28 +83,6 @@
             margin-bottom: 0.5rem;
         }
 
-        .page-header-card {
-            background: var(--hero-gradient);
-            border-radius: 16px;
-            box-shadow: var(--shadow-lg);
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
-            color: #fff;
-        }
-
-        .page-header-card h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin: 0 0 0.5rem 0;
-            color: #fff;
-        }
-
-        .page-header-card p {
-            margin: 0;
-            opacity: 0.9;
-            font-size: 0.95rem;
-        }
-
         .filter-card {
             background: white;
             border-radius: 16px;
@@ -118,7 +99,8 @@
             margin-bottom: 0.5rem;
         }
 
-        .filter-card .form-select {
+        .filter-card .form-select,
+        .filter-card .form-control {
             border-radius: 8px;
             border: 1px solid var(--gray-100);
             padding: 0.6rem 1rem;
@@ -175,10 +157,6 @@
         }
 
         .report-table thead th {
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        .report-table thead th {
             padding: 0.85rem 0.75rem;
             font-weight: 600;
             text-align: center;
@@ -207,11 +185,14 @@
             color: var(--forest-green);
         }
 
-        .college-list {
-            font-size: 0.8rem;
-            color: var(--gray-600);
-            font-style: italic;
-            margin-top: 0.25rem;
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            height: 350px;
+            position: relative;
         }
 
         @media print {
@@ -219,7 +200,8 @@
                 display: none !important;
             }
 
-            .report-section-card {
+            .report-section-card,
+            .chart-container {
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
@@ -231,16 +213,16 @@
         <div class="welcome-card">
             <div>
                 <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
-                <div class="welcome-text">Monthly Reports</div>
-                <div style="font-size: 0.9rem; margin-top: 0.5rem;">Comprehensive report for Testing, Guidance, and
-                    Counseling
-                    activities</div>
+                <div class="welcome-text">Administrative Reports</div>
+                <div style="font-size: 0.9rem; margin-top: 0.5rem;">
+                    Comprehensive reports for Testing, Guidance, and Counseling
+                </div>
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <button onclick="window.print()" class="btn btn-light no-print">
                     <i class="bi bi-printer me-1"></i> Print
                 </button>
-                <a href="{{ route('admin.reports.export', ['format' => 'pdf', 'month' => $month, 'year' => $year]) }}"
+                <a href="{{ route('admin.reports.export', ['format' => 'pdf', 'frequency' => $frequency, 'month' => $month, 'year' => $year, 'week' => $week]) }}"
                     class="btn btn-light no-print">
                     <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
                 </a>
@@ -253,9 +235,27 @@
         <!-- Filter Section -->
         <div class="filter-card no-print">
             <form method="GET" action="{{ route('admin.reports.index') }}" class="row g-3 align-items-end">
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label class="form-label">Report Frequency</label>
+                    <select name="frequency" id="frequencyStart" class="form-select" onchange="toggleInputs()">
+                        <option value="weekly" {{ $frequency == 'weekly' ? 'selected' : '' }}>Weekly</option>
+                        <option value="monthly" {{ $frequency == 'monthly' ? 'selected' : '' }}>Monthly</option>
+                        <option value="annual" {{ $frequency == 'annual' ? 'selected' : '' }}>Annual</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Year</label>
+                    <select name="year" class="form-select" required>
+                        @foreach(range(date('Y') - 5, date('Y') + 2) as $y)
+                            <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-3 input-month" style="display: {{ $frequency == 'monthly' ? 'block' : 'none' }};">
                     <label class="form-label">Month</label>
-                    <select name="month" class="form-select" required>
+                    <select name="month" class="form-select">
                         @foreach(range(1, 12) as $m)
                             <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
                                 {{ DateTime::createFromFormat('!m', $m)->format('F') }}
@@ -263,22 +263,27 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Year</label>
-                    <select name="year" class="form-select" required>
-                        @foreach(range(date('Y') - 2, date('Y') + 1) as $y)
-                            <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>
-                                {{ $y }}
-                            </option>
-                        @endforeach
-                    </select>
+
+                <div class="col-md-3 input-week" style="display: {{ $frequency == 'weekly' ? 'block' : 'none' }};">
+                    <label class="form-label">Week Number</label>
+                    <input type="number" name="week" class="form-control" min="1" max="52" value="{{ $week }}">
                 </div>
-                <div class="col-md-4">
+
+                <div class="col-md-3">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-funnel me-2"></i> Generate Report
                     </button>
                 </div>
             </form>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="row no-print">
+            <div class="col-12">
+                <div class="chart-container">
+                    <canvas id="reportChart"></canvas>
+                </div>
+            </div>
         </div>
 
         <!-- Summary Metrics Cards -->
@@ -329,11 +334,11 @@
             </div>
         </div>
 
-        <!-- Month Display -->
+        <!-- Dynamic Banner Display -->
         <div class="month-banner">
             <h3>
                 <i class="bi bi-calendar-event me-2"></i>
-                {{ DateTime::createFromFormat('!m', $month)->format('F') }} {{ $year }}
+                {{ $bannerText }}
             </h3>
         </div>
 
@@ -381,82 +386,60 @@
                         @endphp
 
                         @forelse($testingData as $test)
-                            <tr>
-                                <td>
-                                    <strong>{{ $test['category'] }}</strong>
-                                </td>
-                                <!-- Administration -->
-                                <td class="text-start">
-                                    @if(count($test['administration']['colleges']) > 0)
-                                        <div style="font-size: 0.7rem; line-height: 1.1; max-width: 150px; min-width: 100px;">
-                                            @foreach($test['administration']['colleges'] as $college)
-                                                <div class="mb-1 text-muted fst-italic">{{ $college }}</div>
-                                            @endforeach
-                                        </div>
+                             @php $rowCount = count($test['rows']); @endphp
+                             @foreach($test['rows'] as $index => $row)
+                                <tr>
+                                    @if($index === 0)
+                                        <td rowspan="{{ $rowCount }}" style="vertical-align: middle; background-color: #f8f9fa;">
+                                            <strong>{{ $test['category'] }}</strong>
+                                        </td>
                                     @endif
-                                </td>
-                                <td class="text-center">{{ $test['administration']['male'] }}</td>
-                                <td class="text-center">{{ $test['administration']['female'] }}</td>
-                                <td class="text-center"><strong>{{ $test['administration']['total'] }}</strong></td>
-                                <td class="text-center"><strong>{{ $test['administration']['total_enrolled'] }}</strong></td>
 
-                                <!-- Checking -->
-                                <td>
-                                    @if(count($test['checking_scoring']['colleges']) > 0)
-                                        <div style="font-size: 0.7rem; line-height: 1.1; max-width: 150px; min-width: 100px;">
-                                            @foreach($test['checking_scoring']['colleges'] as $college)
-                                                <div class="mb-1 text-muted fst-italic">{{ $college }}</div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </td>
-                                <td class="text-center">{{ $test['checking_scoring']['male'] }}</td>
-                                <td class="text-center">{{ $test['checking_scoring']['female'] }}</td>
-                                <td class="text-center"><strong>{{ $test['checking_scoring']['total'] }}</strong></td>
+                                    <!-- Administration -->
+                                    <td class="text-start" style="font-size: 0.75rem;">{{ $row['college'] }}</td>
+                                    <td class="text-center">{{ $row['administration']['male'] }}</td>
+                                    <td class="text-center">{{ $row['administration']['female'] }}</td>
+                                    <td class="text-center"><strong>{{ $row['administration']['total'] }}</strong></td>
+                                    <td class="text-center"><strong>{{ $row['administration']['total_enrolled'] }}</strong></td>
 
-                                <!-- Interpretation -->
-                                <td>
-                                    @if(count($test['interpretation']['colleges']) > 0)
-                                        <div style="font-size: 0.7rem; line-height: 1.1; max-width: 150px; min-width: 100px;">
-                                            @foreach($test['interpretation']['colleges'] as $college)
-                                                <div class="mb-1 text-muted fst-italic">{{ $college }}</div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </td>
-                                <td class="text-center">{{ $test['interpretation']['male'] }}</td>
-                                <td class="text-center">{{ $test['interpretation']['female'] }}</td>
-                                <td class="text-center"><strong>{{ $test['interpretation']['total'] }}</strong></td>
+                                    <!-- Checking -->
+                                    <td class="text-start" style="font-size: 0.75rem;">{{ $row['college'] }}</td>
+                                    <td class="text-center">{{ $row['checking_scoring']['male'] }}</td>
+                                    <td class="text-center">{{ $row['checking_scoring']['female'] }}</td>
+                                    <td class="text-center"><strong>{{ $row['checking_scoring']['total'] }}</strong></td>
 
-                                <!-- Report -->
-                                <td>
-                                    @if(count($test['report_result']['colleges']) > 0)
-                                        <div style="font-size: 0.7rem; line-height: 1.1; max-width: 150px; min-width: 100px;">
-                                            @foreach($test['report_result']['colleges'] as $college)
-                                                <div class="mb-1 text-muted fst-italic">{{ $college }}</div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </td>
-                                <td class="text-center">{{ $test['report_result']['male'] }}</td>
-                                <td class="text-center">{{ $test['report_result']['female'] }}</td>
-                                <td class="text-center"><strong>{{ $test['report_result']['total'] }}</strong></td>
-                            </tr>
-                            @php
-                                $totalAdmin['male'] += $test['administration']['male'];
-                                $totalAdmin['female'] += $test['administration']['female'];
-                                $totalAdmin['total'] += $test['administration']['total'];
-                                $totalAdmin['enrolled'] += $test['administration']['total_enrolled'];
-                                $totalChecking['male'] += $test['checking_scoring']['male'];
-                                $totalChecking['female'] += $test['checking_scoring']['female'];
-                                $totalChecking['total'] += $test['checking_scoring']['total'];
-                                $totalInterpretation['male'] += $test['interpretation']['male'];
-                                $totalInterpretation['female'] += $test['interpretation']['female'];
-                                $totalInterpretation['total'] += $test['interpretation']['total'];
-                                $totalReport['male'] += $test['report_result']['male'];
-                                $totalReport['female'] += $test['report_result']['female'];
-                                $totalReport['total'] += $test['report_result']['total'];
-                            @endphp
+                                    <!-- Interpretation -->
+                                    <td class="text-start" style="font-size: 0.75rem;">{{ $row['college'] }}</td>
+                                    <td class="text-center">{{ $row['interpretation']['male'] }}</td>
+                                    <td class="text-center">{{ $row['interpretation']['female'] }}</td>
+                                    <td class="text-center"><strong>{{ $row['interpretation']['total'] }}</strong></td>
+
+                                    <!-- Report -->
+                                    <td class="text-start" style="font-size: 0.75rem;">{{ $row['college'] }}</td>
+                                    <td class="text-center">{{ $row['report_result']['male'] }}</td>
+                                    <td class="text-center">{{ $row['report_result']['female'] }}</td>
+                                    <td class="text-center"><strong>{{ $row['report_result']['total'] }}</strong></td>
+                                </tr>
+                                
+                                @php
+                                    $totalAdmin['male'] += $row['administration']['male'];
+                                    $totalAdmin['female'] += $row['administration']['female'];
+                                    $totalAdmin['total'] += $row['administration']['total'];
+                                    $totalAdmin['enrolled'] += $row['administration']['total_enrolled'];
+                                    
+                                    $totalChecking['male'] += $row['checking_scoring']['male'];
+                                    $totalChecking['female'] += $row['checking_scoring']['female'];
+                                    $totalChecking['total'] += $row['checking_scoring']['total'];
+                                    
+                                    $totalInterpretation['male'] += $row['interpretation']['male'];
+                                    $totalInterpretation['female'] += $row['interpretation']['female'];
+                                    $totalInterpretation['total'] += $row['interpretation']['total'];
+                                    
+                                    $totalReport['male'] += $row['report_result']['male'];
+                                    $totalReport['female'] += $row['report_result']['female'];
+                                    $totalReport['total'] += $row['report_result']['total'];
+                                @endphp
+                             @endforeach
                         @empty
                             <tr>
                                 <td colspan="18" class="text-center text-muted py-4">
@@ -508,6 +491,7 @@
                             <th>Female</th>
                             <th>Total Attended</th>
                             <th>Total Enrolled</th>
+                            <th>EVALUATION</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -519,30 +503,35 @@
                         @endphp
 
                         @forelse($guidanceData as $guidance)
-                            <tr>
-                                <td>{{ $guidance['date'] }}</td>
-                                <td><strong>{{ $guidance['topic'] }}</strong></td>
-                                <td>
-                                    @if(count($guidance['colleges']) > 0)
-                                        {{ $guidance['colleges']->implode(', ') }}
-                                    @else
-                                        <span class="text-muted">All Colleges</span>
+                            @php $rowCount = count($guidance['rows']); @endphp
+                            @foreach($guidance['rows'] as $index => $row)
+                                <tr>
+                                    @if($index === 0)
+                                        <td rowspan="{{ $rowCount }}" style="vertical-align: middle; background-color: #f8f9fa;">
+                                            {{ $guidance['date'] }}
+                                        </td>
+                                        <td rowspan="{{ $rowCount }}" style="vertical-align: middle; background-color: #f8f9fa;">
+                                            <strong>{{ $guidance['topic'] }}</strong>
+                                        </td>
                                     @endif
-                                </td>
-                                <td class="text-center">{{ $guidance['male'] }}</td>
-                                <td class="text-center">{{ $guidance['female'] }}</td>
-                                <td class="text-center"><strong>{{ $guidance['total_attended'] }}</strong></td>
-                                <td class="text-center"><strong>{{ $guidance['total_enrolled'] }}</strong></td>
-                            </tr>
-                            @php
-                                $totalMale += $guidance['male'];
-                                $totalFemale += $guidance['female'];
-                                $totalAttended += $guidance['total_attended'];
-                                $totalEnrolled += $guidance['total_enrolled'];
-                            @endphp
+                                    
+                                    <td class="text-start" style="font-size: 0.75rem;">{{ $row['college'] }}</td>
+                                    <td class="text-center">{{ $row['male'] }}</td>
+                                    <td class="text-center">{{ $row['female'] }}</td>
+                                    <td class="text-center"><strong>{{ $row['total_attended'] }}</strong></td>
+                                    <td class="text-center"><strong>{{ $row['total_enrolled'] }}</strong></td>
+                                    <td></td> <!-- Evaluation Column Empty -->
+                                </tr>
+                                @php
+                                    $totalMale += $row['male'];
+                                    $totalFemale += $row['female'];
+                                    $totalAttended += $row['total_attended'];
+                                    $totalEnrolled += $row['total_enrolled'];
+                                @endphp
+                            @endforeach
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
+                                <td colspan="8" class="text-center text-muted py-4">
                                     No guidance/seminar data available for this period
                                 </td>
                             </tr>
@@ -555,6 +544,7 @@
                                 <td class="text-center">{{ $totalFemale }}</td>
                                 <td class="text-center"><strong>{{ $totalAttended }}</strong></td>
                                 <td class="text-center"><strong>{{ $totalEnrolled }}</strong></td>
+                                <td></td>
                             </tr>
                         @endif
                     </tbody>
@@ -588,38 +578,28 @@
                         @endphp
 
                         @forelse($counselingData as $counseling)
-                            <tr>
-                                <td><strong>{{ $counseling['nature'] }}</strong></td>
-                                <td>
-                                    @if(count($counseling['colleges']) > 0)
-                                        {{ $counseling['colleges']->implode(', ') }}
-                                    @else
-                                        <span class="text-muted">-</span>
+                            @php $rowCount = count($counseling['rows']); @endphp
+                            @foreach($counseling['rows'] as $index => $row)
+                                <tr>
+                                    @if($index === 0)
+                                        <td rowspan="{{ $rowCount }}" style="vertical-align: middle; background-color: #f8f9fa;">
+                                            <strong>{{ $counseling['nature'] }}</strong>
+                                        </td>
                                     @endif
-                                </td>
-                                <td class="text-center">
-                                    @if(count($counseling['year_levels']) > 0)
-                                        {{ $counseling['year_levels']->implode(', ') }}
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if(count($counseling['presenting_problems']) > 0)
-                                        {{ $counseling['presenting_problems']->implode(', ') }}
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
-                                </td>
-                                <td class="text-center">{{ $counseling['male'] }}</td>
-                                <td class="text-center">{{ $counseling['female'] }}</td>
-                                <td class="text-center"><strong>{{ $counseling['total'] }}</strong></td>
-                            </tr>
-                            @php
-                                $totalMale += $counseling['male'];
-                                $totalFemale += $counseling['female'];
-                                $totalCount += $counseling['total'];
-                            @endphp
+                                    
+                                    <td class="text-start" style="font-size: 0.75rem;">{{ $row['college'] }}</td>
+                                    <td class="text-center">{{ $row['year_level'] }}</td>
+                                    <td class="text-start" style="font-size: 0.75rem;">{{ $row['presenting_problem'] }}</td>
+                                    <td class="text-center">{{ $row['male'] }}</td>
+                                    <td class="text-center">{{ $row['female'] }}</td>
+                                    <td class="text-center"><strong>{{ $row['total'] }}</strong></td>
+                                </tr>
+                                @php
+                                    $totalMale += $row['male'];
+                                    $totalFemale += $row['female'];
+                                    $totalCount += $row['total'];
+                                @endphp
+                            @endforeach
                         @empty
                             <tr>
                                 <td colspan="7" class="text-center text-muted py-4">
@@ -642,4 +622,64 @@
         </div>
 
     </div>
+
+    <script>
+        function toggleInputs() {
+            const freq = document.getElementById('frequencyStart').value;
+            const monthDiv = document.querySelector('.input-month');
+            const weekDiv = document.querySelector('.input-week');
+
+            if (freq === 'weekly') {
+                monthDiv.style.display = 'none';
+                weekDiv.style.display = 'block';
+            } else if (freq === 'monthly') {
+                monthDiv.style.display = 'block';
+                weekDiv.style.display = 'none';
+            } else { // annual
+                monthDiv.style.display = 'none';
+                weekDiv.style.display = 'none';
+            }
+        }
+
+        // Initialize Chart
+        const ctx = document.getElementById('reportChart').getContext('2d');
+        const reportChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Tested', 'Guided', 'Counseled (In Session)'],
+                datasets: [{
+                    label: 'Total Count',
+                    data: [{{ $totalTested ?? 0 }}, {{ $totalGuided ?? 0 }}, {{ $totalCounseled ?? 0 }}],
+                    backgroundColor: [
+                        'rgba(31, 122, 45, 0.7)', // Forest Green
+                        'rgba(255, 203, 5, 0.7)', // Maize Yellow
+                        'rgba(3, 105, 161, 0.7)'  // Blue
+                    ],
+                    borderColor: [
+                        'rgba(31, 122, 45, 1)',
+                        'rgba(255, 203, 5, 1)',
+                        'rgba(3, 105, 161, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Overview Summary'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
+            }
+        });
+    </script>
 @endsection

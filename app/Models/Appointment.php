@@ -21,6 +21,8 @@ class Appointment extends Model
         'guardian2_contact',
         'nature_of_problem',
         'nature_of_problem_other',
+        'appointment_type',
+        'referral_reason',
         'reference_number',
     ];
 

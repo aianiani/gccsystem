@@ -23,7 +23,9 @@ class AppointmentController extends Controller
                         WHERE counselor_id = ' . auth()->id() . '
                         GROUP BY student_id
                     ) as latest'),
-                    'appointments.id', '=', 'latest.id'
+                    'appointments.id',
+                    '=',
+                    'latest.id'
                 )
                 ->with('student')
                 ->orderBy('scheduled_at', 'desc')
@@ -60,13 +62,13 @@ class AppointmentController extends Controller
 
         $counselors = User::where('role', 'counselor')->get();
         $student = auth()->user();
-        
+
         // Get latest DASS-42 assessment
         $dass42Assessment = \App\Models\Assessment::where('user_id', auth()->id())
             ->where('type', 'DASS-42')
             ->latest()
             ->first();
-        
+
         return view('appointments.create', compact('counselors', 'student', 'dass42Assessment'));
     }
 
@@ -74,17 +76,17 @@ class AppointmentController extends Controller
     public function confirmation($id)
     {
         $appointment = Appointment::with(['student', 'counselor'])->findOrFail($id);
-        
+
         // Ensure the appointment belongs to the authenticated student
         if ($appointment->student_id !== auth()->id()) {
             abort(403);
         }
-        
+
         // Check if DASS-42 assessment exists (but don't pass scores to student)
         $hasDass42 = \App\Models\Assessment::where('user_id', $appointment->student_id)
             ->where('type', 'DASS-42')
             ->exists();
-        
+
         return view('appointments.confirmation', compact('appointment', 'hasDass42'));
     }
 
@@ -92,17 +94,17 @@ class AppointmentController extends Controller
     public function downloadPdf($id)
     {
         $appointment = Appointment::with(['student', 'counselor'])->findOrFail($id);
-        
+
         // Ensure the appointment belongs to the authenticated student
         if ($appointment->student_id !== auth()->id()) {
             abort(403);
         }
-        
+
         // Check if DASS-42 assessment exists (but don't pass scores to student)
         $hasDass42 = \App\Models\Assessment::where('user_id', $appointment->student_id)
             ->where('type', 'DASS-42')
             ->exists();
-        
+
         // Get assessment date only (no scores)
         $dass42Assessment = null;
         if ($hasDass42) {
@@ -111,7 +113,7 @@ class AppointmentController extends Controller
                 ->latest()
                 ->first(['id', 'created_at', 'type']); // Only get date, not scores
         }
-        
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('appointments.confirmation-pdf', compact('appointment', 'dass42Assessment'));
         return $pdf->download('appointment-confirmation-' . $appointment->reference_number . '.pdf');
     }
@@ -135,6 +137,8 @@ class AppointmentController extends Controller
             'guardian2_relationship_other' => 'nullable|string|max:255',
             'nature_of_problem' => 'required|in:Academic,Family,Personal / Emotional,Social,Psychological,Other',
             'nature_of_problem_other' => 'nullable|string|max:500',
+            'appointment_type' => 'required|in:Walk-in,Called-in,Referral',
+            'referral_reason' => 'required_if:appointment_type,Referral|nullable|string|max:500',
         ]);
 
         // Normalize scheduled_at to Asia/Manila and format for DB
@@ -174,14 +178,14 @@ class AppointmentController extends Controller
         $referenceNumber = 'APT-' . strtoupper(uniqid());
 
         // Handle guardian relationship "Other" fields
-        $guardian1Relationship = $request->guardian1_relationship === 'Other' 
-            ? $request->guardian1_relationship_other 
+        $guardian1Relationship = $request->guardian1_relationship === 'Other'
+            ? $request->guardian1_relationship_other
             : $request->guardian1_relationship;
-        
+
         $guardian2Relationship = null;
         if ($request->guardian2_relationship) {
-            $guardian2Relationship = $request->guardian2_relationship === 'Other' 
-                ? $request->guardian2_relationship_other 
+            $guardian2Relationship = $request->guardian2_relationship === 'Other'
+                ? $request->guardian2_relationship_other
                 : $request->guardian2_relationship;
         }
 
@@ -200,15 +204,17 @@ class AppointmentController extends Controller
             'guardian2_contact' => $request->guardian2_contact,
             'nature_of_problem' => $request->nature_of_problem,
             'nature_of_problem_other' => $request->nature_of_problem_other,
+            'appointment_type' => $request->appointment_type,
+            'referral_reason' => $request->referral_reason,
             'reference_number' => $referenceNumber,
         ]);
-        
+
         // Notify the counselor
         $counselor = \App\Models\User::find($request->counselor_id);
         if ($counselor) {
             $counselor->notify(new \App\Notifications\AppointmentBookedNotification($appointment));
         }
-        
+
         // Return JSON for AJAX, redirect for normal POST
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => 'Appointment booked successfully!', 'appointment_id' => $appointment->id]);
@@ -405,7 +411,7 @@ class AppointmentController extends Controller
 
         $completedAppointments = Appointment::where('student_id', auth()->id())
             ->where('status', 'completed')
-            ->whereHas('sessionNotes')
+            // Removed whereHas('sessionNotes') to allow feedback on all completed sessions
             ->with(['counselor', 'sessionNotes'])
             ->orderBy('scheduled_at', 'desc')
             ->get();

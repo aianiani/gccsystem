@@ -17,41 +17,38 @@ class RegistrationApprovalController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::where('role', 'student');
-
-        // Apply Search
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('student_id', 'like', "%{$search}%");
-            });
-        }
-
-        // Apply Filter by Status (Default to all if not specified, but we separate them in tabs usually)
-        // However, the original code had 3 separate queries for tabs. 
-        // We will keep the 3 variables but apply filters to them if needed, or better:
-        // The tabs act as the primary status filter. 
-        // The additional filters (college, course) should apply to ALL lists.
-
-        $filterClosure = function ($q) use ($request) {
-            if ($request->has('college') && $request->college != '') {
-                $q->where('college', $request->college);
+        // Build search/filter closure to apply to all queries
+        $applyFilters = function ($query) use ($request) {
+            // Search
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('student_id', 'like', "%{$search}%");
+                });
             }
-            if ($request->has('course') && $request->course != '') {
-                $q->where('course', $request->course);
+
+            // College filter
+            if ($request->filled('college')) {
+                $query->where('college', $request->college);
             }
-            // Date Range Filter
-            if ($request->has('date_from') && $request->date_from != '') {
-                $q->whereDate('created_at', '>=', $request->date_from);
+
+            // Course filter
+            if ($request->filled('course')) {
+                $query->where('course', $request->course);
             }
-            if ($request->has('date_to') && $request->date_to != '') {
-                $q->whereDate('created_at', '<=', $request->date_to);
+
+            // Date range filters
+            if ($request->filled('date_from')) {
+                $query->whereDate('created_at', '>=', $request->date_from);
+            }
+            if ($request->filled('date_to')) {
+                $query->whereDate('created_at', '<=', $request->date_to);
             }
         };
 
-        // Apply Sorting
+        // Determine sorting
         $sortColumn = 'created_at';
         $sortDirection = 'desc';
 
@@ -75,82 +72,69 @@ class RegistrationApprovalController extends Controller
             }
         }
 
-        // Pending
+        // OPTIMIZED: Pending registrations with efficient duplicate detection using subquery
+        $perPage = $request->get('per_page', 15);
+        $perPage = in_array($perPage, [15, 30, 50, 100]) ? $perPage : 15;
+
         $pendingQuery = User::where('role', 'student')
             ->where('registration_status', 'pending')
-            ->with(['approvedBy']);
+            ->with(['approvedBy'])
+            ->select('users.*')
+            ->selectSub(function ($query) {
+                $query->selectRaw('COUNT(*)')
+                    ->from('users as u2')
+                    ->whereColumn('u2.id', '!=', 'users.id')
+                    ->where('u2.role', 'student')
+                    ->where(function ($q) {
+                        $q->whereColumn('u2.email', 'users.email')
+                            ->orWhereRaw('u2.name LIKE CONCAT("%", users.name, "%")')
+                            ->orWhereRaw('(users.student_id IS NOT NULL AND u2.student_id = users.student_id)');
+                    });
+            }, 'duplicate_count');
 
-        // Apply search/filters to pending
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $pendingQuery->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('student_id', 'like', "%{$search}%");
-            });
-        }
-        $filterClosure($pendingQuery);
+        $applyFilters($pendingQuery);
         $pendingQuery->orderBy($sortColumn, $sortDirection);
-        $pendingRegistrations = $pendingQuery->paginate(15, ['*'], 'pending_page');
+        $pendingRegistrations = $pendingQuery->paginate($perPage, ['*'], 'pending_page')->withQueryString();
 
-        // Detect duplicates for pending registrations
+        // Add duplicate flag to each record
         foreach ($pendingRegistrations as $user) {
-            // Check for users with similar email (exact match) or similar name (fuzzy match)
-            $duplicateCount = User::where('role', 'student')
-                ->where('id', '!=', $user->id)
-                ->where(function ($q) use ($user) {
-                    $q->where('email', $user->email)
-                        ->orWhere('name', 'like', "%{$user->name}%");
-
-                    // Also check for duplicate student_id if it exists
-                    if (!empty($user->student_id)) {
-                        $q->orWhere('student_id', $user->student_id);
-                    }
-                })
-                ->count();
-
-            $user->has_potential_duplicate = $duplicateCount > 0;
-            $user->duplicate_count = $duplicateCount;
+            $user->has_potential_duplicate = $user->duplicate_count > 0;
         }
 
-        // Approved
+        // OPTIMIZED: Approved registrations
         $approvedQuery = User::where('role', 'student')
             ->where('registration_status', 'approved')
             ->with(['approvedBy']);
 
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $approvedQuery->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('student_id', 'like', "%{$search}%");
-            });
-        }
-        $filterClosure($approvedQuery);
+        $applyFilters($approvedQuery);
         $approvedQuery->orderBy($sortColumn, $sortDirection);
-        $approvedRegistrations = $approvedQuery->paginate(15, ['*'], 'approved_page');
+        $approvedRegistrations = $approvedQuery->paginate($perPage, ['*'], 'approved_page')->withQueryString();
 
-
-        // Rejected
+        // OPTIMIZED: Rejected registrations
         $rejectedQuery = User::where('role', 'student')
             ->where('registration_status', 'rejected')
             ->with(['approvedBy']);
 
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $rejectedQuery->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('student_id', 'like', "%{$search}%");
-            });
-        }
-        $filterClosure($rejectedQuery);
+        $applyFilters($rejectedQuery);
         $rejectedQuery->orderBy($sortColumn, $sortDirection);
-        $rejectedRegistrations = $rejectedQuery->paginate(15, ['*'], 'rejected_page');
+        $rejectedRegistrations = $rejectedQuery->paginate($perPage, ['*'], 'rejected_page')->withQueryString();
 
-        // Get unique colleges and courses for filter dropdowns
-        $colleges = User::where('role', 'student')->whereNotNull('college')->distinct()->pluck('college');
-        $courses = User::where('role', 'student')->whereNotNull('course')->distinct()->pluck('course');
+        // OPTIMIZED: Cache filter options for 1 hour to avoid repeated queries
+        $colleges = \Cache::remember('registration_approvals_colleges', 3600, function () {
+            return User::where('role', 'student')
+                ->whereNotNull('college')
+                ->distinct()
+                ->orderBy('college')
+                ->pluck('college');
+        });
+
+        $courses = \Cache::remember('registration_approvals_courses', 3600, function () {
+            return User::where('role', 'student')
+                ->whereNotNull('course')
+                ->distinct()
+                ->orderBy('course')
+                ->pluck('course');
+        });
 
         return view('admin.registration-approvals.index', compact(
             'pendingRegistrations',

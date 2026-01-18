@@ -1200,100 +1200,140 @@
                 </div>
             </div>
 
+            <!-- Calendar Section -->
+            <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
             <div class="main-content-card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>All Appointments</h5>
-                    <a href="{{ route('counselor.appointments.index') }}" class="btn btn-success btn-sm" data-bs-toggle="tooltip" title="View all appointments">
-                        <i class="bi bi-eye me-1"></i>View All
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Appointment Calendar</h5>
+                    <a href="{{ route('counselor.appointments.index') }}" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-list-ul me-1"></i>List View
                     </a>
                 </div>
-                <div class="card-body">
-                        @forelse($allAppointments as $appointment)
+                <div class="card-body p-0">
+                    <div id='calendar' style="padding: 1.5rem; min-height: 600px;"></div>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var calendarEl = document.getElementById('calendar');
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        },
+                        themeSystem: 'bootstrap5',
+                        height: 'auto',
+                        dayMaxEvents: true, // Allow "more" link when too many events
+                        navLinks: true, // can click day/week names to navigate views
+                        selectable: true,
+                        selectMirror: true,
+                        dateClick: function(info) {
+                            calendar.changeView('timeGridDay', info.dateStr);
+                        },
+                        events: [
+                            @foreach($allAppointments as $appt)
                             @php
-                                $start = $appointment->scheduled_at;
-                                $end = $start->copy()->addMinutes(30);
-                                $autoCreated = false;
-                                $sessionNumber = null;
-                                $originSession = null;
-                                if($appointment->notes && preg_match('/^(\d+)(st|nd|rd|th) Session - Auto created from session note #(\d+)/', $appointment->notes, $matches)) {
-                                    $autoCreated = true;
-                                    $sessionNumber = $matches[1];
-                                    $originSession = $matches[3];
+                                $color = '#28a745'; // Default Green (Accepted)
+                                $textColor = '#ffffff';
+                                if($appt->status === 'pending') {
+                                    $color = '#ffc107'; // Yellow
+                                    $textColor = '#333333';
+                                } elseif($appt->status === 'completed') {
+                                    $color = '#1f7a2d'; // Forest Green
+                                } elseif($appt->status === 'cancelled' || $appt->status === 'declined') {
+                                    $color = '#dc3545'; // Red
                                 }
-                                $statusColor = $appointment->status === 'completed' ? 'var(--success)' : ($appointment->status === 'pending' ? 'var(--warning)' : 'var(--forest-green)');
+                                
+                                $start = $appt->scheduled_at->format('Y-m-d\TH:i:s');
+                                // Set duration to 90 minutes (1 hour 30 mins)
+                                $end = $appt->scheduled_at->copy()->addMinutes(90)->format('Y-m-d\TH:i:s');
                             @endphp
-                            <div class="appointment-item mb-3 p-3 d-flex align-items-center justify-content-between" style="background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(44,62,80,0.07); border-left: 6px solid {{ $statusColor }};">
-                                <div class="d-flex align-items-center gap-3">
-                                    <img src="{{ $appointment->student->avatar_url }}" alt="Avatar" class="rounded-circle me-2" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid var(--forest-green-light);">
-                                    <div>
-                                        <div class="fw-bold" style="color: var(--forest-green); font-size: 1.1rem;">{{ $appointment->student->name }}</div>
-                                        <div class="text-muted small mb-1"><i class="bi bi-envelope me-1"></i>{{ $appointment->student->email }}</div>
-                                        <div class="mb-1">
-                                            <span class="badge {{ $appointment->status === 'completed' ? 'bg-success' : ($appointment->status === 'pending' ? 'bg-warning text-dark' : 'bg-primary') }}">
-                                                {{ ucfirst($appointment->status) }}
-                                            </span>
-                                            @if($autoCreated && $sessionNumber)
-                                                <span class="badge bg-secondary ms-2">Session {{ $sessionNumber }}</span>
-                                            @endif
-                                        </div>
-                                        <div class="mb-1">
-                                            <i class="bi bi-calendar-event me-1"></i>
-                                            <span class="text-muted">{{ $start->format('F j, Y') }}</span>
-                                            <i class="bi bi-clock ms-3 me-1"></i>
-                                            <span class="text-muted">{{ $start->format('g:i A') }} – {{ $end->format('g:i A') }}</span>
-                                        </div>
-                                        @if($autoCreated && $originSession)
-                                            <div class="text-info small mb-1"><i class="bi bi-arrow-right-circle me-1"></i>Auto-created as next session from Session {{ $originSession }}</div>
-                                        @endif
-                                        @if($appointment->notes)
-                                            <div class="text-muted small"><i class="bi bi-journal-text me-1"></i>{{ Str::limit(strip_tags($appointment->notes), 80) }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <a href="{{ route('counselor.appointments.show', $appointment->id) }}" class="btn-view btn-small" title="View Appointment">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    @if(!$appointment->sessionNotes()->exists())
-                                        <a href="{{ route('counselor.session_notes.create', $appointment->id) }}" class="btn-edit btn-small" title="Add Session Note">
-                                            <i class="bi bi-journal-plus"></i>
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                    @empty
-                        <div class="empty-state">
-                            <i class="bi bi-calendar-x"></i>
-                            <p class="mb-0">No appointments found.</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
+                            {
+                                title: '{{ addslashes($appt->student->name) }}',
+                                start: '{{ $start }}',
+                                end: '{{ $end }}',
+                                url: '{{ route("counselor.appointments.show", $appt->id) }}',
+                                backgroundColor: '{{ $color }}',
+                                borderColor: '{{ $color }}',
+                                textColor: '{{ $textColor }}',
+                                extendedProps: {
+                                    status: '{{ $appt->status }}'
+                                }
+                            },
+                            @endforeach
+                        ],
+                        eventClick: function(info) {
+                            if (info.event.url) {
+                                window.location.href = info.event.url;
+                                info.jsEvent.preventDefault(); // prevents browser from following link in current tab
+                            }
+                        },
+                        eventDidMount: function(info) {
+                             // Optional: Add tooltips
+                             var tooltip = new bootstrap.Tooltip(info.el, {
+                                title: info.event.title + ' (' + info.event.extendedProps.status + ')',
+                                placement: 'top',
+                                trigger: 'hover',
+                                container: 'body'
+                            });
+                        }
+                    });
+                    calendar.render();
+                });
+            </script>
             
-            <div class="main-content-card">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="bi bi-megaphone me-2"></i>Announcements</h6>
-                </div>
-                <div class="card-body">
-                    @forelse($recentAnnouncements as $announcement)
-                        <div class="announcement-item">
-                            <h6 class="mb-1 fw-bold small">{{ $announcement->title }}</h6>
-                            <p class="mb-1 small text-muted">{{ Str::limit($announcement->content, 80) }}</p>
-                            <small class="text-muted">{{ $announcement->created_at->format('F j, Y') }}</small>
-                        </div>
-                    @empty
-                        <div class="empty-state">
-                            <i class="bi bi-megaphone"></i>
-                            <p class="mb-0">No announcements available.</p>
-                        </div>
-                    @endforelse
-                    <div class="text-center mt-3">
-                        <a href="{{ route('announcements.index') }}" class="btn btn-outline-success btn-sm" data-bs-toggle="tooltip" title="View all announcements">
-                            <i class="bi bi-eye me-1"></i>View All
-                        </a>
-                    </div>
-                </div>
-            </div>
+            <style>
+                /* Custom Calendar Styling for Premium Feel */
+                .fc {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .fc-toolbar-title {
+                    font-weight: 700;
+                    color: var(--forest-green);
+                }
+                .fc-button-primary {
+                    background-color: var(--forest-green) !important;
+                    border-color: var(--forest-green) !important;
+                    font-weight: 600;
+                    text-transform: capitalize;
+                }
+                .fc-button-primary:hover {
+                    background-color: var(--forest-green-light) !important;
+                    border-color: var(--forest-green-light) !important;
+                }
+                .fc-button-active {
+                    background-color: var(--primary-green-2) !important;
+                    border-color: var(--primary-green-2) !important;
+                }
+                .fc-daygrid-day-number {
+                    color: var(--text-dark);
+                    font-weight: 500;
+                }
+                .fc-col-header-cell-cushion {
+                    color: var(--forest-green);
+                    text-transform: uppercase;
+                    font-size: 0.85rem;
+                    letter-spacing: 0.05em;
+                }
+                .fc-event {
+                    border-radius: 4px;
+                    border: none;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    cursor: pointer;
+                    transition: transform 0.1s;
+                }
+                .fc-event:hover {
+                    transform: scale(1.02);
+                }
+                .fc-event-main {
+                    padding: 2px 4px;
+                    font-weight: 500;
+                    font-size: 0.85rem;
+                }
+            </style>
 
             
             <div class="main-content-card">

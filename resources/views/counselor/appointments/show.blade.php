@@ -2,736 +2,510 @@
 
 @section('content')
     <style>
-        /* Dashboard theme variables - matching dashboard exactly */
         :root {
             --primary-green: #1f7a2d;
-            /* Dashboard forest green */
-            --primary-green-2: #13601f;
-            /* darker stop */
-            --accent-green: #2e7d32;
-            --light-green: #eaf5ea;
-            --accent-orange: #FFCB05;
+            --primary-green-dark: #13601f;
+            --accent-yellow: #FFCB05;
             --text-dark: #16321f;
-            --text-light: #6c757d;
+            --text-muted: #6c757d;
             --bg-light: #f6fbf6;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-
-            /* Map dashboard-specific names to homepage palette for compatibility */
-            --forest-green: var(--primary-green);
-            --forest-green-dark: var(--primary-green-2);
-            --forest-green-light: var(--accent-green);
-            --forest-green-lighter: var(--light-green);
-            --yellow-maize: var(--accent-orange);
-            --yellow-maize-light: #fef9e7;
-            --white: #ffffff;
-            --gray-50: var(--bg-light);
-            --gray-100: #eef6ee;
-            --gray-600: var(--text-light);
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --success: #28a745;
-            --info: #17a2b8;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
-            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+            --card-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            --card-hover-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        /* Apply the same page zoom used on the appointments index page */
-        .home-zoom {
-            zoom: 0.75;
-        }
+        .home-zoom { zoom: 0.75; }
+        @supports not (zoom: 1) { .home-zoom { transform: scale(0.75); transform-origin: top center; } }
 
-        @supports not (zoom: 1) {
-            .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
-            }
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .main-dashboard-content {
-            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
-            min-height: 100vh;
-            padding: 1rem 1.5rem;
+        .main-content {
             margin-left: 240px;
-            /* space for fixed sidebar */
-            transition: margin-left 0.2s;
-        }
-
-        .main-dashboard-inner {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        .appointment-dashboard-header {
-            background: var(--hero-gradient);
-            color: white;
-            border-radius: 12px 12px 0 0;
             padding: 2rem;
-            margin-bottom: 0;
-            box-shadow: var(--shadow-sm);
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .details-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: #fff;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
         }
-
-        .appointment-dashboard-header .title {
+        .header-title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
             display: flex;
             align-items: center;
-            gap: 1rem;
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 0;
+            gap: 0.75rem;
+        }
+        .header-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
         }
 
-        .appointment-dashboard-header .badge {
-            font-size: 1rem;
-            padding: 0.5em 1em;
-            border-radius: 999px;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .appointment-card {
-            background: var(--white);
-            border-radius: 0 0 12px 12px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .info-section {
-            background: var(--white);
-            border-radius: 12px;
+        /* Card Styles */
+        .content-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            border: 1px solid var(--gray-100);
-            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        .appointment-section-title {
-            color: var(--text-dark);
+        .content-card:hover {
+            box-shadow: var(--card-hover-shadow);
+        }
+        .card-title-styled {
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 1.2rem;
-            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
             padding-bottom: 0.75rem;
-            border-bottom: 2px solid var(--forest-green);
+            border-bottom: 2px solid rgba(31, 122, 45, 0.1);
+        }
+        
+        /* Highlighted Notes Card */
+        .notes-card {
+            background: #fffcf0; /* Light yellow tint */
+            border: 1px solid #f0e68c;
+        }
+        .notes-card .card-title-styled {
+            border-bottom-color: #ffd700;
+            color: #b78900;
         }
 
-        .appointment-avatar {
-            border: 3px solid var(--yellow-maize);
-            box-shadow: var(--shadow-sm);
+        /* Info Rows */
+        .info-group {
+            margin-bottom: 1rem;
         }
-
-        .info-row {
-            display: flex;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--gray-100);
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
         .info-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
             font-weight: 600;
-            color: var(--text-light);
-            width: 200px;
-            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
         }
-
         .info-value {
+            font-size: 1rem;
             color: var(--text-dark);
-            flex: 1;
+            font-weight: 500;
         }
-
-        .list-group-item {
-            border: none;
-            border-bottom: 1px solid var(--gray-100);
-            background: transparent;
-        }
-
-        .list-group-item:last-child {
-            border-bottom: none;
-        }
-
-        .btn {
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-success,
-        .btn-warning,
-        .btn-danger,
-        .btn-primary,
-        .btn-secondary {
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-outline-primary {
-            border: 1.5px solid var(--forest-green);
-            color: var(--forest-green);
-            background: transparent;
-        }
-
-        .btn-outline-primary:hover {
-            background: var(--forest-green);
-            color: white;
-        }
-
-        .text-muted {
-            color: var(--gray-600) !important;
-        }
-
-        .reference-number {
-            background: var(--light-green);
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
+        
+        /* Avatar & Profile */
+        .student-profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            border: 1px solid var(--gray-100);
+            margin-bottom: 1.5rem;
         }
-
-        .reference-number strong {
-            color: var(--text-dark);
-            font-size: 1.1rem;
+        .student-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-green);
+            padding: 3px;
+            background: #fff;
+            object-fit: cover;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-
-        @media (max-width: 600px) {
-
-            .appointment-dashboard-header,
-            .appointment-card,
-            .info-section {
-                padding: 1.2rem;
-            }
-
-            .info-label {
-                width: 150px;
-            }
+        
+        /* Status Badges */
+        .status-badge-lg {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-
-        /* Responsive sidebar adjustments to avoid overlap */
-        @media (max-width: 991.98px) {
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
+        .badge-pending { background: #fff8e1; color: #b78900; }
+        .badge-accepted { background: #e8f5e9; color: #2e7d32; }
+        .badge-completed { background: #e3f2fd; color: #1565c0; }
+        .badge-cancelled { background: #ffebee; color: #c62828; }
+        
+        /* Buttons */
+        .btn-action {
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
         }
+        .btn-action:hover { transform: translateY(-2px); }
 
-        @media (max-width: 767.98px) {
-            .main-dashboard-content {
-                margin-left: 0;
-            }
+        @media (max-width: 991px) {
+            .main-content { margin-left: 200px; }
+        }
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; padding: 1rem; }
+            .details-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
         }
     </style>
+
     <div class="home-zoom">
         <div class="d-flex">
-            <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
             <!-- Sidebar -->
             @include('counselor.sidebar')
-            <div class="main-dashboard-content flex-grow-1">
-                <div class="main-dashboard-inner">
-                    <a href="{{ route('counselor.appointments.index') }}" class="btn btn-secondary mb-3"
-                        style="border-radius: 8px; display: inline-flex; align-items: center; gap: 0.5rem;"><i
-                            class="bi bi-arrow-left"></i> Back to Appointments</a>
 
-                    <div class="appointment-dashboard-header mb-0">
-                        <div class="title">
-                            <i class="bi bi-calendar-event fs-2"></i>
+            <div class="main-content flex-grow-1">
+                <a href="{{ route('counselor.appointments.index') }}" class="btn btn-link text-muted mb-3 px-0 text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Appointments
+                </a>
+
+                <!-- Header -->
+                <div class="details-header">
+                    <div class="header-title">
+                        <h1>
+                            <i class="bi bi-calendar-event-fill text-success"></i>
                             Appointment Details
-                            <span class="badge bg-info text-dark" style="font-size: 0.9rem;">
-                                <i class="bi bi-hash"></i>Session {{ $appointment->session_number }}
-                            </span>
+                        </h1>
+                        <div class="header-meta">
+                            Reference: <span class="font-monospace text-dark">{{ $appointment->reference_number }}</span> • 
+                            Session #{{ $appointment->session_number }}
                         </div>
-                        <span class="badge {{
-        $appointment->status === 'completed' ? 'bg-success' :
-        ($appointment->status === 'cancelled' ? 'bg-danger' :
-            ($appointment->status === 'rescheduled_pending' ? 'bg-warning text-dark' :
-                ($appointment->status === 'declined' ? 'bg-danger' :
-                    ($appointment->status === 'accepted' ? 'bg-primary' : 'bg-secondary'))))
-                            }} text-capitalize">
-                            {{ str_replace('_', ' ', $appointment->status) }}
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                         @php
+                            $statusClass = 'badge-pending';
+                            if($appointment->status === 'accepted') $statusClass = 'badge-accepted';
+                            elseif($appointment->status === 'completed') $statusClass = 'badge-completed';
+                            elseif($appointment->status === 'declined' || $appointment->status === 'cancelled') $statusClass = 'badge-cancelled';
+                        @endphp
+                        <span class="status-badge-lg {{ $statusClass }}">
+                            <i class="bi bi-info-circle"></i> {{ ucfirst(str_replace('_', ' ', $appointment->status)) }}
                         </span>
                     </div>
+                </div>
 
-                    <div class="appointment-card">
-                        <!-- Reference Number -->
-                        <div class="reference-number mb-4">
-                            <strong>Reference Number: {{ $appointment->reference_number }}</strong>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="d-flex flex-wrap gap-2 mb-4">
-                            @if($appointment->status === 'pending')
-                                <form method="POST" action="{{ route('counselor.appointments.accept', $appointment->id) }}"
-                                    data-confirm="Accept this appointment?" style="display:inline;">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>
-                                        Accept</button>
-                                </form>
-                                <a href="{{ route('counselor.appointments.reschedule', $appointment->id) }}"
-                                    class="btn btn-warning" data-confirm="Reschedule this appointment?"><i
-                                        class="bi bi-arrow-repeat me-1"></i> Reschedule</a>
-                                <form method="POST" action="{{ route('counselor.appointments.decline', $appointment->id) }}"
-                                    data-confirm="Decline this appointment?" style="display:inline;">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle me-1"></i>
-                                        Decline</button>
-                                </form>
-                            @else
-                                @if($appointment->status === 'accepted')
-                                    <form method="POST" action="{{ route('counselor.appointments.complete', $appointment->id) }}"
-                                        data-confirm="Mark this appointment as complete?" style="display:inline;">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="btn btn-success"><i class="bi bi-check2-square me-1"></i> Mark
-                                            as Complete</button>
-                                    </form>
-                                @endif
-
-                            @endif
-                            <a href="{{ route('chat.index', $appointment->student->id) }}"
-                                class="btn btn-outline-primary"><i class="bi bi-chat-dots me-1"></i> Chat with Student</a>
-                        </div>
-
-                        <!-- Appointment Details -->
-                        <div class="info-section">
-                            <div class="appointment-section-title"><i class="bi bi-calendar-event"></i>Appointment Details
-                            </div>
-                            @php
-                                $start = $appointment->scheduled_at;
-                                $availability = \App\Models\Availability::where('user_id', $appointment->counselor_id)
-                                    ->where('start', $start)
-                                    ->first();
-                                $end = $availability ? \Carbon\Carbon::parse($availability->end) : $start->copy()->addMinutes(30);
-                            @endphp
-                            <div class="info-row">
-                                <div class="info-label">Date & Time:</div>
-                                <div class="info-value">
-                                    {{ $start->format('l, F j, Y') }}<br>
-                                    <span class="text-muted">{{ $start->format('h:i A') }} –
-                                        {{ $end->format('h:i A') }}</span>
+                <div class="row g-4">
+                    <!-- Left Column (Main Info) -->
+                    <div class="col-lg-8">
+                        <!-- Actions Card -->
+                        <div class="content-card">
+                            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                                <div class="fw-bold text-dark">Actions</div>
+                                <div class="d-flex gap-2">
+                                    @if($appointment->status === 'pending')
+                                        <form method="POST" action="{{ route('counselor.appointments.accept', $appointment->id) }}" data-confirm="Accept this appointment?">
+                                            @csrf @method('PATCH')
+                                            <button class="btn btn-success btn-action"><i class="bi bi-check-lg"></i> Accept</button>
+                                        </form>
+                                        <a href="{{ route('counselor.appointments.reschedule', $appointment->id) }}" class="btn btn-warning btn-action text-dark">
+                                            <i class="bi bi-clock-history"></i> Reschedule
+                                        </a>
+                                        <form method="POST" action="{{ route('counselor.appointments.decline', $appointment->id) }}" data-confirm="Decline this appointment?">
+                                            @csrf @method('PATCH')
+                                            <button class="btn btn-outline-danger btn-action"><i class="bi bi-x-lg"></i> Decline</button>
+                                        </form>
+                                    @elseif($appointment->status === 'accepted')
+                                        <form method="POST" action="{{ route('counselor.appointments.complete', $appointment->id) }}" data-confirm="Mark as complete?">
+                                            @csrf @method('PATCH')
+                                            <button class="btn btn-primary btn-action"><i class="bi bi-check2-square"></i> Mark Complete</button>
+                                        </form>
+                                    @endif
+                                    <a href="{{ route('chat.index', $appointment->student->id) }}" class="btn btn-outline-primary btn-action">
+                                        <i class="bi bi-chat-dots"></i> Chat
+                                    </a>
                                 </div>
                             </div>
-                            @if($appointment->status === 'rescheduled_pending' && $appointment->rescheduled_from)
-                                <div class="info-row">
-                                    <div class="info-label">Previous Time:</div>
-                                    <div class="info-value">
-                                        {{ \Carbon\Carbon::parse($appointment->rescheduled_from)->format('l, F j, Y h:i A') }}
-                                    </div>
-                                </div>
-                            @endif
-                            @if($appointment->notes)
-                                <div class="info-row">
-                                    <div class="info-label">Notes:</div>
-                                    <div class="info-value">{{ $appointment->notes }}</div>
-                                </div>
-                            @endif
                         </div>
 
-                        <!-- Student Information -->
-                        <div class="info-section">
-                            <div class="appointment-section-title"><i class="bi bi-person-circle"></i>Student Information
-                            </div>
+
+
+                        <!-- Appointment Info -->
+                        <div class="content-card">
+                            <div class="card-title-styled"><i class="bi bi-clock"></i> Schedule Information</div>
                             <div class="row">
-                                <!-- Avatar Column -->
-                                <div class="col-md-2 text-center mb-3 mb-md-0">
-                                    <img src="{{ $appointment->student->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($appointment->student->name) . '&background=1f7a2d&color=fff' }}"
-                                        alt="Avatar" class="rounded-circle border shadow-sm appointment-avatar" width="100"
-                                        height="100">
-                                    <div class="mt-2">
-                                        <strong>{{ $appointment->student->name ?? 'N/A' }}</strong>
+                                <div class="col-md-6 info-group">
+                                    <div class="info-label">Date & Time</div>
+                                    @php
+                                        $start = $appointment->scheduled_at;
+                                        $availability = \App\Models\Availability::where('user_id', $appointment->counselor_id)->where('start', $start)->first();
+                                        $end = $availability ? \Carbon\Carbon::parse($availability->end) : $start->copy()->addMinutes(30);
+                                    @endphp
+                                    <div class="info-value">
+                                        {{ $start->format('l, F j, Y') }}<br>
+                                        {{ $start->format('h:i A') }} – {{ $end->format('h:i A') }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 info-group">
+                                    <div class="info-label">Appointment Type</div>
+                                    <div class="info-value">{{ $appointment->appointment_type ?? 'Not specified' }}</div>
+                                </div>
+                                <div class="col-md-6 info-group">
+                                    <div class="info-label">Nature of Problem</div>
+                                    <div class="info-value">
+                                        {{ $appointment->nature_of_problem ?? 'Not specified' }}
+                                        @if($appointment->nature_of_problem_other)
+                                            <div class="small text-muted">({{ $appointment->nature_of_problem_other }})</div>
+                                        @endif
                                     </div>
                                 </div>
 
-                                <!-- Student Details - Column 1 -->
-                                <div class="col-md-5">
-                                    <div class="info-row">
-                                        <div class="info-label">Email:</div>
-                                        <div class="info-value">{{ $appointment->student->email ?? 'N/A' }}</div>
-                                    </div>
-                                    <div class="info-row">
-                                        <div class="info-label">Contact Number:</div>
-                                        <div class="info-value">{{ $appointment->student->contact_number ?? 'N/A' }}</div>
-                                    </div>
-                                    <div class="info-row">
-                                        <div class="info-label">College:</div>
-                                        <div class="info-value">{{ $appointment->student->college ?? 'N/A' }}</div>
-                                    </div>
-                                    <div class="info-row">
-                                        <div class="info-label">Course:</div>
-                                        <div class="info-value">{{ $appointment->student->course ?? 'N/A' }}</div>
-                                    </div>
-                                </div>
-
-                                <!-- Student Details - Column 2 -->
-                                <div class="col-md-5">
-                                    <div class="info-row">
-                                        <div class="info-label">Year Level:</div>
-                                        <div class="info-value">{{ $appointment->student->year_level ?? 'N/A' }}</div>
-                                    </div>
-                                    @if($appointment->student->gender)
-                                        <div class="info-row">
-                                            <div class="info-label">Gender:</div>
-                                            <div class="info-value">{{ ucfirst($appointment->student->gender) }}</div>
-                                        </div>
-                                    @endif
-                                    @if($appointment->student->address)
-                                        <div class="info-row">
-                                            <div class="info-label">Address:</div>
-                                            <div class="info-value">{{ $appointment->student->address }}</div>
-                                        </div>
-                                    @endif
-                                </div>
                             </div>
                         </div>
-
+                        
+                        <!-- Assessment Data -->
                         @if(!empty($latestAssessment))
-                            <div class="info-section">
-                                <div class="appointment-section-title"><i class="bi bi-clipboard-data"></i>Latest Assessment
-                                </div>
-                                <div class="info-row">
-                                    <div class="info-label">Assessment Type:</div>
-                                    <div class="info-value">{{ $latestAssessment->type }} •
-                                        {{ $latestAssessment->created_at->format('M d, Y h:i A') }}
+                            <div class="content-card">
+                                <div class="card-title-styled"><i class="bi bi-bar-chart-fill"></i> Latest Assessment Data</div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <strong>{{ $latestAssessment->type }}</strong>
+                                        <div class="small text-muted">{{ $latestAssessment->created_at->format('M d, Y h:i A') }}</div>
                                     </div>
+                                    <a href="{{ route('counselor.assessments.show', [$latestAssessment->id, 'from_appointment' => $appointment->id]) }}" class="btn btn-sm btn-outline-primary">View Full Report</a>
                                 </div>
+                                
                                 @php
-                                    // Normalize score payload
                                     $laScores = is_array($latestAssessment->score) ? $latestAssessment->score : (is_string($latestAssessment->score) ? json_decode($latestAssessment->score, true) : []);
                                 @endphp
                                 @if($latestAssessment->type === 'DASS-42')
-                                    @php
+                                     @php
+                                        // Simple DASS Logic Reuse
                                         $studentAnswers = [];
                                         if (!empty($laScores) && is_array($laScores)) {
                                             foreach ($laScores as $k => $v) {
                                                 if (is_numeric($k)) {
                                                     $ik = (int) $k;
-                                                    if ($ik >= 0 && $ik <= 41) {
-                                                        $studentAnswers[$ik + 1] = (int) $v;
-                                                        continue;
-                                                    }
-                                                }
-                                                $studentAnswers[$k] = $v;
+                                                    if ($ik >= 0 && $ik <= 41) $studentAnswers[$ik + 1] = (int) $v;
+                                                } else $studentAnswers[$k] = $v;
                                             }
                                         }
                                         $depressionItems = [3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42];
                                         $anxietyItems = [2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41];
                                         $stressItems = [1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39];
-                                        $dep = 0;
-                                        $anx = 0;
-                                        $str = 0;
-                                        foreach ($depressionItems as $it) {
-                                            $dep += (int) ($studentAnswers[$it] ?? 0);
-                                        }
-                                        foreach ($anxietyItems as $it) {
-                                            $anx += (int) ($studentAnswers[$it] ?? 0);
-                                        }
-                                        foreach ($stressItems as $it) {
-                                            $str += (int) ($studentAnswers[$it] ?? 0);
-                                        }
+                                        
+                                        $dep = 0; $anx = 0; $str = 0;
+                                        foreach ($depressionItems as $it) $dep += (int) ($studentAnswers[$it] ?? 0);
+                                        foreach ($anxietyItems as $it) $anx += (int) ($studentAnswers[$it] ?? 0);
+                                        foreach ($stressItems as $it) $str += (int) ($studentAnswers[$it] ?? 0);
                                     @endphp
-                                    <div class="card border-0 bg-light p-3 mb-2">
-                                        <div class="d-flex justify-content-between small mb-1">
-                                            <div>Depression</div>
-                                            <div>{{ $dep }}/42</div>
+                                    <div class="row g-3">
+                                        <div class="col-4 text-center">
+                                            <div class="h4 mb-0 text-primary">{{ $dep }}</div>
+                                            <div class="small text-muted">Depression</div>
                                         </div>
-                                        <div class="progress mb-2" style="height:8px;">
-                                            <div class="progress-bar" role="progressbar"
-                                                style="width: {{ min($dep / 42 * 100, 100) }}%; background-color:#0d6efd;"></div>
+                                        <div class="col-4 text-center">
+                                            <div class="h4 mb-0 text-info">{{ $anx }}</div>
+                                            <div class="small text-muted">Anxiety</div>
                                         </div>
-                                        <div class="d-flex justify-content-between small mb-1">
-                                            <div>Anxiety</div>
-                                            <div>{{ $anx }}/42</div>
-                                        </div>
-                                        <div class="progress mb-2" style="height:8px;">
-                                            <div class="progress-bar" role="progressbar"
-                                                style="width: {{ min($anx / 42 * 100, 100) }}%; background-color:#0099ff;"></div>
-                                        </div>
-                                        <div class="d-flex justify-content-between small mb-1">
-                                            <div>Stress</div>
-                                            <div>{{ $str }}/42</div>
-                                        </div>
-                                        <div class="progress" style="height:8px;">
-                                            <div class="progress-bar" role="progressbar"
-                                                style="width: {{ min($str / 42 * 100, 100) }}%; background-color:#6c757d;"></div>
+                                        <div class="col-4 text-center">
+                                            <div class="h4 mb-0 text-secondary">{{ $str }}</div>
+                                            <div class="small text-muted">Stress</div>
                                         </div>
                                     </div>
                                 @else
-                                    <div class="info-row">
-                                        <div class="info-label">Score:</div>
-                                        <div class="info-value">
-                                            {{ is_array($laScores) ? ($laScores['score'] ?? json_encode($laScores)) : ($latestAssessment->score ?? 'N/A') }}
-                                        </div>
-                                    </div>
+                                    <div class="p-3 bg-light rounded">Score: {{ is_array($laScores) ? ($laScores['score'] ?? json_encode($laScores)) : ($latestAssessment->score ?? 'N/A') }}</div>
                                 @endif
-
-                                <div class="mt-2">
-                                    <a href="{{ route('counselor.assessments.show', [$latestAssessment->id, 'from_appointment' => $appointment->id]) }}"
-                                        class="btn btn-outline-primary btn-sm"><i class="bi bi-eye me-1"></i> View full
-                                        assessment</a>
-                                </div>
                             </div>
                         @endif
 
-                        <!-- Nature of Problem -->
-                        <div class="info-section">
-                            <div class="appointment-section-title"><i class="bi bi-question-circle"></i>Nature of Problem
+                        <!-- Notes Section (Prominent) -->
+                        <div class="content-card notes-card">
+                            <div class="card-title-styled">
+                                <i class="bi bi-sticky-fill"></i> Student Notes / Concerns
                             </div>
-                            <div class="info-row">
-                                <div class="info-label">Category:</div>
-                                <div class="info-value">{{ $appointment->nature_of_problem ?? 'N/A' }}</div>
+                            @if($appointment->notes)
+                                <div class="p-3 bg-white rounded border border-warning">
+                                    <p class="mb-0 fs-5" style="color: #444;">{{ $appointment->notes }}</p>
+                                </div>
+                            @else
+                                <div class="text-muted fst-italic">No additional notes provided by the student.</div>
+                            @endif
+                        </div>
+
+                        <!-- Session Notes (If Completed) -->
+                        @if($appointment->status === 'completed')
+                            <div class="content-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="card-title-styled mb-0"><i class="bi bi-journal-text"></i> Session Notes</div>
+                                    <a href="{{ route('counselor.session_notes.create', $appointment->id) }}" class="btn btn-sm btn-success"><i class="bi bi-plus-lg"></i> Add Note</a>
+                                </div>
+                                @if($appointment->sessionNotes && $appointment->sessionNotes->count())
+                                    <div class="d-flex flex-column gap-3">
+                                        @foreach($appointment->sessionNotes as $note)
+                                            <div class="p-3 border rounded bg-light">
+                                                <div class="d-flex justify-content-between text-muted small mb-2">
+                                                    <div>{{ $note->created_at->format('M d, Y h:i A') }}</div>
+                                                </div>
+                                                <div>{{ $note->content }}</div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="text-muted text-center py-3">No session notes recorded yet.</div>
+                                @endif
                             </div>
-                            @if($appointment->nature_of_problem === 'Other' && $appointment->nature_of_problem_other)
-                                <div class="info-row">
-                                    <div class="info-label">Details:</div>
-                                    <div class="info-value">{{ $appointment->nature_of_problem_other }}</div>
+                        @endif
+                    </div>
+
+                    <!-- Right Column (Student Profile) -->
+                    <div class="col-lg-4">
+                        <div class="content-card">
+                            <div class="student-profile-header">
+                                <img src="{{ $appointment->student->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($appointment->student->name) }}" alt="Student" class="student-avatar">
+                                <h4 class="mb-1 text-dark fw-bold">{{ $appointment->student->name }}</h4>
+                                <div class="badge bg-light text-dark border">{{ $appointment->student->student_id ?? 'No ID' }}</div>
+                            </div>
+                            
+                            <div class="info-group">
+                                <div class="info-label">Contact</div>
+                                <div class="info-value text-break">
+                                    <i class="bi bi-envelope me-1 text-muted"></i> {{ $appointment->student->email }}<br>
+                                    <i class="bi bi-phone me-1 text-muted"></i> {{ $appointment->student->contact_number ?? 'N/A' }}
+                                </div>
+                            </div>
+                            
+                            <hr class="my-3 text-muted opacity-25">
+                            
+                            <div class="row">
+                                <div class="col-6 info-group">
+                                    <div class="info-label">College</div>
+                                    <div class="info-value">{{ $appointment->student->college ?? 'N/A' }}</div>
+                                </div>
+                                <div class="col-6 info-group">
+                                    <div class="info-label">Year Level</div>
+                                    <div class="info-value">{{ $appointment->student->year_level ?? 'N/A' }}</div>
+                                </div>
+                                <div class="col-6 info-group">
+                                    <div class="info-label">Course</div>
+                                    <div class="info-value">{{ $appointment->student->course ?? 'N/A' }}</div>
+                                </div>
+                                <div class="col-6 info-group">
+                                    <div class="info-label">Sex</div>
+                                    <div class="info-value">{{ ucfirst($appointment->student->gender ?? 'N/A') }}</div>
+                                </div>
+                            </div>
+                            
+                            @if($appointment->student->address)
+                                <hr class="my-3 text-muted opacity-25">
+                                <div class="info-group">
+                                    <div class="info-label">Full Address</div>
+                                    <div>{{ $appointment->student->address }}</div>
                                 </div>
                             @endif
                         </div>
 
-                        <!-- Guardian Information -->
-                        <div class="info-section">
-                            <div class="appointment-section-title"><i class="bi bi-people"></i>Guardian Information</div>
-                            <div class="info-row">
-                                <div class="info-label">Guardian 1 Name:</div>
-                                <div class="info-value"><strong>{{ $appointment->guardian1_name ?? 'N/A' }}</strong></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Guardian 1 Relationship:</div>
-                                <div class="info-value">{{ $appointment->guardian1_relationship ?? 'N/A' }}</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Guardian 1 Contact:</div>
-                                <div class="info-value">{{ $appointment->guardian1_contact ?? 'N/A' }}</div>
+                        <!-- Guardian Info -->
+                         <div class="content-card">
+                            <div class="card-title-styled"><i class="bi bi-shield-check"></i> Guardian</div>
+                            <div class="info-group">
+                                <div class="info-label">Primary Guardian</div>
+                                <div class="info-value">{{ $appointment->guardian1_name ?? 'N/A' }}</div>
+                                <div class="small text-muted">{{ $appointment->guardian1_relationship }} • {{ $appointment->guardian1_contact }}</div>
                             </div>
                             @if($appointment->guardian2_name)
-                                <div class="info-row">
-                                    <div class="info-label">Guardian 2 Name:</div>
-                                    <div class="info-value"><strong>{{ $appointment->guardian2_name }}</strong></div>
-                                </div>
-                                <div class="info-row">
-                                    <div class="info-label">Guardian 2 Relationship:</div>
-                                    <div class="info-value">{{ $appointment->guardian2_relationship ?? 'N/A' }}</div>
-                                </div>
-                                <div class="info-row">
-                                    <div class="info-label">Guardian 2 Contact:</div>
-                                    <div class="info-value">{{ $appointment->guardian2_contact ?? 'N/A' }}</div>
+                                <hr class="my-3 text-muted opacity-25">
+                                <div class="info-group">
+                                    <div class="info-label">Secondary Guardian</div>
+                                    <div class="info-value">{{ $appointment->guardian2_name }}</div>
+                                    <div class="small text-muted">{{ $appointment->guardian2_relationship }} • {{ $appointment->guardian2_contact }}</div>
                                 </div>
                             @endif
                         </div>
-
-                        <!-- Session Notes -->
-                        @if($appointment->status === 'completed')
-                                <div class="info-section">
-                                    <div class="appointment-section-title"><i class="bi bi-journal-text"></i>Session Notes</div>
-                                    @if($appointment->sessionNotes && $appointment->sessionNotes->count())
-                                            <ul class="list-group mb-3">
-                                                @foreach($appointment->sessionNotes as $note)
-                                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                                <div>
-                                                                    <div class="fw-semibold">{{ $note->created_at->format('M d, Y h:i A') }}</div>
-                                                                    <div>{{ $note->content }}</div>
-                                                                    <!-- Confirmation Modal -->
-                                                                    <div class="modal fade" id="confirmModal" tabindex="-1"
-                                                                        aria-labelledby="confirmModalLabel" aria-hidden="true">
-                                                                        <div class="modal-dialog modal-dialog-centered">
-                                                                            <div class="modal-content">
-                                                                                <div class="modal-header">
-                                                                                    <h5 class="modal-title" id="confirmModalLabel">Please confirm</h5>
-                                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                                        aria-label="Close"></button>
-                                                                                </div>
-                                                                                <div class="modal-body">
-                                                                                    <p id="confirmModalMessage"></p>
-                                                                                </div>
-                                                                                <div class="modal-footer">
-                                                                                    <button type="button" class="btn btn-secondary"
-                                                                                        data-bs-dismiss="modal">Cancel</button>
-                                                                                    <button type="button" class="btn btn-primary"
-                                                                                        id="confirmModalOk">Confirm</button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                    </div>
-                                                    </li>
-                                                @endforeach
-                                        </ul>
-                                    @else
-                                    <div class="text-muted mb-2">No session notes yet.</div>
-                                @endif
-                                <a href="{{ route('counselor.session_notes.create', $appointment->id) }}" class="btn btn-success"><i
-                                        class="bi bi-plus-circle me-1"></i> Add Session Note</a>
-                            </div>
-                        @endif
-
-                        <!-- Student's Other Appointments -->
+                        
+                        <!-- History -->
                         @if(isset($appointmentHistory) && $appointmentHistory->count() > 0)
-                            <div class="info-section">
-                                <div class="appointment-section-title"><i class="bi bi-clock-history"></i>Other Appointments with {{ $appointment->student->name }}</div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Session</th>
-                                                <th>Date & Time</th>
-                                                <th>Status</th>
-                                                <th>Nature of Problem</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @php
-                                                $sessionCounter = 1;
-                                            @endphp
-                                            @foreach($appointmentHistory as $historyAppt)
-                                                <tr>
-                                                    <td><span class="badge bg-info">#{{ $sessionCounter++ }}</span></td>
-                                                    <td class="small">{{ \Carbon\Carbon::parse($historyAppt->scheduled_at)->format('M d, Y h:i A') }}</td>
-                                                    <td>
-                                                        <span class="badge {{
-                                                            $historyAppt->status === 'completed' ? 'bg-success' :
-                                                            ($historyAppt->status === 'cancelled' ? 'bg-danger' :
-                                                                ($historyAppt->status === 'rescheduled_pending' ? 'bg-warning text-dark' :
-                                                                    ($historyAppt->status === 'declined' ? 'bg-danger' :
-                                                                        ($historyAppt->status === 'accepted' ? 'bg-primary' : 'bg-secondary'))))
-                                                        }}">
-                                                            {{ ucfirst(str_replace('_', ' ', $historyAppt->status)) }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="small">{{ $historyAppt->nature_of_problem ?? 'N/A' }}</td>
-                                                    <td>
-                                                        <a href="{{ route('counselor.appointments.show', $historyAppt->id) }}" class="btn btn-sm btn-outline-primary">
-                                                            <i class="bi bi-eye"></i> View
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                            <div class="content-card p-0 overflow-hidden">
+                                <div class="p-3 bg-light border-bottom fw-bold"><i class="bi bi-clock-history"></i> History</div>
+                                <div class="list-group list-group-flush">
+                                    @foreach($appointmentHistory->take(3) as $hist)
+                                        <a href="{{ route('counselor.appointments.show', $hist->id) }}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <small class="fw-bold text-dark">{{ \Carbon\Carbon::parse($hist->scheduled_at)->format('M d, Y') }}</small>
+                                                <small class="badge bg-secondary">{{ ucfirst($hist->status) }}</small>
+                                            </div>
+                                            <small class="text-muted">{{ $hist->nature_of_problem }}</small>
+                                        </a>
+                                    @endforeach
                                 </div>
+                                @if($appointmentHistory->count() > 3)
+                                    <div class="p-2 text-center text-muted small bg-light">
+                                        +{{ $appointmentHistory->count() - 3 }} more records
+                                    </div>
+                                @endif
                             </div>
                         @endif
+                    </div>
                 </div>
-                <script>
-                    // Sidebar toggle and confirmation handler for mobile
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const sidebar = document.querySelector('.custom-sidebar');
-                        const toggleBtn = document.getElementById('counselorSidebarToggle');
-                        if (toggleBtn && sidebar) {
-                            toggleBtn.addEventListener('click', function () {
-                                if (window.innerWidth < 768) {
-                                    sidebar.classList.toggle('show');
-                                }
-                            });
-                            document.addEventListener('click', function (e) {
-                                if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                    const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                                    if (!clickInside) sidebar.classList.remove('show');
-                                }
-                            });
-                            document.addEventListener('keydown', function (e) {
-                                if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                    sidebar.classList.remove('show');
-                                }
-                            });
-                        }
-                        // Confirmation handler for actions with data-confirm using Bootstrap modal
-                        const confirmModalEl = document.getElementById('confirmModal');
-                        let bsConfirmModal = null;
-                        if (confirmModalEl && typeof bootstrap !== 'undefined') {
-                            bsConfirmModal = new bootstrap.Modal(confirmModalEl, { backdrop: 'static' });
-                        }
-                        let confirmTarget = null;
-                        function showConfirmModal(message, target) {
-                            document.getElementById('confirmModalMessage').textContent = message;
-                            confirmTarget = target;
-                            if (bsConfirmModal) {
-                                bsConfirmModal.show();
-                                return;
-                            }
-                            confirmModalEl.classList.add('show');
-                            confirmModalEl.style.display = 'block';
-                            let backdrop = document.getElementById('confirmModalBackdrop');
-                            if (!backdrop) {
-                                backdrop = document.createElement('div');
-                                backdrop.id = 'confirmModalBackdrop';
-                                backdrop.style.position = 'fixed';
-                                backdrop.style.inset = '0';
-                                backdrop.style.background = 'rgba(0,0,0,0.5)';
-                                backdrop.style.zIndex = 1050;
-                                document.body.appendChild(backdrop);
-                            } else {
-                                backdrop.style.display = 'block';
-                            }
-                            document.body.classList.add('modal-open');
-                        }
-
-                        document.querySelectorAll('[data-confirm]').forEach(function (el) {
-                            if (el.tagName === 'FORM') {
-                                el.addEventListener('submit', function (event) {
-                                    event.preventDefault();
-                                    var msg = el.getAttribute('data-confirm') || 'Are you sure?';
-                                    showConfirmModal(msg, el);
-                                });
-                            } else {
-                                el.addEventListener('click', function (event) {
-                                    event.preventDefault();
-                                    var msg = el.getAttribute('data-confirm') || 'Are you sure?';
-                                    showConfirmModal(msg, el);
-                                });
-                            }
-                        });
-
-                        // Confirm button behavior
-                        const confirmBtn = document.getElementById('confirmModalOk');
-                        if (confirmBtn) {
-                            confirmBtn.addEventListener('click', function () {
-                                if (!confirmTarget) return;
-                                if (confirmTarget.tagName === 'FORM') {
-                                    confirmTarget.removeAttribute('data-confirm');
-                                    confirmTarget.submit();
-                                } else if (confirmTarget.tagName === 'A') {
-                                    const href = confirmTarget.getAttribute('href');
-                                    if (href) window.location.href = href;
-                                }
-                                if (bsConfirmModal) {
-                                    bsConfirmModal.hide();
-                                } else {
-                                    confirmModalEl.classList.remove('show');
-                                    confirmModalEl.style.display = 'none';
-                                    const backdrop = document.getElementById('confirmModalBackdrop');
-                                    if (backdrop) backdrop.style.display = 'none';
-                                    document.body.classList.remove('modal-open');
-                                }
-                            });
-                        }
-                    });
-                </script>
             </div>
         </div>
     </div>
+    
+    <!-- Modals & Scripts -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p id="confirmModalMessage" class="mb-0 fs-5 text-center text-dark"></p>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center pb-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary px-4" id="confirmModalOk">Confirm</button>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Sidebar Toggle (Mobile)
+            const sidebar = document.querySelector('nav'); // Assuming sidebar tag is nav or has specific ID in include
+            const toggleBtn = document.getElementById('counselorSidebarToggle');
+            if (toggleBtn) {
+                 toggleBtn.addEventListener('click', () => {
+                     document.querySelector('.counselor-sidebar').classList.toggle('show'); // Adjust class based on sidebar blade
+                 });
+            }
+
+            // Confirmation Logic
+            const confirmModalEl = document.getElementById('confirmModal');
+            let bsConfirmModal = new bootstrap.Modal(confirmModalEl);
+            let confirmTarget = null;
+
+            document.querySelectorAll('[data-confirm]').forEach(el => {
+                el.addEventListener('click', e => {
+                    e.preventDefault();
+                    // If label clicks trigger check, ensure we have the form
+                    let target = el.closest('form') || el; 
+                    if(target.tagName === 'BUTTON') target = target.form || target; 
+                    
+                    document.getElementById('confirmModalMessage').textContent = el.getAttribute('data-confirm');
+                    confirmTarget = target;
+                    bsConfirmModal.show();
+                });
+            });
+
+            document.getElementById('confirmModalOk').addEventListener('click', () => {
+                if (confirmTarget) {
+                    if (confirmTarget.tagName === 'FORM') confirmTarget.submit();
+                    else window.location.href = confirmTarget.href;
+                }
+                bsConfirmModal.hide();
+            });
+        });
+    </script>
+
 @endsection

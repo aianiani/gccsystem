@@ -3,12 +3,22 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Monthly Report - {{ DateTime::createFromFormat('!m', $month)->format('F') }} {{ $year }}</title>
+    <title>
+        @if($frequency == 'annual')
+            Annual Report - {{ $year }}
+        @elseif($frequency == 'weekly')
+            Weekly Report - Week {{ $week }}, {{ $year }}
+        @else
+            Monthly Report - {{ DateTime::createFromFormat('!m', $month)->format('F') }} {{ $year }}
+        @endif
+    </title>
     <style>
         body {
-            font-family: sans-serif;
-            font-size: 10pt;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 9pt;
             color: #333;
+            margin: 0;
+            padding: 0;
         }
 
         .header {
@@ -18,42 +28,48 @@
 
         .header h1 {
             margin: 0;
-            font-size: 18pt;
+            font-size: 16pt;
             color: #1f7a2d;
+            text-transform: uppercase;
         }
 
         .header p {
             margin: 5px 0 0;
-            font-size: 12pt;
+            font-size: 10pt;
+            font-weight: bold;
         }
 
-        .section-title {
-            background-color: #e8f5e8;
-            color: #1f7a2d;
+        .section-header {
+            background-color: #1f7a2d;
+            color: white;
             font-weight: bold;
-            padding: 8px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #1f7a2d;
+            padding: 6px 10px;
+            font-size: 10pt;
+            margin-top: 15px;
+            margin-bottom: 0;
+            border: 1px solid #1f7a2d;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         th,
         td {
-            border: 1px solid #ddd;
-            padding: 6px;
-            font-size: 9pt;
+            border: 1px solid #444;
+            /* Darker border for print clarity */
+            padding: 4px;
+            font-size: 8pt;
             vertical-align: middle;
+            line-height: 1.2;
         }
 
         th {
-            background-color: #1f7a2d;
-            color: white;
+            background-color: #e8f5e8;
+            /* Lighter background for headers to save ink/toner */
+            color: #1f7a2d;
             text-align: center;
             font-weight: bold;
         }
@@ -62,71 +78,100 @@
             text-align: center;
         }
 
+        .text-start {
+            text-align: left;
+        }
+
         .total-row {
-            background-color: #e8f5e8;
+            background-color: #f0f0f0;
             font-weight: bold;
         }
 
-        .total-row td {
-            color: #1f7a2d;
-        }
-
         .college-list {
-            font-size: 8pt;
+            font-size: 7pt;
             font-style: italic;
-            color: #666;
-            margin-top: 2px;
+            color: #555;
+            white-space: normal;
+            /* Allow wrapping */
         }
 
         .footer {
             position: fixed;
-            bottom: 0;
+            bottom: -20px;
             left: 0;
             right: 0;
-            font-size: 8pt;
+            font-size: 7pt;
             text-align: center;
             color: #999;
             padding: 10px;
-            border-top: 1px solid #eee;
+        }
+
+        /* Helper for very narrow columns */
+        .w-numbers {
+            width: 5%;
+        }
+
+        .page-break {
+            page-break-after: always;
         }
     </style>
 </head>
 
 <body>
     <div class="header">
-        <h1>Monthly Report</h1>
-        <p>{{ DateTime::createFromFormat('!m', $month)->format('F') }} {{ $year }}</p>
+        <h1>
+            @if($frequency == 'annual')
+                Annual Admin Report
+            @elseif($frequency == 'weekly')
+                Weekly Admin Report
+            @else
+                Monthly Admin Report
+            @endif
+        </h1>
+        <p>
+            @if($frequency == 'annual')
+                Year: {{ $year }}
+            @elseif($frequency == 'weekly')
+                Week {{ $week }}, {{ $year }}
+            @else
+                {{ DateTime::createFromFormat('!m', $month)->format('F') }} {{ $year }}
+            @endif
+        </p>
+        <p style="font-size: 8pt; font-weight: normal; margin-top: 2px;">GCC System Generated Report</p>
     </div>
 
     <!-- A. TESTING -->
-    <div class="section-title">A. TESTING</div>
+    <div class="section-header">A. TESTING SERVICES</div>
     <table>
         <thead>
             <tr>
-                <th rowspan="2" style="width: 20%">CLIENT / STUDENTS TEST</th>
+                <th rowspan="2" style="width: 16%">TEST CATEGORY</th>
                 <th colspan="5">ADMINISTRATION</th>
                 <th colspan="4">CHECKING / SCORING</th>
                 <th colspan="4">INTERPRETATION</th>
-                <th colspan="4">REPORT/RESULT</th>
+                <th colspan="4">REPORT / RESULT</th>
             </tr>
             <tr>
-                <th>College</th>
-                <th>M</th>
-                <th>F</th>
-                <th>Tot Attend</th>
-                <th>Tot Enroll</th>
-                <th>College</th>
-                <th>M</th>
-                <th>F</th>
-                <th>Tot</th>
-                <th>College</th>
-                <th>M</th>
-                <th>F</th>
-                <th>Tot</th>
-                <th>College</th>
-                <th>M</th>
-                <th>F</th>
-                <th>Tot</th>
+                <th style="width: 10%;">College</th>
+                <th class="w-numbers">M</th>
+                <th class="w-numbers">F</th>
+                <th class="w-numbers">Tot</th>
+                <th class="w-numbers">Enr</th>
+
+                <th style="width: 8%;">College</th>
+                <th class="w-numbers">M</th>
+                <th class="w-numbers">F</th>
+                <th class="w-numbers">Tot</th>
+
+                <th style="width: 8%;">College</th>
+                <th class="w-numbers">M</th>
+                <th class="w-numbers">F</th>
+                <th class="w-numbers">Tot</th>
+
+                <th style="width: 8%;">College</th>
+                <th class="w-numbers">M</th>
+                <th class="w-numbers">F</th>
+                <th class="w-numbers">Tot</th>
             </tr>
         </thead>
         <tbody>
@@ -136,91 +181,87 @@
                 $totalInterpretation = ['male' => 0, 'female' => 0, 'total' => 0];
                 $totalReport = ['male' => 0, 'female' => 0, 'total' => 0];
             @endphp
+        </tbody>
 
-            @forelse($testingData as $test)
-                <tr>
-                    <td>
-                        <strong>{{ $test['category'] }}</strong>
-                    </td>
-                    <!-- Administration -->
-                    <td>
-                        @if(count($test['administration']['colleges']) > 0)
-                            <div class="college-list">
-                                {{ $test['administration']['colleges']->implode(', ') }}
-                            </div>
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td class="text-center">{{ $test['administration']['male'] }}</td>
-                    <td class="text-center">{{ $test['administration']['female'] }}</td>
-                    <td class="text-center"><strong>{{ $test['administration']['total'] }}</strong></td>
-                    <td class="text-center"><strong>{{ $test['administration']['total_enrolled'] }}</strong></td>
+        @forelse($testingData as $test)
+            <tbody style="page-break-inside: avoid;">
+                @php $rowCount = count($test['rows']); @endphp
+                @foreach($test['rows'] as $index => $row)
+                    <tr>
+                        @php
+                            $borderStyle = 'border-bottom: 1px solid #444;';
+                            if ($rowCount > 1) {
+                                if ($index === 0) {
+                                    $borderStyle = 'border-bottom: none;';
+                                } elseif ($index === $rowCount - 1) {
+                                    $borderStyle = 'border-top: none; border-bottom: 1px solid #444;';
+                                } else {
+                                    $borderStyle = 'border-top: none; border-bottom: none;';
+                                }
+                            }
+                        @endphp
+                        <td style="vertical-align: middle; background-color: #f8f9fa; {{ $borderStyle }}">
+                            @if($index === 0)
+                                <strong>{{ $test['category'] }}</strong>
+                            @endif
+                        </td>
 
-                    <!-- Checking -->
-                    <td>
-                        @if(count($test['checking_scoring']['colleges']) > 0)
-                            <div class="college-list">
-                                {{ $test['checking_scoring']['colleges']->implode(', ') }}
-                            </div>
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td class="text-center">{{ $test['checking_scoring']['male'] }}</td>
-                    <td class="text-center">{{ $test['checking_scoring']['female'] }}</td>
-                    <td class="text-center"><strong>{{ $test['checking_scoring']['total'] }}</strong></td>
+                        <!-- Administration -->
+                        <td class="text-start" style="font-size: 7pt;">{{ $row['college'] }}</td>
+                        <td class="text-center">{{ $row['administration']['male'] }}</td>
+                        <td class="text-center">{{ $row['administration']['female'] }}</td>
+                        <td class="text-center"><strong>{{ $row['administration']['total'] }}</strong></td>
+                        <td class="text-center">{{ $row['administration']['total_enrolled'] }}</td>
 
-                    <!-- Interpretation -->
-                    <td>
-                        @if(count($test['interpretation']['colleges']) > 0)
-                            <div class="college-list">
-                                {{ $test['interpretation']['colleges']->implode(', ') }}
-                            </div>
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td class="text-center">{{ $test['interpretation']['male'] }}</td>
-                    <td class="text-center">{{ $test['interpretation']['female'] }}</td>
-                    <td class="text-center"><strong>{{ $test['interpretation']['total'] }}</strong></td>
+                        <!-- Checking -->
+                        <td class="text-start" style="font-size: 7pt;">{{ $row['college'] }}</td>
+                        <td class="text-center">{{ $row['checking_scoring']['male'] }}</td>
+                        <td class="text-center">{{ $row['checking_scoring']['female'] }}</td>
+                        <td class="text-center"><strong>{{ $row['checking_scoring']['total'] }}</strong></td>
 
-                    <!-- Report -->
-                    <td>
-                        @if(count($test['report_result']['colleges']) > 0)
-                            <div class="college-list">
-                                {{ $test['report_result']['colleges']->implode(', ') }}
-                            </div>
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td class="text-center">{{ $test['report_result']['male'] }}</td>
-                    <td class="text-center">{{ $test['report_result']['female'] }}</td>
-                    <td class="text-center"><strong>{{ $test['report_result']['total'] }}</strong></td>
-                </tr>
-                @php
-                    $totalAdmin['male'] += $test['administration']['male'];
-                    $totalAdmin['female'] += $test['administration']['female'];
-                    $totalAdmin['total'] += $test['administration']['total'];
-                    $totalAdmin['enrolled'] += $test['administration']['total_enrolled'];
-                    $totalChecking['male'] += $test['checking_scoring']['male'];
-                    $totalChecking['female'] += $test['checking_scoring']['female'];
-                    $totalChecking['total'] += $test['checking_scoring']['total'];
-                    $totalInterpretation['male'] += $test['interpretation']['male'];
-                    $totalInterpretation['female'] += $test['interpretation']['female'];
-                    $totalInterpretation['total'] += $test['interpretation']['total'];
-                    $totalReport['male'] += $test['report_result']['male'];
-                    $totalReport['female'] += $test['report_result']['female'];
-                    $totalReport['total'] += $test['report_result']['total'];
-                @endphp
-            @empty
+                        <!-- Interpretation -->
+                        <td class="text-start" style="font-size: 7pt;">{{ $row['college'] }}</td>
+                        <td class="text-center">{{ $row['interpretation']['male'] }}</td>
+                        <td class="text-center">{{ $row['interpretation']['female'] }}</td>
+                        <td class="text-center"><strong>{{ $row['interpretation']['total'] }}</strong></td>
+
+                        <!-- Report -->
+                        <td class="text-start" style="font-size: 7pt;">{{ $row['college'] }}</td>
+                        <td class="text-center">{{ $row['report_result']['male'] }}</td>
+                        <td class="text-center">{{ $row['report_result']['female'] }}</td>
+                        <td class="text-center"><strong>{{ $row['report_result']['total'] }}</strong></td>
+                    </tr>
+
+                    @php
+                        $totalAdmin['male'] += $row['administration']['male'];
+                        $totalAdmin['female'] += $row['administration']['female'];
+                        $totalAdmin['total'] += $row['administration']['total'];
+                        $totalAdmin['enrolled'] += $row['administration']['total_enrolled'];
+
+                        $totalChecking['male'] += $row['checking_scoring']['male'];
+                        $totalChecking['female'] += $row['checking_scoring']['female'];
+                        $totalChecking['total'] += $row['checking_scoring']['total'];
+
+                        $totalInterpretation['male'] += $row['interpretation']['male'];
+                        $totalInterpretation['female'] += $row['interpretation']['female'];
+                        $totalInterpretation['total'] += $row['interpretation']['total'];
+
+                        $totalReport['male'] += $row['report_result']['male'];
+                        $totalReport['female'] += $row['report_result']['female'];
+                        $totalReport['total'] += $row['report_result']['total'];
+                    @endphp
+                @endforeach
+            </tbody>
+        @empty
+            <tbody>
                 <tr>
                     <td colspan="18" class="text-center">No testing data available</td>
                 </tr>
-            @endforelse
+            </tbody>
+        @endforelse
 
-            @if(count($testingData) > 0)
+        @if(count($testingData) > 0)
+            <tbody style="page-break-inside: avoid;">
                 <tr class="total-row">
                     <td>GRAND TOTAL</td>
                     <td></td> <!-- College -->
@@ -241,22 +282,23 @@
                     <td class="text-center">{{ $totalReport['female'] }}</td>
                     <td class="text-center">{{ $totalReport['total'] }}</td>
                 </tr>
-            @endif
-        </tbody>
+            </tbody>
+        @endif
     </table>
 
     <!-- B. GUIDANCE -->
-    <div class="section-title">B. GUIDANCE</div>
+    <div class="section-header">B. GUIDANCE / SEMINARS</div>
     <table>
         <thead>
             <tr>
                 <th style="width: 15%">DATE</th>
                 <th style="width: 30%">TOPIC</th>
                 <th style="width: 25%">COLLEGE</th>
-                <th>Male</th>
-                <th>Female</th>
-                <th>Total Attended</th>
-                <th>Total Enrolled</th>
+                <th class="w-numbers">M</th>
+                <th class="w-numbers">F</th>
+                <th style="width: 8%">Total</th>
+                <th style="width: 8%">Enr</th>
+                <th style="width: 10%">EVALUATION</th>
             </tr>
         </thead>
         <tbody>
@@ -266,59 +308,88 @@
                 $totalAttended = 0;
                 $totalEnrolled = 0;
             @endphp
+        </tbody>
 
-            @forelse($guidanceData as $guidance)
-                <tr>
-                    <td>{{ $guidance['date'] }}</td>
-                    <td><strong>{{ $guidance['topic'] }}</strong></td>
-                    <td>
-                        @if(count($guidance['colleges']) > 0)
-                            {{ $guidance['colleges']->implode(', ') }}
-                        @else
-                            All Colleges
-                        @endif
-                    </td>
-                    <td class="text-center">{{ $guidance['male'] }}</td>
-                    <td class="text-center">{{ $guidance['female'] }}</td>
-                    <td class="text-center"><strong>{{ $guidance['total_attended'] }}</strong></td>
-                    <td class="text-center"><strong>{{ $guidance['total_enrolled'] }}</strong></td>
-                </tr>
-                @php
-                    $totalMale += $guidance['male'];
-                    $totalFemale += $guidance['female'];
-                    $totalAttended += $guidance['total_attended'];
-                    $totalEnrolled += $guidance['total_enrolled'];
-                @endphp
-            @empty
-                <tr>
-                    <td colspan="7" class="text-center">No guidance data available</td>
-                </tr>
-            @endforelse
+        @forelse($guidanceData as $guidance)
+            <tbody style="page-break-inside: avoid;">
+                @php $rowCount = count($guidance['rows']); @endphp
+                @foreach($guidance['rows'] as $index => $row)
+                    <tr>
+                        @php
+                            $borderStyle = 'border-bottom: 1px solid #444;';
+                            if ($rowCount > 1) {
+                                if ($index === 0) {
+                                    $borderStyle = 'border-bottom: none;';
+                                } elseif ($index === $rowCount - 1) {
+                                    $borderStyle = 'border-top: none; border-bottom: 1px solid #444;';
+                                } else {
+                                    $borderStyle = 'border-top: none; border-bottom: none;';
+                                }
+                            }
+                        @endphp
+                        <td style="vertical-align: middle; background-color: #f8f9fa; {{ $borderStyle }}">
+                            @if($index === 0)
+                                {{ $guidance['date'] }}
+                            @endif
+                        </td>
+                        <td style="vertical-align: middle; background-color: #f8f9fa; {{ $borderStyle }}">
+                            @if($index === 0)
+                                <strong>{{ $guidance['topic'] }}</strong>
+                            @endif
+                        </td>
 
-            @if(count($guidanceData) > 0)
+                        <td class="text-start" style="font-size: 7pt;">{{ $row['college'] }}</td>
+                        <td class="text-center">{{ $row['male'] }}</td>
+                        <td class="text-center">{{ $row['female'] }}</td>
+                        <td class="text-center"><strong>{{ $row['total_attended'] }}</strong></td>
+                        <td class="text-center">{{ $row['total_enrolled'] }}</td>
+                        <td></td> <!-- Evaluation -->
+                    </tr>
+                    @php
+                        $totalMale += $row['male'];
+                        $totalFemale += $row['female'];
+                        $totalAttended += $row['total_attended'];
+                        $totalEnrolled += $row['total_enrolled'];
+                    @endphp
+                @endforeach
+            </tbody>
+        @empty
+            <tbody>
+                <tr>
+                    <td colspan="8" class="text-center">No guidance data available</td>
+                </tr>
+            </tbody>
+        @endforelse
+
+        @if(count($guidanceData) > 0)
+            <tbody style="page-break-inside: avoid;">
                 <tr class="total-row">
                     <td colspan="3">GRAND TOTAL</td>
                     <td class="text-center">{{ $totalMale }}</td>
                     <td class="text-center">{{ $totalFemale }}</td>
                     <td class="text-center">{{ $totalAttended }}</td>
                     <td class="text-center">{{ $totalEnrolled }}</td>
+                    <td></td>
                 </tr>
-            @endif
-        </tbody>
+            </tbody>
+        @endif
     </table>
 
+    {{-- Force page break if needed, but often fits in landscape --}}
+    {{-- <div class="page-break"></div> --}}
+
     <!-- C. COUNSELING -->
-    <div class="section-title">C. COUNSELING</div>
+    <div class="section-header">C. COUNSELING SERVICES</div>
     <table>
         <thead>
             <tr>
-                <th style="width: 20%">NATURE</th>
+                <th style="width: 15%">NATURE</th>
                 <th style="width: 20%">COLLEGE</th>
                 <th style="width: 15%">YEAR LEVEL</th>
-                <th style="width: 25%">PRESENTING PROBLEM</th>
-                <th>Male</th>
-                <th>Female</th>
-                <th>Total Attendees</th>
+                <th style="width: 20%">PRESENTING PROBLEM</th>
+                <th class="w-numbers">M</th>
+                <th class="w-numbers">F</th>
+                <th style="width: 10%">Total</th>
             </tr>
         </thead>
         <tbody>
@@ -327,55 +398,63 @@
                 $totalFemale = 0;
                 $totalCount = 0;
             @endphp
+        </tbody>
 
-            @forelse($counselingData as $counseling)
-                <tr>
-                    <td><strong>{{ $counseling['nature'] }}</strong></td>
-                    <td>
-                        @if(count($counseling['colleges']) > 0)
-                            {{ $counseling['colleges']->implode(', ') }}
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td class="text-center">
-                        @if(count($counseling['year_levels']) > 0)
-                            {{ $counseling['year_levels']->implode(', ') }}
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td>
-                        @if(count($counseling['presenting_problems']) > 0)
-                            {{ $counseling['presenting_problems']->implode(', ') }}
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td class="text-center">{{ $counseling['male'] }}</td>
-                    <td class="text-center">{{ $counseling['female'] }}</td>
-                    <td class="text-center"><strong>{{ $counseling['total'] }}</strong></td>
-                </tr>
-                @php
-                    $totalMale += $counseling['male'];
-                    $totalFemale += $counseling['female'];
-                    $totalCount += $counseling['total'];
-                @endphp
-            @empty
+        @forelse($counselingData as $counseling)
+            <tbody style="page-break-inside: avoid;">
+                @php $rowCount = count($counseling['rows']); @endphp
+                @foreach($counseling['rows'] as $index => $row)
+                    <tr>
+                        @php
+                            $borderStyle = 'border-bottom: 1px solid #444;';
+                            if ($rowCount > 1) {
+                                if ($index === 0) {
+                                    $borderStyle = 'border-bottom: none;';
+                                } elseif ($index === $rowCount - 1) {
+                                    $borderStyle = 'border-top: none; border-bottom: 1px solid #444;';
+                                } else {
+                                    $borderStyle = 'border-top: none; border-bottom: none;';
+                                }
+                            }
+                        @endphp
+                        <td style="vertical-align: middle; background-color: #f8f9fa; {{ $borderStyle }}">
+                            @if($index === 0)
+                                <strong>{{ $counseling['nature'] }}</strong>
+                            @endif
+                        </td>
+
+                        <td class="text-start" style="font-size: 7pt;">{{ $row['college'] }}</td>
+                        <td class="text-center" style="font-size: 7pt;">{{ $row['year_level'] }}</td>
+                        <td class="text-start" style="font-size: 7pt;">{{ $row['presenting_problem'] }}</td>
+                        <td class="text-center">{{ $row['male'] }}</td>
+                        <td class="text-center">{{ $row['female'] }}</td>
+                        <td class="text-center"><strong>{{ $row['total'] }}</strong></td>
+                    </tr>
+                    @php
+                        $totalMale += $row['male'];
+                        $totalFemale += $row['female'];
+                        $totalCount += $row['total'];
+                    @endphp
+                @endforeach
+            </tbody>
+        @empty
+            <tbody>
                 <tr>
                     <td colspan="7" class="text-center">No counseling data available</td>
                 </tr>
-            @endforelse
+            </tbody>
+        @endforelse
 
-            @if(count($counselingData) > 0)
+        @if(count($counselingData) > 0)
+            <tbody style="page-break-inside: avoid;">
                 <tr class="total-row">
                     <td colspan="4">GRAND TOTAL</td>
                     <td class="text-center">{{ $totalMale }}</td>
                     <td class="text-center">{{ $totalFemale }}</td>
                     <td class="text-center">{{ $totalCount }}</td>
                 </tr>
-            @endif
-        </tbody>
+            </tbody>
+        @endif
     </table>
 
     <div class="footer">

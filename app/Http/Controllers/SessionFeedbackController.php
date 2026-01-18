@@ -81,14 +81,31 @@ class SessionFeedbackController extends Controller
             if (auth()->user()->role !== 'counselor') {
                 return redirect()->back()->with('error', 'Access denied.');
             }
-            
-            $feedback = SessionFeedback::whereHas('appointment', function($query) {
-                    $query->where('counselor_id', auth()->id());
-                })
+
+            $feedback = SessionFeedback::whereHas('appointment', function ($query) {
+                $query->where('counselor_id', auth()->id());
+            })
                 ->with(['appointment.student', 'appointment.sessionNotes'])
                 ->findOrFail($feedbackId);
         }
 
         return view('session-feedback.show', compact('feedback'));
     }
-} 
+
+    // List all feedback for the counselor
+    public function index()
+    {
+        if (auth()->user()->role !== 'counselor') {
+            return redirect()->back()->with('error', 'Access denied.');
+        }
+
+        $feedbacks = SessionFeedback::whereHas('appointment', function ($query) {
+            $query->where('counselor_id', auth()->id());
+        })
+            ->with(['appointment.student'])
+            ->latest()
+            ->paginate(10); // Paginate for better UI
+
+        return view('counselor.feedback.index', compact('feedbacks'));
+    }
+}

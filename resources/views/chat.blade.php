@@ -83,13 +83,27 @@
 
         .custom-sidebar .sidebar-logo {
             text-align: center;
-            padding: 2rem 1rem 1rem 1rem;
-            border-bottom: 1px solid #4a7c59;
+            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-sidebar .sidebar-logo h3 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-sidebar .sidebar-logo p {
+            letter-spacing: 1px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem !important;
         }
 
         .custom-sidebar .sidebar-nav {
             flex: 1;
-            padding: 1.5rem 0.5rem 0 0.5rem;
+            padding: 1.25rem 0.75rem;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
@@ -98,44 +112,88 @@
         .custom-sidebar .sidebar-link {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: #fff;
+            gap: 1.1rem;
+            padding: 0.9rem 1.25rem;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             font-weight: 500;
-            transition: background 0.2s, color 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            margin: 0.1rem 0;
         }
 
-        .custom-sidebar .sidebar-link.active,
         .custom-sidebar .sidebar-link:hover {
-            background: #4a7c59;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        .custom-sidebar .sidebar-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
             color: #f4d03f;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-sidebar .sidebar-link.active::before {
+            content: '';
+            position: absolute;
+            left: -0.75rem;
+            top: 15%;
+            bottom: 15%;
+            width: 5px;
+            background: #f4d03f;
+            border-radius: 0 6px 6px 0;
+            box-shadow: 2px 0 15px rgba(244, 208, 63, 0.5);
         }
 
         .custom-sidebar .sidebar-link .bi {
-            font-size: 1.1rem;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .custom-sidebar .sidebar-link.active .bi {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px rgba(244, 208, 63, 0.3));
         }
 
         .custom-sidebar .sidebar-bottom {
-            padding: 1rem 0.5rem;
-            border-top: 1px solid #4a7c59;
+            padding: 1.5rem 1rem;
+            background: rgba(0, 0, 0, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .custom-sidebar .sidebar-link.logout {
-            background: #dc3545;
-            color: #fff;
-            border-radius: 8px;
-            text-align: center;
-            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            text-align: left;
+            padding: 0.85rem 1.25rem;
             font-weight: 600;
-            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1.1rem;
         }
 
         .custom-sidebar .sidebar-link.logout:hover {
-            background: #b52a37;
+            background: #dc3545;
             color: #fff;
+            border-color: #dc3545;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        @media (max-width: 991.98px) {
+            .custom-sidebar {
+                width: 200px;
+            }
+
+            .main-dashboard-content {
+                margin-left: 200px;
+            }
         }
 
         @media (max-width: 991.98px) {
@@ -159,33 +217,19 @@
                 top: 0;
                 width: 240px;
                 transform: translateX(-100%);
-                transition: transform 0.2s ease;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 flex-direction: column;
                 padding: 0;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
             }
 
             .custom-sidebar.show {
                 transform: translateX(0);
             }
 
-            .custom-sidebar .sidebar-logo {
-                display: block;
-            }
-
-            .custom-sidebar .sidebar-nav {
-                flex-direction: column;
-                gap: 0.25rem;
-                padding: 1rem 0.5rem 1rem 0.5rem;
-            }
-
-            .custom-sidebar .sidebar-link {
-                justify-content: flex-start;
-                padding: 0.6rem 0.75rem;
-                font-size: 1rem;
-            }
-
             .main-dashboard-content {
                 margin-left: 0;
+                padding: 1rem;
             }
 
             /* Toggle button */
@@ -197,9 +241,12 @@
                 background: var(--forest-green);
                 color: #fff;
                 border: none;
-                border-radius: 8px;
-                padding: 0.5rem 0.75rem;
-                box-shadow: var(--shadow-sm);
+                border-radius: 10px;
+                padding: 0.6rem 0.8rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
             }
         }
 
@@ -229,37 +276,52 @@
                 @include('counselor.sidebar')
             @else
                 <div class="custom-sidebar">
-                    <div class="sidebar-logo mb-4">
+                    <div class="sidebar-logo">
                         <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
-                            style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
+                            style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                         <h3
                             style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">
                             CMU Guidance and Counseling Center</h3>
-                        <p style="margin: 0; font-size: 0.95rem; color: #fff; opacity: 0.7;">Student Portal</p>
+                        <p
+                            style="margin: 0; font-size: 0.8rem; color: #fff; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">
+                            Student Portal</p>
                     </div>
-                    <nav class="sidebar-nav flex-grow-1">
-                        <a href="{{ route('profile') }}"
-                            class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
-                                class="bi bi-person"></i>Profile</a>
+                    <nav class="sidebar-nav">
                         <a href="{{ route('dashboard') }}"
                             class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
                                 class="bi bi-house-door"></i>Dashboard</a>
+                        <a href="{{ route('profile') }}"
+                            class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
+                                class="bi bi-person"></i>Profile</a>
                         <a href="{{ route('appointments.index') }}"
-                            class="sidebar-link{{ request()->routeIs('appointments.*') ? ' active' : '' }}"><i
+                            class="sidebar-link{{ request()->routeIs('appointments.*') && !request()->routeIs('appointments.completedWithNotes') ? ' active' : '' }}"><i
                                 class="bi bi-calendar-check"></i>Appointments</a>
+                        <a href="{{ route('appointments.completedWithNotes') }}"
+                            class="sidebar-link{{ request()->routeIs('appointments.completedWithNotes') ? ' active' : '' }}"><i
+                                class="bi bi-journal-text"></i>Sessions & Feedback</a>
                         <a href="{{ route('assessments.index') }}"
                             class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i
                                 class="bi bi-clipboard-data"></i>Assessments</a>
                         <a href="{{ route('chat.selectCounselor') }}"
                             class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i
                                 class="bi bi-chat-dots"></i>Chat with a Counselor</a>
+
+                        <div class="sidebar-divider my-3" style="border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
+                        <div class="sidebar-resources">
+                            <div class="text-uppercase small px-3 mb-2"
+                                style="color: rgba(255,255,255,0.5); font-weight:700; font-size: 0.75rem; letter-spacing: 1px;">
+                                Resources</div>
+                            <a href="#" class="sidebar-link"><i class="bi bi-play-circle"></i>Orientation</a>
+                            <a href="#" class="sidebar-link"><i class="bi bi-book"></i>Library</a>
+                            <a href="#" class="sidebar-link"><i class="bi bi-gear"></i>Settings</a>
+                        </div>
                     </nav>
                     <div class="sidebar-bottom w-100">
                         <a href="{{ route('logout') }}" class="sidebar-link logout"
-                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            onclick="event.preventDefault(); document.getElementById('logout-form-chat').submit();">
                             <i class="bi bi-box-arrow-right"></i>Logout
                         </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        <form id="logout-form-chat" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
                     </div>
@@ -862,8 +924,8 @@
                 }
                 if (message.image) {
                     messageContent += `<div class="message-image mt-2">
-                            <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
-                        </div>`;
+                                    <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
+                                </div>`;
                 }
 
                 // Avatar for other user
@@ -873,13 +935,13 @@
                 }
 
                 wrapperDiv.innerHTML = `
-                        ${avatarHtml}
-                        <div class="message-bubble">
-                            ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
-                            ${messageContent}
-                            <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                        </div>
-                    `;
+                                ${avatarHtml}
+                                <div class="message-bubble">
+                                    ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
+                                    ${messageContent}
+                                    <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                            `;
 
                 messagesContainer.insertBefore(wrapperDiv, scrollAnchor);
             }

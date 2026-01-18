@@ -446,62 +446,104 @@
                                                         @endif
                                                     </div>
                                                 </div>
-                                                <div class="d-flex gap-2 align-self-center">
-                                                    <a href="{{ route('admin.registration-approvals.show', $user->id) }}"
-                                                        class="btn btn-sm btn-outline-primary">
-                                                        <i class="bi bi-eye me-1"></i>Review
-                                                    </a>
-                                                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                                        data-bs-target="#approveModal{{ $user->id }}">
-                                                        <i class="bi bi-check me-1"></i>Approve
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                                        data-bs-target="#rejectModal{{ $user->id }}">
-                                                        <i class="bi bi-x me-1"></i>Reject
-                                                    </button>
+                                                <div class="d-flex gap-3 align-items-center">
+                                                    @if($user->cor_file)
+                                                        <div class="cor-preview-container" style="position: relative;">
+                                                            <div class="d-flex flex-column align-items-center" style="width: 140px;">
+                                                                <div class="text-center mb-1">
+                                                                    <small class="fw-semibold text-success"
+                                                                        style="font-size: 0.85rem;">Preview</small>
+                                                                </div>
+                                                                <div class="position-relative"
+                                                                    style="width: 140px; height: 140px; border: 2px solid var(--gray-100); border-radius: 8px; overflow: hidden; background: white; cursor: pointer;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#corPreviewModal{{ $user->id }}"
+                                                                    onmouseover="this.style.borderColor='var(--forest-green)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+                                                                    onmouseout="this.style.borderColor='var(--gray-100)'; this.style.boxShadow='none'">
+                                                                    <iframe src="{{ asset('storage/cor_files/' . $user->cor_file) }}"
+                                                                        style="width: 400%; height: 400%; transform: scale(0.25); transform-origin: 0 0; border: none; pointer-events: none;"
+                                                                        scrolling="no"></iframe>
+                                                                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                                                                        style="background: rgba(0,0,0,0); transition: background 0.2s;"
+                                                                        onmouseover="this.style.background='rgba(0,0,0,0.05)'"
+                                                                        onmouseout="this.style.background='rgba(0,0,0,0)'">
+                                                                        <i class="bi bi-eye text-success"
+                                                                            style="font-size: 2rem; opacity: 0; transition: opacity 0.2s;"
+                                                                            onmouseover="this.style.opacity='0.8'"
+                                                                            onmouseout="this.style.opacity='0'"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        <div class="cor-preview-container" style="position: relative;">
+                                                            <div class="d-flex flex-column align-items-center" style="width: 140px;">
+                                                                <div class="text-center mb-1">
+                                                                    <small class="fw-semibold text-danger"
+                                                                        style="font-size: 0.85rem;">Preview</small>
+                                                                </div>
+                                                                <div class="d-flex flex-column align-items-center justify-content-center"
+                                                                    style="width: 140px; height: 140px; border: 2px dashed #dc3545; border-radius: 8px; background: #f8d7da;">
+                                                                    <i class="bi bi-exclamation-circle"
+                                                                        style="font-size: 3rem; color: #dc3545; opacity: 0.5;"></i>
+                                                                    <small class="text-danger mt-2" style="font-size: 0.75rem;">No COR
+                                                                        File</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div class="d-flex gap-2 align-self-center">
+                                                        <a href="{{ route('admin.registration-approvals.show', $user->id) }}"
+                                                            class="btn btn-sm btn-outline-primary">
+                                                            <i class="bi bi-eye me-1"></i>Review
+                                                        </a>
+
+                                                        <!-- Direct Approve Form -->
+                                                        <!-- Direct Approve Button -->
+                                                        <button type="button" class="btn btn-sm btn-success"
+                                                            onclick="confirmAction('{{ route('admin.registration-approvals.approve', $user->id) }}', 'Approve registration for {{ addslashes($user->name) }}?')">
+                                                            <i class="bi bi-check me-1"></i>Approve
+                                                        </button>
+
+                                                        <!-- Direct Reject Button -->
+                                                        <button type="button" class="btn btn-sm btn-danger"
+                                                            onclick="confirmRejectAction('{{ route('admin.registration-approvals.reject', $user->id) }}', 'Reject registration for {{ addslashes($user->name) }}?')">
+                                                            <i class="bi bi-x me-1"></i>Reject
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Approve Modal -->
-                                    <div class="modal fade" id="approveModal{{ $user->id }}" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Approve Registration</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                {{-- Note: We can't nest forms, so we'll handle single logic via JS or dedicated
-                                                forms outside the loop if strict HTML compliance is needed.
-                                                However, modal forms are usually placed at the end of body or handle themselves.
-                                                In this structure, we should be careful not to nest the single act forms inside the
-                                                bulk form.
 
-                                                Actually, Blade loop is inside the bulk form. HTML forbids nested forms.
-                                                FIX: We will submit single forms via JS or move modals outside.
-                                                Better Fix: Use 'formaction' attribute on buttons? No, different inputs needed.
-                                                Best Fix: Move modals outside the bulk form. --}}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Reject Modal -->
-                                    <div class="modal fade" id="rejectModal{{ $user->id }}" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Reject Registration</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 @endforeach
 
-                                <div class="d-flex justify-content-center mt-4">
-                                    {{ $pendingRegistrations->withQueryString()->links('vendor.pagination.bootstrap-5') }}
+                                <div class="d-flex justify-content-between align-items-center py-3 px-3 border-top">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="text-muted small">
+                                            Showing <strong>{{ $pendingRegistrations->firstItem() ?? 0 }}</strong> to
+                                            <strong>{{ $pendingRegistrations->lastItem() ?? 0 }}</strong> of
+                                            <strong>{{ $pendingRegistrations->total() }}</strong> users
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <label class="text-muted small mb-0">Per page:</label>
+                                            <select class="form-select form-select-sm" style="width: auto;"
+                                                onchange="changePerPage(this.value)">
+                                                <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15
+                                                </option>
+                                                <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30</option>
+                                                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {{ $pendingRegistrations->withQueryString()->links('vendor.pagination.bootstrap-5') }}
+                                    </div>
                                 </div>
+
                             @else
                                 <div class="empty-state">
                                     <i class="bi bi-check-circle text-success"></i>
@@ -517,67 +559,34 @@
                     </div>
                 </form> <!-- End Bulk Form -->
 
-                <!-- Single Action Modals (Loop again to place outside form) -->
-                @foreach($pendingRegistrations as $user)
-                    <!-- Approve Modal -->
-                    <div class="modal fade" id="approveModal{{ $user->id }}" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Approve Registration</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <form action="{{ route('admin.registration-approvals.approve', $user->id) }}" method="POST">
-                                    @csrf
-                                    <div class="modal-body">
-                                        <p>Are you sure you want to approve the registration for
-                                            <strong>{{ $user->name }}</strong>?
-                                        </p>
-                                        <div class="mb-3">
-                                            <label for="registration_notes" class="form-label">Approval Notes (Optional)</label>
-                                            <textarea class="form-control" id="registration_notes" name="registration_notes"
-                                                rows="3" placeholder="Add any notes about this approval..."></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-success">Approve Registration</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Reject Modal -->
-                    <div class="modal fade" id="rejectModal{{ $user->id }}" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Reject Registration</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <form action="{{ route('admin.registration-approvals.reject', $user->id) }}" method="POST">
-                                    @csrf
-                                    <div class="modal-body">
-                                        <p>Are you sure you want to reject the registration for
-                                            <strong>{{ $user->name }}</strong>?
-                                        </p>
-                                        <div class="mb-3">
-                                            <label for="rejection_reason" class="form-label">Rejection Reason <span
-                                                    class="text-danger">*</span></label>
-                                            <textarea class="form-control" id="rejection_reason" name="rejection_reason"
-                                                rows="3" placeholder="Please provide a reason for rejection..."
-                                                required></textarea>
-                                        </div>
+                <!-- COR File Preview Modal -->
+                @foreach($pendingRegistrations as $user)
+                    @if($user->cor_file)
+                        <div class="modal fade" id="corPreviewModal{{ $user->id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="bi bi-file-earmark-pdf me-2"></i>COR File -
+                                            {{ $user->name }}
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-0">
+                                        <iframe src="{{ asset('storage/cor_files/' . $user->cor_file) }}"
+                                            style="width: 100%; height: 70vh; border: none;"></iframe>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-danger">Reject Registration</button>
+                                        <a href="{{ asset('storage/cor_files/' . $user->cor_file) }}" target="_blank"
+                                            class="btn btn-primary">
+                                            <i class="bi bi-download me-1"></i>Open in New Tab
+                                        </a>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 @endforeach
             </div>
 
@@ -641,8 +650,27 @@
                                 </div>
                             @endforeach
 
-                            <div class="d-flex justify-content-center mt-4">
-                                {{ $approvedRegistrations->withQueryString()->links('vendor.pagination.bootstrap-5') }}
+                            <div class="d-flex justify-content-between align-items-center py-3 px-3 border-top">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="text-muted small">
+                                        Showing <strong>{{ $approvedRegistrations->firstItem() ?? 0 }}</strong> to
+                                        <strong>{{ $approvedRegistrations->lastItem() ?? 0 }}</strong> of
+                                        <strong>{{ $approvedRegistrations->total() }}</strong> users
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="text-muted small mb-0">Per page:</label>
+                                        <select class="form-select form-select-sm" style="width: auto;"
+                                            onchange="changePerPage(this.value)">
+                                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                                            <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30</option>
+                                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                            <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    {{ $approvedRegistrations->withQueryString()->links('vendor.pagination.bootstrap-5') }}
+                                </div>
                             </div>
                         @else
                             <div class="empty-state">
@@ -715,8 +743,27 @@
                                 </div>
                             @endforeach
 
-                            <div class="d-flex justify-content-center mt-4">
-                                {{ $rejectedRegistrations->withQueryString()->links('vendor.pagination.bootstrap-5') }}
+                            <div class="d-flex justify-content-between align-items-center py-3 px-3 border-top">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="text-muted small">
+                                        Showing <strong>{{ $rejectedRegistrations->firstItem() ?? 0 }}</strong> to
+                                        <strong>{{ $rejectedRegistrations->lastItem() ?? 0 }}</strong> of
+                                        <strong>{{ $rejectedRegistrations->total() }}</strong> users
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="text-muted small mb-0">Per page:</label>
+                                        <select class="form-select form-select-sm" style="width: auto;"
+                                            onchange="changePerPage(this.value)">
+                                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                                            <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30</option>
+                                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                            <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    {{ $rejectedRegistrations->withQueryString()->links('vendor.pagination.bootstrap-5') }}
+                                </div>
                             </div>
                         @else
                             <div class="empty-state">
@@ -738,291 +785,401 @@
         <button type="button" class="btn btn-success rounded-pill px-4" onclick="submitBulkAction('approve')">
             <i class="bi bi-check-circle me-1"></i>Approve
         </button>
-        <button type="button" class="btn btn-danger rounded-pill px-4" data-bs-toggle="modal"
-            data-bs-target="#bulkRejectModal">
-            <i class="bi bi-x-circle me-1"></i>Reject
-        </button>
-    </div>
-
-    <!-- Bulk Reject Reason Modal -->
-    <div class="modal fade" id="bulkRejectModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Bulk Reject Students</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="bulk_reason_input" class="form-label">Rejection Reason <span
-                                class="text-danger">*</span></label>
-                        <textarea class="form-control" id="bulk_reason_input" rows="3"
-                            placeholder="Please provide a reason for rejecting the selected students..."
-                            required></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" onclick="submitBulkAction('reject')">Confirm
-                        Rejection</button>
-                </div>
-            </div>
+        <button type="button" class="btn btn-danger rounded-pill px-4" onclick="submitBulkAction('reject')">
+                <i class="bi bi-x-circle me-1"></i>Reject
+            </button>
         </div>
-    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const selectAll = document.getElementById('selectAllPending');
-            const checkboxes = document.querySelectorAll('.user-select-checkbox');
-            const actionBar = document.getElementById('bulkActionBar');
-            const selectedCountSpan = document.querySelector('.bulk-selected-count');
-
-            window.updateActionBar = function () {
-                const selected = document.querySelectorAll('.user-select-checkbox:checked').length;
-                selectedCountSpan.textContent = selected;
-                if (selected > 0) {
-                    actionBar.classList.add('visible');
-                } else {
-                    actionBar.classList.remove('visible');
-                }
-            };
-
-            if (selectAll) {
-                selectAll.addEventListener('change', function () {
-                    checkboxes.forEach(cb => {
-                        cb.checked = this.checked;
-                    });
-                    updateActionBar();
-                });
+        <script>
+            // Per Page Selector Function
+            function changePerPage(perPage) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('per_page', perPage);
+                url.searchParams.delete('pending_page'); // Reset to page 1
+                url.searchParams.delete('approved_page'); // Reset to page 1
+                url.searchParams.delete('rejected_page'); // Reset to page 1
+                window.location.href = url.toString();
             }
 
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', function () {
-                    updateActionBar();
-                    // Update select all state
-                    if (selectAll) {
-                        const allChecked = document.querySelectorAll('.user-select-checkbox:checked').length === checkboxes.length;
-                        selectAll.checked = allChecked;
+            // Clear Verified Enrollment Function
+            function clearVerifiedEnrollment() {
+                sessionStorage.removeItem('verified_enrollment_ids');
+                window.location.reload();
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const selectAll = document.getElementById('selectAllPending');
+                const checkboxes = document.querySelectorAll('.user-select-checkbox');
+                const actionBar = document.getElementById('bulkActionBar');
+                const selectedCountSpan = document.querySelector('.bulk-selected-count');
+
+                window.updateActionBar = function () {
+                    const selected = document.querySelectorAll('.user-select-checkbox:checked').length;
+                    selectedCountSpan.textContent = selected;
+                    if (selected > 0) {
+                        actionBar.classList.add('visible');
+                    } else {
+                        actionBar.classList.remove('visible');
                     }
+                };
+
+                if (selectAll) {
+                    selectAll.addEventListener('change', function () {
+                        checkboxes.forEach(cb => {
+                            cb.checked = this.checked;
+                        });
+                        updateActionBar();
+                    });
+                }
+
+                checkboxes.forEach(cb => {
+                    cb.addEventListener('change', function () {
+                        updateActionBar();
+                        // Update select all state
+                        if (selectAll) {
+                            const allChecked = document.querySelectorAll('.user-select-checkbox:checked').length === checkboxes.length;
+                            selectAll.checked = allChecked;
+                        }
+                    });
                 });
             });
-        });
 
-        function submitBulkAction(action) {
-            const form = document.getElementById('bulkActionForm');
-            if (action === 'approve') {
-                if (confirm('Are you sure you want to approve the selected students?')) {
-                    form.action = "{{ route('admin.registration-approvals.bulk-approve') }}";
-                    form.submit();
+            function submitBulkAction(action) {
+                const form = document.getElementById('bulkActionForm');
+                if (action === 'approve') {
+                    const count = document.querySelectorAll('.user-select-checkbox:checked').length;
+                    Swal.fire({
+                        title: 'Approve Students?',
+                        text: `Are you sure you want to approve the ${count} selected student(s)?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#1f7a2d',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, Approve All'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.action = "{{ route('admin.registration-approvals.bulk-approve') }}";
+                            form.submit();
+                        }
+                    });
+                } else if (action === 'reject') {
+                    const count = document.querySelectorAll('.user-select-checkbox:checked').length;
+                    Swal.fire({
+                        title: 'Reject Students',
+                        text: `Please provide a reason for rejecting the ${count} selected student(s):`,
+                        input: 'textarea',
+                        inputPlaceholder: 'Reason for rejection...',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Reject All',
+                        cancelButtonText: 'Cancel',
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'You need to write a reason!'
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed && result.value) {
+                            document.getElementById('bulk_rejection_reason').value = result.value;
+                            form.action = "{{ route('admin.registration-approvals.bulk-reject') }}";
+                            form.submit();
+                        }
+                    });
                 }
-            } else if (action === 'reject') {
-                const reason = document.getElementById('bulk_reason_input').value;
-                if (!reason) {
-                    alert('Please provide a rejection reason.');
+            }
+
+            // Enrollment Verification File Upload
+            window.verifyEnrollment = async function (btn) {
+                const verificationForm = document.getElementById('enrollmentVerificationForm');
+                const fileInput = document.getElementById('enrollment_file');
+                const verificationResults = document.getElementById('verificationResults');
+
+                if (!fileInput || !verificationForm) return;
+
+                // Clear previous errors
+                if (verificationResults) verificationResults.innerHTML = '';
+
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    if (verificationResults) {
+                        verificationResults.innerHTML = '<div class="alert alert-danger">Please select a file first.</div>';
+                    } else {
+                        alert('Please select a file first.');
+                    }
                     return;
-                } // The modal validates via required, but we are submitting via JS so we need manual check
-
-                document.getElementById('bulk_rejection_reason').value = reason;
-                form.action = "{{ route('admin.registration-approvals.bulk-reject') }}";
-                form.submit();
-            }
-        }
-
-        // Enrollment Verification File Upload
-        window.verifyEnrollment = async function (btn) {
-            const verificationForm = document.getElementById('enrollmentVerificationForm');
-            const fileInput = document.getElementById('enrollment_file');
-            const verificationResults = document.getElementById('verificationResults');
-
-            if (!fileInput || !verificationForm) return;
-
-            // Clear previous errors
-            if (verificationResults) verificationResults.innerHTML = '';
-
-            const file = fileInput.files[0];
-
-            if (!file) {
-                if (verificationResults) {
-                    verificationResults.innerHTML = '<div class="alert alert-danger">Please select a file first.</div>';
-                } else {
-                    alert('Please select a file first.');
                 }
-                return;
-            }
 
-            // Show loading state
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-            if (verificationResults) {
-                verificationResults.innerHTML = '<div class="text-center"><div class="spinner-border text-success" role="status"></div><p class="mt-2">Analyzing enrollment file...</p></div>';
-            }
+                // Show loading state
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                if (verificationResults) {
+                    verificationResults.innerHTML = '<div class="text-center"><div class="spinner-border text-success" role="status"></div><p class="mt-2">Analyzing enrollment file...</p></div>';
+                }
 
-            const formData = new FormData();
-            formData.append('enrollment_file', file);
-            formData.append('_token', '{{ csrf_token() }}');
+                const formData = new FormData();
+                formData.append('enrollment_file', file);
+                formData.append('_token', '{{ csrf_token() }}');
 
-            try {
-                const response = await fetch('{{ route("admin.registration-approvals.verify-enrollment") }}', {
-                    method: 'POST',
-                    body: formData
-                });
+                try {
+                    const response = await fetch('{{ route("admin.registration-approvals.verify-enrollment") }}', {
+                        method: 'POST',
+                        body: formData
+                    });
 
-                const data = await response.json();
+                    const data = await response.json();
 
-                if (data.success) {
-                    // Auto-select matched students
-                    if (data.matched_ids) {
-                        data.matched_ids.forEach(id => {
-                            const checkbox = document.querySelector(`input[name="user_ids[]"][value="${id}"]`);
-                            if (checkbox) {
-                                checkbox.checked = true;
-                                // Add visual indicator
-                                const card = checkbox.closest('.registration-item');
-                                if (card) {
-                                    card.style.borderLeft = '4px solid #28a745';
-                                    card.style.backgroundColor = '#f8fff9';
-                                    // Add verified badge
-                                    const badge = document.createElement('span');
-                                    badge.className = 'badge bg-success ms-2 verified-badge';
-                                    badge.innerHTML = '<i class="bi bi-check-circle me-1"></i>Verified';
-                                    const statusArea = card.querySelector('.text-muted.small');
-                                    if (statusArea) {
-                                        const existingBadge = card.querySelector('.verified-badge');
-                                        if (!existingBadge) statusArea.insertAdjacentElement('afterend', badge);
+                    if (data.success) {
+                        // Auto-select matched students
+                        if (data.matched_ids) {
+                            // Store matched IDs in sessionStorage for cross-page selection
+                            sessionStorage.setItem('verified_enrollment_ids', JSON.stringify(data.matched_ids));
+
+                            // Check boxes for currently visible students
+                            let visibleMatches = 0;
+                            data.matched_ids.forEach(id => {
+                                const checkbox = document.querySelector(`input[name="user_ids[]"][value="${id}"]`);
+                                if (checkbox) {
+                                    checkbox.checked = true;
+                                    visibleMatches++;
+                                    // Add visual indicator
+                                    const card = checkbox.closest('.registration-item');
+                                    if (card) {
+                                        card.style.borderLeft = '4px solid #28a745';
+                                        card.style.backgroundColor = '#f8fff9';
+                                        // Add verified badge
+                                        const badge = document.createElement('span');
+                                        badge.className = 'badge bg-success ms-2 verified-badge';
+                                        badge.innerHTML = '<i class="bi bi-check-circle me-1"></i>Verified';
+                                        const statusArea = card.querySelector('.text-muted.small');
+                                        if (statusArea) {
+                                            const existingBadge = card.querySelector('.verified-badge');
+                                            if (!existingBadge) statusArea.insertAdjacentElement('afterend', badge);
+                                        }
                                     }
                                 }
+                            });
+
+                            // Notify about students on other pages
+                            const hiddenMatches = data.matched_ids.length - visibleMatches;
+                            if (hiddenMatches > 0) {
+                                console.log(`${hiddenMatches} matched student(s) are on other pages and will be auto-selected when you navigate to those pages.`);
                             }
-                        });
+                        }
+
+                        // Update action bar visibility
+                        if (typeof updateActionBar === 'function') {
+                            updateActionBar();
+                        }
+
+                        if (verificationResults) {
+                            verificationResults.innerHTML = `
+                                                                                                                                    <div class="alert alert-success">
+                                                                                                                                        <h6><i class="bi bi-check-circle me-2"></i>Enrollment Verification Complete</h6>
+                                                                                                                                        <p class="mb-2"><strong>${data.total_matched}</strong> student(s) matched out of <strong>${data.total_enrollment}</strong> in enrollment file.</p>
+                                                                                                                                        <p class="mb-0 small">Matched students have been auto-selected and highlighted in green.</p>
+                                                                                                                                    </div>
+                                                                                                                                    ${data.match_details && data.match_details.length > 0 ? `
+                                                                                                                                        <div class="mt-3">
+                                                                                                                                            <h6>Matched Students (showing first 50):</h6>
+                                                                                                                                            <div class="list-group" style="max-height: 400px; overflow-y: auto;">
+                                                                                                                                                ${data.match_details.slice(0, 50).map(student => `
+                                                                                                                                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                                                                                                                        <div>
+                                                                                                                                                            <strong>${student.name}</strong>
+                                                                                                                                                            <br><small class="text-muted">${student.student_id} • ${student.email}</small>
+                                                                                                                                                        </div>
+                                                                                                                                                        <span class="badge bg-success">${student.reasons}</span>
+                                                                                                                                                    </div>
+                                                                                                                                                `).join('')}
+                                                                                                                                            </div>
+                                                                                                                                        </div>
+                                                                                                                                    ` : ''}
+                                                                                                                                `;
+                        }
+
+                    } else {
+                        if (verificationResults) {
+                            verificationResults.innerHTML = `
+                                                                                                                                    <div class="alert alert-danger">
+                                                                                                                                        <i class="bi bi-exclamation-triangle me-2"></i>${data.message}
+                                                                                                                                    </div>
+                                                                                                                                `;
+                        }
                     }
 
-                    // Update action bar visibility
-                    if (typeof updateActionBar === 'function') {
-                        updateActionBar();
-                    }
-
+                } catch (error) {
+                    console.error('Verify error:', error);
                     if (verificationResults) {
                         verificationResults.innerHTML = `
-                                            <div class="alert alert-success">
-                                                <h6><i class="bi bi-check-circle me-2"></i>Enrollment Verification Complete</h6>
-                                                <p class="mb-2"><strong>${data.total_matched}</strong> student(s) matched out of <strong>${data.total_enrollment}</strong> in enrollment file.</p>
-                                                <p class="mb-0 small">Matched students have been auto-selected and highlighted in green.</p>
-                                            </div>
-                                            ${data.match_details && data.match_details.length > 0 ? `
-                                                <div class="mt-3">
-                                                    <h6>Matched Students:</h6>
-                                                    <div class="list-group">
-                                                        ${data.match_details.map(student => `
-                                                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                                <div>
-                                                                    <strong>${student.name}</strong>
-                                                                    <br><small class="text-muted">${student.student_id} • ${student.email}</small>
-                                                                </div>
-                                                                <span class="badge bg-success">${student.reasons}</span>
-                                                            </div>
-                                                        `).join('')}
-                                                    </div>
-                                                </div>
-                                            ` : ''}
-                                        `;
+                                                                                                                                <div class="alert alert-danger">
+                                                                                                                                    <i class="bi bi-exclamation-triangle me-2"></i>Error processing file: ${error.message}
+                                                                                                                                </div>
+                                                                                                                            `;
                     }
-
-                } else {
-                    if (verificationResults) {
-                        verificationResults.innerHTML = `
-                                            <div class="alert alert-danger">
-                                                <i class="bi bi-exclamation-triangle me-2"></i>${data.message}
-                                            </div>
-                                        `;
-                    }
-                }
-
-            } catch (error) {
-                console.error('Verify error:', error);
-                if (verificationResults) {
-                    verificationResults.innerHTML = `
-                                        <div class="alert alert-danger">
-                                            <i class="bi bi-exclamation-triangle me-2"></i>Error processing file: ${error.message}
-                                        </div>
-                                    `;
-                }
-            } finally {
-                // Reset button
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-upload me-2"></i>Process File';
-                }
-            }
-        };
-
-        // Reset modal on close
-        document.addEventListener('DOMContentLoaded', function () {
-            const verificationModal = document.getElementById('enrollmentVerificationModal');
-            if (verificationModal) {
-                verificationModal.addEventListener('hidden.bs.modal', function () {
-                    const form = document.getElementById('enrollmentVerificationForm');
-                    const results = document.getElementById('verificationResults');
-                    const btn = document.getElementById('uploadEnrollmentBtn');
-
-                    if (form) form.reset();
-                    if (results) results.innerHTML = '';
+                } finally {
+                    // Reset button
                     if (btn) {
                         btn.disabled = false;
                         btn.innerHTML = '<i class="bi bi-upload me-2"></i>Process File';
                     }
-                });
-            }
-        });
-    </script>
+                }
+            };
 
-    <!-- Enrollment Verification Modal -->
-    <div class="modal fade" id="enrollmentVerificationModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-file-earmark-check me-2"></i>Verify Enrollment File</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>Upload your enrollment list</strong> (Excel or CSV) and we'll automatically match and select
-                        registered students.
+            // Reset modal on close
+            document.addEventListener('DOMContentLoaded', function () {
+                const verificationModal = document.getElementById('enrollmentVerificationModal');
+                if (verificationModal) {
+                    verificationModal.addEventListener('hidden.bs.modal', function () {
+                        const form = document.getElementById('enrollmentVerificationForm');
+                        const results = document.getElementById('verificationResults');
+                        const btn = document.getElementById('uploadEnrollmentBtn');
+
+                        if (form) form.reset();
+                        if (results) results.innerHTML = '';
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="bi bi-upload me-2"></i>Process File';
+                        }
+                    });
+                }
+            });
+        </script>
+
+        <!-- Enrollment Verification Modal -->
+        <div class="modal fade" id="enrollmentVerificationModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-file-earmark-check me-2"></i>Verify Enrollment File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Upload your enrollment list</strong> (Excel or CSV) and we'll automatically match and select
+                            registered students.
+                        </div>
 
-                    <form id="enrollmentVerificationForm">
-                        <div class="mb-3">
-                            <label for="enrollment_file" class="form-label">Enrollment File</label>
-                            <input type="file" class="form-control" id="enrollment_file" accept=".xlsx,.xls,.csv" required>
-                            <div class="form-text">
-                                Accepted formats: Excel (.xlsx, .xls) or CSV (.csv). Max size: 5MB
+                        <form id="enrollmentVerificationForm">
+                            <div class="mb-3">
+                                <label for="enrollment_file" class="form-label">Enrollment File</label>
+                                <input type="file" class="form-control" id="enrollment_file" accept=".xlsx,.xls,.csv" required>
+                                <div class="form-text">
+                                    Accepted formats: Excel (.xlsx, .xls) or CSV (.csv). Max size: 5MB
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Required Columns</label>
-                            <ul class="small text-muted mb-0">
-                                <li><strong>Student ID</strong> (or "ID Number", "Student Number")</li>
-                                <li><strong>Name</strong> (or "Full Name", "Student Name")</li>
-                                <li><strong>Email</strong> (or "Email Address", "Student Email")</li>
-                            </ul>
-                            <p class="small text-muted mt-2 mb-0">
-                                <i class="bi bi-lightbulb me-1"></i>Extra columns are fine - they'll be ignored
-                                automatically!
-                            </p>
-                        </div>
-                    </form>
+                            <div class="mb-3">
+                                <label class="form-label">Required Columns</label>
+                                <ul class="small text-muted mb-0">
+                                    <li><strong>Student ID</strong> (or "ID Number", "Student Number")</li>
+                                    <li><strong>Name</strong> (or "Full Name", "Student Name")</li>
+                                    <li><strong>Email</strong> (or "Email Address", "Student Email")</li>
+                                </ul>
+                                <p class="small text-muted mt-2 mb-0">
+                                    <i class="bi bi-lightbulb me-1"></i>Extra columns are fine - they'll be ignored
+                                    automatically!
+                                </p>
+                            </div>
+                        </form>
 
-                    <!-- Results Area -->
-                    <div id="verificationResults" class="mt-3"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" id="uploadEnrollmentBtn" onclick="verifyEnrollment(this)">
-                        <i class="bi bi-upload me-2"></i>Process File
-                    </button>
+                        <!-- Results Area -->
+                        <div id="verificationResults" class="mt-3"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-success" id="uploadEnrollmentBtn" onclick="verifyEnrollment(this)">
+                            <i class="bi bi-upload me-2"></i>Process File
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        </div>
+        </div>
+
+        <!-- Universal Hidden Action Form -->
+        <form id="actionForm" method="POST" style="display: none;">
+            @csrf
+        </form>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Check for success/error messages from redirect
+                @if(session('success'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: "{{ session('success') }}",
+                        confirmButtonColor: '#1f7a2d'
+                    });
+                @endif
+
+                @if(session('error'))
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: "{{ session('error') }}",
+                        confirmButtonColor: '#dc3545'
+                    });
+                @endif
+                                    });
+
+            function confirmAction(url, message) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: message,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#1f7a2d',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, proceed',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('actionForm');
+                        form.action = url;
+                        form.submit();
+                    }
+                });
+            }
+
+            function confirmRejectAction(url, message) {
+                Swal.fire({
+                    title: 'Reject Registration',
+                    text: "Please provide a reason for rejection:",
+                    input: 'textarea',
+                    inputPlaceholder: 'Reason for rejection...',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Reject Registration',
+                    cancelButtonText: 'Cancel',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'You need to write a reason!'
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed && result.value) {
+                        const form = document.getElementById('actionForm');
+                        form.action = url;
+
+                        // Create hidden input for reason
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'rejection_reason';
+                        input.value = result.value;
+                        form.appendChild(input);
+
+                        form.submit();
+                    }
+                });
+            }
+        </script>
 @endsection
