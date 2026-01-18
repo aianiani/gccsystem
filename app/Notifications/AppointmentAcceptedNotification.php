@@ -54,7 +54,7 @@ class AppointmentAcceptedNotification extends Notification
         $appointment = $this->appointment;
 
         $message = (new MailMessage)
-            ->subject('Your Appointment Has Been Accepted')
+            ->subject('Your Appointment Has Been Approved')
             ->view('emails.appointments.accepted', compact('student', 'counselor', 'appointment'));
 
         return $message;
@@ -77,7 +77,8 @@ class AppointmentAcceptedNotification extends Notification
         $date = $start->format('F j, Y');
         $time = $start->format('g:i A') . ' – ' . (new \Carbon\Carbon($end))->format('g:i A');
         return [
-            'message' => 'Your appointment with ' . ($counselor ? $counselor->name : 'your counselor') . ' has been accepted. Please proceed to GCC on ' . $date . ' at ' . $time . '.',
+            'message' => 'Your appointment with ' . ($counselor ? $counselor->name : 'your counselor') . ' has been approved. Please proceed to GCC on ' . $date . ' at ' . $time . '.',
+            'appointment_id' => $this->appointment->id,
             'url' => route('appointments.index'),
         ];
     }
@@ -92,7 +93,7 @@ class AppointmentAcceptedNotification extends Notification
         $ref = $this->appointment->reference_number;
 
         return [
-            'message' => "Your appointment on {$date} at {$time} has been accepted. Ref: {$ref}",
+            'message' => "Your appointment on {$date} at {$time} has been approved. Ref: {$ref}",
             'type' => 'appointment_accepted',
         ];
     }

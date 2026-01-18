@@ -93,250 +93,183 @@
   }
 @endphp
 
-<div class="web-view">
-  <!-- Premium Header Card -->
-  <div class="content-card mb-4">
-    <div class="d-flex flex-column flex-md-row align-items-center gap-4 p-3">
-      <div class="position-relative">
-        <img src="{{ $avatarUrl }}" class="rounded-circle shadow-sm" width="100" height="100" alt="{{ $studentName }}">
-        <span
-          class="position-absolute bottom-0 end-0 badge rounded-pill bg-success border border-white">{{ ucfirst($assessment->user->gender ?? 'Student') }}</span>
-      </div>
-      <div class="flex-grow-1 text-center text-md-start">
-        <h2 class="fw-bold text-dark mb-1">{{ $studentName }}</h2>
-        <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 text-muted mb-3">
-          <div class="d-flex align-items-center gap-1"><i class="bi bi-card-heading"></i>
-            {{ $assessment->user->student_id ?? 'N/A' }}</div>
-          <div class="d-flex align-items-center gap-1"><i class="bi bi-mortarboard"></i>
-            {{ $assessment->user->course ?? 'N/A' }}</div>
-          <div class="d-flex align-items-center gap-1"><i class="bi bi-calendar3"></i>
-            {{ $assessment->user->year_level ?? 'N/A' }}</div>
+
+
+
+<ul class="nav nav-tabs mb-4 px-2" id="assessmentTabs-{{ $assessment->id }}" role="tablist"
+  style="border-bottom: 2px solid #f0f0f0;">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active fw-bold" id="details-tab-{{ $assessment->id }}" data-bs-toggle="tab"
+      data-bs-target="#details-{{ $assessment->id }}" type="button" role="tab"
+      aria-controls="details-{{ $assessment->id }}" aria-selected="true"><i
+        class="bi bi-bar-chart-fill me-2"></i>Results Overview</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link fw-bold" id="score-tab-{{ $assessment->id }}" data-bs-toggle="tab"
+      data-bs-target="#score-{{ $assessment->id }}" type="button" role="tab" aria-controls="score-{{ $assessment->id }}"
+      aria-selected="false"><i class="bi bi-table me-2"></i>Score
+      Sheet</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link fw-bold" id="insights-tab-{{ $assessment->id }}" data-bs-toggle="tab"
+      data-bs-target="#insights-{{ $assessment->id }}" type="button" role="tab"
+      aria-controls="insights-{{ $assessment->id }}" aria-selected="false"><i
+        class="bi bi-lightbulb-fill me-2"></i>Insights & Notes</button>
+  </li>
+</ul>
+
+<div class="tab-content" id="assessmentTabsContent-{{ $assessment->id }}">
+  <div class="tab-pane fade show active" id="details-{{ $assessment->id }}" role="tabpanel"
+    aria-labelledby="details-tab-{{ $assessment->id }}">
+
+    @if($assessment->type === 'DASS-42')
+      <!-- DASS-42 Visuals -->
+      <div class="row g-4 mb-4">
+        @php
+          $dep = $depressionTotal;
+          $anx = $anxietyTotal;
+          $str = $stressTotal;
+          $depSev = $severityDep($dep);
+          $anxSev = $severityAnx($anx);
+          $strSev = $severityStr($str);
+
+          $getSevColor = function ($sev) {
+            if (str_contains($sev, 'Extremely'))
+              return '#8b1e3f'; // Very High
+            if ($sev === 'Severe')
+              return '#dc3545'; // Red
+            if ($sev === 'Moderate')
+              return '#fd7e14'; // Orange
+            if ($sev === 'Mild')
+              return '#ffc107'; // Yellow
+            return '#198754'; // Green
+          };
+         @endphp
+
+        <!-- Depression Card -->
+        <div class="col-md-4">
+          <div class="content-card h-100 text-center p-3">
+            <div class="mb-2">
+              <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; background: #e7f1ff; color: #0d6efd;">
+                <i class="bi bi-emoji-frown fs-5"></i>
+              </div>
+            </div>
+            <div class="fw-bold text-muted small text-uppercase mb-1">Depression</div>
+            <div class="h2 fw-bold mb-1" style="color: #0d6efd;">{{ $dep }}</div>
+            <span class="badge rounded-pill px-2 py-1 small" style="background-color: #0d6efd;">{{ $depSev }}</span>
+          </div>
         </div>
-        <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
-          <span class="badge bg-light text-dark border"><i class="bi bi-file-earmark-text me-1"></i>
-            {{ $assessment->type }}</span>
-          <span class="badge bg-light text-muted border"><i class="bi bi-clock me-1"></i> {{ $createdAt }}</span>
-          <a href="{{ route('counselor.assessments.export', $assessment->id) }}" target="_blank"
-            class="btn btn-sm btn-outline-danger ms-2" style="padding: 0.1rem 0.5rem; font-size: 0.8rem;">
-            <i class="bi bi-file-pdf me-1"></i> Export PDF
-          </a>
+
+        <!-- Anxiety Card -->
+        <div class="col-md-4">
+          <div class="content-card h-100 text-center p-3">
+            <div class="mb-2">
+              <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; background: #e0f7fa; color: #0dcaf0;">
+                <i class="bi bi-lightning-charge fs-5"></i>
+              </div>
+            </div>
+            <div class="fw-bold text-muted small text-uppercase mb-1">Anxiety</div>
+            <div class="h2 fw-bold mb-1" style="color: #0dcaf0;">{{ $anx }}</div>
+            <span class="badge rounded-pill px-2 py-1 small text-dark"
+              style="background-color: #0dcaf0;">{{ $anxSev }}</span>
+          </div>
+        </div>
+
+        <!-- Stress Card -->
+        <div class="col-md-4">
+          <div class="content-card h-100 text-center p-3">
+            <div class="mb-2">
+              <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; background: #f8f9fa; color: #6c757d;">
+                <i class="bi bi-activity fs-5"></i>
+              </div>
+            </div>
+            <div class="fw-bold text-muted small text-uppercase mb-1">Stress</div>
+            <div class="h2 fw-bold mb-1" style="color: #6c757d;">{{ $str }}</div>
+            <span class="badge rounded-pill px-2 py-1 small" style="background-color: #6c757d;">{{ $strSev }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- Quick Risk Indicator -->
-      <div class="text-center p-3 rounded bg-light border" style="min-width: 150px;">
-        <div class="small text-uppercase text-muted fw-bold mb-1">Risk Level</div>
-        <div class="h4 mb-0 fw-bold" style="color: {{ $riskColor }}">{{ $riskLabel }}</div>
+    @else
+      <!-- Non-DASS Fallback -->
+      <div class="content-card p-4 text-center">
+        <h3 class="display-6 fw-bold text-success">{{ $scores['score'] ?? ($assessment->score ?? '-') }}</h3>
+        <p class="text-muted">Total Score</p>
       </div>
-    </div>
+    @endif
+
+
+    @if($assessment->type === 'DASS-42')
+      <div class="mt-4">
+        @includeIf('counselor.assessments.partials.dass42_questionnaire')
+      </div>
+    @endif
   </div>
 
-  <ul class="nav nav-tabs mb-4 px-2" id="assessmentTabs-{{ $assessment->id }}" role="tablist"
-    style="border-bottom: 2px solid #f0f0f0;">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active fw-bold" id="details-tab-{{ $assessment->id }}" data-bs-toggle="tab"
-        data-bs-target="#details-{{ $assessment->id }}" type="button" role="tab"
-        aria-controls="details-{{ $assessment->id }}" aria-selected="true"><i
-          class="bi bi-bar-chart-fill me-2"></i>Results Overview</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link fw-bold" id="score-tab-{{ $assessment->id }}" data-bs-toggle="tab"
-        data-bs-target="#score-{{ $assessment->id }}" type="button" role="tab"
-        aria-controls="score-{{ $assessment->id }}" aria-selected="false"><i class="bi bi-table me-2"></i>Score
-        Sheet</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link fw-bold" id="insights-tab-{{ $assessment->id }}" data-bs-toggle="tab"
-        data-bs-target="#insights-{{ $assessment->id }}" type="button" role="tab"
-        aria-controls="insights-{{ $assessment->id }}" aria-selected="false"><i
-          class="bi bi-lightbulb-fill me-2"></i>Insights & Notes</button>
-    </li>
-  </ul>
-
-  <div class="tab-content" id="assessmentTabsContent-{{ $assessment->id }}">
-    <div class="tab-pane fade show active" id="details-{{ $assessment->id }}" role="tabpanel"
-      aria-labelledby="details-tab-{{ $assessment->id }}">
-
-      @if($assessment->type === 'DASS-42')
-        <!-- DASS-42 Visuals -->
-        <div class="row g-4 mb-4">
-          @php
-            $dep = $depressionTotal;
-            $anx = $anxietyTotal;
-            $str = $stressTotal;
-            $depSev = $severityDep($dep);
-            $anxSev = $severityAnx($anx);
-            $strSev = $severityStr($str);
-
-            $getSevColor = function ($sev) {
-              if (str_contains($sev, 'Extremely'))
-                return '#8b1e3f'; // Very High
-              if ($sev === 'Severe')
-                return '#dc3545'; // Red
-              if ($sev === 'Moderate')
-                return '#fd7e14'; // Orange
-              if ($sev === 'Mild')
-                return '#ffc107'; // Yellow
-              return '#198754'; // Green
-            };
-           @endphp
-
-          <!-- Depression Card -->
-          <div class="col-md-4">
-            <div class="content-card h-100 text-center p-4">
-              <div class="d-flex align-items-center justify-content-center mb-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                  style="width: 50px; height: 50px; background: #e8f5e9; color: #1f7a2d;">
-                  <i class="bi bi-emoji-frown fs-4"></i>
-                </div>
-              </div>
-              <h5 class="text-muted text-uppercase small fw-bold mb-1">Depression</h5>
-              <div class="display-4 fw-bold mb-2" style="color: {{ $getSevColor($depSev) }}">{{ $dep }}</div>
-              <span class="badge rounded-pill px-3 py-2"
-                style="background-color: {{ $getSevColor($depSev) }}">{{ $depSev }}</span>
-              <div class="mt-3">
-                <div class="progress" style="height: 6px;">
-                  <div class="progress-bar" role="progressbar"
-                    style="width: {{ min($dep / 42 * 100, 100) }}%; background-color: {{ $getSevColor($depSev) }}"></div>
-                </div>
-                <div class="d-flex justify-content-between text-muted small mt-1">
-                  <span>0</span>
-                  <span>42</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Anxiety Card -->
-          <div class="col-md-4">
-            <div class="content-card h-100 text-center p-4">
-              <div class="d-flex align-items-center justify-content-center mb-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                  style="width: 50px; height: 50px; background: #e3f2fd; color: #0d6efd;">
-                  <i class="bi bi-lightning-charge fs-4"></i>
-                </div>
-              </div>
-              <h5 class="text-muted text-uppercase small fw-bold mb-1">Anxiety</h5>
-              <div class="display-4 fw-bold mb-2" style="color: {{ $getSevColor($anxSev) }}">{{ $anx }}</div>
-              <span class="badge rounded-pill px-3 py-2"
-                style="background-color: {{ $getSevColor($anxSev) }}">{{ $anxSev }}</span>
-              <div class="mt-3">
-                <div class="progress" style="height: 6px;">
-                  <div class="progress-bar" role="progressbar"
-                    style="width: {{ min($anx / 42 * 100, 100) }}%; background-color: {{ $getSevColor($anxSev) }}"></div>
-                </div>
-                <div class="d-flex justify-content-between text-muted small mt-1">
-                  <span>0</span>
-                  <span>42</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Stress Card -->
-          <div class="col-md-4">
-            <div class="content-card h-100 text-center p-4">
-              <div class="d-flex align-items-center justify-content-center mb-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                  style="width: 50px; height: 50px; background: #fdf2e9; color: #fd7e14;">
-                  <i class="bi bi-activity fs-4"></i>
-                </div>
-              </div>
-              <h5 class="text-muted text-uppercase small fw-bold mb-1">Stress</h5>
-              <div class="display-4 fw-bold mb-2" style="color: {{ $getSevColor($strSev) }}">{{ $str }}</div>
-              <span class="badge rounded-pill px-3 py-2"
-                style="background-color: {{ $getSevColor($strSev) }}">{{ $strSev }}</span>
-              <div class="mt-3">
-                <div class="progress" style="height: 6px;">
-                  <div class="progress-bar" role="progressbar"
-                    style="width: {{ min($str / 42 * 100, 100) }}%; background-color: {{ $getSevColor($strSev) }}"></div>
-                </div>
-                <div class="d-flex justify-content-between text-muted small mt-1">
-                  <span>0</span>
-                  <span>42</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      @else
-        <!-- Non-DASS Fallback -->
-        <div class="content-card p-4 text-center">
-          <h3 class="display-6 fw-bold text-success">{{ $scores['score'] ?? ($assessment->score ?? '-') }}</h3>
-          <p class="text-muted">Total Score</p>
-        </div>
-      @endif
-
-
-      @if($assessment->type === 'DASS-42')
-          <div class="mt-4">
-              @includeIf('counselor.assessments.partials.dass42_questionnaire')
-          </div>
-      @endif
-    </div>
-
-<div class="tab-pane fade" id="score-{{ $assessment->id }}" role="tabpanel"
-  aria-labelledby="score-tab-{{ $assessment->id }}">
-  <div class="card shadow-sm p-3 dass-score-sheet">
-    <div class="card-header">
-      <h5 class="mb-0"><i class="bi bi-grid-1x2 me-2"></i> DASS-42 Score Sheet Table</h5>
-    </div>
-    <div class="card-body p-3">
-      @includeIf('counselor.assessments.partials.score_sheet')
-    </div>
-    <div class="card-footer bg-white border-0 pt-3">
-      <div class="interpretation-guide small text-muted">
-        <h6 class="fw-bold">DASS-42 Interpretation Guide</h6>
-        <p class="mb-1">The DASS-42 contains three subscales:</p>
-        <ul class="mb-0">
-          <li><strong>Depression (14 items):</strong> 3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42</li>
-          <li><strong>Anxiety (14 items):</strong> 2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41</li>
-          <li><strong>Stress (14 items):</strong> 1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39</li>
-        </ul>
+  <div class="tab-pane fade" id="score-{{ $assessment->id }}" role="tabpanel"
+    aria-labelledby="score-tab-{{ $assessment->id }}">
+    <div class="card shadow-sm p-3 dass-score-sheet">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-grid-1x2 me-2"></i> DASS-42 Score Sheet Table</h5>
       </div>
-    </div>
-  </div>
-</div>
-
-<div class="tab-pane fade" id="insights-{{ $assessment->id }}" role="tabpanel"
-  aria-labelledby="insights-tab-{{ $assessment->id }}">
-  <div class="p-3">
-    <h5 class="fw-bold mb-3"><i class="bi bi-lightbulb me-2"></i>Insights</h5>
-    <div class="row g-3">
-      <div class="col-12">
-        <div class="card border-0 p-3 mb-3" style="background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.04);">
-          <div class="fw-semibold mb-2">Quick Suggestions</div>
-          <ul class="small mb-0">
-            <li>Review high-severity subscales first.</li>
-            <li>Consider scheduling a follow-up session.</li>
-            <li>Share resources for self-care and crisis lines if needed.</li>
+      <div class="card-body p-3">
+        @includeIf('counselor.assessments.partials.score_sheet')
+      </div>
+      <div class="card-footer bg-white border-0 pt-3">
+        <div class="interpretation-guide small text-muted">
+          <h6 class="fw-bold">DASS-42 Interpretation Guide</h6>
+          <p class="mb-1">The DASS-42 contains three subscales:</p>
+          <ul class="mb-0">
+            <li><strong>Depression (14 items):</strong> 3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42</li>
+            <li><strong>Anxiety (14 items):</strong> 2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41</li>
+            <li><strong>Stress (14 items):</strong> 1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39</li>
           </ul>
         </div>
       </div>
+    </div>
+  </div>
 
-      <div class="col-12">
-        <div class="card shadow-sm p-3">
-          <h6 class="fw-bold">Case Management Notes</h6>
-          <form method="POST" action="{{ route('counselor.assessments.saveNotes', $assessment->id) }}">
-            @csrf
-            <div class="mb-2">
-              <label for="case_notes_insights_{{ $assessment->id }}" class="form-label small">Add / Update
-                Notes</label>
-              <textarea name="case_notes" id="case_notes_insights_{{ $assessment->id }}" rows="5"
-                class="form-control">{{ old('case_notes', $assessment->case_notes ?? '') }}</textarea>
-            </div>
-            <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary btn-sm">Save Notes</button>
-              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse"
-                data-bs-target="#counselorNotes-{{ $assessment->id }}">Private Notes</button>
-            </div>
-          </form>
+  <div class="tab-pane fade" id="insights-{{ $assessment->id }}" role="tabpanel"
+    aria-labelledby="insights-tab-{{ $assessment->id }}">
+    <div class="p-3">
+      <h5 class="fw-bold mb-3"><i class="bi bi-lightbulb me-2"></i>Insights</h5>
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="card border-0 p-3 mb-3" style="background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.04);">
+            <div class="fw-semibold mb-2">Quick Suggestions</div>
+            <ul class="small mb-0">
+              <li>Review high-severity subscales first.</li>
+              <li>Consider scheduling a follow-up session.</li>
+              <li>Share resources for self-care and crisis lines if needed.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="card shadow-sm p-3">
+            <h6 class="fw-bold">Case Management Notes</h6>
+            <form method="POST" action="{{ route('counselor.assessments.saveNotes', $assessment->id) }}">
+              @csrf
+              <div class="mb-2">
+                <label for="case_notes_insights_{{ $assessment->id }}" class="form-label small">Add / Update
+                  Notes</label>
+                <textarea name="case_notes" id="case_notes_insights_{{ $assessment->id }}" rows="5"
+                  class="form-control">{{ old('case_notes', $assessment->case_notes ?? '') }}</textarea>
+              </div>
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm">Save Notes</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse"
+                  data-bs-target="#counselorNotes-{{ $assessment->id }}">Private Notes</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </div>
 </div>
 </div>
@@ -362,160 +295,9 @@
 
 {{-- Download and Close buttons removed per request --}}
 </div>
-</div>
 
-<style>
-  .card .progress {
-    background: rgba(0, 0, 0, 0.04);
-  }
 
-  .card .badge.white {
-    background: #fff;
-    color: #222;
-  }
 
-  .summary-avatar {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-  }
-
-  .student-header {
-    background: linear-gradient(180deg, #0b6623, #07521a);
-  }
-
-  .student-header .summary-avatar {
-    border: 3px solid rgba(255, 255, 255, 0.12);
-  }
-
-  .student-header .text-white {
-    color: #fff !important;
-  }
-
-  .student-header .text-white-50 {
-    color: rgba(255, 255, 255, 0.85) !important;
-  }
-
-  .student-header .badge.bg-white {
-    background: #fff;
-  }
-
-  @media (max-width: 767.98px) {
-    .summary-avatar {
-      width: 56px;
-      height: 56px;
-    }
-  }
-
-  .key-scores .score-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .key-scores .progress {
-    margin-bottom: 0.5rem;
-  }
-
-  .nav-tabs .nav-link i {
-    font-size: 1rem;
-    vertical-align: middle;
-  }
-
-  .nav-tabs .nav-link.active {
-    border-color: transparent;
-    color: #0b6623;
-  }
-
-  /* Web view layout and alignment fixes */
-  .web-view {
-    max-width: 100%;
-    margin: 18px auto;
-    zoom: 1;
-  }
-
-  .web-view .card {
-    width: 100%;
-  }
-
-  .web-view .card {
-    box-shadow: 0 8px 28px rgba(13, 46, 29, 0.06);
-  }
-
-  /* Responsive typography to reduce zoom/overflow issues */
-  .web-view {
-    font-size: clamp(14px, 1.2vw, 15.5px);
-  }
-
-  .student-meta-grid {
-    display: grid;
-    gap: 0.5rem 1rem;
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 576px) {
-    .student-meta-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 992px) {
-    .student-meta-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  /* Enhanced grid for better space utilization */
-  .student-meta-grid-enhanced {
-    display: grid;
-    gap: 0.4rem 1.5rem;
-    grid-template-columns: 1fr;
-    font-size: 0.85rem;
-  }
-
-  @media (min-width: 576px) {
-    .student-meta-grid-enhanced {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 992px) {
-    .student-meta-grid-enhanced {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
-
-  .student-meta-grid-enhanced .col-span-2 {
-    grid-column: span 2;
-  }
-
-  .student-meta-grid .fw-semibold {
-    color: rgba(255, 255, 255, 0.95);
-  }
-
-  @media (max-width: 575.98px) {
-    .web-view {
-      padding: 0 8px;
-    }
-
-    .student-header .d-flex {
-      gap: 0.8rem;
-    }
-  }
-
-  .export-pdf-btn {
-    background: #fff;
-    color: #0b6623;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    padding: 6px 10px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  }
-
-  .export-pdf-btn i {
-    color: #d6332a;
-  }
-</style>
 
 <script>
   function saveNote{{ $assessment->id }}() {

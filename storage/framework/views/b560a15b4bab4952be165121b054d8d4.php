@@ -1,0 +1,1197 @@
+
+
+<?php $__env->startSection('content'); ?>
+    <style>
+        :root {
+            --forest-green: #1f7a2d;
+            --forest-green-light: #4a7c59;
+            --forest-green-lighter: #e8f5e8;
+            --yellow-maize: #f4d03f;
+            --gray-50: #f8f9fa;
+            --gray-100: #dee2e6;
+            --gray-600: #6c757d;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
+        }
+
+        /* Match admin zoom standard */
+        .home-zoom {
+            zoom: 0.75;
+        }
+
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top center;
+            }
+        }
+
+        .main-content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .main-content-card .card-header {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-weight: 600;
+        }
+
+        .main-content-card .card-body {
+            padding: 1.25rem;
+        }
+
+        .page-header-card {
+            background: var(--hero-gradient);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .page-header-card h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            color: #fff;
+        }
+
+        .page-header-card p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-stat-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.25rem 1rem;
+            text-align: center;
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .dashboard-stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--forest-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-stat-card .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid var(--gray-100);
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+            border-radius: 0;
+            transition: all 0.2s;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--forest-green);
+            background: none;
+            border-bottom: 3px solid var(--forest-green);
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--forest-green);
+        }
+
+        .registration-item {
+            border: 1px solid var(--gray-100);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            background: var(--gray-50);
+            transition: all 0.2s ease;
+        }
+
+        .registration-item:hover {
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+            background: white;
+            border-color: var(--forest-green-light);
+        }
+
+        /* Checkbox styling */
+        .item-checkbox {
+            transform: scale(1.2);
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--gray-600);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Floating Action Bar */
+        .bulk-action-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid var(--forest-green-lighter);
+        }
+
+        .bulk-action-bar.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .bulk-selected-count {
+            font-weight: bold;
+            color: var(--forest-green);
+            background: var(--forest-green-lighter);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+    </style>
+
+    <div class="main-dashboard-inner home-zoom">
+        <div class="page-header-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1><i class="bi bi-person-check me-2"></i>Registration Approvals</h1>
+                    <p>Manage student registration approvals and rejections</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="<?php echo e(route('users.index')); ?>" class="btn btn-light">
+                        <i class="bi bi-people me-2"></i>View All Users
+                    </a>
+                    <a href="<?php echo e(route('dashboard')); ?>" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Search and Filter Section -->
+        <div class="main-content-card">
+            <div class="card-body">
+                <form action="<?php echo e(route('admin.registration-approvals.index')); ?>" method="GET">
+                    <div class="row g-2 align-items-end mb-2">
+                        <div class="col-md-3">
+                            <label for="search"
+                                class="form-label fw-bold small text-muted text-uppercase mb-1">Search</label>
+                            <div class="input-group">
+                                <div class="form-control d-flex align-items-center bg-white border"
+                                    style="overflow: hidden;">
+                                    <i class="bi bi-search text-muted me-2"></i>
+                                    <input type="text" class="border-0 shadow-none w-100 p-0" id="search" name="search"
+                                        value="<?php echo e(request('search')); ?>" placeholder="Search students..."
+                                        style="outline: none;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="college"
+                                class="form-label fw-bold small text-muted text-uppercase mb-1">College</label>
+                            <select class="form-select" id="college" name="college">
+                                <option value="">All</option>
+                                <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($college); ?>" <?php echo e(request('college') == $college ? 'selected' : ''); ?>>
+                                        <?php echo e($college); ?>
+
+                                    </option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="course"
+                                class="form-label fw-bold small text-muted text-uppercase mb-1">Course</label>
+                            <select class="form-select" id="course" name="course">
+                                <option value="">All</option>
+                                <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($course); ?>" <?php echo e(request('course') == $course ? 'selected' : ''); ?>>
+                                        <?php echo e($course); ?>
+
+                                    </option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="date_from" class="form-label fw-bold small text-muted text-uppercase mb-1">From
+                                Date</label>
+                            <input type="date" class="form-control" id="date_from" name="date_from"
+                                value="<?php echo e(request('date_from')); ?>">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="date_to" class="form-label fw-bold small text-muted text-uppercase mb-1">To
+                                Date</label>
+                            <input type="date" class="form-control" id="date_to" name="date_to"
+                                value="<?php echo e(request('date_to')); ?>">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-success text-white w-100">
+                                <i class="bi bi-funnel"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3">
+                            <label for="sort" class="form-label fw-bold small text-muted text-uppercase mb-1">Sort
+                                By</label>
+                            <select class="form-select" id="sort" name="sort">
+                                <option value="latest" <?php echo e(request('sort') == 'latest' ? 'selected' : ''); ?>>Newest First
+                                </option>
+                                <option value="oldest" <?php echo e(request('sort') == 'oldest' ? 'selected' : ''); ?>>Oldest First
+                                </option>
+                                <option value="name_asc" <?php echo e(request('sort') == 'name_asc' ? 'selected' : ''); ?>>Name (A-Z)
+                                </option>
+                                <option value="name_desc" <?php echo e(request('sort') == 'name_desc' ? 'selected' : ''); ?>>Name (Z-A)
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-auto">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">&nbsp;</label>
+                            <button type="button" class="btn btn-success d-block" data-bs-toggle="modal"
+                                data-bs-target="#enrollmentVerificationModal">
+                                <i class="bi bi-file-earmark-check me-1"></i>Verify Enrollment
+                            </button>
+                        </div>
+                        <div class="col-md text-end">
+                            <?php if(request()->anyFilled(['search', 'college', 'course', 'sort', 'date_from', 'date_to'])): ?>
+                                <a href="<?php echo e(route('admin.registration-approvals.index')); ?>"
+                                    class="btn btn-sm btn-light text-muted">
+                                    <i class="bi bi-x-circle me-1"></i>Clear All Filters
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="approvalTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
+                    type="button" role="tab">
+                    <i class="bi bi-clock me-2"></i>Pending (<?php echo e($pendingRegistrations->total()); ?>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button"
+                    role="tab">
+                    <i class="bi bi-check-circle me-2"></i>Approved (<?php echo e($approvedRegistrations->total()); ?>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button"
+                    role="tab">
+                    <i class="bi bi-x-circle me-2"></i>Rejected (<?php echo e($rejectedRegistrations->total()); ?>)
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="approvalTabsContent">
+            <!-- Pending Registrations -->
+            <div class="tab-pane fade show active" id="pending" role="tabpanel">
+                <!-- Bulk Approve Form -->
+                <form id="bulkActionForm" method="POST" action="">
+                    <?php echo csrf_field(); ?>
+                    <input type="hidden" name="rejection_reason" id="bulk_rejection_reason">
+
+                    <div class="main-content-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-clock me-2"></i>Pending Approvals</h5>
+                            <?php if($pendingRegistrations->count() > 0): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAllPending">
+                                    <label class="form-check-label user-select-none" for="selectAllPending">Select All</label>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="card-body">
+                            <?php if($pendingRegistrations->count() > 0): ?>
+                                <?php $__currentLoopData = $pendingRegistrations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="registration-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="d-flex align-items-center h-100 pt-3">
+                                                <input class="form-check-input item-checkbox user-select-checkbox" type="checkbox"
+                                                    name="user_ids[]" value="<?php echo e($user->id); ?>">
+                                            </div>
+
+                                            <div
+                                                class="d-flex justify-content-between align-items-start flex-grow-1 flex-wrap gap-3 ms-2">
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <div class="me-3">
+                                                            <?php if($user->avatar): ?>
+                                                                <img src="<?php echo e($user->avatar_url); ?>" alt="<?php echo e($user->name); ?>"
+                                                                    class="rounded-circle"
+                                                                    style="width: 50px; height: 50px; object-fit: cover;">
+                                                            <?php else: ?>
+                                                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                                                                    style="width: 50px; height: 50px;">
+                                                                    <span
+                                                                        class="text-white fw-bold"><?php echo e(strtoupper(substr($user->name ?? 'U', 0, 1))); ?></span>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <h6 class="mb-1 fw-bold text-dark"><?php echo e($user->name ?? 'N/A'); ?></h6>
+                                                            <p class="text-muted mb-1"><?php echo e($user->email ?? 'N/A'); ?></p>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Improved Details Grid -->
+                                                    <div class="row g-2 mb-2">
+                                                        <div class="col-md-6 col-lg-4">
+                                                            <small class="text-muted d-block">Student ID</small>
+                                                            <span class="fw-medium"><?php echo e($user->student_id ?? 'N/A'); ?></span>
+                                                        </div>
+                                                        <div class="col-md-6 col-lg-4">
+                                                            <small class="text-muted d-block">Course/Program</small>
+                                                            <span class="fw-medium text-truncate d-block"
+                                                                title="<?php echo e($user->course); ?>"><?php echo e($user->course ?? 'N/A'); ?></span>
+                                                        </div>
+                                                        <div class="col-md-6 col-lg-4">
+                                                            <small class="text-muted d-block">College</small>
+                                                            <span class="fw-medium text-truncate d-block"
+                                                                title="<?php echo e($user->college); ?>"><?php echo e($user->college ?? 'N/A'); ?></span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex gap-2 flex-wrap align-items-center mt-2">
+                                                        <span class="status-badge status-pending">Pending Approval</span>
+                                                        <?php if($user->has_potential_duplicate ?? false): ?>
+                                                            <span class="badge bg-warning text-dark"
+                                                                title="Potential duplicate: <?php echo e($user->duplicate_count); ?> similar record(s) found">
+                                                                <i class="bi bi-exclamation-triangle me-1"></i>Duplicate Warning
+                                                            </span>
+                                                        <?php endif; ?>
+                                                        <span class="text-muted small">
+                                                            Registered: <?php echo e($user->created_at->format('M d, Y H:i')); ?>
+
+                                                        </span>
+                                                        <?php if($user->cor_file): ?>
+                                                            <a href="<?php echo e(asset('storage/cor_files/' . $user->cor_file)); ?>"
+                                                                target="_blank"
+                                                                class="badge bg-light text-primary border text-decoration-none">
+                                                                <i class="bi bi-file-earmark-pdf me-1"></i>COR File
+                                                            </a>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-light text-danger border">
+                                                                <i class="bi bi-exclamation-circle me-1"></i>No COR
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex gap-3 align-items-center">
+                                                    <?php if($user->cor_file): ?>
+                                                        <div class="cor-preview-container" style="position: relative;">
+                                                            <div class="d-flex flex-column align-items-center" style="width: 140px;">
+                                                                <div class="text-center mb-1">
+                                                                    <small class="fw-semibold text-success"
+                                                                        style="font-size: 0.85rem;">Preview</small>
+                                                                </div>
+                                                                <div class="position-relative"
+                                                                    style="width: 140px; height: 140px; border: 2px solid var(--gray-100); border-radius: 8px; overflow: hidden; background: white; cursor: pointer;"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#corPreviewModal<?php echo e($user->id); ?>"
+                                                                    onmouseover="this.style.borderColor='var(--forest-green)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+                                                                    onmouseout="this.style.borderColor='var(--gray-100)'; this.style.boxShadow='none'">
+                                                                    <iframe src="<?php echo e(asset('storage/cor_files/' . $user->cor_file)); ?>"
+                                                                        style="width: 400%; height: 400%; transform: scale(0.25); transform-origin: 0 0; border: none; pointer-events: none;"
+                                                                        scrolling="no"></iframe>
+                                                                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                                                                        style="background: rgba(0,0,0,0); transition: background 0.2s;"
+                                                                        onmouseover="this.style.background='rgba(0,0,0,0.05)'"
+                                                                        onmouseout="this.style.background='rgba(0,0,0,0)'">
+                                                                        <i class="bi bi-eye text-success"
+                                                                            style="font-size: 2rem; opacity: 0; transition: opacity 0.2s;"
+                                                                            onmouseover="this.style.opacity='0.8'"
+                                                                            onmouseout="this.style.opacity='0'"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="cor-preview-container" style="position: relative;">
+                                                            <div class="d-flex flex-column align-items-center" style="width: 140px;">
+                                                                <div class="text-center mb-1">
+                                                                    <small class="fw-semibold text-danger"
+                                                                        style="font-size: 0.85rem;">Preview</small>
+                                                                </div>
+                                                                <div class="d-flex flex-column align-items-center justify-content-center"
+                                                                    style="width: 140px; height: 140px; border: 2px dashed #dc3545; border-radius: 8px; background: #f8d7da;">
+                                                                    <i class="bi bi-exclamation-circle"
+                                                                        style="font-size: 3rem; color: #dc3545; opacity: 0.5;"></i>
+                                                                    <small class="text-danger mt-2" style="font-size: 0.75rem;">No COR
+                                                                        File</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <div class="d-flex gap-2 align-self-center">
+                                                        <a href="<?php echo e(route('admin.registration-approvals.show', $user->id)); ?>"
+                                                            class="btn btn-sm btn-outline-primary">
+                                                            <i class="bi bi-eye me-1"></i>Review
+                                                        </a>
+
+                                                        <!-- Direct Approve Form -->
+                                                        <!-- Direct Approve Button -->
+                                                        <button type="button" class="btn btn-sm btn-success"
+                                                            onclick="confirmAction('<?php echo e(route('admin.registration-approvals.approve', $user->id)); ?>', 'Approve registration for <?php echo e(addslashes($user->name)); ?>?')">
+                                                            <i class="bi bi-check me-1"></i>Approve
+                                                        </button>
+
+                                                        <!-- Direct Reject Button -->
+                                                        <button type="button" class="btn btn-sm btn-danger"
+                                                            onclick="confirmRejectAction('<?php echo e(route('admin.registration-approvals.reject', $user->id)); ?>', 'Reject registration for <?php echo e(addslashes($user->name)); ?>?')">
+                                                            <i class="bi bi-x me-1"></i>Reject
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                                <div class="d-flex justify-content-between align-items-center py-3 px-3 border-top">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="text-muted small">
+                                            Showing <strong><?php echo e($pendingRegistrations->firstItem() ?? 0); ?></strong> to
+                                            <strong><?php echo e($pendingRegistrations->lastItem() ?? 0); ?></strong> of
+                                            <strong><?php echo e($pendingRegistrations->total()); ?></strong> users
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <label class="text-muted small mb-0">Per page:</label>
+                                            <select class="form-select form-select-sm" style="width: auto;"
+                                                onchange="changePerPage(this.value)">
+                                                <option value="15" <?php echo e(request('per_page', 15) == 15 ? 'selected' : ''); ?>>15
+                                                </option>
+                                                <option value="30" <?php echo e(request('per_page') == 30 ? 'selected' : ''); ?>>30</option>
+                                                <option value="50" <?php echo e(request('per_page') == 50 ? 'selected' : ''); ?>>50</option>
+                                                <option value="100" <?php echo e(request('per_page') == 100 ? 'selected' : ''); ?>>100
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <?php echo e($pendingRegistrations->withQueryString()->links('vendor.pagination.bootstrap-5')); ?>
+
+                                    </div>
+                                </div>
+
+                            <?php else: ?>
+                                <div class="empty-state">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                    <h5 class="mt-3">No Pending Approvals</h5>
+                                    <?php if(request()->anyFilled(['search', 'college', 'course'])): ?>
+                                        <p class="text-muted">No students matched your search filters.</p>
+                                    <?php else: ?>
+                                        <p class="text-muted">All student registrations have been processed.</p>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </form> <!-- End Bulk Form -->
+
+
+                <!-- COR File Preview Modal -->
+                <?php $__currentLoopData = $pendingRegistrations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php if($user->cor_file): ?>
+                        <div class="modal fade" id="corPreviewModal<?php echo e($user->id); ?>" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="bi bi-file-earmark-pdf me-2"></i>COR File -
+                                            <?php echo e($user->name); ?>
+
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-0">
+                                        <iframe src="<?php echo e(asset('storage/cor_files/' . $user->cor_file)); ?>"
+                                            style="width: 100%; height: 70vh; border: none;"></iframe>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a href="<?php echo e(asset('storage/cor_files/' . $user->cor_file)); ?>" target="_blank"
+                                            class="btn btn-primary">
+                                            <i class="bi bi-download me-1"></i>Open in New Tab
+                                        </a>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+
+            <!-- Approved Registrations -->
+            <div class="tab-pane fade" id="approved" role="tabpanel">
+                <div class="main-content-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Approved Registrations</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if($approvedRegistrations->count() > 0): ?>
+                            <?php $__currentLoopData = $approvedRegistrations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <div class="registration-item">
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="me-3">
+                                                    <?php if($user->avatar): ?>
+                                                        <img src="<?php echo e($user->avatar_url); ?>" alt="<?php echo e($user->name); ?>"
+                                                            class="rounded-circle"
+                                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                                    <?php else: ?>
+                                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                                                            style="width: 50px; height: 50px;">
+                                                            <span
+                                                                class="text-white fw-bold"><?php echo e(strtoupper(substr($user->name ?? 'U', 0, 1))); ?></span>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold"><?php echo e($user->name ?? 'N/A'); ?></h6>
+                                                    <p class="text-muted mb-1"><?php echo e($user->email ?? 'N/A'); ?></p>
+                                                    <div class="d-flex gap-2 flex-wrap">
+                                                        <span class="status-badge status-approved">Approved</span>
+                                                        <span class="text-muted small">
+                                                            Approved:
+                                                            <?php echo e($user->approved_at ? $user->approved_at->format('M d, Y H:i') : 'N/A'); ?>
+
+                                                        </span>
+                                                        <?php if($user->approvedBy): ?>
+                                                            <span class="text-muted small">
+                                                                by <?php echo e($user->approvedBy->name); ?>
+
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php if($user->registration_notes): ?>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Notes:</strong>
+                                                        <?php echo e($user->registration_notes); ?></small>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div>
+                                            <a href="<?php echo e(route('admin.registration-approvals.show', $user->id)); ?>"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye me-1"></i>View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                            <div class="d-flex justify-content-between align-items-center py-3 px-3 border-top">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="text-muted small">
+                                        Showing <strong><?php echo e($approvedRegistrations->firstItem() ?? 0); ?></strong> to
+                                        <strong><?php echo e($approvedRegistrations->lastItem() ?? 0); ?></strong> of
+                                        <strong><?php echo e($approvedRegistrations->total()); ?></strong> users
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="text-muted small mb-0">Per page:</label>
+                                        <select class="form-select form-select-sm" style="width: auto;"
+                                            onchange="changePerPage(this.value)">
+                                            <option value="15" <?php echo e(request('per_page', 15) == 15 ? 'selected' : ''); ?>>15</option>
+                                            <option value="30" <?php echo e(request('per_page') == 30 ? 'selected' : ''); ?>>30</option>
+                                            <option value="50" <?php echo e(request('per_page') == 50 ? 'selected' : ''); ?>>50</option>
+                                            <option value="100" <?php echo e(request('per_page') == 100 ? 'selected' : ''); ?>>100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <?php echo e($approvedRegistrations->withQueryString()->links('vendor.pagination.bootstrap-5')); ?>
+
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="empty-state">
+                                <i class="bi bi-check-circle text-success"></i>
+                                <h5 class="mt-3">No Approved Registrations</h5>
+                                <p class="text-muted">No student registrations have been approved yet.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rejected Registrations -->
+            <div class="tab-pane fade" id="rejected" role="tabpanel">
+                <div class="main-content-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-x-circle me-2"></i>Rejected Registrations</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if($rejectedRegistrations->count() > 0): ?>
+                            <?php $__currentLoopData = $rejectedRegistrations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <div class="registration-item">
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="me-3">
+                                                    <?php if($user->avatar): ?>
+                                                        <img src="<?php echo e($user->avatar_url); ?>" alt="<?php echo e($user->name); ?>"
+                                                            class="rounded-circle"
+                                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                                    <?php else: ?>
+                                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                                                            style="width: 50px; height: 50px;">
+                                                            <span
+                                                                class="text-white fw-bold"><?php echo e(strtoupper(substr($user->name ?? 'U', 0, 1))); ?></span>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold"><?php echo e($user->name ?? 'N/A'); ?></h6>
+                                                    <p class="text-muted mb-1"><?php echo e($user->email ?? 'N/A'); ?></p>
+                                                    <div class="d-flex gap-2 flex-wrap">
+                                                        <span class="status-badge status-rejected">Rejected</span>
+                                                        <span class="text-muted small">
+                                                            Rejected:
+                                                            <?php echo e($user->approved_at ? $user->approved_at->format('M d, Y H:i') : 'N/A'); ?>
+
+                                                        </span>
+                                                        <?php if($user->approvedBy): ?>
+                                                            <span class="text-muted small">
+                                                                by <?php echo e($user->approvedBy->name); ?>
+
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php if($user->rejection_reason): ?>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Reason:</strong>
+                                                        <?php echo e($user->rejection_reason); ?></small>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div>
+                                            <a href="<?php echo e(route('admin.registration-approvals.show', $user->id)); ?>"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye me-1"></i>View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                            <div class="d-flex justify-content-between align-items-center py-3 px-3 border-top">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="text-muted small">
+                                        Showing <strong><?php echo e($rejectedRegistrations->firstItem() ?? 0); ?></strong> to
+                                        <strong><?php echo e($rejectedRegistrations->lastItem() ?? 0); ?></strong> of
+                                        <strong><?php echo e($rejectedRegistrations->total()); ?></strong> users
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="text-muted small mb-0">Per page:</label>
+                                        <select class="form-select form-select-sm" style="width: auto;"
+                                            onchange="changePerPage(this.value)">
+                                            <option value="15" <?php echo e(request('per_page', 15) == 15 ? 'selected' : ''); ?>>15</option>
+                                            <option value="30" <?php echo e(request('per_page') == 30 ? 'selected' : ''); ?>>30</option>
+                                            <option value="50" <?php echo e(request('per_page') == 50 ? 'selected' : ''); ?>>50</option>
+                                            <option value="100" <?php echo e(request('per_page') == 100 ? 'selected' : ''); ?>>100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <?php echo e($rejectedRegistrations->withQueryString()->links('vendor.pagination.bootstrap-5')); ?>
+
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="empty-state">
+                                <i class="bi bi-x-circle text-danger"></i>
+                                <h5 class="mt-3">No Rejected Registrations</h5>
+                                <p class="text-muted">No student registrations have been rejected.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Action Floating Bar -->
+    <div class="bulk-action-bar" id="bulkActionBar">
+        <span class="bulk-selected-count">1</span> Selected
+        <div class="vr mx-2"></div>
+        <button type="button" class="btn btn-success rounded-pill px-4" onclick="submitBulkAction('approve')">
+            <i class="bi bi-check-circle me-1"></i>Approve
+        </button>
+        <button type="button" class="btn btn-danger rounded-pill px-4" onclick="submitBulkAction('reject')">
+                <i class="bi bi-x-circle me-1"></i>Reject
+            </button>
+        </div>
+
+        <script>
+            // Per Page Selector Function
+            function changePerPage(perPage) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('per_page', perPage);
+                url.searchParams.delete('pending_page'); // Reset to page 1
+                url.searchParams.delete('approved_page'); // Reset to page 1
+                url.searchParams.delete('rejected_page'); // Reset to page 1
+                window.location.href = url.toString();
+            }
+
+            // Clear Verified Enrollment Function
+            function clearVerifiedEnrollment() {
+                sessionStorage.removeItem('verified_enrollment_ids');
+                window.location.reload();
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const selectAll = document.getElementById('selectAllPending');
+                const checkboxes = document.querySelectorAll('.user-select-checkbox');
+                const actionBar = document.getElementById('bulkActionBar');
+                const selectedCountSpan = document.querySelector('.bulk-selected-count');
+
+                window.updateActionBar = function () {
+                    const selected = document.querySelectorAll('.user-select-checkbox:checked').length;
+                    selectedCountSpan.textContent = selected;
+                    if (selected > 0) {
+                        actionBar.classList.add('visible');
+                    } else {
+                        actionBar.classList.remove('visible');
+                    }
+                };
+
+                if (selectAll) {
+                    selectAll.addEventListener('change', function () {
+                        checkboxes.forEach(cb => {
+                            cb.checked = this.checked;
+                        });
+                        updateActionBar();
+                    });
+                }
+
+                checkboxes.forEach(cb => {
+                    cb.addEventListener('change', function () {
+                        updateActionBar();
+                        // Update select all state
+                        if (selectAll) {
+                            const allChecked = document.querySelectorAll('.user-select-checkbox:checked').length === checkboxes.length;
+                            selectAll.checked = allChecked;
+                        }
+                    });
+                });
+            });
+
+            function submitBulkAction(action) {
+                const form = document.getElementById('bulkActionForm');
+                if (action === 'approve') {
+                    const count = document.querySelectorAll('.user-select-checkbox:checked').length;
+                    Swal.fire({
+                        title: 'Approve Students?',
+                        text: `Are you sure you want to approve the ${count} selected student(s)?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#1f7a2d',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, Approve All'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.action = "<?php echo e(route('admin.registration-approvals.bulk-approve')); ?>";
+                            form.submit();
+                        }
+                    });
+                } else if (action === 'reject') {
+                    const count = document.querySelectorAll('.user-select-checkbox:checked').length;
+                    Swal.fire({
+                        title: 'Reject Students',
+                        text: `Please provide a reason for rejecting the ${count} selected student(s):`,
+                        input: 'textarea',
+                        inputPlaceholder: 'Reason for rejection...',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Reject All',
+                        cancelButtonText: 'Cancel',
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'You need to write a reason!'
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed && result.value) {
+                            document.getElementById('bulk_rejection_reason').value = result.value;
+                            form.action = "<?php echo e(route('admin.registration-approvals.bulk-reject')); ?>";
+                            form.submit();
+                        }
+                    });
+                }
+            }
+
+            // Enrollment Verification File Upload
+            window.verifyEnrollment = async function (btn) {
+                const verificationForm = document.getElementById('enrollmentVerificationForm');
+                const fileInput = document.getElementById('enrollment_file');
+                const verificationResults = document.getElementById('verificationResults');
+
+                if (!fileInput || !verificationForm) return;
+
+                // Clear previous errors
+                if (verificationResults) verificationResults.innerHTML = '';
+
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    if (verificationResults) {
+                        verificationResults.innerHTML = '<div class="alert alert-danger">Please select a file first.</div>';
+                    } else {
+                        alert('Please select a file first.');
+                    }
+                    return;
+                }
+
+                // Show loading state
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                if (verificationResults) {
+                    verificationResults.innerHTML = '<div class="text-center"><div class="spinner-border text-success" role="status"></div><p class="mt-2">Analyzing enrollment file...</p></div>';
+                }
+
+                const formData = new FormData();
+                formData.append('enrollment_file', file);
+                formData.append('_token', '<?php echo e(csrf_token()); ?>');
+
+                try {
+                    const response = await fetch('<?php echo e(route("admin.registration-approvals.verify-enrollment")); ?>', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Auto-select matched students
+                        if (data.matched_ids) {
+                            // Store matched IDs in sessionStorage for cross-page selection
+                            sessionStorage.setItem('verified_enrollment_ids', JSON.stringify(data.matched_ids));
+
+                            // Check boxes for currently visible students
+                            let visibleMatches = 0;
+                            data.matched_ids.forEach(id => {
+                                const checkbox = document.querySelector(`input[name="user_ids[]"][value="${id}"]`);
+                                if (checkbox) {
+                                    checkbox.checked = true;
+                                    visibleMatches++;
+                                    // Add visual indicator
+                                    const card = checkbox.closest('.registration-item');
+                                    if (card) {
+                                        card.style.borderLeft = '4px solid #28a745';
+                                        card.style.backgroundColor = '#f8fff9';
+                                        // Add verified badge
+                                        const badge = document.createElement('span');
+                                        badge.className = 'badge bg-success ms-2 verified-badge';
+                                        badge.innerHTML = '<i class="bi bi-check-circle me-1"></i>Verified';
+                                        const statusArea = card.querySelector('.text-muted.small');
+                                        if (statusArea) {
+                                            const existingBadge = card.querySelector('.verified-badge');
+                                            if (!existingBadge) statusArea.insertAdjacentElement('afterend', badge);
+                                        }
+                                    }
+                                }
+                            });
+
+                            // Notify about students on other pages
+                            const hiddenMatches = data.matched_ids.length - visibleMatches;
+                            if (hiddenMatches > 0) {
+                                console.log(`${hiddenMatches} matched student(s) are on other pages and will be auto-selected when you navigate to those pages.`);
+                            }
+                        }
+
+                        // Update action bar visibility
+                        if (typeof updateActionBar === 'function') {
+                            updateActionBar();
+                        }
+
+                        if (verificationResults) {
+                            verificationResults.innerHTML = `
+                                                                                                                                    <div class="alert alert-success">
+                                                                                                                                        <h6><i class="bi bi-check-circle me-2"></i>Enrollment Verification Complete</h6>
+                                                                                                                                        <p class="mb-2"><strong>${data.total_matched}</strong> student(s) matched out of <strong>${data.total_enrollment}</strong> in enrollment file.</p>
+                                                                                                                                        <p class="mb-0 small">Matched students have been auto-selected and highlighted in green.</p>
+                                                                                                                                    </div>
+                                                                                                                                    ${data.match_details && data.match_details.length > 0 ? `
+                                                                                                                                        <div class="mt-3">
+                                                                                                                                            <h6>Matched Students (showing first 50):</h6>
+                                                                                                                                            <div class="list-group" style="max-height: 400px; overflow-y: auto;">
+                                                                                                                                                ${data.match_details.slice(0, 50).map(student => `
+                                                                                                                                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                                                                                                                        <div>
+                                                                                                                                                            <strong>${student.name}</strong>
+                                                                                                                                                            <br><small class="text-muted">${student.student_id} • ${student.email}</small>
+                                                                                                                                                        </div>
+                                                                                                                                                        <span class="badge bg-success">${student.reasons}</span>
+                                                                                                                                                    </div>
+                                                                                                                                                `).join('')}
+                                                                                                                                            </div>
+                                                                                                                                        </div>
+                                                                                                                                    ` : ''}
+                                                                                                                                `;
+                        }
+
+                    } else {
+                        if (verificationResults) {
+                            verificationResults.innerHTML = `
+                                                                                                                                    <div class="alert alert-danger">
+                                                                                                                                        <i class="bi bi-exclamation-triangle me-2"></i>${data.message}
+                                                                                                                                    </div>
+                                                                                                                                `;
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('Verify error:', error);
+                    if (verificationResults) {
+                        verificationResults.innerHTML = `
+                                                                                                                                <div class="alert alert-danger">
+                                                                                                                                    <i class="bi bi-exclamation-triangle me-2"></i>Error processing file: ${error.message}
+                                                                                                                                </div>
+                                                                                                                            `;
+                    }
+                } finally {
+                    // Reset button
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-upload me-2"></i>Process File';
+                    }
+                }
+            };
+
+            // Reset modal on close
+            document.addEventListener('DOMContentLoaded', function () {
+                const verificationModal = document.getElementById('enrollmentVerificationModal');
+                if (verificationModal) {
+                    verificationModal.addEventListener('hidden.bs.modal', function () {
+                        const form = document.getElementById('enrollmentVerificationForm');
+                        const results = document.getElementById('verificationResults');
+                        const btn = document.getElementById('uploadEnrollmentBtn');
+
+                        if (form) form.reset();
+                        if (results) results.innerHTML = '';
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="bi bi-upload me-2"></i>Process File';
+                        }
+                    });
+                }
+            });
+        </script>
+
+        <!-- Enrollment Verification Modal -->
+        <div class="modal fade" id="enrollmentVerificationModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-file-earmark-check me-2"></i>Verify Enrollment File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Upload your enrollment list</strong> (Excel or CSV) and we'll automatically match and select
+                            registered students.
+                        </div>
+
+                        <form id="enrollmentVerificationForm">
+                            <div class="mb-3">
+                                <label for="enrollment_file" class="form-label">Enrollment File</label>
+                                <input type="file" class="form-control" id="enrollment_file" accept=".xlsx,.xls,.csv" required>
+                                <div class="form-text">
+                                    Accepted formats: Excel (.xlsx, .xls) or CSV (.csv). Max size: 5MB
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Required Columns</label>
+                                <ul class="small text-muted mb-0">
+                                    <li><strong>Student ID</strong> (or "ID Number", "Student Number")</li>
+                                    <li><strong>Name</strong> (or "Full Name", "Student Name")</li>
+                                    <li><strong>Email</strong> (or "Email Address", "Student Email")</li>
+                                </ul>
+                                <p class="small text-muted mt-2 mb-0">
+                                    <i class="bi bi-lightbulb me-1"></i>Extra columns are fine - they'll be ignored
+                                    automatically!
+                                </p>
+                            </div>
+                        </form>
+
+                        <!-- Results Area -->
+                        <div id="verificationResults" class="mt-3"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-success" id="uploadEnrollmentBtn" onclick="verifyEnrollment(this)">
+                            <i class="bi bi-upload me-2"></i>Process File
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+
+        <!-- Universal Hidden Action Form -->
+        <form id="actionForm" method="POST" style="display: none;">
+            <?php echo csrf_field(); ?>
+        </form>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Check for success/error messages from redirect
+                <?php if(session('success')): ?>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: "<?php echo e(session('success')); ?>",
+                        confirmButtonColor: '#1f7a2d'
+                    });
+                <?php endif; ?>
+
+                <?php if(session('error')): ?>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: "<?php echo e(session('error')); ?>",
+                        confirmButtonColor: '#dc3545'
+                    });
+                <?php endif; ?>
+                                    });
+
+            function confirmAction(url, message) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: message,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#1f7a2d',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, proceed',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('actionForm');
+                        form.action = url;
+                        form.submit();
+                    }
+                });
+            }
+
+            function confirmRejectAction(url, message) {
+                Swal.fire({
+                    title: 'Reject Registration',
+                    text: "Please provide a reason for rejection:",
+                    input: 'textarea',
+                    inputPlaceholder: 'Reason for rejection...',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Reject Registration',
+                    cancelButtonText: 'Cancel',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'You need to write a reason!'
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed && result.value) {
+                        const form = document.getElementById('actionForm');
+                        form.action = url;
+
+                        // Create hidden input for reason
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'rejection_reason';
+                        input.value = result.value;
+                        form.appendChild(input);
+
+                        form.submit();
+                    }
+                });
+            }
+        </script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/admin/registration-approvals/index.blade.php ENDPATH**/ ?>

@@ -2,433 +2,693 @@
 
 @section('content')
     <style>
-        /* Homepage theme variables (mapped into existing dashboard vars) */
         :root {
-            --primary-green: #1f7a2d;
-            /* Homepage forest green */
-            --primary-green-2: #13601f;
-            /* darker stop */
-            --accent-green: #2e7d32;
-            --light-green: #eaf5ea;
-            --accent-orange: #FFCB05;
-            --text-dark: #16321f;
-            --text-light: #6c757d;
-            --bg-light: #f6fbf6;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            /* Executive Color System - HSL for better control */
+            --primary-h: 129;
+            --primary-s: 60%;
+            --primary-l: 30%;
 
-            /* Map dashboard-specific names to homepage palette for compatibility */
-            --forest-green: var(--primary-green);
-            --forest-green-dark: var(--primary-green-2);
-            --forest-green-light: var(--accent-green);
-            --forest-green-lighter: var(--light-green);
-            --yellow-maize: var(--accent-orange);
-            --yellow-maize-light: #fef9e7;
-            --white: #ffffff;
-            --gray-50: var(--bg-light);
-            --gray-100: #eef6ee;
-            --gray-600: var(--text-light);
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --success: #28a745;
-            --info: #17a2b8;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
-            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+            --forest-green: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+            --forest-green-dark: hsl(var(--primary-h), var(--primary-s), 20%);
+            --forest-green-light: hsl(var(--primary-h), var(--primary-s), 45%);
+            --forest-green-soft: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.08);
+
+            --maize-yellow: #FFCB05;
+            --maize-yellow-glow: rgba(255, 203, 5, 0.3);
+
+            --glass-white: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --premium-shadow: 0 20px 40px -15px rgba(0, 50, 0, 0.15);
+            --card-radius: 24px;
         }
 
-        /* Apply the same page zoom used on the homepage */
         .home-zoom {
             zoom: 0.75;
-        }
-
-        @supports not (zoom: 1) {
-            .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
-            }
-        }
-
-        body,
-        .profile-card,
-        .stats-card,
-        .main-content-card {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .main-dashboard-content {
-            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+            padding: 2rem;
+            background: radial-gradient(circle at 0% 0%, #f7faf7 0%, #ffffff 100%);
             min-height: 100vh;
-            padding: 1rem 1.5rem;
-            margin-left: 240px;
-            transition: margin-left 0.2s;
         }
 
-        .main-dashboard-inner {
-            max-width: 1180px;
-            margin: 0 auto;
-        }
-
-        .welcome-card {
-            background: var(--hero-gradient);
-            border-radius: 16px;
-            box-shadow: var(--shadow-lg);
-            padding: 1.5rem 1.5rem;
-            margin-bottom: 1.5rem;
-            color: #fff;
+        /* Dashboard Header */
+        .executive-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 1rem;
-            min-height: 100px;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            animation: fadeInDown 0.6s ease-out;
         }
 
-        .welcome-card .welcome-text {
-            font-size: 1.75rem;
-            font-weight: 700;
-            line-height: 1.1;
+        .header-title h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--forest-green-dark);
+            letter-spacing: -1px;
             margin-bottom: 0.25rem;
         }
 
-        .welcome-card .welcome-date {
-            font-size: 0.95rem;
+        .header-title p {
+            font-size: 1.1rem;
+            color: var(--text-light);
             font-weight: 500;
-            margin-bottom: 0.5rem;
         }
 
-        .welcome-card .welcome-avatar {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+        .date-chip {
+            background: var(--glass-white);
+            border: 1px solid var(--glass-border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: var(--shadow-sm);
             display: flex;
             align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            align-items: start;
-        }
-
-        .dashboard-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 0.75rem;
-            align-items: stretch;
+            font-weight: 600;
+            color: var(--forest-green);
         }
 
-        .dashboard-stat-card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            padding: 1.25rem 1rem;
-            text-align: center;
-            border: 1px solid var(--gray-100);
-            transition: all 0.3s ease;
-            height: 100%;
+        /* Executive Stats Row */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .premium-stat-card {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 140px;
+            min-height: 180px;
         }
 
-        .dashboard-stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        .premium-stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--premium-shadow);
+            border-color: var(--forest-green-light);
         }
 
-        .dashboard-stat-card .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--forest-green);
-            margin-bottom: 0.5rem;
-            display: block;
+        .premium-stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: var(--forest-green-soft);
+            border-radius: 0 0 0 100%;
+            transition: all 0.4s ease;
         }
 
-        .dashboard-stat-card .stat-label {
-            font-size: 1rem;
-            color: var(--forest-green-light);
-            margin-bottom: 0.25rem;
-        }
-
-        .dashboard-stat-card .stat-subtitle {
-            font-size: 0.8rem;
-            color: var(--gray-600);
-            margin-bottom: 0.75rem;
-        }
-
-        .dashboard-stat-card .stat-progress {
-            height: 6px;
-            background-color: var(--gray-100);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .dashboard-stat-card .stat-progress-bar {
+        .premium-stat-card:hover::after {
+            width: 100%;
             height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease-in-out;
+            border-radius: 0;
+            opacity: 0.5;
         }
 
-        .progress-success {
-            background-color: var(--success);
-        }
-
-        .progress-warning {
-            background-color: var(--warning);
-        }
-
-        .progress-info {
-            background-color: var(--info);
-        }
-
-        .progress-danger {
-            background-color: var(--danger);
-        }
-
-        .main-content-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-
-        .main-content-card .card-header {
-            background: var(--forest-green-lighter);
+        .stat-icon {
+            font-size: 2rem;
             color: var(--forest-green);
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--gray-100);
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-info .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--forest-green-dark);
+            line-height: 1;
+        }
+
+        .stat-info .label {
+            font-size: 0.95rem;
             font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+        }
+
+        /* Charts Section */
+        .chart-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .premium-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border-radius: var(--card-radius);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .card-header-flex h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--forest-green-dark);
+            margin: 0;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 0.75rem;
         }
 
-        .main-content-card .card-body {
-            padding: 1.25rem;
+        .card-header-flex .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
         }
 
-        .quick-actions-sidebar {
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-            height: fit-content;
-        }
-
-        .quick-actions-sidebar .card-header {
-            background: linear-gradient(180deg, rgba(34, 139, 34, 0.06), rgba(34, 139, 34, 0.02));
-            color: var(--forest-green);
-            padding: 0.875rem 1rem;
-            border-bottom: 1px solid var(--gray-100);
-            font-weight: 600;
-        }
-
-        .quick-actions-sidebar .card-body {
+        /* Critical Alerts */
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             padding: 1rem;
+            border-radius: 16px;
+            background: white;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(220, 53, 69, 0.1);
+            transition: all 0.3s ease;
         }
 
-        .btn-outline-primary,
-        .btn-outline-success,
-        .btn-outline-info,
-        .btn-outline-warning {
+        .alert-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 15px -5px rgba(220, 53, 69, 0.1);
+            border-color: #dc3545;
+        }
+
+        .alert-icon {
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.15s ease;
-            padding: 0.6rem 1rem;
-            border-width: 1px;
-            box-shadow: 0 6px 18px rgba(17, 94, 37, 0.06);
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
         }
 
-        .btn-outline-primary {
-            border-color: var(--forest-green);
-            color: var(--forest-green);
+        .alert-details h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--forest-green-dark);
         }
 
-        .btn-outline-primary:hover {
-            background-color: var(--forest-green);
-            border-color: var(--forest-green);
+        .alert-details p {
+            font-size: 0.85rem;
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        .alert-risk {
+            margin-left: auto;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .risk-extremely-severe {
+            background: #f82b60;
             color: white;
-            transform: translateY(-1px);
+        }
+
+        .risk-severe {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        /* Quick Action Grid */
+        .action-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .action-button {
+            background: white;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--forest-green-dark);
+            font-weight: 700;
+            text-decoration: none !important;
+            transition: all 0.3s ease;
             box-shadow: var(--shadow-sm);
         }
 
-        .btn-outline-success:hover,
-        .btn-outline-info:hover,
-        .btn-outline-warning:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
+        .action-button:hover {
+            background: var(--forest-green);
+            color: var(--maize-yellow);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(31, 122, 45, 0.3);
         }
 
-        .list-group-item {
-            border: none;
-            border-bottom: 1px solid var(--gray-100);
-            padding: 0.75rem 0;
+        .action-button i {
+            font-size: 1.8rem;
         }
 
-        .list-group-item:last-child {
-            border-bottom: none;
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        @media (max-width: 991px) {
-            .dashboard-layout {
+        @media (max-width: 1200px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-layout {
                 grid-template-columns: 1fr;
-                gap: 1rem;
             }
 
-            .dashboard-stats {
-                grid-template-columns: 1fr;
-                gap: 1.2rem;
-            }
-
-            .welcome-card {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 2rem 1.5rem;
-                text-align: center;
-            }
-
-            .main-dashboard-content {
-                padding: 1.5rem 1rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .welcome-card .welcome-text {
-                font-size: 1.8rem;
-            }
-
-            .dashboard-stat-card {
-                padding: 1.5rem 1rem;
-            }
-
-            .main-content-card .card-header,
-            .main-content-card .card-body,
-            .quick-actions-sidebar .card-header,
-            .quick-actions-sidebar .card-body {
-                padding: 1rem;
+            .action-strip {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
 
-    <div class="welcome-card">
-        <div>
-            <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
-            <div class="welcome-text">Welcome back, {{ auth()->user()->name }}!</div>
-            <div style="font-size: 0.9rem; margin-top: 0.5rem;">Manage and monitor the GCC System</div>
-        </div>
-        <div class="welcome-avatar">
-            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
-                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-        </div>
-    </div>
+    <div class="home-zoom">
+        <!-- Dashboard Header -->
+        <header class="executive-header">
+            <div class="header-title">
+                <h1>CMU Guidance and Counseling Center</h1>
+                <p>Strategic overview of GCC student wellness and operations.</p>
+            </div>
+            <div class="date-chip">
+                <i class="bi bi-calendar3"></i>
+                <span>{{ now()->format('l, F j, Y') }}</span>
+            </div>
+        </header>
 
-    <div class="dashboard-layout">
-        <div class="dashboard-stats">
-            <div class="dashboard-stat-card">
-                <div class="stat-value">{{ \App\Models\User::count() }}</div>
-                <div class="stat-label">Total Users</div>
-                <div class="stat-subtitle">{{ \App\Models\User::where('role', 'student')->count() }} Students •
-                    {{ \App\Models\User::where('role', 'counselor')->count() }} Counselors</div>
-                <div class="stat-progress">
-                    <div class="stat-progress-bar progress-success"
-                        style="width: {{ round((\App\Models\User::where('is_active', true)->count() / \App\Models\User::count()) * 100) }}%">
-                    </div>
+        <!-- Premium Stats Row -->
+        <div class="stat-grid">
+            <div class="premium-stat-card">
+                <i class="bi bi-people-fill stat-icon"></i>
+                <div class="stat-info">
+                    <div class="value">{{ number_format($stats['total_users']) }}</div>
+                    <div class="label">Total Workforce</div>
                 </div>
             </div>
-            <div class="dashboard-stat-card">
-                <div class="stat-value">{{ \App\Models\Appointment::count() }}</div>
-                <div class="stat-label">Total Appointments</div>
-                <div class="stat-subtitle">{{ \App\Models\Appointment::where('status', 'pending')->count() }} Pending •
-                    {{ \App\Models\Appointment::where('status', 'completed')->count() }} Completed</div>
-                <div class="stat-progress">
-                    <div class="stat-progress-bar progress-info"
-                        style="width: {{ \App\Models\Appointment::count() > 0 ? round((\App\Models\Appointment::where('status', 'completed')->count() / \App\Models\Appointment::count()) * 100) : 0 }}%">
-                    </div>
+            <div class="premium-stat-card">
+                <i class="bi bi-calendar-check-fill stat-icon"></i>
+                <div class="stat-info">
+                    <div class="value">{{ number_format($analytics['action_items']['pending_appointments']) }}</div>
+                    <div class="label">Active Sessions</div>
                 </div>
             </div>
-            <div class="dashboard-stat-card">
-                <div class="stat-value">{{ \App\Models\Assessment::count() }}</div>
-                <div class="stat-label">Total Assessments</div>
-                <div class="stat-subtitle">{{ \App\Models\Assessment::where('status', 'completed')->count() }} Completed •
-                    {{ \App\Models\Assessment::where('status', 'pending')->count() }} Pending</div>
-                <div class="stat-progress">
-                    <div class="stat-progress-bar progress-warning"
-                        style="width: {{ \App\Models\Assessment::count() > 0 ? round((\App\Models\Assessment::where('status', 'completed')->count() / \App\Models\Assessment::count()) * 100) : 0 }}%">
-                    </div>
+            <div class="premium-stat-card">
+                <i class="bi bi-shield-exclamation stat-icon" style="color: #dc3545;"></i>
+                <div class="stat-info">
+                    <div class="value">{{ $analytics['critical_alerts']->count() }}</div>
+                    <div class="label">Critical Cases</div>
                 </div>
             </div>
-            <div class="dashboard-stat-card">
-                <div class="stat-value">{{ \App\Models\User::where('registration_status', 'pending')->count() }}</div>
-                <div class="stat-label">Pending Approvals</div>
-                <div class="stat-subtitle">{{ \App\Models\User::where('registration_status', 'pending')->count() }}
-                    registrations awaiting review</div>
-                @if(\App\Models\User::where('registration_status', 'pending')->count() > 0)
-                    <div class="stat-progress">
-                        <div class="stat-progress-bar progress-danger" style="width: 100%"></div>
-                    </div>
-                @else
-                    <div class="stat-progress">
-                        <div class="stat-progress-bar" style="width: 0%"></div>
-                    </div>
-                @endif
+            <div class="premium-stat-card">
+                <i class="bi bi-person-plus-fill stat-icon" style="color: var(--maize-yellow);"></i>
+                <div class="stat-info">
+                    <div class="value">{{ $analytics['action_items']['pending_approvals'] }}</div>
+                    <div class="label">Pending Access</div>
+                </div>
             </div>
         </div>
 
-        <!-- Quick Actions Section -->
-        <div class="quick-actions-sidebar">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h6>
-            </div>
-            <div class="card-body">
-                <div class="d-flex flex-column gap-2">
-                    <a href="{{ route('users.index') }}" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-people me-1"></i>Manage Users
-                    </a>
-                    <a href="{{ route('admin.registration-approvals.index') }}" class="btn btn-outline-success btn-sm">
-                        <i class="bi bi-person-check me-1"></i>Review Registrations
-                    </a>
-                    <a href="{{ route('announcements.index') }}" class="btn btn-outline-info btn-sm">
-                        <i class="bi bi-megaphone me-1"></i>Manage Announcements
-                    </a>
-                    <a href="{{ route('activities') }}" class="btn btn-outline-warning btn-sm">
-                        <i class="bi bi-activity me-1"></i>View Activity Logs
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="main-content-card">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
-            <a href="{{ route('activities') }}" class="btn btn-success btn-sm">
-                <i class="bi bi-arrow-right me-1"></i>View All
+        <!-- Quick Actions Grid -->
+        <div class="action-strip">
+            <a href="{{ route('users.index') }}" class="action-button">
+                <i class="bi bi-person-gear"></i>
+                Manage Users
+            </a>
+            <a href="{{ route('admin.registration-approvals.index') }}" class="action-button">
+                <i class="bi bi-shield-check"></i>
+                Security Check
+            </a>
+            <a href="{{ route('announcements.index') }}" class="action-button">
+                <i class="bi bi-broadcast"></i>
+                Global Broadcast
+            </a>
+            <a href="{{ route('activities') }}" class="action-button">
+                <i class="bi bi-journal-text"></i>
+                Audit Logs
             </a>
         </div>
-        <div class="card-body">
-            @php $userActivities = \App\Models\UserActivity::where('user_id', auth()->id())->latest()->take(10)->get(); @endphp
-            @if($userActivities->count())
-                <ul class="list-group list-group-flush">
-                    @foreach($userActivities as $activity)
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>{{ ucfirst($activity->action) }} - {{ $activity->description }}</span>
-                            <span class="text-muted small">{{ $activity->created_at->diffForHumans() }}</span>
-                        </li>
+
+        <!-- Middle Section: Trends & Strategy -->
+        <div class="chart-layout">
+            <!-- Registration Trends -->
+            <div class="premium-card">
+                <div class="card-header-flex">
+                    <h2><i class="bi bi-graph-up-arrow"></i> System Growth Velocity</h2>
+                    <span class="badge bg-success-subtle text-success">Last 7 Days Analysis</span>
+                </div>
+                <div style="height: 320px;">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Risk Heatmap -->
+            <div class="premium-card">
+                <div class="card-header-flex">
+                    <h2><i class="bi bi-heart-pulse"></i> Wellness Risk Profile</h2>
+                </div>
+                <div style="height: 250px;">
+                    <canvas id="riskDonut"></canvas>
+                </div>
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between small text-muted mb-1">
+                        <span>Critical Reach</span>
+                        <span>{{ $analytics['risk']['data']->sum() > 0 ? round(($analytics['critical_alerts']->count() / $analytics['risk']['data']->sum()) * 100) : 0 }}%</span>
+                    </div>
+                    <div class="progress" style="height: 6px; border-radius: 50px;">
+                        <div class="progress-bar bg-danger"
+                            style="width: {{ $analytics['risk']['data']->sum() > 0 ? round(($analytics['critical_alerts']->count() / $analytics['risk']['data']->sum()) * 100) : 0 }}%">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW: Demographic Intel Section -->
+        <div class="header-title mb-4">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--forest-green-dark);">Student Demographic
+                Intelligence</h2>
+            <p style="font-size: 0.9rem;">Deep-dive into organizational composition and distribution.</p>
+        </div>
+
+        <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 2.5rem;">
+            <!-- Gender Distribution -->
+            <div class="premium-card">
+                <div class="card-header-flex">
+                    <h2 style="font-size: 1.1rem;"><i class="bi bi-gender-ambiguous"></i> Gender Distribution</h2>
+                </div>
+                <div style="height: 220px;">
+                    <canvas id="genderDonut"></canvas>
+                </div>
+            </div>
+
+            <!-- Year Level -->
+            <div class="premium-card">
+                <div class="card-header-flex">
+                    <h2 style="font-size: 1.1rem;"><i class="bi bi-mortarboard"></i> Population by Year</h2>
+                </div>
+                <div style="height: 220px;">
+                    <canvas id="yearLevelBar"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Programs -->
+            <div class="premium-card">
+                <div class="card-header-flex">
+                    <h2 style="font-size: 1.1rem;"><i class="bi bi-journal-check"></i> High-Density Programs</h2>
+                </div>
+                <div class="list-group list-group-flush pt-2">
+                    @foreach($analytics['demographics']['top_courses']['labels'] as $index => $course)
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="badge rounded-pill bg-success-subtle text-success">{{ $index + 1 }}</div>
+                                <span class="fw-600 text-dark small">{{ Str::limit($course, 25) }}</span>
+                            </div>
+                            <span
+                                class="badge bg-light text-dark">{{ $analytics['demographics']['top_courses']['data'][$index] }}</span>
+                        </div>
                     @endforeach
-                </ul>
-            @else
-                <div class="text-muted text-center py-4">No recent activities.</div>
-            @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-layout">
+            <!-- College Enrollment Heatmap -->
+            <div class="premium-card">
+                <div class="card-header-flex">
+                    <h2><i class="bi bi-building"></i> Multi-College Enrollment Map</h2>
+                    <span class="badge bg-light text-dark">Total Enrollment:
+                        {{ number_format($stats['total_users']) }}</span>
+                </div>
+                <div style="height: 350px;">
+                    <canvas id="collegeBar"></canvas>
+                </div>
+            </div>
+
+            <!-- Critical Notifications Panel -->
+            <div class="premium-card">
+                <div class="card-header-flex">
+                    <h2><i class="bi bi-exclamation-triangle-fill text-danger"></i> High-Priority Alerts</h2>
+                </div>
+                <div class="alert-container">
+                    @forelse($analytics['critical_alerts'] as $alert)
+                        <div class="alert-item">
+                            <div class="alert-icon">
+                                <i class="bi bi-person-fill-exclamation"></i>
+                            </div>
+                            <div class="alert-details">
+                                <h4>{{ $alert->user->name }}</h4>
+                                <p>{{ $alert->user->college }} • {{ $alert->created_at->format('M d, g:i A') }}</p>
+                            </div>
+                            <div class="alert-risk risk-{{ Str::slug($alert->risk_level) }}">
+                                {{ $alert->risk_level }}
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-5">
+                            <i class="bi bi-shield-check text-success display-4 mb-3"></i>
+                            <p class="text-muted fw-500">No critical alerts detected.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Section: Workforce -->
+        <div class="premium-card mb-5">
+            <div class="card-header-flex">
+                <h2><i class="bi bi-person-workspace"></i> Counselor Strategic Workload</h2>
+                <a href="#" class="text-decoration-none small fw-bold" style="color: var(--forest-green);">Manage Counselor
+                    Assignments</a>
+            </div>
+            <div style="height: 350px;">
+                <canvas id="workloadBar"></canvas>
+            </div>
         </div>
     </div>
+
+    <!-- Chart Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Chart.defaults.font.family = "'Plus Jakarta Sans', 'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+
+            // 1. Growth Chart
+            const growthCtx = document.getElementById('growthChart').getContext('2d');
+            const growthGradient = growthCtx.createLinearGradient(0, 0, 0, 400);
+            growthGradient.addColorStop(0, 'hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.2)');
+            growthGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+            new Chart(growthCtx, {
+                type: 'line',
+                data: {
+                    labels: @json($analytics['registration']['labels']),
+                    datasets: [{
+                        label: 'New Enrollment',
+                        data: @json($analytics['registration']['data']),
+                        borderColor: '#1f7a2d',
+                        backgroundColor: growthGradient,
+                        fill: true,
+                        tension: 0.45,
+                        borderWidth: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#1f7a2d',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#FFCB05',
+                        pointHoverBorderColor: '#1f7a2d'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.03)' },
+                            ticks: { font: { weight: 600 } }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 2. Risk Donut
+            const riskCtx = document.getElementById('riskDonut').getContext('2d');
+            new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: @json($analytics['risk']['labels']),
+                    datasets: [{
+                        data: @json($analytics['risk']['data']),
+                        backgroundColor: [
+                            '#1f7a2d', // Normal
+                            '#17a2b8', // Mild
+                            '#FFCB05', // Moderate
+                            '#ff7043', // Severe
+                            '#dc3545'  // Extremely Severe
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 20,
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, padding: 20, font: { weight: 700 } } }
+                    }
+                }
+            });
+
+            // 3. Gender Distribution Donut
+            const genderCtx = document.getElementById('genderDonut').getContext('2d');
+            new Chart(genderCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: @json($analytics['demographics']['gender']['labels']),
+                    datasets: [{
+                        data: @json($analytics['demographics']['gender']['data']),
+                        backgroundColor: ['#1f7a2d', '#FFCB05', '#17a2b8', '#ff7043', '#adb5bd'],
+                        borderWidth: 0,
+                        hoverOffset: 15,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 8, padding: 15, font: { weight: 600, size: 10 } } }
+                    }
+                }
+            });
+
+            // 4. Year Level Bar
+            const yearCtx = document.getElementById('yearLevelBar').getContext('2d');
+            new Chart(yearCtx, {
+                type: 'bar',
+                data: {
+                    labels: @json($analytics['demographics']['year_level']['labels']),
+                    datasets: [{
+                        label: 'Students',
+                        data: @json($analytics['demographics']['year_level']['data']),
+                        backgroundColor: 'hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.8)',
+                        hoverBackgroundColor: '#FFCB05',
+                        borderRadius: 6,
+                        maxBarThickness: 30
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // 5. College Bar
+            const collegeCtx = document.getElementById('collegeBar').getContext('2d');
+            new Chart(collegeCtx, {
+                type: 'bar',
+                data: {
+                    labels: @json($analytics['demographics']['college']['labels']),
+                    datasets: [{
+                        label: 'Total Enrollment',
+                        data: @json($analytics['demographics']['college']['data']),
+                        backgroundColor: '#1f7a2d',
+                        hoverBackgroundColor: '#FFCB05',
+                        borderRadius: 10,
+                        maxBarThickness: 50
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { weight: 600 } } },
+                        y: { grid: { display: false }, ticks: { font: { weight: 700, size: 11 } } }
+                    }
+                }
+            });
+
+            // 6. Workload Bar
+            const workloadCtx = document.getElementById('workloadBar').getContext('2d');
+            new Chart(workloadCtx, {
+                type: 'bar',
+                data: {
+                    labels: @json($analytics['counselor_workload']['labels']),
+                    datasets: [{
+                        label: 'Managed Cases',
+                        data: @json($analytics['counselor_workload']['data']),
+                        backgroundColor: 'hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.9)',
+                        hoverBackgroundColor: '#FFCB05',
+                        borderRadius: 12,
+                        maxBarThickness: 45
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' } },
+                        y: { grid: { display: false }, ticks: { font: { weight: 700, size: 12 } } }
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

@@ -55,6 +55,7 @@ class AppointmentDeclinedNotification extends Notification implements ShouldQueu
         $time = $this->appointment->scheduled_at->format('g:i A');
         return [
             'message' => 'Your appointment scheduled for ' . $start . ' at ' . $time . ' has been declined. Please select another available slot or contact the GCC for assistance.',
+            'appointment_id' => $this->appointment->id,
             'url' => route('appointments.index'),
         ];
     }

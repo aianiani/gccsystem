@@ -247,3 +247,53 @@ Route::middleware(['auth', 'admin'])->prefix('admin/analytics')->name('admin.ana
     Route::get('/', [AnalyticsController::class, 'index'])->name('index');
 });
 
+// Temporary debug route - add at the end of the file
+Route::get('/debug/notifications', function () {
+    if (!auth()->check()) {
+        return response()->json(['error' => 'Not authenticated']);
+    }
+
+    $user = auth()->user();
+    $notifications = $user->notifications()->latest()->take(10)->get();
+
+    return response()->json([
+        'user_id' => $user->id,
+        'user_name' => $user->name,
+        'user_role' => $user->role,
+        'total_notifications' => $notifications->count(),
+        'unread_count' => $user->unreadNotifications()->count(),
+        'notifications_raw' => $notifications->map(function ($n) {
+            return [
+                'id' => $n->id,
+                'type' => $n->type,
+                'data' => $n->data,
+                'read_at' => $n->read_at,
+                'created_at' => $n->created_at,
+            ];
+        })
+    ]);
+});
+
+// Test route to create a sample notification for students
+Route::get('/debug/create-test-notification', function () {
+    if (!auth()->check()) {
+        return 'Please log in first';
+    }
+
+    $user = auth()->user();
+
+    if ($user->role !== 'student') {
+        return 'This route is only for students. Your role is: ' . $user->role;
+    }
+
+    // Create a fake appointment for testing
+    $appointment = new \App\Models\Appointment();
+    $appointment->id = 999; // Fake ID
+    $appointment->scheduled_at = now()->addDays(2);
+
+    // Send a test notification
+    $user->notify(new \App\Notifications\AppointmentAcceptedNotification($appointment));
+
+    return 'Test notification created! Go check your notification bell.';
+});
+

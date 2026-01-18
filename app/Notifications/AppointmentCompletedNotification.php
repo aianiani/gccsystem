@@ -56,6 +56,7 @@ class AppointmentCompletedNotification extends Notification
         $time = $this->appointment->scheduled_at->format('g:i A');
         return [
             'message' => 'Your appointment with ' . ($counselor ? $counselor->name : 'your counselor') . ' on ' . $start . ' at ' . $time . ' has been marked as completed. You may now view your session notes if available.',
+            'appointment_id' => $this->appointment->id,
             'url' => route('appointments.index'),
         ];
     }

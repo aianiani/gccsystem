@@ -218,6 +218,10 @@
             color: #fff;
         }
 
+        .page-header h2 {
+            color: #fff;
+        }
+
         .content-card {
             background: #fff;
             border-radius: 16px;

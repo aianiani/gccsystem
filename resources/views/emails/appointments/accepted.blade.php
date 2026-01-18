@@ -1,10 +1,10 @@
 @component('emails.layouts.base', [
-    'title' => 'Appointment Accepted',
-    'heading' => 'Appointment Accepted',
+    'title' => 'Appointment Approved',
+    'heading' => 'Appointment Approved',
 ])
 <h2>Hello {{ $student->name }},</h2>
 
-<p>Great news! Your appointment request has been accepted by {{ $counselor->name }}.</p>
+<p>Great news! Your appointment request has been approved by {{ $counselor->name }}.</p>
 
 <div class="info-box">
     <p><strong>Counselor:</strong> {{ $counselor->name }}</p>

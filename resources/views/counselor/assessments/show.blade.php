@@ -1,324 +1,334 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $studentName = $assessment->user->name ?? 'Student';
+        $avatarUrl = $assessment->user->avatar_url ?? ('https://ui-avatars.com/api/?name=' . urlencode($studentName) . '&background=1f7a2d&color=fff&rounded=true&size=128');
+        $createdAt = $assessment->created_at ? $assessment->created_at->format('M d, Y h:i A') : '';
+        $studentId = $assessment->user->student_id ?? 'N/A';
+        $course = $assessment->user->course ?? 'N/A';
+        $yearLevel = $assessment->user->year_level ?? 'N/A';
+    @endphp
     <div class="home-zoom">
-        @include('counselor.sidebar')
-        <div class="main-dashboard-content">
-            <div class="container py-4 assessment-summary-page" style="max-width: 100%; padding: 0 1rem;">
-                @php
-                    $studentName = $assessment->user->name ?? 'Student';
-                    $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($studentName) . '&background=0D8ABC&color=fff';
+        <div class="d-flex">
+            <!-- Mobile Sidebar Toggle -->
+            <button id="counselorSidebarToggle" class="d-md-none"
+                style="position: fixed; top: 1rem; left: 1rem; z-index: 1100; background: var(--forest-green); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 0.75rem;">
+                <i class="bi bi-list"></i>
+            </button>
 
-                    // Initialize scores
-                    $scores = ['depression' => 0, 'anxiety' => 0, 'stress' => 0];
-                    $score_interpretation = [];
+            @include('counselor.sidebar')
 
-                    // Get student answers
-                    $studentAnswers = [];
-                    if ($assessment->score) {
-                        if (is_array($assessment->score)) {
-                            $studentAnswers = $assessment->score;
-                        } elseif (is_string($assessment->score)) {
-                            $studentAnswers = json_decode($assessment->score, true) ?? [];
-                        }
-                    }
+            <div class="main-dashboard-content flex-grow-1">
+                <div class="main-dashboard-inner">
+                    <!-- Assessment Summary Title -->
+                    <h2 class="h4 fw-bold text-dark mb-3">
+                        <i class="bi bi-clipboard-data me-2"></i>Assessment Summary
+                    </h2>
 
-                    if ($assessment->type === 'DASS-42') {
-                        // DASS-42 Scoring
-                        // Depression items: 3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42 (14 items)
-                        $depressionItems = [3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42];
-                        // Anxiety items: 2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41 (14 items)
-                        $anxietyItems = [2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41];
-                        // Stress items: 1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39 (14 items)
-                        $stressItems = [1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39];
+                    <!-- Green Hero Header with Student Profile -->
+                    <div class="details-header mb-4">
+                        <div class="d-flex flex-column flex-md-row align-items-center gap-4 w-100">
+                            <!-- Avatar -->
+                            <div class="position-relative">
+                                <img src="{{ $avatarUrl }}" class="rounded-circle shadow-sm border border-3 border-white"
+                                    width="90" height="90" alt="{{ $studentName }}">
+                            </div>
 
-                        // Calculate raw scores
-                        foreach ($depressionItems as $item) {
-                            $score = $studentAnswers[$item] ?? 0;
-                            $scores['depression'] += (int) $score;
-                        }
-                        foreach ($anxietyItems as $item) {
-                            $score = $studentAnswers[$item] ?? 0;
-                            $scores['anxiety'] += (int) $score;
-                        }
-                        foreach ($stressItems as $item) {
-                            $score = $studentAnswers[$item] ?? 0;
-                            $scores['stress'] += (int) $score;
-                        }
+                            <!-- Student Info -->
+                            <div class="flex-grow-1 text-center text-md-start">
+                                <h1 class="h3 fw-bold text-white mb-2">{{ $studentName }}</h1>
 
-                        // Multiply by 2 for DASS-42 scoring
-                        $scores['depression'] *= 2;
-                        $scores['anxiety'] *= 2;
-                        $scores['stress'] *= 2;
+                                <!-- Primary Contact Info -->
+                                <div
+                                    class="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 text-white mb-2">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <i class="bi bi-card-heading"></i>
+                                        <span class="fw-semibold">{{ $assessment->user->student_id ?? 'No ID' }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <i class="bi bi-envelope"></i>
+                                        <span>{{ $assessment->user->email }}</span>
+                                    </div>
+                                    @if($assessment->user->contact_number)
+                                        <div class="d-flex align-items-center gap-1">
+                                            <i class="bi bi-telephone"></i>
+                                            <span>{{ $assessment->user->contact_number }}</span>
+                                        </div>
+                                    @endif
+                                </div>
 
-                        // Interpretation based on DASS-42 thresholds
-                        // Depression thresholds: Normal 0-9, Mild 10-13, Moderate 14-20, Severe 21-27, Extremely Severe 28+
-                        if ($scores['depression'] <= 9) {
-                            $score_interpretation['depression'] = 'Normal';
-                        } elseif ($scores['depression'] <= 13) {
-                            $score_interpretation['depression'] = 'Mild';
-                        } elseif ($scores['depression'] <= 20) {
-                            $score_interpretation['depression'] = 'Moderate';
-                        } elseif ($scores['depression'] <= 27) {
-                            $score_interpretation['depression'] = 'Severe';
-                        } else {
-                            $score_interpretation['depression'] = 'Extremely Severe';
-                        }
+                                <!-- Secondary Academic Info -->
+                                <div
+                                    class="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 text-white-50 mb-3 small">
+                                    @if($assessment->user->college)
+                                        <div class="d-flex align-items-center gap-1">
+                                            <i class="bi bi-building"></i> {{ $assessment->user->college }}
+                                        </div>
+                                    @endif
+                                    @if($assessment->user->course)
+                                        <div class="d-flex align-items-center gap-1">
+                                            <i class="bi bi-mortarboard"></i> {{ $assessment->user->course }}
+                                        </div>
+                                    @endif
+                                    @if($assessment->user->year_level)
+                                        <div class="d-flex align-items-center gap-1">
+                                            <i class="bi bi-calendar3"></i> {{ $assessment->user->year_level }}
+                                        </div>
+                                    @endif
+                                    @if($assessment->user->gender)
+                                        <div class="d-flex align-items-center gap-1">
+                                            <i class="bi bi-person"></i> {{ ucfirst($assessment->user->gender) }}
+                                        </div>
+                                    @endif
+                                </div>
 
-                        // Anxiety thresholds: Normal 0-7, Mild 8-9, Moderate 10-14, Severe 15-19, Extremely Severe 20+
-                        if ($scores['anxiety'] <= 7) {
-                            $score_interpretation['anxiety'] = 'Normal';
-                        } elseif ($scores['anxiety'] <= 9) {
-                            $score_interpretation['anxiety'] = 'Mild';
-                        } elseif ($scores['anxiety'] <= 14) {
-                            $score_interpretation['anxiety'] = 'Moderate';
-                        } elseif ($scores['anxiety'] <= 19) {
-                            $score_interpretation['anxiety'] = 'Severe';
-                        } else {
-                            $score_interpretation['anxiety'] = 'Extremely Severe';
-                        }
+                                <!-- Badges Row with Risk Level -->
+                                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
+                                    <span class="badge bg-white text-success border"><i
+                                            class="bi bi-file-earmark-text me-1"></i> {{ $assessment->type }}</span>
+                                    <span class="badge bg-white text-secondary border"><i class="bi bi-clock me-1"></i>
+                                        {{ $createdAt }}</span>
+                                    @php
+                                        $risk = strtolower($assessment->risk_level ?? 'low');
+                                        $riskColors = [
+                                            'low' => 'success',
+                                            'low-moderate' => 'info',
+                                            'moderate' => 'warning',
+                                            'high' => 'danger',
+                                            'very-high' => 'dark'
+                                        ];
+                                        $riskClass = $riskColors[$risk] ?? 'secondary';
+                                        $riskLabel = ucwords(str_replace('-', ' ', $risk));
+                                    @endphp
+                                    <span class="badge bg-{{ $riskClass }} text-white border">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Risk: {{ $riskLabel }}
+                                    </span>
+                                    <a href="{{ route('counselor.assessments.export', $assessment->id) }}" target="_blank"
+                                        class="btn btn-sm btn-light text-danger fw-bold"
+                                        style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">
+                                        <i class="bi bi-file-pdf me-1"></i> Export PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
 
-                        // Stress thresholds: Normal 0-14, Mild 15-18, Moderate 19-25, Severe 26-33, Extremely Severe 34+
-                        if ($scores['stress'] <= 14) {
-                            $score_interpretation['stress'] = 'Normal';
-                        } elseif ($scores['stress'] <= 18) {
-                            $score_interpretation['stress'] = 'Mild';
-                        } elseif ($scores['stress'] <= 25) {
-                            $score_interpretation['stress'] = 'Moderate';
-                        } elseif ($scores['stress'] <= 33) {
-                            $score_interpretation['stress'] = 'Severe';
-                        } else {
-                            $score_interpretation['stress'] = 'Extremely Severe';
-                        }
-
-                        $max = 0; // Not used for DASS
-                        $total = 0;
-                    } elseif ($assessment->type === 'Academic Stress Survey') {
-                        $max = 45;
-                        $total = is_array($assessment->score) ? ($assessment->score['score'] ?? 0) : (is_numeric($assessment->score) ? $assessment->score : 0);
-                    } elseif ($assessment->type === 'Wellness Check') {
-                        $max = 36;
-                        $total = is_array($assessment->score) ? ($assessment->score['score'] ?? 0) : (is_numeric($assessment->score) ? $assessment->score : 0);
-                    } else {
-                        $max = 0;
-                        $total = 0;
-                    }
-                @endphp
-                <div class="mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h2 class="fw-bold mb-0 d-flex align-items-center gap-2 university-brand">
-                            <i class="bi bi-clipboard-data"></i> Assessment Summary
-                        </h2>
-                        <div class="d-flex gap-2">
+                        <!-- Actions -->
+                        <div class="d-flex gap-2 align-self-md-start ms-md-auto">
                             @if(request('from_appointment'))
                                 <a href="{{ route('counselor.appointments.show', request('from_appointment')) }}"
-                                    class="btn btn-outline-secondary shadow-sm">
-                                    <i class="bi bi-arrow-left"></i> Back to Appointment Details
+                                    class="btn btn-outline-light btn-sm d-flex align-items-center gap-2">
+                                    <i class="bi bi-arrow-left"></i> Back to Appointment
                                 </a>
                             @else
                                 <a href="{{ route('counselor.assessments.index') }}"
-                                    class="btn btn-outline-secondary shadow-sm">
+                                    class="btn btn-outline-light btn-sm d-flex align-items-center gap-2">
                                     <i class="bi bi-arrow-left"></i> Back to List
                                 </a>
                             @endif
                         </div>
                     </div>
-
-                    {{-- College info removed from header to avoid duplication with hero card --}}
-
-                    @includeIf('counselor.assessments.partials.summary', ['assessment' => $assessment, 'scores' => $scores])
                 </div>
+
+                {{-- Main Content --}}
+                @includeIf('counselor.assessments.partials.summary', ['assessment' => $assessment])
             </div>
+        </div>
+    </div>
+    </div>
 
-            <style>
-                :root {
-                    --primary-green: #1f7a2d;
-                    --primary-green-2: #13601f;
-                    --accent-green: #2e7d32;
-                    --light-green: #eaf5ea;
-                    --accent-orange: #FFCB05;
-                    --text-dark: #16321f;
-                    --text-light: #6c757d;
-                    --bg-light: #f6fbf6;
-                    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-                    --forest-green: var(--primary-green);
-                    --forest-green-dark: var(--primary-green-2);
-                    --forest-green-light: var(--accent-green);
-                    --forest-green-lighter: var(--light-green);
-                    --yellow-maize: var(--accent-orange);
-                    --white: #ffffff;
-                    --gray-50: var(--bg-light);
-                    --gray-100: #eef6ee;
-                    --gray-600: var(--text-light);
-                    --danger: #dc3545;
-                    --warning: #ffc107;
-                    --success: #28a745;
-                    --info: #17a2b8;
-                    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
-                    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
-                    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
-                    --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
-                }
-
-                .home-zoom {
-                    zoom: 0.75;
-                }
-
-                @supports not (zoom: 1) {
-                    .home-zoom {
-                        transform: scale(0.75);
-                        transform-origin: top center;
+    <!-- Mobile Sidebar Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('counselorSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function () {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
                     }
-                }
-
-                .custom-sidebar {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    bottom: 0;
-                    width: 240px;
-                    background: var(--forest-green);
-                    color: #fff;
-                    z-index: 1040;
-                    display: flex;
-                    flex-direction: column;
-                    box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-                    overflow-y: auto;
-                    padding-bottom: 1rem;
-                }
-
-                .main-dashboard-content {
-                    background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
-                    min-height: 100vh;
-                    padding: 1rem 1.5rem;
-                    margin-left: 240px;
-                    transition: margin-left 0.2s;
-                }
-
-                .assessment-summary-page {
-                    max-width: 1100px;
-                }
-
-                .university-brand {
-                    color: #237728;
-                    letter-spacing: 1px;
-                    font-weight: 700;
-                }
-
-                .card {
-                    border-radius: 1rem;
-                    box-shadow: 0 8px 30px rgba(14, 56, 20, 0.06);
-                }
-
-                .card-header {
-                    background: linear-gradient(90deg, rgba(35, 119, 40, 0.08), rgba(35, 119, 40, 0.02));
-                    border-bottom: none;
-                    color: #1f7a2d;
-                    font-weight: 700;
-                }
-
-                h2,
-                h3,
-                .fw-bold {
-                    color: #1f7a2d;
-                }
-
-                .nav-tabs {
-                    border-bottom: 1px solid #e0e0e0;
-                }
-
-                .nav-tabs .nav-link {
-                    color: #666;
-                    padding: 0.75rem 1rem;
-                    font-weight: 600;
-                    border: none !important;
-                    border-bottom: 3px solid transparent !important;
-                    background: transparent;
-                    transition: all 0.3s ease;
-                }
-
-                .nav-tabs .nav-link:hover {
-                    color: #1f7a2d;
-                    border-bottom-color: rgba(31, 122, 45, 0.3) !important;
-                }
-
-                .nav-tabs .nav-link.active {
-                    background: transparent;
-                    border-bottom: 3px solid #1f7a2d !important;
-                    color: #1f7a2d;
-                }
-
-                .tab-content>.tab-pane {
-                    min-height: 220px;
-                }
-
-                .assessment-summary-page .avatar-large {
-                    width: 96px;
-                    height: 96px;
-                }
-
-                .card .progress {
-                    background: #eef7ee;
-                    height: 12px;
-                    border-radius: 8px;
-                }
-
-                .progress-bar {
-                    border-radius: 8px;
-                }
-
-                .score-badge {
-                    font-size: 0.95rem;
-                    padding: 0.45rem 0.6rem;
-                }
-
-                .badge.bg-primary {
-                    background-color: #237728 !important;
-                }
-
-                .badge.bg-danger {
-                    background-color: #d9534f !important;
-                }
-
-                .btn-outline-primary {
-                    border-color: rgba(35, 119, 40, 0.15);
-                    color: #235;
-                }
-
-                .table thead th {
-                    background: #f6fbf6;
-                    color: #1f7a2d;
-                    font-weight: 700;
-                }
-
-                .table td,
-                .table th {
-                    padding: 0.75rem;
-                    vertical-align: middle;
-                }
-
-                .dass-score-sheet {
-                    border-radius: 0.6rem;
-                    overflow: hidden;
-                }
-
-                @media (max-width: 900px) {
-                    .assessment-summary-page {
-                        max-width: 100%;
-                        padding-left: 12px;
-                        padding-right: 12px;
+                });
+                document.addEventListener('click', function (e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
                     }
+                });
+            }
+        });
+    </script>
 
-                    .avatar-large {
-                        width: 72px;
-                        height: 72px;
-                    }
+    <style>
+        /* Homepage theme variables */
+        :root {
+            --primary-green: #1f7a2d;
+            --primary-green-2: #13601f;
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
+            --text-dark: #16321f;
+            --text-light: #6c757d;
+            --bg-light: #f6fbf6;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 
-                    .nav-tabs .nav-link {
-                        padding: 0.45rem 0.6rem;
-                        font-size: 0.95rem;
-                    }
-                }
-            </style>
+            --forest-green: var(--primary-green);
+            --forest-green-dark: var(--primary-green-2);
+            --forest-green-light: var(--accent-green);
+            --forest-green-lighter: var(--light-green);
+            --yellow-maize: var(--accent-orange);
+            --yellow-maize-light: #fef9e7;
+            --white: #ffffff;
+            --gray-50: var(--bg-light);
+            --gray-100: #eef6ee;
+            --gray-600: var(--text-light);
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --info: #17a2b8;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+        }
+
+        /* Apply page zoom */
+        .home-zoom {
+            zoom: 0.75;
+        }
+
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top center;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+        }
+
+        .custom-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            background: var(--forest-green);
+            color: #fff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+
+        .main-dashboard-content {
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+            min-height: 100vh;
+            padding: 1rem 1.5rem;
+            margin-left: 240px;
+            transition: margin-left 0.2s;
+        }
+
+        .main-dashboard-inner {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header Styles */
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--hero-gradient);
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            color: #fff;
+        }
+
+        .header-title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-meta {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Card Styles */
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--forest-green-lighter);
+        }
+
+        /* Ensure nav tabs match */
+        .nav-tabs .nav-link {
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--forest-green);
+        }
+
+        @media (max-width: 991.98px) {
+            .main-dashboard-content {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .main-dashboard-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .details-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .custom-sidebar {
+                position: fixed;
+                z-index: 1040;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                width: 240px;
+                transform: translateX(-100%);
+                transition: transform 0.2s ease;
+                flex-direction: column;
+                padding: 0;
+            }
+
+            .custom-sidebar.show {
+                transform: translateX(0);
+            }
+        }
+    </style>
 
 @endsection

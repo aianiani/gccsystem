@@ -110,6 +110,9 @@ class MessageController extends Controller
             // Load the sender relationship for JSON response
             $message->load('sender');
 
+            // Broadcast the message
+            broadcast(new \App\Events\MessageSent($message))->toOthers();
+
             // If AJAX, return JSON
             if ($request->ajax()) {
                 return response()->json([
@@ -157,16 +160,7 @@ class MessageController extends Controller
     public function selectCounselor()
     {
         $currentUserId = Auth::id();
-        $counselors = \App\Models\User::where('role', 'counselor')
-            ->where(function ($query) use ($currentUserId) {
-                $query->whereHas('sentMessages', function ($q) use ($currentUserId) {
-                    $q->where('recipient_id', $currentUserId);
-                })
-                    ->orWhereHas('receivedMessages', function ($q) use ($currentUserId) {
-                        $q->where('sender_id', $currentUserId);
-                    });
-            })
-            ->get();
+        $counselors = \App\Models\User::where('role', 'counselor')->get();
 
         // Attach last message
         foreach ($counselors as $counselor) {

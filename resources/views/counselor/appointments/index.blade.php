@@ -414,7 +414,7 @@
                                         <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending
                                         </option>
                                         <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>
-                                            Accepted</option>
+                                            Approved</option>
                                         <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>
                                             Completed</option>
                                         <option value="rescheduled_pending" {{ request('status') == 'rescheduled_pending' ? 'selected' : '' }}>Reschedule Pending</option>
@@ -562,7 +562,7 @@
                                                 class="badge {{ $statusMap[$status]['class'] ?? 'bg-secondary' }} px-3 py-2 mb-2 rounded-pill d-inline-flex align-items-center"
                                                 style="font-size: 0.85rem;">
                                                 <i class="bi bi-{{ $statusMap[$status]['icon'] ?? 'info-circle' }} me-1"></i>
-                                                {{ ucfirst(str_replace('_', ' ', $status)) }}
+                                                {{ $status === 'accepted' ? 'Approved' : ucfirst(str_replace('_', ' ', $status)) }}
                                             </span>
                                             <div class="small text-muted fst-italic text-truncate px-2 mx-auto"
                                                 style="max-width: 200px; font-size: 0.8rem;">

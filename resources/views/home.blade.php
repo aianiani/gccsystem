@@ -1801,15 +1801,6 @@
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
-                @else
-                    <!-- Debug info for no announcements -->
-                    <div class="text-center mt-4">
-                        <small class="text-muted">Debug:
-                            {{ $announcements ? count($announcements) : 'No announcements variable' }} announcements
-                            found</small>
-                        <br>
-                        <small class="text-muted">Navigation controls only appear when there are 2+ announcements</small>
-                    </div>
                 @endif
 
                 <div class="text-center mt-4">
@@ -3263,12 +3254,6 @@
                 return;
             }
 
-            console.log('Announcement carousel debug:', {
-                totalSlides: totalAnnouncementSlides,
-                nextBtn: !!announcementNextBtn,
-                prevBtn: !!announcementPrevBtn,
-                track: !!announcementTrack
-            });
 
             // Only proceed if we have slides to show
             if (totalAnnouncementSlides === 0) {
@@ -5225,16 +5210,21 @@
                                 const fd = new FormData(resendForm);
                                 const resp = await fetch(resendForm.action, {
                                     method: 'POST',
-                                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        'Accept': 'application/json'
+                                    },
                                     body: fd,
                                     credentials: 'same-origin'
                                 });
+                                const data = await resp.json();
+
                                 if (resp.ok) {
                                     // start timer and notify user
                                     startResendTimer(120);
-                                    try { const data = await resp.json(); if (data && data.message) alert(data.message); else alert('Verification code resent.'); } catch { alert('Verification code resent.'); }
+                                    alert(data.message || 'Verification code resent.');
                                 } else {
-                                    try { const data = await resp.json(); alert(data.message || 'Unable to resend code'); } catch { alert('Unable to resend code'); }
+                                    alert(data.message || 'Unable to resend code');
                                 }
                             } catch (err) {
                                 console.error(err);
@@ -5266,28 +5256,38 @@
                     twofaForm.addEventListener('submit', async function (e) {
                         e.preventDefault();
                         const submitBtn = twofaForm.querySelector('button[type="submit"]');
+                        const originalText = submitBtn.innerHTML;
                         submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verifying...';
+
                         try {
                             updateHidden();
                             const formData = new FormData(twofaForm);
                             const resp = await fetch(twofaForm.action, {
                                 method: 'POST',
-                                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json'
+                                },
                                 body: formData,
                                 credentials: 'same-origin'
                             });
-                            if (resp.ok || resp.redirected) {
-                                window.location.href = resp.redirected ? resp.url : window.location.href;
-                            } else {
-                                let msg = 'Invalid authentication code';
-                                try { const data = await resp.json(); msg = data.message || msg; } catch { }
+
+                            const data = await resp.json();
+
+                            if (resp.ok) { // Success (200)
+                                window.location.href = data.redirect || '/dashboard';
+                            } else { // Error (422, etc)
+                                let msg = data.message || 'Invalid authentication code';
                                 alert(msg);
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalText;
                             }
                         } catch (err) {
                             console.error(err);
                             alert('Network error. Please try again.');
-                        } finally {
                             submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalText;
                         }
                     });
                 }

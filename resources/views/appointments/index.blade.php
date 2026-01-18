@@ -608,7 +608,7 @@
                                                                 class="bi bi-hourglass-split me-1"></i>Pending</span>
                                                     @elseif($appointment->status === 'accepted')
                                                         <span class="status-badge-styled bg-status-accepted"><i
-                                                                class="bi bi-check-circle me-1"></i>Accepted</span>
+                                                                class="bi bi-check-circle me-1"></i>Approved</span>
                                                     @elseif($appointment->status === 'completed')
                                                         <span class="status-badge-styled bg-status-completed"><i
                                                                 class="bi bi-check-all me-1"></i>Completed</span>

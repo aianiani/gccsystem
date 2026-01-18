@@ -4,25 +4,64 @@ namespace App\Events;
 
 use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class MessageSent implements ShouldBroadcastNow
 {
-    use InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
-    public $receiverId;
 
-    public function __construct(Message $message, $receiverId)
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(Message $message)
     {
         $this->message = $message;
-        $this->receiverId = $receiverId;
     }
 
-    public function broadcastOn()
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
+    public function broadcastOn(): array
     {
-        return new Channel('chat.' . $this->receiverId);
+        // Broadcast to the recipient's private channel
+        return [
+            new PrivateChannel('chat.' . $this->message->recipient_id),
+        ];
+    }
+
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'message.sent';
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'id' => $this->message->id,
+            'message' => $this->message->content,
+            'image' => $this->message->image,
+            'sender_id' => $this->message->sender_id,
+            'sender_name' => $this->message->sender->name,
+            'is_self' => false,
+            'created_at' => $this->message->created_at->format('M j, g:i A'),
+        ];
     }
 }

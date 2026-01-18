@@ -810,10 +810,10 @@
                                             $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]);
                                         @endphp
                                         <div class="d-flex align-items-center justify-content-center gap-2 px-3 py-2 rounded-3 border transition-all text-center
-                                                                                                    {{ $isAttended ? $style['color'] . ' shadow-sm' : 'border-white-10 text-white-50' }}"
+                                                                                                                            {{ $isAttended ? $style['color'] . ' shadow-sm' : 'border-white-10 text-white-50' }}"
                                             style="background: {{ $isAttended ? '' : 'rgba(255, 255, 255, 0.05)' }}; 
-                                                                                                           border-color: {{ $isAttended ? '' : 'rgba(255, 255, 255, 0.1)' }};
-                                                                                                           backdrop-filter: blur(4px); min-width: 100px;">
+                                                                                                                                   border-color: {{ $isAttended ? '' : 'rgba(255, 255, 255, 0.1)' }};
+                                                                                                                                   backdrop-filter: blur(4px); min-width: 100px;">
                                             @if($isAttended)
                                                 <i class="bi {{ $style['icon'] }}"></i>
                                                 <span class="fw-bold small">{{ $seminarName }}</span>
@@ -929,68 +929,81 @@
                                         ->first();
                                     $end = $availability ? \Carbon\Carbon::parse($availability->end) : $start->copy()->addMinutes(30);
                                 @endphp
-                                <div class="appointment-item">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h6 class="mb-1 fw-bold">Counseling Session</h6>
-                                            <p class="text-muted mb-1">
-                                                <i
-                                                    class="bi bi-person me-1"></i>{{ $appointment->counselor->name ?? 'Counselor' }}
-                                            </p>
-                                            <p class="text-muted mb-0">
-                                                <i class="bi bi-calendar me-1"></i>{{ $start->format('F j, Y') }} at
-                                                {{ $start->format('g:i A') }} – {{ $end->format('g:i A') }}
-                                            </p>
+                                <div class="appointment-item p-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <!-- Counselor Avatar -->
+                                        <div class="flex-shrink-0">
+                                            <img src="{{ $appointment->counselor->avatar_url }}"
+                                                alt="{{ $appointment->counselor->name }}" class="rounded-circle border"
+                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                        </div>
+
+                                        <!-- Appointment Details -->
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <h6 class="mb-0 fw-bold text-dark">
+                                                    {{ $appointment->counselor->name ?? 'Counselor' }}</h6>
+                                                <span
+                                                    class="badge bg-primary rounded-pill px-3">{{ $appointment->status === 'accepted' ? 'Approved' : ucfirst($appointment->status) }}</span>
+                                            </div>
+
+                                            <div class="text-muted small mb-2">
+                                                <i class="bi bi-calendar-event me-1"></i>{{ $start->format('F j, Y') }} &bull;
+                                                <i class="bi bi-clock me-1 ms-1"></i>{{ $start->format('g:i A') }} –
+                                                {{ $end->format('g:i A') }}
+                                            </div>
+
                                             @if($appointment->status === 'accepted')
-                                                <div class="mt-1 text-success small">
-                                                    <i class="bi bi-journal-text me-1"></i>Your Appointment has been accepted,
-                                                    please proceed to GCC on {{ $start->format('M d, Y') }} at
-                                                    {{ $start->format('g:i A') }} – {{ $end->format('g:i A') }}.
+                                                <div
+                                                    class="bg-success bg-opacity-10 text-success p-2 rounded-3 small border border-success border-opacity-10">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                                    <strong>Approved!</strong> Please proceed to GCC on scheduled time.
                                                 </div>
                                             @elseif($appointment->status === 'completed')
-                                                <div class="mt-1 text-primary small">
-                                                    <i class="bi bi-journal-text me-1"></i>Session notes available.
+                                                <div
+                                                    class="bg-primary bg-opacity-10 text-primary p-2 rounded-3 small border border-primary border-opacity-10">
+                                                    <i class="bi bi-journal-check me-1"></i>
+                                                    Session completed. <a href="{{ route('appointments.completedWithNotes') }}"
+                                                        class="fw-bold text-primary">View Notes</a>
                                                 </div>
                                             @elseif($appointment->status === 'declined')
-                                                <div class="mt-1 text-danger small">
-                                                    <i class="bi bi-journal-text me-1"></i>Your appointment was declined. Please
-                                                    select another available slot or contact the GCC for assistance.
+                                                <div
+                                                    class="bg-danger bg-opacity-10 text-danger p-2 rounded-3 small border border-danger border-opacity-10">
+                                                    <i class="bi bi-x-circle-fill me-1"></i>
+                                                    Appointment declined. Please book another slot.
                                                 </div>
                                             @elseif($appointment->status === 'rescheduled_pending')
-                                                <div class="mt-1 text-info small">
-                                                    <i class="bi bi-arrow-repeat me-1"></i>Your counselor has proposed a new slot.
-                                                    Please accept or decline below.
-                                                </div>
-                                                <div class="mt-2">
-                                                    <form action="{{ route('appointments.acceptReschedule', $appointment->id) }}"
-                                                        method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="btn btn-success btn-sm me-2">
-                                                            <i class="bi bi-check-circle me-1"></i>Accept
-                                                        </button>
-                                                    </form>
-                                                    <form action="{{ route('appointments.declineReschedule', $appointment->id) }}"
-                                                        method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            <i class="bi bi-x-circle me-1"></i>Decline
-                                                        </button>
-                                                    </form>
+                                                <div
+                                                    class="bg-info bg-opacity-10 text-info p-2 rounded-3 small border border-info border-opacity-10">
+                                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                        <span><i class="bi bi-arrow-repeat me-1"></i>Reschedule proposed</span>
+                                                        <div>
+                                                            <form
+                                                                action="{{ route('appointments.acceptReschedule', $appointment->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf @method('PATCH')
+                                                                <button type="submit" class="btn btn-success btn-xs py-0 px-2"
+                                                                    style="font-size: 0.75rem;">Accept</button>
+                                                            </form>
+                                                            <form
+                                                                action="{{ route('appointments.declineReschedule', $appointment->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf @method('PATCH')
+                                                                <button type="submit" class="btn btn-danger btn-xs py-0 px-2"
+                                                                    style="font-size: 0.75rem;">Decline</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             @elseif($appointment->notes)
-                                                <div class="mt-1 text-muted small">
-                                                    <i class="bi bi-journal-text me-1"></i>{{ Str::limit($appointment->notes, 60) }}
+                                                <div class="bg-light p-2 rounded-3 small text-muted border">
+                                                    <i class="bi bi-sticky me-1"></i>{{ Str::limit($appointment->notes, 60) }}
                                                 </div>
                                             @else
-                                                <div class="mt-1 text-muted small">
-                                                    <i class="bi bi-journal-text me-1"></i>No notes
+                                                <div class="text-muted small fst-italic ps-1">
+                                                    Topc: {{ $appointment->nature_of_problem ?? 'General Counseling' }}
                                                 </div>
                                             @endif
-                                        </div>
-                                        <div class="d-flex flex-column gap-1">
-                                            <span class="badge bg-primary">{{ ucfirst($appointment->status) }}</span>
                                         </div>
                                     </div>
                                 </div>

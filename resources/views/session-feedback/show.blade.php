@@ -1,278 +1,425 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    :root {
-        --forest-green: #2d5016;
-        --forest-green-light: #4a7c59;
-        --forest-green-lighter: #e8f5e8;
-        --yellow-maize: #f4d03f;
-        --yellow-maize-light: #fef9e7;
-        --white: #ffffff;
-        --gray-50: #f8f9fa;
-        --gray-100: #f1f3f4;
-        --gray-600: #6c757d;
-        --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
+    <style>
+        :root {
+            --primary-green: #1f7a2d;
+            --primary-green-2: #13601f;
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
+            --text-dark: #16321f;
+            --text-light: #6c757d;
+            --bg-light: #f6fbf6;
 
-    .page-header {
-        background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
-        color: white;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: var(--shadow-md);
-    }
+            /* Map to common names */
+            --forest-green: var(--primary-green);
+            --forest-green-dark: var(--primary-green-2);
+            --forest-green-light: var(--accent-green);
+            --forest-green-lighter: var(--light-green);
+            --yellow-maize: var(--accent-orange);
+            --yellow-maize-light: #fef9e7;
+            --white: #ffffff;
+            --gray-50: var(--bg-light);
+            --gray-100: #eef6ee;
+            --gray-200: #e9ecef;
+            --gray-600: var(--text-light);
+            --gray-800: #343a40;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+        }
 
-    .feedback-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--gray-100);
-        overflow: hidden;
-    }
+        html {
+            zoom: 75% !important;
+        }
 
-    .feedback-header {
-        background: var(--forest-green-lighter);
-        color: var(--forest-green);
-        padding: 1.5rem 2rem;
-        border-bottom: 1px solid var(--gray-100);
-        font-weight: 600;
-    }
+        body {
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%) !important;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .feedback-body {
-        padding: 2rem;
-    }
+        .page-header {
+            background: var(--hero-gradient);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .session-summary {
-        background: var(--gray-50);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        border-left: 4px solid var(--forest-green);
-    }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
 
-    .student-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            position: relative;
+            z-index: 1;
+            line-height: 1.1;
+            color: var(--yellow-maize);
+        }
 
-    .student-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: var(--forest-green);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 1.5rem;
-    }
+        .page-header p {
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+        }
 
-    .rating-display {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin: 1rem 0;
-        padding: 1rem;
-        background: var(--yellow-maize-light);
-        border-radius: 8px;
-    }
+        .feedback-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            overflow: hidden;
+        }
 
-    .stars {
-        display: flex;
-        gap: 0.25rem;
-    }
+        .feedback-header {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-weight: 600;
+        }
 
-    .star {
-        font-size: 1.5rem;
-        color: var(--yellow-maize);
-    }
+        .feedback-header h4 {
+            font-size: 1.25rem;
+            letter-spacing: -0.3px;
+        }
 
-    .feedback-comments {
-        background: var(--gray-50);
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        border-left: 4px solid var(--forest-green);
-    }
+        .feedback-body {
+            padding: 1.5rem;
+        }
 
-    .back-btn {
-        background: var(--forest-green);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
+        .session-summary {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--forest-green);
+            border: 1px solid var(--gray-100);
+        }
 
-    .back-btn:hover {
-        background: var(--forest-green-light);
-        color: white;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-sm);
-    }
+        .session-summary h5 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--forest-green);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-    .status-badge {
-        background: var(--forest-green);
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        font-weight: 500;
-    }
-</style>
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--gray-100);
+        }
 
-<div class="container-fluid py-4">
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="mb-2">
-                    <i class="bi bi-star me-3"></i>
-                    Session Feedback Details
-                </h1>
-                <p class="mb-0 opacity-75">Student feedback for your counseling session</p>
-            </div>
-            <a href="{{ route('dashboard') }}" class="back-btn">
-                <i class="bi bi-arrow-left"></i>
-                Back to Dashboard
-            </a>
-        </div>
-    </div>
+        .student-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--hero-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+        }
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="feedback-card">
-                <div class="feedback-header">
-                    <h4 class="mb-0">
-                        <i class="bi bi-calendar-check me-2"></i>
-                        Session Feedback from {{ $feedback->appointment->student->name }}
-                    </h4>
-                </div>
-                <div class="feedback-body">
-                    <!-- Session Summary -->
-                    <div class="session-summary">
-                        <h5 class="mb-3">Session Details</h5>
-                        <div class="student-info">
-                            <div class="student-avatar">
-                                {{ strtoupper(substr($feedback->appointment->student->name ?? 'S', 0, 1)) }}
-                            </div>
-                            <div>
-                                <h6 class="mb-1 fw-bold">{{ $feedback->appointment->student->name ?? 'Student' }}</h6>
-                                <p class="mb-0 text-muted">{{ $feedback->appointment->student->email ?? 'student@example.com' }}</p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="mb-2">
-                                    <i class="bi bi-calendar me-2 text-primary"></i>
-                                    <strong>Date:</strong> {{ $feedback->appointment->scheduled_at->format('F j, Y') }}
-                                </p>
-                                <p class="mb-2">
-                                    <i class="bi bi-clock me-2 text-primary"></i>
-                                    <strong>Time:</strong> {{ $feedback->appointment->scheduled_at->format('g:i A') }} - {{ $feedback->appointment->scheduled_at->addMinutes(30)->format('g:i A') }}
-                                </p>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="mb-2">
-                                    <i class="bi bi-journal-text me-2 text-success"></i>
-                                    <strong>Session Notes:</strong> {{ $feedback->appointment->sessionNotes->count() }} note(s)
-                                </p>
-                                @if($feedback->appointment->notes)
-                                    <p class="mb-2">
-                                        <i class="bi bi-sticky me-2 text-warning"></i>
-                                        <strong>Appointment Notes:</strong> {{ Str::limit($feedback->appointment->notes, 100) }}
-                                    </p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
+        .rating-box {
+            background: var(--yellow-maize-light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 203, 5, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-                    <!-- Rating Display -->
-                    <div class="rating-display">
+        .stars {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .star {
+            font-size: 1.5rem;
+            color: var(--yellow-maize);
+        }
+
+        .feedback-content {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--gray-100);
+            margin-bottom: 1.5rem;
+        }
+
+        .feedback-content h6 {
+            font-weight: 700;
+            color: var(--forest-green);
+            margin-bottom: 0.75rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 0.7rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            text-decoration: none;
+            transform: translateX(-3px);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .badge-rating {
+            background: var(--forest-green);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Sidebar Styles */
+        .custom-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            background: var(--forest-green);
+            color: #fff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+        }
+
+        .custom-sidebar .sidebar-logo {
+            text-align: center;
+            padding: 2.5rem 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-sidebar .sidebar-nav {
+            flex: 1;
+            padding: 1.25rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .custom-sidebar .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 1.1rem;
+            padding: 0.9rem 1.25rem;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .custom-sidebar .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        .custom-sidebar .sidebar-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #f4d03f;
+            font-weight: 600;
+        }
+
+        .custom-sidebar .sidebar-bottom {
+            padding: 1.5rem 1rem;
+            background: rgba(0, 0, 0, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-sidebar .sidebar-link.logout:hover {
+            background: #dc3545;
+        }
+
+        .main-dashboard-content {
+            margin-left: 240px;
+        }
+
+        .meta-info {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .meta-item i {
+            color: var(--forest-green-light);
+        }
+    </style>
+
+    <div class="d-flex">
+        @if (auth()->user()->role === 'counselor')
+            @include('counselor.sidebar')
+        @else
+            <!-- Fallback or Student sidebar if accessed by student (though route is counselor focused) -->
+            @include('student.sidebar')
+        @endif
+
+        <div class="main-dashboard-content flex-grow-1">
+            <div class="container-fluid py-4">
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-1 fw-bold">Session Rating</h6>
-                            <div class="stars">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="bi bi-star{{ $i <= $feedback->rating ? '-fill' : '' }} star"></i>
-                                @endfor
+                            <h1 class="mb-2">
+                                <i class="bi bi-star me-2"></i>
+                                Session Feedback Details
+                            </h1>
+                            <p class="mb-0 opacity-75">Review student thoughts about your counseling session</p>
+                        </div>
+                        <a href="{{ route('counselor.feedback.index') }}" class="back-btn">
+                            <i class="bi bi-arrow-left"></i>
+                            Back to Feedback List
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="feedback-card">
+                            <div class="feedback-header">
+                                <h4 class="mb-0">
+                                    <i class="bi bi-person-check me-2"></i>
+                                    Feedback from {{ $feedback->appointment->student->name }}
+                                </h4>
                             </div>
-                        </div>
-                        <div class="ms-auto">
-                            <span class="status-badge">{{ $feedback->rating }}/5 Stars</span>
-                        </div>
-                    </div>
-
-                    <!-- Feedback Comments -->
-                    <div class="feedback-comments">
-                        <h6 class="mb-2 fw-bold">
-                            <i class="bi bi-chat-text me-2"></i>
-                            Student Comments
-                        </h6>
-                        <div class="mt-2">
-                            {!! nl2br(e($feedback->comments)) !!}
-                        </div>
-                    </div>
-
-                    <!-- Feedback Metadata -->
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <p class="mb-1">
-                                <i class="bi bi-calendar-event me-2 text-muted"></i>
-                                <strong>Feedback Date:</strong> {{ $feedback->created_at->format('F j, Y g:i A') }}
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-1">
-                                <i class="bi bi-clock-history me-2 text-muted"></i>
-                                <strong>Submitted:</strong> {{ $feedback->created_at->diffForHumans() }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Session Notes Summary -->
-                    @if($feedback->appointment->sessionNotes->count() > 0)
-                        <div class="mt-4">
-                            <h6 class="mb-3 fw-bold">
-                                <i class="bi bi-journal-text me-2"></i>
-                                Session Notes Summary
-                            </h6>
-                            @foreach($feedback->appointment->sessionNotes as $sessionNote)
-                                <div class="card mb-2">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="mb-1">Session Note #{{ $sessionNote->id }}</h6>
-                                            <small class="text-muted">{{ $sessionNote->created_at->format('F j, Y') }}</small>
+                            <div class="feedback-body">
+                                <div class="session-summary">
+                                    <h5>
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Session Details
+                                    </h5>
+                                    <div class="student-info">
+                                        <div class="student-avatar">
+                                            {{ strtoupper(substr($feedback->appointment->student->name ?? 'S', 0, 1)) }}
                                         </div>
-                                        @if($sessionNote->content)
-                                            @if(auth()->check() && auth()->user()->role === 'counselor')
-                                                <p class="mb-1 small">{{ Str::limit($sessionNote->content, 150) }}</p>
-                                            @else
-                                                <p class="mb-1 small text-muted"><em>Private note — visible only to your counselor.</em></p>
-                                            @endif
-                                        @endif
-                                        @if($sessionNote->recommendations)
-                                            <p class="mb-0 small text-muted">
-                                                <strong>Recommendations:</strong> {{ Str::limit($sessionNote->recommendations, 100) }}
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">{{ $feedback->appointment->student->name }}</h6>
+                                            <p class="mb-0 text-muted small">{{ $feedback->appointment->student->email }}
                                             </p>
-                                        @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-2">
+                                                <i class="bi bi-calendar3 me-2 text-primary"></i>
+                                                <strong>Date:</strong>
+                                                {{ $feedback->appointment->scheduled_at->format('M j, Y') }}
+                                            </p>
+                                            <p class="mb-0">
+                                                <i class="bi bi-clock me-2 text-primary"></i>
+                                                <strong>Time:</strong>
+                                                {{ $feedback->appointment->scheduled_at->format('g:i A') }}
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-2">
+                                                <i class="bi bi-hash me-2 text-success"></i>
+                                                <strong>Session Number:</strong> {{ $sessionNumber }}
+                                            </p>
+                                            <p class="mb-0">
+                                                <i class="bi bi-journal-text me-2 text-success"></i>
+                                                <strong>Notes:</strong> {{ $feedback->appointment->sessionNotes->count() }}
+                                                note(s)
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            @endforeach
+
+                                <div class="rating-box">
+                                    <div>
+                                        <h6 class="mb-2 fw-bold text-dark">Overall Rating</h6>
+                                        <div class="stars">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                <i class="bi bi-star{{ $i <= $feedback->rating ? '-fill' : '' }} star"></i>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge-rating">{{ $feedback->rating }} / 5 Stars</span>
+                                    </div>
+                                </div>
+
+                                <div class="feedback-content">
+                                    <h6>Student Comments</h6>
+                                    <div class="p-2" style="line-height: 1.6; color: #444;">
+                                        {!! nl2br(e($feedback->comments)) !!}
+                                    </div>
+                                </div>
+
+                                <div class="meta-info">
+                                    <div class="meta-item">
+                                        <i class="bi bi-calendar-event"></i>
+                                        Submitted on {{ $feedback->created_at->format('F j, Y') }}
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="bi bi-clock-history"></i>
+                                        {{ $feedback->created_at->diffForHumans() }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@endsection 
+@endsection

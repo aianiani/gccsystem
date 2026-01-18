@@ -218,6 +218,10 @@
             color: #fff;
         }
 
+        .page-header h2 {
+            color: #fff;
+        }
+
         .content-card {
             background: #fff;
             border-radius: 16px;
@@ -342,11 +346,14 @@
                                             <td class="align-middle px-4">
                                                 <div class="w-full">
                                                     <div class="flex justify-between items-center mb-1">
-                                                        <span class="text-xs font-semibold text-gray-700">{{ $seminar->stats['completed'] }}/{{ $seminar->stats['total'] }}</span>
-                                                        <span class="text-xs font-bold text-green-700">{{ $seminar->stats['percentage'] }}%</span>
+                                                        <span
+                                                            class="text-xs font-semibold text-gray-700">{{ $seminar->stats['completed'] }}/{{ $seminar->stats['total'] }}</span>
+                                                        <span
+                                                            class="text-xs font-bold text-green-700">{{ $seminar->stats['percentage'] }}%</span>
                                                     </div>
                                                     <div class="w-full bg-gray-200 rounded-full h-2">
-                                                        <div class="bg-green-600 h-2 rounded-full transition-all duration-500" style="width: {{ $seminar->stats['percentage'] }}%"></div>
+                                                        <div class="bg-green-600 h-2 rounded-full transition-all duration-500"
+                                                            style="width: {{ $seminar->stats['percentage'] }}%"></div>
                                                     </div>
                                                 </div>
                                             </td>

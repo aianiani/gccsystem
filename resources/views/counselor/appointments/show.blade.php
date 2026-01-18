@@ -2,26 +2,83 @@
 
 @section('content')
     <style>
+        /* Homepage theme variables */
         :root {
             --primary-green: #1f7a2d;
-            --primary-green-dark: #13601f;
-            --accent-yellow: #FFCB05;
+            --primary-green-2: #13601f;
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
             --text-dark: #16321f;
-            --text-muted: #6c757d;
+            --text-light: #6c757d;
             --bg-light: #f6fbf6;
-            --card-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            --card-hover-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+            --forest-green: var(--primary-green);
+            --forest-green-dark: var(--primary-green-2);
+            --forest-green-light: var(--accent-green);
+            --forest-green-lighter: var(--light-green);
+            --yellow-maize: var(--accent-orange);
+            --yellow-maize-light: #fef9e7;
+            --white: #ffffff;
+            --gray-50: var(--bg-light);
+            --gray-100: #eef6ee;
+            --gray-600: var(--text-light);
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --info: #17a2b8;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        .home-zoom { zoom: 0.75; }
-        @supports not (zoom: 1) { .home-zoom { transform: scale(0.75); transform-origin: top center; } }
+        /* Apply page zoom */
+        .home-zoom {
+            zoom: 0.75;
+        }
 
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-light); }
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top center;
+            }
+        }
 
-        .main-content {
-            margin-left: 240px;
-            padding: 2rem;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+        }
+
+        .custom-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            background: var(--forest-green);
+            color: #fff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+
+        .main-dashboard-content {
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
             min-height: 100vh;
+            padding: 1rem 1.5rem;
+            margin-left: 240px;
+            transition: margin-left 0.2s;
+        }
+
+        .main-dashboard-inner {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
 
         /* Header Styles */
@@ -30,58 +87,62 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
-            background: #fff;
+            background: var(--hero-gradient);
             padding: 1.5rem 2rem;
             border-radius: 16px;
-            box-shadow: var(--card-shadow);
+            box-shadow: var(--shadow-lg);
+            color: #fff;
         }
         .header-title h1 {
             font-size: 1.75rem;
             font-weight: 700;
-            color: var(--text-dark);
+            color: #fff;
             margin: 0;
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
         .header-meta {
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.9);
             font-size: 0.9rem;
             margin-top: 0.25rem;
         }
 
-        /* Card Styles */
+        /* Card Styles matching Index */
         .content-card {
-            background: #fff;
+            background: white;
             border-radius: 16px;
-            box-shadow: var(--card-shadow);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            border: 1px solid rgba(0,0,0,0.04);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
         }
+        
         .content-card:hover {
-            box-shadow: var(--card-hover-shadow);
+            box-shadow: var(--shadow-md);
+            border-color: var(--forest-green-lighter);
         }
+
         .card-title-styled {
             font-size: 1.1rem;
             font-weight: 700;
-            color: var(--text-dark);
+            color: var(--forest-green);
             margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
             padding-bottom: 0.75rem;
-            border-bottom: 2px solid rgba(31, 122, 45, 0.1);
+            border-bottom: 2px solid var(--forest-green-lighter);
         }
         
         /* Highlighted Notes Card */
         .notes-card {
-            background: #fffcf0; /* Light yellow tint */
-            border: 1px solid #f0e68c;
+            background: var(--yellow-maize-light);
+            border: 1px solid var(--yellow-maize);
         }
         .notes-card .card-title-styled {
-            border-bottom-color: #ffd700;
+            border-bottom-color: var(--yellow-maize);
             color: #b78900;
         }
 
@@ -91,7 +152,7 @@
         }
         .info-label {
             font-size: 0.85rem;
-            color: var(--text-muted);
+            color: var(--text-light);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -115,12 +176,12 @@
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            border: 3px solid var(--primary-green);
+            border: 3px solid var(--forest-green);
             padding: 3px;
             background: #fff;
             object-fit: cover;
             margin-bottom: 0.75rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-sm);
         }
         
         /* Status Badges */
@@ -133,38 +194,71 @@
             align-items: center;
             gap: 0.5rem;
         }
-        .badge-pending { background: #fff8e1; color: #b78900; }
-        .badge-accepted { background: #e8f5e9; color: #2e7d32; }
-        .badge-completed { background: #e3f2fd; color: #1565c0; }
-        .badge-cancelled { background: #ffebee; color: #c62828; }
+        .badge-pending { background: var(--warning); color: #856404; }
+        .badge-accepted { background: var(--success); color: #fff; }
+        .badge-completed { background: var(--primary-green); color: #fff; }
+        .badge-cancelled { background: var(--danger); color: #fff; }
         
         /* Buttons */
         .btn-action {
             padding: 0.6rem 1.2rem;
-            border-radius: 10px;
+            border-radius: 12px;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
             transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
         }
-        .btn-action:hover { transform: translateY(-2px); }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
-        @media (max-width: 991px) {
-            .main-content { margin-left: 200px; }
+        .btn-success { background-color: var(--success); border-color: var(--success); }
+        .btn-primary { background-color: var(--forest-green); border-color: var(--forest-green); }
+        .btn-primary:hover { background-color: var(--forest-green-dark); border-color: var(--forest-green-dark); }
+        .btn-outline-primary { color: var(--forest-green); border-color: var(--forest-green); }
+        .btn-outline-primary:hover { background-color: var(--forest-green); color: #fff; }
+
+        @media (max-width: 991.98px) {
+            .main-dashboard-content {
+                margin-left: 200px;
+            }
         }
-        @media (max-width: 768px) {
-            .main-content { margin-left: 0; padding: 1rem; }
-            .details-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        @media (max-width: 767.98px) {
+            .main-dashboard-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            /* Off-canvas behavior on mobile */
+            .custom-sidebar {
+                position: fixed;
+                z-index: 1040;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                width: 240px;
+                transform: translateX(-100%);
+                transition: transform 0.2s ease;
+                flex-direction: column;
+                padding: 0;
+            }
+            .custom-sidebar.show {
+                transform: translateX(0);
+            }
         }
     </style>
 
     <div class="home-zoom">
         <div class="d-flex">
+            <!-- Mobile Sidebar Toggle -->
+            <button id="counselorSidebarToggle" class="d-md-none" style="position: fixed; top: 1rem; left: 1rem; z-index: 1100; background: var(--forest-green); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 0.75rem;">
+                <i class="bi bi-list"></i>
+            </button>
+
             <!-- Sidebar -->
             @include('counselor.sidebar')
 
-            <div class="main-content flex-grow-1">
+            <div class="main-dashboard-content flex-grow-1">
+                <div class="main-dashboard-inner">
                 <a href="{{ route('counselor.appointments.index') }}" class="btn btn-link text-muted mb-3 px-0 text-decoration-none">
                     <i class="bi bi-arrow-left me-1"></i> Back to Appointments
                 </a>
@@ -173,11 +267,11 @@
                 <div class="details-header">
                     <div class="header-title">
                         <h1>
-                            <i class="bi bi-calendar-event-fill text-success"></i>
+                            <i class="bi bi-calendar-event-fill text-white"></i>
                             Appointment Details
                         </h1>
                         <div class="header-meta">
-                            Reference: <span class="font-monospace text-dark">{{ $appointment->reference_number }}</span> • 
+                            Reference: <span class="font-monospace text-white">{{ $appointment->reference_number }}</span> • 
                             Session #{{ $appointment->session_number }}
                         </div>
                     </div>
@@ -189,7 +283,8 @@
                             elseif($appointment->status === 'declined' || $appointment->status === 'cancelled') $statusClass = 'badge-cancelled';
                         @endphp
                         <span class="status-badge-lg {{ $statusClass }}">
-                            <i class="bi bi-info-circle"></i> {{ ucfirst(str_replace('_', ' ', $appointment->status)) }}
+                            <i class="bi bi-info-circle"></i> 
+                            {{ $appointment->status === 'accepted' ? 'Approved' : ucfirst(str_replace('_', ' ', $appointment->status)) }}
                         </span>
                     </div>
                 </div>
@@ -279,24 +374,43 @@
                                 @endphp
                                 @if($latestAssessment->type === 'DASS-42')
                                      @php
-                                        // Simple DASS Logic Reuse
+                                        // Normalize answers to 1-indexed (exact same logic as score_sheet.blade.php)
                                         $studentAnswers = [];
                                         if (!empty($laScores) && is_array($laScores)) {
-                                            foreach ($laScores as $k => $v) {
-                                                if (is_numeric($k)) {
-                                                    $ik = (int) $k;
-                                                    if ($ik >= 0 && $ik <= 41) $studentAnswers[$ik + 1] = (int) $v;
-                                                } else $studentAnswers[$k] = $v;
+                                            // Check if 0-based keys are used
+                                            if (isset($laScores[0])) {
+                                                foreach ($laScores as $k => $v) {
+                                                    if (is_numeric($k)) {
+                                                        $ik = (int) $k;
+                                                        if ($ik >= 0 && $ik <= 41) {
+                                                            $studentAnswers[$ik + 1] = (int) $v;
+                                                            continue;
+                                                        }
+                                                    }
+                                                    $studentAnswers[$k] = $v;
+                                                }
+                                            } else {
+                                                // Already 1-based or has other keys
+                                                $studentAnswers = $laScores;
                                             }
                                         }
+                                        
+                                        // DASS-42 Scoring items (CORRECTED mapping with Q42 in Depression)
                                         $depressionItems = [3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42];
                                         $anxietyItems = [2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41];
                                         $stressItems = [1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39];
                                         
+                                        // Calculate scores (raw sums of item values only)
                                         $dep = 0; $anx = 0; $str = 0;
-                                        foreach ($depressionItems as $it) $dep += (int) ($studentAnswers[$it] ?? 0);
-                                        foreach ($anxietyItems as $it) $anx += (int) ($studentAnswers[$it] ?? 0);
-                                        foreach ($stressItems as $it) $str += (int) ($studentAnswers[$it] ?? 0);
+                                        foreach ($depressionItems as $item) {
+                                            $dep += (int) ($studentAnswers[$item] ?? 0);
+                                        }
+                                        foreach ($anxietyItems as $item) {
+                                            $anx += (int) ($studentAnswers[$item] ?? 0);
+                                        }
+                                        foreach ($stressItems as $item) {
+                                            $str += (int) ($studentAnswers[$item] ?? 0);
+                                        }
                                     @endphp
                                     <div class="row g-3">
                                         <div class="col-4 text-center">
@@ -446,6 +560,7 @@
                         @endif
                     </div>
                 </div>
+                </div>
             </div>
         </div>
     </div>
@@ -471,13 +586,26 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar Toggle (Mobile)
-            const sidebar = document.querySelector('nav'); // Assuming sidebar tag is nav or has specific ID in include
+            // Sidebar toggle logic matching student directory
+            const sidebar = document.querySelector('.custom-sidebar');
             const toggleBtn = document.getElementById('counselorSidebarToggle');
-            if (toggleBtn) {
-                 toggleBtn.addEventListener('click', () => {
-                     document.querySelector('.counselor-sidebar').classList.toggle('show'); // Adjust class based on sidebar blade
-                 });
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function () {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
             }
 
             // Confirmation Logic

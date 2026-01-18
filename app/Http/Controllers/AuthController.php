@@ -504,8 +504,25 @@ class AuthController extends Controller
             // Log login activity
             UserActivity::log($user->id, 'login', 'User logged in with 2FA');
             $request->session()->regenerate();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => '2FA verification successful. Welcome!',
+                    'redirect' => route('dashboard'),
+                ], 200);
+            }
+
             return redirect()->intended(route('dashboard'))->with('success', '2FA verification successful. Welcome!');
         }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid or expired 2FA code.',
+            ], 422);
+        }
+
         return back()->withErrors(['code' => 'Invalid or expired 2FA code.'])->withInput();
     }
 
@@ -534,6 +551,14 @@ class AuthController extends Controller
         // Send code via email
         Mail::to($user->email)->send(new \App\Mail\TwoFactorCodeMail($code, $user->name));
         \App\Models\UserActivity::log($user->id, '2fa_resent', '2FA code resent to user email');
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'A new 2FA code has been sent to your email.',
+            ], 200);
+        }
+
         return redirect()->route('2fa.form')->with('info', 'A new 2FA code has been sent to your email.');
     }
 }

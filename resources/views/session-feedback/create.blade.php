@@ -1,363 +1,569 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    :root {
-        --forest-green: #2d5016;
-        --forest-green-light: #4a7c59;
-        --forest-green-lighter: #e8f5e8;
-        --yellow-maize: #f4d03f;
-        --yellow-maize-light: #fef9e7;
-        --white: #ffffff;
-        --gray-50: #f8f9fa;
-        --gray-100: #f1f3f4;
-        --gray-600: #6c757d;
-        --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
+    <style>
+        :root {
+            --primary-green: #1f7a2d;
+            --primary-green-2: #13601f;
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
+            --text-dark: #16321f;
+            --text-light: #6c757d;
+            --bg-light: #f6fbf6;
 
-    .page-header {
-        background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
-        color: white;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: var(--shadow-md);
-    }
+            /* Map to common names */
+            --forest-green: var(--primary-green);
+            --forest-green-dark: var(--primary-green-2);
+            --forest-green-light: var(--accent-green);
+            --forest-green-lighter: var(--light-green);
+            --yellow-maize: var(--accent-orange);
+            --yellow-maize-light: #fef9e7;
+            --white: #ffffff;
+            --gray-50: var(--bg-light);
+            --gray-100: #eef6ee;
+            --gray-200: #e9ecef;
+            --gray-600: var(--text-light);
+            --gray-800: #343a40;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+        }
 
-    .feedback-form-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--gray-100);
-        overflow: hidden;
-    }
+        html {
+            zoom: 75% !important;
+        }
 
-    .feedback-form-header {
-        background: var(--forest-green-lighter);
-        color: var(--forest-green);
-        padding: 1.5rem 2rem;
-        border-bottom: 1px solid var(--gray-100);
-        font-weight: 600;
-    }
+        body {
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%) !important;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .feedback-form-body {
-        padding: 2rem;
-    }
+        .page-header {
+            background: var(--hero-gradient);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .appointment-summary {
-        background: var(--gray-50);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        border-left: 4px solid var(--forest-green);
-    }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
 
-    .counselor-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            position: relative;
+            z-index: 1;
+            line-height: 1.1;
+            color: var(--yellow-maize);
+        }
 
-    .counselor-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: var(--forest-green);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 1.5rem;
-    }
+        .page-header p {
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+        }
 
-    .rating-stars {
-        display: flex;
-        gap: 0.5rem;
-        margin: 1rem 0;
-    }
+        .feedback-form-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            overflow: hidden;
+        }
 
-    .star-btn {
-        background: none;
-        border: none;
-        font-size: 2rem;
-        color: #ddd;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        padding: 0.25rem;
-    }
+        .feedback-form-header {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-weight: 600;
+        }
 
-    .star-btn:hover,
-    .star-btn.active {
-        color: var(--yellow-maize);
-        transform: scale(1.1);
-    }
+        .feedback-form-header h4 {
+            font-size: 1.25rem;
+            letter-spacing: -0.3px;
+            margin-bottom: 0;
+        }
 
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
+        .feedback-form-body {
+            padding: 1.25rem;
+        }
 
-    .form-label {
-        font-weight: 600;
-        color: var(--forest-green);
-        margin-bottom: 0.5rem;
-        display: block;
-    }
+        .appointment-summary {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--forest-green);
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
+        }
 
-    .form-control {
-        border: 1px solid var(--gray-100);
-        border-radius: 8px;
-        padding: 0.75rem;
-        width: 100%;
-        transition: border-color 0.2s ease;
-    }
+        .appointment-summary:hover {
+            background: var(--forest-green-lighter);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
 
-    .form-control:focus {
-        outline: none;
-        border-color: var(--forest-green);
-        box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
-    }
+        .appointment-summary h5 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--forest-green);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-    .btn-submit {
-        background: var(--forest-green);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
+        .counselor-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--gray-100);
+            transition: all 0.2s ease;
+        }
 
-    .btn-submit:hover {
-        background: var(--forest-green-light);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-sm);
-    }
+        .counselor-info:hover {
+            transform: scale(1.01);
+            box-shadow: var(--shadow-sm);
+        }
 
-    .btn-cancel {
-        background: var(--gray-100);
-        color: var(--gray-600);
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        margin-right: 1rem;
-    }
+        .counselor-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--hero-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 3px solid white;
+            transition: transform 0.3s ease;
+        }
 
-    .btn-cancel:hover {
-        background: var(--gray-600);
-        color: white;
-        text-decoration: none;
-    }
+        .counselor-avatar:hover {
+            transform: rotate(5deg) scale(1.05);
+        }
 
-    .back-btn {
-        background: var(--forest-green);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
+        .rating-stars {
+            display: flex;
+            gap: 0.75rem;
+            margin: 1.25rem 0;
+            justify-content: center;
+        }
 
-    .back-btn:hover {
-        background: var(--forest-green-light);
-        color: white;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-sm);
-    }
-</style>
+        .star-btn {
+            background: rgba(244, 208, 63, 0.1);
+            border: 2px solid transparent;
+            font-size: 2.5rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            padding: 0.5rem;
+            border-radius: 12px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-<div class="container-fluid py-4">
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="mb-2">
-                    <i class="bi bi-star me-3"></i>
-                    Session Feedback
-                </h1>
-                <p class="mb-0 opacity-75">Share your experience and help us improve our counseling services</p>
-            </div>
-            <a href="{{ route('appointments.completedWithNotes') }}" class="back-btn">
-                <i class="bi bi-arrow-left"></i>
-                Back to Session Notes
-            </a>
-        </div>
-    </div>
+        .star-btn:hover {
+            color: var(--yellow-maize);
+            transform: scale(1.15) rotate(10deg);
+            background: rgba(244, 208, 63, 0.2);
+            border-color: var(--yellow-maize);
+        }
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="feedback-form-card">
-                <div class="feedback-form-header">
-                    <h4 class="mb-0">
-                        <i class="bi bi-calendar-check me-2"></i>
-                        Provide Feedback for Your Session
-                    </h4>
-                </div>
-                <div class="feedback-form-body">
-                    <!-- Appointment Summary -->
-                    <div class="appointment-summary">
-                        <h5 class="mb-3">Session Details</h5>
-                        <div class="counselor-info">
-                            @if($appointment->counselor->avatar)
-                                <img src="{{ $appointment->counselor->avatar_url }}" 
-                                     alt="{{ $appointment->counselor->name }}" 
-                                     class="counselor-avatar" 
-                                     style="object-fit: cover;">
-                            @else
-                                <div class="counselor-avatar">
-                                    {{ strtoupper(substr($appointment->counselor->name ?? 'C', 0, 1)) }}
-                                </div>
-                            @endif
-                            <div>
-                                <h6 class="mb-1 fw-bold">{{ $appointment->counselor->name ?? 'Counselor' }}</h6>
-                                <p class="mb-0 text-muted">{{ $appointment->counselor->email ?? 'counselor@example.com' }}</p>
-                            </div>
+        .star-btn.active {
+            color: var(--yellow-maize);
+            transform: scale(1.1);
+            background: rgba(244, 208, 63, 0.25);
+            border-color: var(--yellow-maize);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--forest-green);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--forest-green);
+            box-shadow: 0 0 0 4px rgba(31, 122, 45, 0.1);
+            transform: translateY(-1px);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .btn-submit {
+            background: var(--hero-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.15s ease;
+            box-shadow: 0 6px 18px rgba(17, 94, 37, 0.06);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-cancel {
+            background: var(--gray-200);
+            color: var(--gray-800);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.15s ease;
+            margin-right: 0.75rem;
+            display: inline-block;
+        }
+
+        .btn-cancel:hover {
+            background: var(--gray-600);
+            color: white;
+            text-decoration: none;
+            border-color: var(--gray-600);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 0.7rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            text-decoration: none;
+            transform: translateX(-3px);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Sidebar Styles */
+        .custom-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            background: var(--forest-green);
+            color: #fff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+        }
+
+        .custom-sidebar .sidebar-logo {
+            text-align: center;
+            padding: 2.5rem 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-sidebar .sidebar-nav {
+            flex: 1;
+            padding: 1.25rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .custom-sidebar .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 1.1rem;
+            padding: 0.9rem 1.25rem;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .custom-sidebar .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        .custom-sidebar .sidebar-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #f4d03f;
+            font-weight: 600;
+        }
+
+        .custom-sidebar .sidebar-bottom {
+            padding: 1.5rem 1rem;
+            background: rgba(0, 0, 0, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-sidebar .sidebar-link.logout:hover {
+            background: #dc3545;
+        }
+
+        .main-dashboard-content {
+            margin-left: 240px;
+        }
+    </style>
+
+    <div class="d-flex">
+        @include('student.sidebar')
+
+        <div class="main-dashboard-content flex-grow-1">
+            <div class="container-fluid py-4">
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="mb-2">
+                                <i class="bi bi-star me-3"></i>
+                                Session Feedback
+                            </h1>
+                            <p class="mb-0 opacity-75">Share your experience and help us improve our counseling services</p>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="mb-2">
-                                    <i class="bi bi-calendar me-2 text-primary"></i>
-                                    <strong>Date:</strong> {{ $appointment->scheduled_at->format('F j, Y') }}
-                                </p>
-                                <p class="mb-2">
-                                    <i class="bi bi-clock me-2 text-primary"></i>
-                                    <strong>Time:</strong> {{ $appointment->scheduled_at->format('g:i A') }} - {{ $appointment->scheduled_at->addMinutes(30)->format('g:i A') }}
-                                </p>
+                        <a href="{{ route('appointments.completedWithNotes') }}" class="back-btn">
+                            <i class="bi bi-arrow-left"></i>
+                            Back to Session Notes
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="feedback-form-card">
+                            <div class="feedback-form-header">
+                                <h4 class="mb-0">
+                                    <i class="bi bi-calendar-check me-2"></i>
+                                    Provide Feedback for Your Session
+                                </h4>
                             </div>
-                            <div class="col-md-6">
-                                <p class="mb-2">
-                                    <i class="bi bi-journal-text me-2 text-success"></i>
-                                    <strong>Session Notes:</strong> {{ $appointment->sessionNotes->count() }} note(s)
-                                </p>
-                                @if($appointment->notes)
-                                    <p class="mb-2">
-                                        <i class="bi bi-sticky me-2 text-warning"></i>
-                                        <strong>Appointment Notes:</strong> {{ Str::limit($appointment->notes, 100) }}
-                                    </p>
-                                @endif
+                            <div class="feedback-form-body">
+                                <!-- Appointment Summary -->
+                                <div class="appointment-summary">
+                                    <h5 class="mb-3">Session Details</h5>
+                                    <div class="counselor-info">
+                                        @if($appointment->counselor->avatar)
+                                            <img src="{{ $appointment->counselor->avatar_url }}"
+                                                alt="{{ $appointment->counselor->name }}" class="counselor-avatar"
+                                                style="object-fit: cover;">
+                                        @else
+                                            <div class="counselor-avatar">
+                                                {{ strtoupper(substr($appointment->counselor->name ?? 'C', 0, 1)) }}
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">{{ $appointment->counselor->name ?? 'Counselor' }}</h6>
+                                            <p class="mb-0 text-muted">{{ $appointment->counselor->email ??
+                                                'counselor@example.com'
+                                                }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-2">
+                                                <i class="bi bi-calendar me-2 text-primary"></i>
+                                                <strong>Date:</strong> {{ $appointment->scheduled_at->format('F j, Y') }}
+                                            </p>
+                                            <p class="mb-2">
+                                                <i class="bi bi-clock me-2 text-primary"></i>
+                                                <strong>Time:</strong> {{ $appointment->scheduled_at->format('g:i A') }} -
+                                                {{ $appointment->scheduled_at->addMinutes(30)->format('g:i A') }}
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-2">
+                                                <i class="bi bi-hash me-2 text-success"></i>
+                                                <strong>Session Number:</strong> {{ $sessionNumber }}
+                                            </p>
+                                            @if($appointment->notes)
+                                                <p class="mb-2">
+                                                    <i class="bi bi-sticky me-2 text-warning"></i>
+                                                    <strong>Appointment Notes:</strong>
+                                                    {{ Str::limit($appointment->notes, 100) }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Feedback Form -->
+                                <form action="{{ route('session-feedback.store', $appointment->id) }}" method="POST">
+                                    @csrf
+
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="bi bi-star me-2"></i>
+                                            How would you rate your counseling session?
+                                        </label>
+                                        <div class="rating-stars">
+                                            <button type="button" class="star-btn" data-rating="1" title="Poor">
+                                                <i class="bi bi-star"></i>
+                                            </button>
+                                            <button type="button" class="star-btn" data-rating="2" title="Fair">
+                                                <i class="bi bi-star"></i>
+                                            </button>
+                                            <button type="button" class="star-btn" data-rating="3" title="Good">
+                                                <i class="bi bi-star"></i>
+                                            </button>
+                                            <button type="button" class="star-btn" data-rating="4" title="Very Good">
+                                                <i class="bi bi-star"></i>
+                                            </button>
+                                            <button type="button" class="star-btn" data-rating="5" title="Excellent">
+                                                <i class="bi bi-star"></i>
+                                            </button>
+                                        </div>
+                                        <input type="hidden" name="rating" id="rating" required>
+                                        @error('rating')
+                                            <div class="text-danger mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="comments" class="form-label">
+                                            <i class="bi bi-chat-text me-2"></i>
+                                            Please share your thoughts about the session
+                                        </label>
+                                        <textarea name="comments" id="comments" class="form-control" rows="6"
+                                            placeholder="Tell us about your experience with the counselor, what you found helpful, and any suggestions for improvement..."
+                                            required>{{ old('comments') }}</textarea>
+                                        @error('comments')
+                                            <div class="text-danger mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{{ route('appointments.completedWithNotes') }}" class="btn-cancel">
+                                            Cancel
+                                        </a>
+                                        <button type="submit" class="btn-submit">
+                                            <i class="bi bi-send me-2"></i>
+                                            Submit Feedback
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Feedback Form -->
-                    <form action="{{ route('session-feedback.store', $appointment->id) }}" method="POST">
-                        @csrf
-                        
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="bi bi-star me-2"></i>
-                                How would you rate your counseling session?
-                            </label>
-                            <div class="rating-stars">
-                                <button type="button" class="star-btn" data-rating="1" title="Poor">
-                                    <i class="bi bi-star"></i>
-                                </button>
-                                <button type="button" class="star-btn" data-rating="2" title="Fair">
-                                    <i class="bi bi-star"></i>
-                                </button>
-                                <button type="button" class="star-btn" data-rating="3" title="Good">
-                                    <i class="bi bi-star"></i>
-                                </button>
-                                <button type="button" class="star-btn" data-rating="4" title="Very Good">
-                                    <i class="bi bi-star"></i>
-                                </button>
-                                <button type="button" class="star-btn" data-rating="5" title="Excellent">
-                                    <i class="bi bi-star"></i>
-                                </button>
-                            </div>
-                            <input type="hidden" name="rating" id="rating" required>
-                            @error('rating')
-                                <div class="text-danger mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label for="comments" class="form-label">
-                                <i class="bi bi-chat-text me-2"></i>
-                                Please share your thoughts about the session (minimum 10 characters)
-                            </label>
-                            <textarea 
-                                name="comments" 
-                                id="comments" 
-                                class="form-control" 
-                                rows="6" 
-                                placeholder="Tell us about your experience with the counselor, what you found helpful, and any suggestions for improvement..."
-                                required
-                            >{{ old('comments') }}</textarea>
-                            @error('comments')
-                                <div class="text-danger mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <a href="{{ route('appointments.completedWithNotes') }}" class="btn-cancel">
-                                Cancel
-                            </a>
-                            <button type="submit" class="btn-submit">
-                                <i class="bi bi-send me-2"></i>
-                                Submit Feedback
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const starButtons = document.querySelectorAll('.star-btn');
-    const ratingInput = document.getElementById('rating');
-    let selectedRating = 0;
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const starButtons = document.querySelectorAll('.star-btn');
+            const ratingInput = document.getElementById('rating');
+            let selectedRating = 0;
 
-    starButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            selectedRating = rating;
-            ratingInput.value = rating;
+            starButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    selectedRating = rating;
+                    ratingInput.value = rating;
 
-            // Update star display
-            starButtons.forEach((star, index) => {
-                if (index < rating) {
-                    star.classList.add('active');
-                    star.innerHTML = '<i class="bi bi-star-fill"></i>';
-                } else {
-                    star.classList.remove('active');
-                    star.innerHTML = '<i class="bi bi-star"></i>';
-                }
+                    // Update star display
+                    starButtons.forEach((star, index) => {
+                        if (index < rating) {
+                            star.classList.add('active');
+                            star.innerHTML = '<i class="bi bi-star-fill"></i>';
+                        } else {
+                            star.classList.remove('active');
+                            star.innerHTML = '<i class="bi bi-star"></i>';
+                        }
+                    });
+                });
+
+                // Hover effects
+                button.addEventListener('mouseenter', function () {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    starButtons.forEach((star, index) => {
+                        if (index < rating) {
+                            star.innerHTML = '<i class="bi bi-star-fill"></i>';
+                        }
+                    });
+                });
+
+                button.addEventListener('mouseleave', function () {
+                    starButtons.forEach((star, index) => {
+                        if (index < selectedRating) {
+                            star.innerHTML = '<i class="bi bi-star-fill"></i>';
+                        } else {
+                            star.innerHTML = '<i class="bi bi-star"></i>';
+                        }
+                    });
+                });
             });
         });
-
-        // Hover effects
-        button.addEventListener('mouseenter', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            starButtons.forEach((star, index) => {
-                if (index < rating) {
-                    star.innerHTML = '<i class="bi bi-star-fill"></i>';
-                }
-            });
-        });
-
-        button.addEventListener('mouseleave', function() {
-            starButtons.forEach((star, index) => {
-                if (index < selectedRating) {
-                    star.innerHTML = '<i class="bi bi-star-fill"></i>';
-                } else {
-                    star.innerHTML = '<i class="bi bi-star"></i>';
-                }
-            });
-        });
-    });
-});
-</script>
-@endsection 
+    </script>
+@endsection

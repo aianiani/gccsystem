@@ -68,6 +68,7 @@ class AppointmentRescheduledNotification extends Notification
         $newStr = $new->format('F j, Y \a\t g:i A');
         return [
             'message' => 'Your appointment on ' . $oldStr . ' has been rescheduled to ' . $newStr . '. Please accept or decline the new schedule in your dashboard.',
+            'appointment_id' => $this->appointment->id,
             'url' => route('appointments.index'),
         ];
     }

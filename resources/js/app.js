@@ -1,7 +1,7 @@
 import './bootstrap';
 
 // Enhanced notification system for user actions
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Auto-hide notifications after 5 seconds
     const notifications = document.querySelectorAll('.alert');
     notifications.forEach(notification => {
@@ -95,14 +95,14 @@ document.addEventListener('DOMContentLoaded', function() {
     confirmButtons.forEach(button => {
         // If it's a form, intercept submit; otherwise intercept click
         if (button.tagName === 'FORM') {
-            button.addEventListener('submit', function(e) {
+            button.addEventListener('submit', function (e) {
                 e.preventDefault();
                 const message = this.getAttribute('data-confirm');
                 const title = this.getAttribute('data-confirm-title') || 'Confirm Action';
                 showConfirm(message, title).then(ok => { if (ok) { button.removeAttribute('data-confirm'); button.submit(); } });
             });
         } else {
-            button.addEventListener('click', function(e) {
+            button.addEventListener('click', function (e) {
                 e.preventDefault();
                 const message = this.getAttribute('data-confirm');
                 const title = this.getAttribute('data-confirm-title') || 'Confirm Action';
@@ -115,13 +115,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Enhanced form validation feedback
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
-        form.addEventListener('submit', function() {
+        form.addEventListener('submit', function () {
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
                 const originalText = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing...';
                 submitBtn.disabled = true;
-                
+
                 // Re-enable button after 3 seconds (fallback)
                 setTimeout(() => {
                     submitBtn.innerHTML = originalText;
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     tableRows.forEach(row => {
         const deleteBtn = row.querySelector('.btn-delete-user');
         if (deleteBtn) {
-            deleteBtn.addEventListener('click', function(e) {
+            deleteBtn.addEventListener('click', function (e) {
                 const userName = this.getAttribute('data-user-name');
                 const userEmail = this.getAttribute('data-user-email');
                 const msg = `⚠️ Delete User\n\nAre you sure you want to permanently delete:\n\nName: ${userName}\nEmail: ${userEmail}\n\nThis action cannot be undone and will remove all associated data.`;
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const toggleBtn = row.querySelector('.btn-toggle-status');
         if (toggleBtn) {
-            toggleBtn.addEventListener('click', function(e) {
+            toggleBtn.addEventListener('click', function (e) {
                 const userName = this.getAttribute('data-user-name');
                 const currentStatus = this.getAttribute('data-current-status');
                 const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('user-search');
     if (searchInput) {
         let searchTimeout;
-        searchInput.addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 this.form.submit();
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Enhanced pagination feedback
     const paginationLinks = document.querySelectorAll('.pagination a');
     paginationLinks.forEach(link => {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function () {
             const pageInfo = document.getElementById('page-loading');
             if (pageInfo) {
                 pageInfo.style.display = 'block';
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Auto-wrap tables in .table-responsive if not already wrapped
-    document.querySelectorAll('table').forEach(function(tbl) {
+    document.querySelectorAll('table').forEach(function (tbl) {
         if (!tbl.closest('.table-responsive')) {
             const wrapper = document.createElement('div');
             wrapper.className = 'table-responsive responsive-overflow';
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Ensure all inline images inside content scale appropriately
-    document.querySelectorAll('img').forEach(function(img) {
+    document.querySelectorAll('img').forEach(function (img) {
         img.classList.add('img-fluid');
     });
 });
@@ -215,14 +215,14 @@ function showNotification(message, type = 'info', duration = 5000) {
     const alertContainer = document.createElement('div');
     alertContainer.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
     alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    
+
     alertContainer.innerHTML = `
         <i class="bi bi-${getIconForType(type)} me-2"></i>${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
-    
+
     document.body.appendChild(alertContainer);
-    
+
     // Auto-remove after duration
     setTimeout(() => {
         if (alertContainer.parentNode) {

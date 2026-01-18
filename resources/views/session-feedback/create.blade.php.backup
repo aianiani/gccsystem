@@ -1,0 +1,634 @@
+@extends('layouts.app')
+
+@section('content')
+    \u003cstyle\u003e
+    /* Student Dashboard Color Scheme */
+    :root {
+    --primary-green: #1f7a2d;
+    --primary-green-2: #13601f;
+    --accent-green: #2e7d32;
+    --light-green: #eaf5ea;
+    --accent-orange: #FFCB05;
+    --text-dark: #16321f;
+    --text-light: #6c757d;
+    --bg-light: #f6fbf6;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+    /* Map to common names */
+    --forest-green: var(--primary-green);
+    --forest-green-dark: var(--primary-green-2);
+    --forest-green-light: var(--accent-green);
+    --forest-green-lighter: var(--light-green);
+    --yellow-maize: var(--accent-orange);
+    --yellow-maize-light: #fef9e7;
+    --white: #ffffff;
+    --gray-50: var(--bg-light);
+    --gray-100: #eef6ee;
+    --gray-200: #e9ecef;
+    --gray-600: var(--text-light);
+    --gray-800: #343a40;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
+    --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+    }
+
+    html {
+    zoom: 75% !important;
+    }
+
+    body {
+    background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%) !important;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .page-header {
+    background: var(--hero-gradient);
+    color: white;
+    border-radius: 16px;
+    padding: 1.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+    }
+
+    .page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    filter: blur(60px);
+    }
+
+    .page-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+    line-height: 1.1;
+    }
+
+    .page-header p {
+    font-size: 0.95rem;
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+    }
+
+    .feedback-form-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-100);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    }
+
+    .feedback-form-card:hover {
+    box-shadow: var(--shadow-md);
+    }
+
+    .feedback-form-header {
+    background: var(--forest-green-lighter);
+    color: var(--forest-green);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--gray-100);
+    font-weight: 600;
+    }
+
+    .feedback-form-header h4 {
+    font-size: 1.25rem;
+    letter-spacing: -0.3px;
+    margin-bottom: 0;
+    }
+
+    .feedback-form-body {
+    padding: 1.25rem;
+    }
+
+    .appointment-summary {
+    background: var(--gray-50);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--forest-green);
+    box-shadow: none;
+    border: 1px solid var(--gray-100);
+    transition: all 0.3s ease;
+    }
+
+    .appointment-summary:hover {
+    background: var(--forest-green-lighter);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+    }
+
+    .appointment-summary h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--forest-green);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    }
+
+    .appointment-summary h5::before {
+    content: '📋';
+    font-size: 1.25rem;
+    }
+
+    .counselor-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--gray-100);
+    transition: all 0.2s ease;
+    }
+
+    .counselor-info:hover {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-sm);
+    }
+
+    .counselor-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--hero-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 3px solid white;
+    transition: transform 0.3s ease;
+    }
+
+    .counselor-avatar:hover {
+    transform: rotate(5deg) scale(1.05);
+    }
+
+    .counselor-info h6 {
+    font-size: 1rem;
+    color: var(--gray-800);
+    margin-bottom: 0;
+    font-weight: 700;
+    }
+
+    .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    }
+
+    .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--gray-100);
+    transition: all 0.2s ease;
+    }
+
+    .detail-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    }
+
+    .detail-item i {
+    font-size: 1.25rem;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    }
+
+    .detail-item.date i {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    }
+
+    .detail-item.time i {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    }
+
+    .detail-item.notes i {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    }
+
+    .rating-section {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+    border-radius: 12px;
+    border: 2px dashed rgba(244, 208, 63, 0.3);
+    }
+
+    .rating-stars {
+    display: flex;
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+    justify-content: center;
+    }
+
+    .star-btn {
+    background: rgba(244, 208, 63, 0.1);
+    border: 2px solid transparent;
+    font-size: 2.5rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    padding: 0.5rem;
+    border-radius: 12px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .star-btn:hover {
+    color: var(--yellow-maize);
+    transform: scale(1.15) rotate(10deg);
+    background: rgba(244, 208, 63, 0.2);
+    border-color: var(--yellow-maize);
+    }
+
+    .star-btn.active {
+    color: var(--yellow-maize);
+    transform: scale(1.1);
+    background: rgba(244, 208, 63, 0.25);
+    border-color: var(--yellow-maize);
+    animation: pulse 0.5s ease;
+    }
+
+    @keyframes pulse {
+
+    0%,
+    100% {
+    transform: scale(1.1);
+    }
+
+    50% {
+    transform: scale(1.25);
+    }
+    }
+
+    .rating-label {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--forest-green);
+    min-height: 28px;
+    }
+
+    .form-group {
+    margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+    font-weight: 600;
+    color: var(--forest-green);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    }
+
+    .form-control {
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    background: white;
+    }
+
+    .form-control:focus {
+    outline: none;
+    border-color: var(--forest-green);
+    box-shadow: 0 0 0 4px rgba(31, 122, 45, 0.1);
+    transform: translateY(-1px);
+    }
+
+    .form-control::placeholder {
+    color: var(--gray-600);
+    opacity: 0.7;
+    }
+
+    textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+    }
+
+    .btn-submit {
+    background: var(--hero-gradient);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.15s ease;
+    box-shadow: 0 6px 18px rgba(17, 94, 37, 0.06);
+    position: relative;
+    overflow: hidden;
+    }
+
+    .btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+    }
+
+    .btn-submit:hover::before {
+    left: 100%;
+    }
+
+    .btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+    }
+
+    .btn-submit:active {
+    transform: translateY(0);
+    }
+
+    .btn-cancel {
+    background: var(--gray-200);
+    color: var(--gray-800);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    margin-right: 0.75rem;
+    display: inline-block;
+    }
+
+    .btn-cancel:hover {
+    background: var(--gray-600);
+    color: white;
+    text-decoration: none;
+    border-color: var(--gray-600);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+    }
+
+    .back-btn {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+    }
+
+    .back-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    text-decoration: none;
+    transform: translateX(-3px);
+    border-color: rgba(255, 255, 255, 0.5);
+    }
+    \u003c/style\u003e
+
+    \u003cdiv class=\"container-fluid py-4\"\u003e
+    \u003cdiv class=\"page-header\"\u003e
+    \u003cdiv class=\"d-flex justify-content-between align-items-center\"\u003e
+    \u003cdiv\u003e
+    \u003ch1 class=\"mb-2\"\u003e
+    \u003ci class=\"bi bi-star me-3\"\u003e\u003c/i\u003e
+    Session Feedback
+    \u003c/h1\u003e
+    \u003cp class=\"mb-0 opacity-75\"\u003eShare your experience and help us improve our counseling services\u003c/p\u003e
+    \u003c/div\u003e
+    \u003ca href=\"{{ route('appointments.completedWithNotes') }}\" class=\"back-btn\"\u003e
+    \u003ci class=\"bi bi-arrow-left\"\u003e\u003c/i\u003e
+    Back to Session Notes
+    \u003c/a\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+
+    \u003cdiv class=\"row justify-content-center\"\u003e
+    \u003cdiv class=\"col-lg-8\"\u003e
+    \u003cdiv class=\"feedback-form-card\"\u003e
+    \u003cdiv class=\"feedback-form-header\"\u003e
+    \u003ch4 class=\"mb-0\"\u003e
+    \u003ci class=\"bi bi-calendar-check me-2\"\u003e\u003c/i\u003e
+    Provide Feedback for Your Session
+    \u003c/h4\u003e
+    \u003c/div\u003e
+    \u003cdiv class=\"feedback-form-body\"\u003e
+    \u003c!-- Appointment Summary --\u003e
+    \u003cdiv class=\"appointment-summary\"\u003e
+    \u003ch5 class=\"mb-3\"\u003eSession Details\u003c/h5\u003e
+    \u003cdiv class=\"counselor-info\"\u003e
+    @if($appointment - \u003ecounselor - \u003eavatar)
+        \u003cimg src=\"{{ $appointment - \u003ecounselor - \u003eavatar_url }}\"
+        alt=\"{{ $appointment - \u003ecounselor - \u003ename }}\" class=\"counselor-avatar\"
+        style=\"object-fit: cover;\"\u003e
+    @else
+        \u003cdiv class=\"counselor-avatar\"\u003e
+        {{ strtoupper(substr($appointment - \u003ecounselor - \u003ename ?? 'C', 0, 1)) }}
+        \u003c/div\u003e
+    @endif
+    \u003cdiv\u003e
+    \u003ch6 class=\"mb-1 fw-bold\"\u003e{{ $appointment - \u003ecounselor - \u003ename ?? 'Counselor' }}\u003c/h6\u003e
+    \u003cp class=\"mb-0 text-muted\"\u003e{{ $appointment-\u003ecounselor-\u003eemail ?? 'counselor@example.com'
+    }}\u003c/p\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+    \u003cdiv class=\"detail-grid\"\u003e
+    \u003cdiv class=\"detail-item date\"\u003e
+    \u003ci class=\"bi bi-calendar\"\u003e\u003c/i\u003e
+    \u003cdiv\u003e
+    \u003csmall class=\"text-muted d-block\"\u003eDate\u003c/small\u003e
+    \u003cstrong\u003e{{ $appointment - \u003escheduled_at - \u003eformat('F j, Y') }}\u003c/strong\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+    \u003cdiv class=\"detail-item time\"\u003e
+    \u003ci class=\"bi bi-clock\"\u003e\u003c/i\u003e
+    \u003cdiv\u003e
+    \u003csmall class=\"text-muted d-block\"\u003eTime\u003c/small\u003e
+    \u003cstrong\u003e{{ $appointment - \u003escheduled_at - \u003eformat('g:i A') }} -
+    {{ $appointment - \u003escheduled_at - \u003eaddMinutes(30) - \u003eformat('g:i A') }}\u003c/strong\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+    \u003cdiv class=\"detail-item notes\"\u003e
+    \u003ci class=\"bi bi-journal-text\"\u003e\u003c/i\u003e
+    \u003cdiv\u003e
+    \u003csmall class=\"text-muted d-block\"\u003eSession Notes\u003c/small\u003e
+    \u003cstrong\u003e{{ $appointment - \u003esessionNotes - \u003ecount() }} note(s)\u003c/strong\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+
+    \u003c!-- Feedback Form --\u003e
+    \u003cform action=\"{{ route('session-feedback.store', $appointment - \u003eid) }}\" method=\"POST\"\u003e
+    @csrf
+
+
+    \u003cdiv class=\"rating-section\"\u003e
+    \u003clabel class=\"form-label\"\u003e
+    \u003ci class=\"bi bi-star\"\u003e\u003c/i\u003e
+    How would you rate your counseling session?
+    \u003c/label\u003e
+    \u003cdiv class=\"rating-stars\"\u003e
+    \u003cbutton type=\"button\" class=\"star-btn\" data-rating=\"1\" title=\"Poor\"\u003e
+    \u003ci class=\"bi bi-star\"\u003e\u003c/i\u003e
+    \u003c/button\u003e
+    \u003cbutton type=\"button\" class=\"star-btn\" data-rating=\"2\" title=\"Fair\"\u003e
+    \u003ci class=\"bi bi-star\"\u003e\u003c/i\u003e
+    \u003c/button\u003e
+    \u003cbutton type=\"button\" class=\"star-btn\" data-rating=\"3\" title=\"Good\"\u003e
+    \u003ci class=\"bi bi-star\"\u003e\u003c/i\u003e
+    \u003c/button\u003e
+    \u003cbutton type=\"button\" class=\"star-btn\" data-rating=\"4\" title=\"Very Good\"\u003e
+    \u003ci class=\"bi bi-star\"\u003e\u003c/i\u003e
+    \u003c/button\u003e
+    \u003cbutton type=\"button\" class=\"star-btn\" data-rating=\"5\" title=\"Excellent\"\u003e
+    \u003ci class=\"bi bi-star\"\u003e\u003c/i\u003e
+    \u003c/button\u003e
+    \u003c/div\u003e
+    \u003cdiv class=\"rating-label\" id=\"ratingLabel\"\u003e\u003c/div\u003e
+    \u003cinput type=\"hidden\" name=\"rating\" id=\"rating\" required\u003e
+    @error('rating')
+        \u003cdiv class=\"text-danger mt-1\"\u003e{{ $message }}\u003c/div\u003e
+    @enderror
+    \u003c/div\u003e
+
+    \u003cdiv class=\"form-group\"\u003e
+    \u003clabel for=\"comments\" class=\"form-label\"\u003e
+    \u003ci class=\"bi bi-chat-text\"\u003e\u003c/i\u003e
+    Please share your thoughts about the session (minimum 10 characters)
+    \u003c/label\u003e
+    \u003ctextarea name=\"comments\" id=\"comments\" class=\"form-control\" rows=\"6\"
+    placeholder=\"Tell us about your experience with the counselor, what you found helpful, and any suggestions for
+    improvement...\"
+    required\u003e{{ old('comments') }}\u003c/textarea\u003e
+    @error('comments')
+        \u003cdiv class=\"text-danger mt-1\"\u003e{{ $message }}\u003c/div\u003e
+    @enderror
+    \u003c/div\u003e
+
+    \u003cdiv class=\"d-flex justify-content-end\"\u003e
+    \u003ca href=\"{{ route('appointments.completedWithNotes') }}\" class=\"btn-cancel\"\u003e
+    Cancel
+    \u003c/a\u003e
+    \u003cbutton type=\"submit\" class=\"btn-submit\"\u003e
+    \u003ci class=\"bi bi-send me-2\"\u003e\u003c/i\u003e
+    Submit Feedback
+    \u003c/button\u003e
+    \u003c/div\u003e
+    \u003c/form\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+    \u003c/div\u003e
+
+    \u003cscript\u003e
+    document.addEventListener('DOMContentLoaded', function () {
+    const starButtons = document.querySelectorAll('.star-btn');
+    const ratingInput = document.getElementById('rating');
+    const ratingLabel = document.getElementById('ratingLabel');
+    let selectedRating = 0;
+
+    const ratingTexts = {
+    1: '⭐ Poor',
+    2: '⭐⭐ Fair',
+    3: '⭐⭐⭐ Good',
+    4: '⭐⭐⭐⭐ Very Good',
+    5: '⭐⭐⭐⭐⭐ Excellent'
+    };
+
+    starButtons.forEach(button =\u003e {
+    button.addEventListener('click', function () {
+    const rating = parseInt(this.getAttribute('data-rating'));
+    selectedRating = rating;
+    ratingInput.value = rating;
+    ratingLabel.textContent = ratingTexts[rating];
+
+    // Update star display
+    starButtons.forEach((star, index) =\u003e {
+    if (index \u003c rating) {
+    star.classList.add('active');
+    star.innerHTML = '\u003ci class=\"bi bi-star-fill\"\u003e\u003c/i\u003e';
+    } else {
+    star.classList.remove('active');
+    star.innerHTML = '\u003ci class=\"bi bi-star\"\u003e\u003c/i\u003e';
+    }
+    });
+    });
+
+    // Hover effects
+    button.addEventListener('mouseenter', function () {
+    const rating = parseInt(this.getAttribute('data-rating'));
+    ratingLabel.textContent = ratingTexts[rating];
+    starButtons.forEach((star, index) =\u003e {
+    if (index \u003c rating) {
+    star.innerHTML = '\u003ci class=\"bi bi-star-fill\"\u003e\u003c/i\u003e';
+    }
+    });
+    });
+
+    button.addEventListener('mouseleave', function () {
+    if (selectedRating \u003e 0) {
+    ratingLabel.textContent = ratingTexts[selectedRating];
+    } else {
+    ratingLabel.textContent = '';
+    }
+    starButtons.forEach((star, index) =\u003e {
+    if (index \u003c selectedRating) {
+    star.innerHTML = '\u003ci class=\"bi bi-star-fill\"\u003e\u003c/i\u003e';
+    } else {
+    star.innerHTML = '\u003ci class=\"bi bi-star\"\u003e\u003c/i\u003e';
+    }
+    });
+    });
+    });
+    });
+    \u003c/script\u003e
+@endsection

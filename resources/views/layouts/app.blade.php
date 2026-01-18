@@ -23,25 +23,39 @@
 
     <style>
         :root {
-            --forest-green: #2d5016;
-            --forest-green-light: #4a7c59;
+            --forest-green: #1f7a2d;
+            --forest-green-light: #2e7d32;
             --forest-green-lighter: #e8f5e8;
-            --yellow-maize: #f4d03f;
+            --yellow-maize: #FFCB05;
             --yellow-maize-light: #fef9e7;
             --white: #ffffff;
-            --gray-50: #f8f9fa;
-            --gray-100: #f1f3f4;
+            --gray-50: #f8fafc;
+            --gray-100: #eef6ee;
             --gray-600: #6c757d;
             --danger: #dc3545;
             --warning: #ffc107;
             --success: #28a745;
             --info: #17a2b8;
-            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
             --radius: 16px;
             --input-radius: 10px;
             --transition: 0.2s;
+
+            /* Re-mapping university branding to ensure overrides */
+            --university-blue: #1f7a2d;
+            --university-light-blue: #e8f5e8;
+            --primary: #1f7a2d;
+            --primary-light: #e8f5e8;
+            --accent: #FFCB05;
+            --sidebar-bg: linear-gradient(135deg, #1f7a2d 0%, #13601f 100%);
+        }
+
+        #adminSidebar,
+        .custom-sidebar {
+            background: #1f7a2d !important;
+            background: var(--sidebar-bg) !important;
         }
 
         /* Centralized home-zoom variables and behavior
@@ -412,22 +426,21 @@
         /* Active / hover state: light rounded panel with yellow accent */
         .custom-sidebar .sidebar-link.active,
         .custom-sidebar .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.04) !important;
-            color: var(--yellow-maize, #f4d03f) !important;
-            transform: translateX(0.5px) !important;
-            box-shadow: inset 4px 0 0 0 rgba(244, 208, 63, 0.06) !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: var(--yellow-maize) !important;
+            transform: translateX(4px) !important;
         }
 
         .custom-sidebar .sidebar-link.active::before {
             content: '';
             position: absolute;
-            left: 10px;
-            top: 10px;
-            bottom: 10px;
+            left: 0;
+            top: 20%;
+            bottom: 20%;
             width: 4px;
-            background: var(--yellow-maize, #f4d03f);
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            background: var(--yellow-maize);
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 10px rgba(255, 203, 5, 0.4);
         }
 
         .custom-sidebar .sidebar-divider {
@@ -507,7 +520,7 @@
                         <i class="bi bi-list"></i>
                     </button>
                     <!-- Sidebar -->
-                    <div class="custom-sidebar" id="adminSidebar">
+                    <div class="custom-sidebar" id="adminSidebar" style="background: var(--sidebar-bg) !important;">
                         <div class="sidebar-logo mb-4">
                             <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
                                 style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto;">
@@ -985,15 +998,15 @@
                                             }
 
                                             li.innerHTML = `
-                                                                                                                                                                                                                                            <div class="notification-icon ${iconType}">
-                                                                                                                                                                                                                                                ${icon}
-                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                            <div class="notification-content">
-                                                                                                                                                                                                                                                <div class="notification-message">${n.data.message || n.type}</div>
-                                                                                                                                                                                                                                                <div class="notification-time">${n.created_at}</div>
-                                                                                                                                                                                                                                                ${actionsHtml ? `<div class="notification-actions">${actionsHtml}</div>` : ''}
-                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                                        <div class="notification-icon ${iconType}">
+                                                                                                                                                                                                                                                            ${icon}
+                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                        <div class="notification-content">
+                                                                                                                                                                                                                                                            <div class="notification-message">${n.data.message || n.type}</div>
+                                                                                                                                                                                                                                                            <div class="notification-time">${n.created_at}</div>
+                                                                                                                                                                                                                                                            ${actionsHtml ? `<div class="notification-actions">${actionsHtml}</div>` : ''}
+                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                    `;
                                             notifDropdown.appendChild(li);
                                         });
                                     }
@@ -1050,11 +1063,11 @@
                     });
                 </script>
             @endif
-            <main class="fade-in">
-                <div class="container py-4">
-                    @yield('content')
-                </div>
-            </main>
+                    <main class="fade-in">
+                        <div class="container py-4">
+                            @yield('content')
+                        </div>
+                    </main>
         @endif
     @endauth
     @guest

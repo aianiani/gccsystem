@@ -243,69 +243,168 @@
 
         /* Specific Page Styles similar to appointments.index */
         .appointments-hero {
-            background: var(--hero-gradient);
+            background: linear-gradient(135deg, #1a3d0f 0%, var(--primary-green) 50%, var(--accent-green) 100%);
             color: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
+            padding: 2rem 1.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
             margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .appointments-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            filter: blur(60px);
         }
 
         .appointments-hero .title {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .appointments-hero .small {
+            position: relative;
+            z-index: 1;
+            font-size: 1.05rem;
         }
 
         .appointment-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(31, 122, 45, 0.08);
             margin-bottom: 1.5rem;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .appointment-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(31, 122, 45, 0.12);
+            border-color: rgba(31, 122, 45, 0.15);
         }
 
         .appointment-header {
-            background: var(--forest-green-lighter);
+            background: linear-gradient(135deg, #f0f9f1 0%, #e8f5e8 100%);
             color: var(--forest-green);
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--gray-100);
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(31, 122, 45, 0.08);
             font-weight: 600;
         }
 
+        .appointment-header h6 {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+        }
+
+        .appointment-header .badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem;
+            background: var(--forest-green) !important;
+        }
+
         .appointment-body {
-            padding: 1.25rem;
+            padding: 1.5rem;
         }
 
         .counselor-avatar {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid rgba(31, 122, 45, 0.1);
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(31, 122, 45, 0.15);
+        }
+
+        .appointment-body .text-muted {
+            color: var(--text-light) !important;
+            font-size: 0.95rem;
+        }
+
+        .appointment-body .text-dark {
+            color: var(--text-dark) !important;
+            font-weight: 600;
         }
 
         .session-note {
-            background: var(--gray-50);
-            border-radius: 10px;
-            padding: 1.25rem;
-            margin-top: 1rem;
+            background: linear-gradient(135deg, #f8fcf9 0%, #f0f9f1 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.25rem;
             border-left: 4px solid var(--forest-green);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        .session-note h6 {
+            color: var(--forest-green);
+            font-size: 1.05rem;
+        }
+
+        /* Enhanced Feedback Section */
+        .feedback-section {
+            background: linear-gradient(135deg, #fffbf0 0%, #fff9e6 100%);
+            border: 2px dashed rgba(255, 203, 5, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-section:hover {
+            border-color: rgba(255, 203, 5, 0.5);
+            box-shadow: 0 4px 12px rgba(255, 203, 5, 0.1);
+        }
+
+        .feedback-section h6 {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+        }
+
+        .feedback-section .btn-outline-success {
+            border: 2px solid var(--forest-green);
+            color: var(--forest-green);
+            font-weight: 600;
+            padding: 0.5rem 1.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-section .btn-outline-success:hover {
+            background: var(--forest-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(31, 122, 45, 0.25);
+        }
+
+        .feedback-section .badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
         }
 
         .empty-state {
             text-align: center;
-            padding: 3rem;
+            padding: 4rem 3rem;
             color: var(--gray-600);
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             border: 2px dashed var(--gray-100);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 1.5rem;
         }
     </style>
 
@@ -460,10 +559,10 @@
                                                 @php
                                                     $existingFeedback = \App\Models\SessionFeedback::where('appointment_id', $appointment->id)->first();
                                                 @endphp
-                                                <div class="mt-4 p-3 rounded-3" style="background-color: #f8f9fa; border: 1px dashed #dee2e6;">
+                                                <div class="feedback-section">
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <div>
-                                                            <h6 class="mb-1 fw-bold text-dark">
+                                                            <h6 class="mb-1 fw-bold">
                                                                 <i class="bi bi-star me-2 text-warning"></i>Session Feedback
                                                             </h6>
                                                             @if($existingFeedback)

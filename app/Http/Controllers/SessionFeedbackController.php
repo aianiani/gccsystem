@@ -29,7 +29,13 @@ class SessionFeedbackController extends Controller
                 ->with('info', 'You have already provided feedback for this session.');
         }
 
-        return view('session-feedback.create', compact('appointment'));
+        // Calculate session number (count of completed appointments for this student up to this one)
+        $sessionNumber = Appointment::where('student_id', auth()->id())
+            ->where('status', 'completed')
+            ->where('scheduled_at', '<=', $appointment->scheduled_at)
+            ->count();
+
+        return view('session-feedback.create', compact('appointment', 'sessionNumber'));
     }
 
     // Store feedback for a specific appointment
@@ -41,7 +47,7 @@ class SessionFeedbackController extends Controller
 
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'comments' => 'required|string|min:10|max:1000',
+            'comments' => 'required|string|max:1000',
         ]);
 
         // Check if appointment exists and belongs to the student
@@ -89,7 +95,13 @@ class SessionFeedbackController extends Controller
                 ->findOrFail($feedbackId);
         }
 
-        return view('session-feedback.show', compact('feedback'));
+        // Calculate session number for the student up to this appointment
+        $sessionNumber = Appointment::where('student_id', $feedback->appointment->student_id)
+            ->where('status', 'completed')
+            ->where('scheduled_at', '<=', $feedback->appointment->scheduled_at)
+            ->count();
+
+        return view('session-feedback.show', compact('feedback', 'sessionNumber'));
     }
 
     // List all feedback for the counselor
