@@ -54,6 +54,7 @@ class DashboardController extends Controller
                     $attendanceMatrix[$attendance->year_level][$attendance->seminar_name] = [
                         'attended' => true,
                         'schedule_id' => $attendance->seminar_schedule_id,
+                        'status' => $attendance->status,
                     ];
                 }
 
@@ -138,10 +139,10 @@ class DashboardController extends Controller
 
         // 7. Demographic Breakdown
         $genderDistribution = User::where('role', 'student')
-            ->selectRaw('gender, COUNT(*) as count')
-            ->groupBy('gender')
+            ->selectRaw('sex, COUNT(*) as count')
+            ->groupBy('sex')
             ->get()
-            ->pluck('count', 'gender');
+            ->pluck('count', 'sex');
 
         // FALLBACK: If sparse, inject dummy data for visualization
         if ($genderDistribution->isEmpty()) {

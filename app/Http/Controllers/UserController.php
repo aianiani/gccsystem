@@ -49,7 +49,7 @@ class UserController extends Controller
         // Get unique colleges and courses for filter dropdowns (like Registration Approval)
         $colleges = User::where('role', 'student')->whereNotNull('college')->distinct()->pluck('college');
         $courses = User::where('role', 'student')->whereNotNull('course')->distinct()->pluck('course');
-        $genders = User::whereNotNull('gender')->distinct()->pluck('gender');
+        $genders = User::whereNotNull('sex')->distinct()->pluck('sex');
 
         return view('users.index', compact('users', 'colleges', 'courses', 'genders'));
     }
@@ -106,8 +106,8 @@ class UserController extends Controller
         if ($request->filled('year_level')) {
             $query->where('year_level', $request->year_level);
         }
-        if ($request->filled('gender')) {
-            $query->where('gender', $request->gender);
+        if ($request->filled('sex')) {
+            $query->where('sex', $request->sex);
         }
 
         // Date Range Filter (Registered)

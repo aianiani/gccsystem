@@ -64,6 +64,7 @@ class AppointmentBookedNotification extends Notification
         return [
             'message' => "A new appointment has been booked by {$student->name} on {$start} at {$time}.",
             'url' => url('/counselor/appointments/' . $this->appointment->id),
+            'appointment_id' => $this->appointment->id,
         ];
     }
 

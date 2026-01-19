@@ -40,7 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'college',
         'course',
         'year_level',
-        'gender',
+        'sex',
         'cor_file',
         'consent_agreed',
         'consent_agreed_at',
@@ -143,6 +143,52 @@ class User extends Authenticatable implements MustVerifyEmail
             return asset('storage/cor_files/' . $this->cor_file);
         }
         return null;
+    }
+
+    /**
+     * Get the college acronym
+     */
+    public function getCollegeAcronymAttribute()
+    {
+        $map = [
+            'College of Arts and Sciences' => 'CAS',
+            'College of Veterinary Medicine' => 'CVM',
+            'College of Forestry and Environmental Sciences' => 'CFES',
+            'College of Business and Management' => 'CBM',
+            'College of Nursing' => 'CON',
+            'College of Human Ecology' => 'CHE',
+            'College of Agriculture' => 'CA',
+            'College of Information Sciences and Computing' => 'CISC',
+            'College of Education' => 'CE',
+            'College of Engineering' => 'COE',
+        ];
+
+        return $map[$this->college] ?? $this->college;
+    }
+
+    /**
+     * Get a clean year level label (e.g., 4th Year)
+     */
+    public function getYearLevelLabelAttribute()
+    {
+        if (!$this->year_level)
+            return 'N/A';
+
+        // If it's already formatted like "4th Year" or similar, return as is
+        if (str_contains(strtolower($this->year_level), 'year')) {
+            return $this->year_level;
+        }
+
+        // Otherwise format it
+        $suffix = 'th';
+        if ($this->year_level == 1)
+            $suffix = 'st';
+        elseif ($this->year_level == 2)
+            $suffix = 'nd';
+        elseif ($this->year_level == 3)
+            $suffix = 'rd';
+
+        return $this->year_level . $suffix . ' Year';
     }
 
     /**
@@ -275,5 +321,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasRole($role)
     {
         return $this->role === $role;
+    }
+    /**
+     * Get the seminar attendances for the user.
+     */
+    public function seminarAttendances()
+    {
+        return $this->hasMany(\App\Models\SeminarAttendance::class);
+    }
+
+    /**
+     * Get the seminar evaluations for the user.
+     */
+    public function seminarEvaluations()
+    {
+        return $this->hasMany(\App\Models\SeminarEvaluation::class);
     }
 }

@@ -22,9 +22,12 @@
         <a href="{{ route('assessments.index') }}"
             class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i
                 class="bi bi-clipboard-data"></i>Assessments</a>
+        <a href="{{ route('student.seminars.index') }}"
+            class="sidebar-link{{ request()->routeIs('student.seminars.*') ? ' active' : '' }}"><i
+                class="bi bi-award"></i>Guidance Program</a>
         <a href="{{ route('chat.selectCounselor') }}"
             class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i
-                class="bi bi-chat-dots"></i>Chat with a Counselor</a>
+                class="bi bi-chat-dots"></i>Talk with Counselor</a>
 
         <div class="sidebar-divider my-3" style="border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
         <div class="sidebar-resources">

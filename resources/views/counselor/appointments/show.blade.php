@@ -298,9 +298,9 @@
                                 <div class="fw-bold text-dark">Actions</div>
                                 <div class="d-flex gap-2">
                                     @if($appointment->status === 'pending')
-                                        <form method="POST" action="{{ route('counselor.appointments.accept', $appointment->id) }}" data-confirm="Accept this appointment?">
+                                        <form method="POST" action="{{ route('counselor.appointments.accept', $appointment->id) }}" data-confirm="Approve this appointment?">
                                             @csrf @method('PATCH')
-                                            <button class="btn btn-success btn-action"><i class="bi bi-check-lg"></i> Accept</button>
+                                            <button class="btn btn-success btn-action"><i class="bi bi-check-lg"></i> Approve</button>
                                         </form>
                                         <a href="{{ route('counselor.appointments.reschedule', $appointment->id) }}" class="btn btn-warning btn-action text-dark">
                                             <i class="bi bi-clock-history"></i> Reschedule
@@ -545,7 +545,7 @@
                                         <a href="{{ route('counselor.appointments.show', $hist->id) }}" class="list-group-item list-group-item-action">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <small class="fw-bold text-dark">{{ \Carbon\Carbon::parse($hist->scheduled_at)->format('M d, Y') }}</small>
-                                                <small class="badge bg-secondary">{{ ucfirst($hist->status) }}</small>
+                                                <small class="badge bg-secondary">{{ $hist->status === 'accepted' ? 'Approved' : ucfirst($hist->status) }}</small>
                                             </div>
                                             <small class="text-muted">{{ $hist->nature_of_problem }}</small>
                                         </a>

@@ -25,9 +25,9 @@ class CounselorStudentController extends Controller
             $query->where('course', 'like', '%' . $request->course . '%');
         }
 
-        // Filter by gender
-        if ($request->filled('gender')) {
-            $query->where('gender', $request->gender);
+        // Filter by sex
+        if ($request->filled('sex')) {
+            $query->where('sex', $request->sex);
         }
 
         // Filter by year level
@@ -92,11 +92,11 @@ class CounselorStudentController extends Controller
             }
         }
 
-        // Gender Counts
+        // Sex Counts
         $genderStats = User::where('role', 'student')
-            ->selectRaw('gender, count(*) as count')
-            ->groupBy('gender')
-            ->pluck('count', 'gender')
+            ->selectRaw('sex, count(*) as count')
+            ->groupBy('sex')
+            ->pluck('count', 'sex')
             ->toArray();
 
         return view('counselor.students.index', compact('students', 'colleges', 'yearLevels', 'totalStudents', 'yearStats', 'genderStats'));

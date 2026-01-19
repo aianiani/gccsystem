@@ -415,7 +415,7 @@
             <!-- Gender Distribution -->
             <div class="premium-card">
                 <div class="card-header-flex">
-                    <h2 style="font-size: 1.1rem;"><i class="bi bi-gender-ambiguous"></i> Gender Distribution</h2>
+                    <h2 style="font-size: 1.1rem;"><i class="bi bi-gender-ambiguous"></i> Sex Distribution</h2>
                 </div>
                 <div style="height: 220px;">
                     <canvas id="genderDonut"></canvas>

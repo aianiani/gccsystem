@@ -221,8 +221,8 @@ class AuthController extends Controller
             'college' => 'nullable|string|max:255',
             'course' => 'nullable|string|max:255',
             'year_level' => 'nullable|string|max:50',
-            'gender' => 'nullable|in:male,female,non-binary,prefer_not_to_say,other',
-            'gender_other' => 'required_if:gender,other|nullable|string|max:255',
+            'sex' => 'nullable|in:male,female,non-binary,prefer_not_to_say,other',
+            'sex_other' => 'required_if:sex,other|nullable|string|max:255',
             'cor_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
         ]);
 
@@ -241,13 +241,13 @@ class AuthController extends Controller
                 ->with('error', 'Please correct the errors below and try again.');
         }
 
-        // Handle gender - if "other" is selected, use gender_other value
-        $gender = $request->gender;
-        if ($request->gender === 'other' && $request->filled('gender_other')) {
+        // Handle sex - if "other" is selected, use sex_other value
+        $sex = $request->sex;
+        if ($request->sex === 'other' && $request->filled('sex_other')) {
             // Store as "other" in enum, but we could also store the custom value
             // For now, we'll keep it as "other" since enum doesn't support custom values
-            // You might want to add a separate field for custom gender if needed
-            $gender = 'other';
+            // You might want to add a separate field for custom sex if needed
+            $sex = 'other';
         }
 
         // Handle COR file upload
@@ -281,7 +281,7 @@ class AuthController extends Controller
             'college' => $request->college,
             'course' => $request->course,
             'year_level' => $request->year_level,
-            'gender' => $gender,
+            'sex' => $sex,
             'cor_file' => $corFileName,
         ]);
 

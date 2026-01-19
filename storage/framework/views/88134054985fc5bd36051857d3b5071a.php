@@ -1,6 +1,6 @@
-@extends('layouts.app')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
     <style>
         /* Homepage theme variables (mapped into existing dashboard vars) */
         :root {
@@ -297,13 +297,13 @@
             </button>
             
             <!-- Sidebar -->
-            @include('counselor.sidebar')
+            <?php echo $__env->make('counselor.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
                 <div class="main-dashboard-inner">
                     <div class="mb-6">
-                        <a href="{{ route('counselor.guidance.index') }}" class="btn-secondary-custom">
+                        <a href="<?php echo e(route('counselor.guidance.index')); ?>" class="btn-secondary-custom">
                             <i class="bi bi-arrow-left"></i> Back to Student List
                         </a>
                     </div>
@@ -318,42 +318,42 @@
                             <h3 class="text-lg font-bold text-gray-800 m-0">Option 1: Select Manually</h3>
                         </div>
                         <div class="p-6">
-                            <form method="GET" action="{{ route('counselor.guidance.bulk.create') }}">
+                            <form method="GET" action="<?php echo e(route('counselor.guidance.bulk.create')); ?>">
                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                                     <div>
                                         <label for="year_level" class="block text-sm font-medium text-gray-700 mb-2">Year Level</label>
                                         <select name="year_level" id="year_level" class="form-select-custom w-full" required>
                                             <option value="">Select Year</option>
-                                            <option value="1" {{ request('year_level') == '1' ? 'selected' : '' }}>1st Year</option>
-                                            <option value="2" {{ request('year_level') == '2' ? 'selected' : '' }}>2nd Year</option>
-                                            <option value="3" {{ request('year_level') == '3' ? 'selected' : '' }}>3rd Year</option>
-                                            <option value="4" {{ request('year_level') == '4' ? 'selected' : '' }}>4th Year</option>
+                                            <option value="1" <?php echo e(request('year_level') == '1' ? 'selected' : ''); ?>>1st Year</option>
+                                            <option value="2" <?php echo e(request('year_level') == '2' ? 'selected' : ''); ?>>2nd Year</option>
+                                            <option value="3" <?php echo e(request('year_level') == '3' ? 'selected' : ''); ?>>3rd Year</option>
+                                            <option value="4" <?php echo e(request('year_level') == '4' ? 'selected' : ''); ?>>4th Year</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label for="college" class="block text-sm font-medium text-gray-700 mb-2">College (Optional)</label>
                                         <select name="college" id="college" class="form-select-custom w-full">
                                             <option value="">All Colleges</option>
-                                            <option value="College of Arts and Sciences" {{ request('college') == 'College of Arts and Sciences' ? 'selected' : '' }}>College of Arts and Sciences</option>
-                                            <option value="College of Veterinary Medicine" {{ request('college') == 'College of Veterinary Medicine' ? 'selected' : '' }}>College of Veterinary Medicine</option>
-                                            <option value="College of Forestry and Environmental Sciences" {{ request('college') == 'College of Forestry and Environmental Sciences' ? 'selected' : '' }}>College of Forestry and Environmental Sciences</option>
-                                            <option value="College of Business and Management" {{ request('college') == 'College of Business and Management' ? 'selected' : '' }}>College of Business and Management</option>
-                                            <option value="College of Nursing" {{ request('college') == 'College of Nursing' ? 'selected' : '' }}>College of Nursing</option>
-                                            <option value="College of Human Ecology" {{ request('college') == 'College of Human Ecology' ? 'selected' : '' }}>College of Human Ecology</option>
-                                            <option value="College of Agriculture" {{ request('college') == 'College of Agriculture' ? 'selected' : '' }}>College of Agriculture</option>
-                                            <option value="College of Information Science and Computing" {{ request('college') == 'College of Information Science and Computing' ? 'selected' : '' }}>College of Information Science and Computing</option>
-                                            <option value="College of Education" {{ request('college') == 'College of Education' ? 'selected' : '' }}>College of Education</option>
-                                            <option value="College of Engineering" {{ request('college') == 'College of Engineering' ? 'selected' : '' }}>College of Engineering</option>
+                                            <option value="College of Arts and Sciences" <?php echo e(request('college') == 'College of Arts and Sciences' ? 'selected' : ''); ?>>College of Arts and Sciences</option>
+                                            <option value="College of Veterinary Medicine" <?php echo e(request('college') == 'College of Veterinary Medicine' ? 'selected' : ''); ?>>College of Veterinary Medicine</option>
+                                            <option value="College of Forestry and Environmental Sciences" <?php echo e(request('college') == 'College of Forestry and Environmental Sciences' ? 'selected' : ''); ?>>College of Forestry and Environmental Sciences</option>
+                                            <option value="College of Business and Management" <?php echo e(request('college') == 'College of Business and Management' ? 'selected' : ''); ?>>College of Business and Management</option>
+                                            <option value="College of Nursing" <?php echo e(request('college') == 'College of Nursing' ? 'selected' : ''); ?>>College of Nursing</option>
+                                            <option value="College of Human Ecology" <?php echo e(request('college') == 'College of Human Ecology' ? 'selected' : ''); ?>>College of Human Ecology</option>
+                                            <option value="College of Agriculture" <?php echo e(request('college') == 'College of Agriculture' ? 'selected' : ''); ?>>College of Agriculture</option>
+                                            <option value="College of Information Science and Computing" <?php echo e(request('college') == 'College of Information Science and Computing' ? 'selected' : ''); ?>>College of Information Science and Computing</option>
+                                            <option value="College of Education" <?php echo e(request('college') == 'College of Education' ? 'selected' : ''); ?>>College of Education</option>
+                                            <option value="College of Engineering" <?php echo e(request('college') == 'College of Engineering' ? 'selected' : ''); ?>>College of Engineering</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label for="seminar_name" class="block text-sm font-medium text-gray-700 mb-2">Seminar</label>
                                         <select name="seminar_name" id="seminar_name" class="form-select-custom w-full" required>
                                             <option value="">Select Seminar</option>
-                                            <option value="IDREAMS" {{ request('seminar_name') == 'IDREAMS' ? 'selected' : '' }}>IDREAMS (Year 1)</option>
-                                            <option value="10C" {{ request('seminar_name') == '10C' ? 'selected' : '' }}>10C (Year 2)</option>
-                                            <option value="LEADS" {{ request('seminar_name') == 'LEADS' ? 'selected' : '' }}>LEADS (Year 3)</option>
-                                            <option value="IMAGE" {{ request('seminar_name') == 'IMAGE' ? 'selected' : '' }}>IMAGE (Year 4)</option>
+                                            <option value="IDREAMS" <?php echo e(request('seminar_name') == 'IDREAMS' ? 'selected' : ''); ?>>IDREAMS (Year 1)</option>
+                                            <option value="10C" <?php echo e(request('seminar_name') == '10C' ? 'selected' : ''); ?>>10C (Year 2)</option>
+                                            <option value="LEADS" <?php echo e(request('seminar_name') == 'LEADS' ? 'selected' : ''); ?>>LEADS (Year 3)</option>
+                                            <option value="IMAGE" <?php echo e(request('seminar_name') == 'IMAGE' ? 'selected' : ''); ?>>IMAGE (Year 4)</option>
                                         </select>
                                     </div>
                                     <div>
@@ -364,7 +364,7 @@
                         </div>
                     </div>
 
-                    @if(request('year_level') && request('seminar_name'))
+                    <?php if(request('year_level') && request('seminar_name')): ?>
                         <div class="content-card mb-6">
                             <div class="card-header-custom d-flex justify-content-between align-items-center">
                                 <h3 class="text-lg font-bold text-gray-800 m-0">Step 2: Select Students</h3>
@@ -375,10 +375,10 @@
                                 </div>
                             </div>
                             
-                            <form action="{{ route('counselor.guidance.bulk.store') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="year_level" value="{{ request('year_level') }}">
-                                <input type="hidden" name="seminar_name" value="{{ request('seminar_name') }}">
+                            <form action="<?php echo e(route('counselor.guidance.bulk.store')); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
+                                <input type="hidden" name="year_level" value="<?php echo e(request('year_level')); ?>">
+                                <input type="hidden" name="seminar_name" value="<?php echo e(request('seminar_name')); ?>">
 
                                 <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
                                     <table class="min-w-full table-custom">
@@ -395,62 +395,62 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($students as $student)
-                                                @php
+                                            <?php $__empty_1 = true; $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $student): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                <?php
                                                     $seminarName = request('seminar_name');
                                                     $isAttended = \App\Models\SeminarAttendance::where('user_id', $student->id)
                                                         ->where('seminar_name', $seminarName)
                                                         ->where('year_level', request('year_level'))
                                                         ->exists();
-                                                @endphp
-                                                <tr class="{{ $isAttended ? 'bg-green-50' : '' }}">
+                                                ?>
+                                                <tr class="<?php echo e($isAttended ? 'bg-green-50' : ''); ?>">
                                                     <td>
-                                                        @if(!$isAttended)
-                                                            <input type="checkbox" name="student_ids[]" value="{{ $student->id }}" class="student-checkbox rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 form-check-input">
-                                                        @else
+                                                        <?php if(!$isAttended): ?>
+                                                            <input type="checkbox" name="student_ids[]" value="<?php echo e($student->id); ?>" class="student-checkbox rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 form-check-input">
+                                                        <?php else: ?>
                                                             <i class="bi bi-check-circle-fill text-green-600"></i>
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
-                                                    <td class="font-medium text-gray-900">{{ $student->name }}</td>
-                                                    <td class="text-gray-500">{{ $student->student_id ?? 'N/A' }}</td>
-                                                    <td class="text-gray-500">{{ $student->year_level ?? 'N/A' }}</td>
-                                                    <td class="text-gray-500">{{ $student->college ?? 'N/A' }}</td>
+                                                    <td class="font-medium text-gray-900"><?php echo e($student->name); ?></td>
+                                                    <td class="text-gray-500"><?php echo e($student->student_id ?? 'N/A'); ?></td>
+                                                    <td class="text-gray-500"><?php echo e($student->year_level ?? 'N/A'); ?></td>
+                                                    <td class="text-gray-500"><?php echo e($student->college ?? 'N/A'); ?></td>
                                                     <td>
-                                                        @if($isAttended)
+                                                        <?php if($isAttended): ?>
                                                             <span class="text-green-700 font-medium text-sm bg-green-100 px-2 py-1 rounded-full">Attended</span>
-                                                        @else
+                                                        <?php else: ?>
                                                             <span class="text-gray-500 text-sm">Pending</span>
-                                                        @endif
+                                                        <?php endif; ?>
                                                     </td>
                                                 </tr>
-                                            @empty
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                                 <tr>
                                                     <td colspan="6" class="text-center py-8 text-gray-500">
                                                         No students found for this year level.<br>
                                                         <span class="text-xs opacity-75">Please ensure students have their Year Level set in their profile.</span>
                                                     </td>
                                                 </tr>
-                                            @endforelse
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
 
                                 <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
-                                    <button type="submit" class="btn-primary-custom" {{ $students->isEmpty() ? 'disabled' : '' }}>
+                                    <button type="submit" class="btn-primary-custom" <?php echo e($students->isEmpty() ? 'disabled' : ''); ?>>
                                         Mark Selected as Attended
                                     </button>
                                 </div>
                             </form>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <div class="content-card">
                         <div class="card-header-custom">
                             <h3 class="text-lg font-bold text-gray-800 m-0">Option 2: Import from CSV</h3>
                         </div>
                         <div class="p-6">
-                            <form action="{{ route('counselor.guidance.import') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
+                            <form action="<?php echo e(route('counselor.guidance.import')); ?>" method="POST" enctype="multipart/form-data">
+                                <?php echo csrf_field(); ?>
                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                                     <div>
                                         <label for="import_year_level" class="block text-sm font-medium text-gray-700 mb-2">Year Level</label>
@@ -544,4 +544,6 @@
             setupSync('import_year_level', 'import_seminar_name');
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/counselor/guidance/bulk_create.blade.php ENDPATH**/ ?>

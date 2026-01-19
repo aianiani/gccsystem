@@ -296,7 +296,7 @@ class AppointmentController extends Controller
     {
         $appointment = Appointment::where('counselor_id', auth()->id())->findOrFail($id);
         if ($appointment->status !== 'pending') {
-            return redirect()->back()->with('error', 'Only pending appointments can be accepted.');
+            return redirect()->back()->with('error', 'Only pending appointments can be approved.');
         }
         $appointment->status = 'accepted';
         $appointment->save();
@@ -305,7 +305,7 @@ class AppointmentController extends Controller
         if ($student) {
             $student->notify(new AppointmentAcceptedNotification($appointment));
         }
-        return redirect()->back()->with('success', 'Appointment accepted.');
+        return redirect()->back()->with('success', 'Appointment approved.');
     }
 
     // Decline an appointment
@@ -330,7 +330,7 @@ class AppointmentController extends Controller
     {
         $appointment = Appointment::where('student_id', auth()->id())->findOrFail($id);
         if ($appointment->status !== 'rescheduled_pending') {
-            return redirect()->back()->with('error', 'Only rescheduled appointments can be accepted.');
+            return redirect()->back()->with('error', 'Only rescheduled appointments can be approved.');
         }
         // Use previous_scheduled_at for the old date/time
         $oldDateTime = $appointment->previous_scheduled_at;
@@ -342,7 +342,7 @@ class AppointmentController extends Controller
         if ($counselor) {
             $counselor->notify(new \App\Notifications\AppointmentRescheduleAcceptedNotification($appointment, $oldDateTimeFormatted));
         }
-        return redirect()->back()->with('success', 'You have accepted the new appointment slot.');
+        return redirect()->back()->with('success', 'You have approved the new appointment slot.');
     }
 
     // Decline a rescheduled appointment (student action)

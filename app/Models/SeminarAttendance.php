@@ -15,6 +15,7 @@ class SeminarAttendance extends Model
         'year_level',
         'seminar_schedule_id',
         'attended_at',
+        'status',
     ];
 
     protected $casts = [

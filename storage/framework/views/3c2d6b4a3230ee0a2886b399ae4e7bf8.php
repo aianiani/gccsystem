@@ -31,8 +31,15 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        html {
-            zoom: 75% !important;
+        .home-zoom {
+            zoom: 75%;
+        }
+        @supports not (zoom: 1) {
+            .home-zoom {
+                transform: scale(0.75);
+                transform-origin: top left;
+                width: 133.33%;
+            }
         }
 
         body {
@@ -306,7 +313,7 @@
         }
     </style>
 
-    <div class="d-flex">
+    <div class="d-flex home-zoom">
         <?php if(auth()->user()->role === 'counselor'): ?>
             <?php echo $__env->make('counselor.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         <?php else: ?>
@@ -332,8 +339,8 @@
                     </div>
                 </div>
 
-                <div class="row justify-content-center">
-                    <div class="col-lg-10">
+                <div class="row">
+                    <div class="col-12">
                         <div class="feedback-card">
                             <div class="feedback-header">
                                 <h4 class="mb-0">
@@ -343,86 +350,67 @@
                                 </h4>
                             </div>
                             <div class="feedback-body">
-                                <div class="session-summary">
-                                    <h5>
-                                        <i class="bi bi-info-circle me-1"></i>
-                                        Session Details
-                                    </h5>
-                                    <div class="student-info">
-                                        <div class="student-avatar">
-                                            <?php echo e(strtoupper(substr($feedback->appointment->student->name ?? 'S', 0, 1))); ?>
+                                <div class="row g-4">
+                                    <div class="col-lg-5">
+                                        <div class="session-summary h-100 mb-0">
+                                            <h5><i class="bi bi-info-circle me-1"></i> Session Details</h5>
+                                            <div class="student-info">
+                                                <div class="student-avatar">
+                                                    <?php echo e(strtoupper(substr($feedback->appointment->student->name ?? 'S', 0, 1))); ?>
 
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0 fw-bold"><?php echo e($feedback->appointment->student->name); ?></h6>
-                                            <p class="mb-0 text-muted small"><?php echo e($feedback->appointment->student->email); ?>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold"><?php echo e($feedback->appointment->student->name); ?>
 
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <p class="mb-2">
-                                                <i class="bi bi-calendar3 me-2 text-primary"></i>
-                                                <strong>Date:</strong>
-                                                <?php echo e($feedback->appointment->scheduled_at->format('M j, Y')); ?>
+                                                    </h6>
+                                                    <p class="mb-0 text-muted small">
+                                                        <?php echo e($feedback->appointment->student->email); ?></p>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-column gap-2 mb-4">
+                                                <p class="mb-0"><i class="bi bi-calendar3 me-2 text-primary"></i>
+                                                    <strong>Date:</strong>
+                                                    <?php echo e($feedback->appointment->scheduled_at->format('M j, Y')); ?></p>
+                                                <p class="mb-0"><i class="bi bi-clock me-2 text-primary"></i>
+                                                    <strong>Time:</strong>
+                                                    <?php echo e($feedback->appointment->scheduled_at->format('g:i A')); ?></p>
+                                                <p class="mb-0"><i class="bi bi-hash me-2 text-success"></i> <strong>Session
+                                                        Number:</strong> <?php echo e($sessionNumber); ?></p>
+                                                <p class="mb-0"><i class="bi bi-journal-text me-2 text-success"></i>
+                                                    <strong>Notes:</strong>
+                                                    <?php echo e($feedback->appointment->sessionNotes->count()); ?> note(s)</p>
+                                            </div>
 
-                                            </p>
-                                            <p class="mb-0">
-                                                <i class="bi bi-clock me-2 text-primary"></i>
-                                                <strong>Time:</strong>
-                                                <?php echo e($feedback->appointment->scheduled_at->format('g:i A')); ?>
-
-                                            </p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p class="mb-2">
-                                                <i class="bi bi-hash me-2 text-success"></i>
-                                                <strong>Session Number:</strong> <?php echo e($sessionNumber); ?>
-
-                                            </p>
-                                            <p class="mb-0">
-                                                <i class="bi bi-journal-text me-2 text-success"></i>
-                                                <strong>Notes:</strong> <?php echo e($feedback->appointment->sessionNotes->count()); ?>
-
-                                                note(s)
-                                            </p>
+                                            <div class="meta-info border-top pt-3 d-flex flex-column gap-2">
+                                                <div class="meta-item"><i class="bi bi-calendar-event"></i> Submitted on
+                                                    <?php echo e($feedback->created_at->format('F j, Y')); ?></div>
+                                                <div class="meta-item"><i class="bi bi-clock-history"></i>
+                                                    <?php echo e($feedback->created_at->diffForHumans()); ?></div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="rating-box">
-                                    <div>
-                                        <h6 class="mb-2 fw-bold text-dark">Overall Rating</h6>
-                                        <div class="stars">
-                                            <?php for($i = 1; $i <= 5; $i++): ?>
-                                                <i class="bi bi-star<?php echo e($i <= $feedback->rating ? '-fill' : ''); ?> star"></i>
-                                            <?php endfor; ?>
+                                    <div class="col-lg-7">
+                                        <div class="rating-box mb-4">
+                                            <div>
+                                                <h6 class="mb-2 fw-bold text-dark">Overall Rating</h6>
+                                                <div class="stars">
+                                                    <?php for($i = 1; $i <= 5; $i++): ?>
+                                                        <i
+                                                            class="bi bi-star<?php echo e($i <= $feedback->rating ? '-fill' : ''); ?> star"></i>
+                                                    <?php endfor; ?>
+                                                </div>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge-rating"><?php echo e($feedback->rating); ?> / 5 Stars</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <span class="badge-rating"><?php echo e($feedback->rating); ?> / 5 Stars</span>
-                                    </div>
-                                </div>
+                                        <div class="feedback-content h-100 mb-0">
+                                            <h6>Student Comments</h6>
+                                            <div class="p-2" style="line-height: 1.6; color: #444;">
+                                                <?php echo nl2br(e($feedback->comments)); ?>
 
-                                <div class="feedback-content">
-                                    <h6>Student Comments</h6>
-                                    <div class="p-2" style="line-height: 1.6; color: #444;">
-                                        <?php echo nl2br(e($feedback->comments)); ?>
-
-                                    </div>
-                                </div>
-
-                                <div class="meta-info">
-                                    <div class="meta-item">
-                                        <i class="bi bi-calendar-event"></i>
-                                        Submitted on <?php echo e($feedback->created_at->format('F j, Y')); ?>
-
-                                    </div>
-                                    <div class="meta-item">
-                                        <i class="bi bi-clock-history"></i>
-                                        <?php echo e($feedback->created_at->diffForHumans()); ?>
-
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

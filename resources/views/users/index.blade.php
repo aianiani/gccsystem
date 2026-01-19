@@ -362,13 +362,13 @@
 
                     <!-- Sex (Gender) -->
                     <div class="col-md-2">
-                        <label for="gender" class="form-label text-success fw-semibold small text-uppercase mb-1">
+                        <label for="sex" class="form-label text-success fw-semibold small text-uppercase mb-1">
                             <i class="bi bi-gender-ambiguous me-1"></i>Sex
                         </label>
-                        <select class="form-select" id="gender" name="gender" onchange="this.form.submit()">
+                        <select class="form-select" id="sex" name="sex" onchange="this.form.submit()">
                             <option value="">All</option>
                             @foreach($genders as $gender)
-                                <option value="{{ $gender }}" {{ request('gender') == $gender ? 'selected' : '' }}>
+                                <option value="{{ $gender }}" {{ request('sex') == $gender ? 'selected' : '' }}>
                                     {{ ucfirst($gender) }}
                                 </option>
                             @endforeach
@@ -905,7 +905,7 @@
         // --- IMPORT MATCH FUNCTIONALITY ---
         window.verifyImport = function (btn) {
             console.log('verifyImport function called'); // Debug log
-            
+
             try {
                 const form = document.getElementById('importDeleteForm');
                 const errorDiv = document.getElementById('importError');
@@ -918,7 +918,7 @@
                     alert('Form not found. Please refresh the page and try again.');
                     return;
                 }
-                
+
                 if (!btn) {
                     console.error('Button reference lost');
                     return;
@@ -1019,12 +1019,12 @@
                             // Display Results in Modal
                             if (resultsDiv) {
                                 resultsDiv.innerHTML = `
-                                                                        <div class="alert alert-success">
-                                                                            <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
-                                                                            <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
-                                                                            <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
-                                                                        </div>
-                                                                    `;
+                                                                            <div class="alert alert-success">
+                                                                                <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
+                                                                                <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
+                                                                                <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
+                                                                            </div>
+                                                                        `;
                             }
 
 

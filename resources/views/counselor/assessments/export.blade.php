@@ -155,7 +155,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="label" style="padding-bottom: 4px;">Year / Gender:</td>
+                            <td class="label" style="padding-bottom: 4px;">Year / Sex:</td>
                             <td class="value" style="padding-bottom: 4px;">
                                 {{ $assessment->user->year_level ?? $assessment->user->year ?? 'N/A' }} /
                                 {{ $assessment->user->gender ?? 'N/A' }}</td>

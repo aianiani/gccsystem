@@ -131,20 +131,20 @@ class AdminReportsController extends Controller
                 ->selectRaw("
                     users.college,
                     count(*) as admin_total,
-                    sum(case when users.gender = 'male' then 1 else 0 end) as admin_male,
-                    sum(case when users.gender = 'female' then 1 else 0 end) as admin_female,
+                    sum(case when users.sex = 'male' then 1 else 0 end) as admin_male,
+                    sum(case when users.sex = 'female' then 1 else 0 end) as admin_female,
                     
                     sum(case when assessments.status != 'pending' then 1 else 0 end) as checking_total,
-                    sum(case when assessments.status != 'pending' and users.gender = 'male' then 1 else 0 end) as checking_male,
-                    sum(case when assessments.status != 'pending' and users.gender = 'female' then 1 else 0 end) as checking_female,
+                    sum(case when assessments.status != 'pending' and users.sex = 'male' then 1 else 0 end) as checking_male,
+                    sum(case when assessments.status != 'pending' and users.sex = 'female' then 1 else 0 end) as checking_female,
 
                     sum(case when assessments.notes is not null then 1 else 0 end) as interp_total,
-                    sum(case when assessments.notes is not null and users.gender = 'male' then 1 else 0 end) as interp_male,
-                    sum(case when assessments.notes is not null and users.gender = 'female' then 1 else 0 end) as interp_female,
+                    sum(case when assessments.notes is not null and users.sex = 'male' then 1 else 0 end) as interp_male,
+                    sum(case when assessments.notes is not null and users.sex = 'female' then 1 else 0 end) as interp_female,
 
                     sum(case when assessments.status = 'completed' then 1 else 0 end) as report_total,
-                    sum(case when assessments.status = 'completed' and users.gender = 'male' then 1 else 0 end) as report_male,
-                    sum(case when assessments.status = 'completed' and users.gender = 'female' then 1 else 0 end) as report_female
+                    sum(case when assessments.status = 'completed' and users.sex = 'male' then 1 else 0 end) as report_male,
+                    sum(case when assessments.status = 'completed' and users.sex = 'female' then 1 else 0 end) as report_female
                 ")
                 ->groupBy('users.college')
                 ->get()
@@ -274,8 +274,8 @@ class AdminReportsController extends Controller
                 // Matching full college name from user record
                 $collegeAttendances = $attendancesByCollege->get($collegeName, collect());
 
-                $males = $collegeAttendances->where('user.gender', 'male')->count();
-                $females = $collegeAttendances->where('user.gender', 'female')->count();
+                $males = $collegeAttendances->where('user.sex', 'male')->count();
+                $females = $collegeAttendances->where('user.sex', 'female')->count();
                 $totalAttended = $collegeAttendances->count();
 
                 // Calculate Total Enrolled (Target Population) for this SPECIFIC college
@@ -375,8 +375,8 @@ class AdminReportsController extends Controller
             foreach ($this->collegesList as $collegeName => $acronym) {
                 $collegeAppts = $apptsByCollege->get($collegeName, collect());
 
-                $males = $collegeAppts->where('student.gender', 'male')->count();
-                $females = $collegeAppts->where('student.gender', 'female')->count();
+                $males = $collegeAppts->where('student.sex', 'male')->count();
+                $females = $collegeAppts->where('student.sex', 'female')->count();
                 $total = $collegeAppts->count();
 
                 // Aggregate Year Levels (Unique list)

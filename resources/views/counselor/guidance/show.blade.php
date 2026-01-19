@@ -227,10 +227,39 @@
         }
 
         .table-custom td {
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.5rem;
             vertical-align: middle;
             border-bottom: 1px solid #f0f0f0;
             color: var(--text-dark);
+        }
+
+        .matrix-cell-active {
+            position: relative;
+            background-color: var(--cell-bg, transparent) !important;
+            transition: all 0.2s ease;
+        }
+
+        .matrix-cell-active:hover {
+            opacity: 0.9;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge-attended {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .status-badge-completed {
+            background-color: #d1e7dd;
+            color: #0f5132;
         }
 
         .btn-secondary-custom {
@@ -265,6 +294,85 @@
             background-color: var(--primary-green);
             border-color: var(--primary-green);
         }
+
+        /* Evaluation Accordion Styles */
+        .custom-accordion .accordion-item {
+            border: 1px solid #eef6ee !important;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .custom-accordion .accordion-button:not(.collapsed) {
+            background-color: var(--light-green);
+            color: var(--primary-green);
+            box-shadow: none;
+        }
+
+        .seminar-badge-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .eval-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--seminar-color, var(--primary-green));
+            display: inline-block;
+        }
+
+        .question-card {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--seminar-color, var(--primary-green));
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            margin-bottom: 1rem;
+        }
+
+        .criteria-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: #fff;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #f0f0f0;
+        }
+
+        .custom-accordion .accordion-button:focus {
+            box-shadow: none;
+            border-color: rgba(0,0,0,.125);
+        }
+
+        .border-start-md {
+            border-left: 1px solid #e0e0e0;
+        }
+
+        @media (max-width: 767.98px) {
+            .border-start-md {
+                border-left: none;
+                border-top: 1px solid #e0e0e0;
+                padding-top: 1.5rem;
+                margin-top: 1.5rem;
+            }
+        }
+
+        /* Fast transition to minimize flickering in zoomed layout without breaking Bootstrap transitions */
+        .custom-accordion .accordion-collapse {
+            transition: height 0.15s ease-out !important;
+        }
+        
+        .custom-accordion .accordion-collapse.collapse.show {
+            display: block !important;
+        }
     </style>
 
     <div class="home-zoom">
@@ -280,15 +388,17 @@
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
                 <div class="main-dashboard-inner">
-                    <div class="mb-6">
-                        <a href="{{ route('counselor.guidance.index') }}" class="btn-secondary-custom">
-                            <i class="bi bi-arrow-left"></i> Back to Student List
-                        </a>
-                    </div>
+
 
                     <!-- Student Profile Header (Seminar Highlight Version) -->
-                    <div class="page-header py-4 px-4">
-                        <div class="row g-4 align-items-center">
+                    <div class="page-header py-4 px-4 position-relative">
+                        <a href="{{ route('counselor.guidance.index') }}" 
+                           class="btn btn-light btn-sm position-absolute top-0 start-0 m-3 shadow-sm d-flex align-items-center gap-2 text-dark"
+                           style="z-index: 10; border-radius: 8px; font-weight: 500;">
+                            <i class="bi bi-arrow-left"></i> 
+                            <span class="d-none d-md-inline">Back to Student List</span>
+                        </a>
+                        <div class="row g-4 align-items-center mt-2">
                             
                             <!-- Left: Identity (Wider Column) -->
                             <div class="col-xl-5 col-lg-6 border-end-xl border-white/10">
@@ -365,12 +475,15 @@
                                                 ];
                                             @endphp
                                             @foreach($badges as $seminarName => $style)
-                                                @php $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]); @endphp
+                                                @php 
+                                                    $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]);
+                                                    $isCompleted = $isAttended && ($attendanceMatrix[$style['year']][$seminarName]['status'] ?? '') === 'completed';
+                                                @endphp
                                                 <div class="col-6 col-sm-3">
                                                     <div class="d-flex align-items-center justify-content-center gap-2 py-2 rounded-3 border transition-all text-center
-                                                        {{ $isAttended ? $style['color'] . ' shadow-sm' : 'bg-white/5 border-white/10 text-white-50' }}"
+                                                        {{ $isCompleted ? $style['color'] . ' shadow-sm' : 'bg-white/5 border-white/10 text-white-50' }}"
                                                         style="backdrop-filter: blur(4px);">
-                                                        @if($isAttended)
+                                                        @if($isCompleted)
                                                             <i class="bi {{ $style['icon'] }}"></i>
                                                             <span class="fw-bold small">{{ $seminarName }}</span>
                                                         @else
@@ -419,32 +532,50 @@
                                 <tbody>
                                     @for ($year = 1; $year <= 4; $year++)
                                         <tr class="transition-colors hover:bg-gray-50 {{ $student->year_level == $year ? 'bg-green-50/50' : '' }}">
-                                            <td class="font-bold text-gray-700 py-4">
+                                            <td class="font-bold text-gray-700 py-3">
                                                 @php
                                                     $suffixes = [1 => 'st', 2 => 'nd', 3 => 'rd', 4 => 'th'];
+                                                    $seminarMap = ['IDREAMS', '10C', 'LEADS', 'IMAGE'];
+                                                    $seminarStyles = [
+                                                        'IDREAMS' => 'rgba(13, 202, 240, 0.05)',
+                                                        '10C' => 'rgba(255, 203, 5, 0.05)',
+                                                        'LEADS' => 'rgba(13, 110, 253, 0.05)',
+                                                        'IMAGE' => 'rgba(25, 135, 84, 0.08)'
+                                                    ];
                                                 @endphp
                                                 <div class="d-flex align-items-center justify-content-between pe-4">
                                                     <span>{{ $year }}{{ $suffixes[$year] ?? 'th' }} Year</span>
                                                     @if($student->year_level == $year)
-                                                        <span class="badge bg-green-100 text-green-800 border border-green-200 shadow-sm rounded-pill px-3">Current</span>
+                                                        <span class="badge bg-green-100 text-green-800 border border-green-200 shadow-sm rounded-pill px-3" style="font-size: 0.65rem;">Current</span>
                                                     @endif
                                                 </div>
                                             </td>
-                                            @foreach(['IDREAMS', '10C', 'LEADS', 'IMAGE'] as $index => $seminar)
-                                                <td class="text-center py-4">
-                                                    <div class="flex justify-center h-100 align-items-center">
-                                                        @if($year == $index + 1)
+                                            @foreach($seminarMap as $index => $seminar)
+                                                @php 
+                                                    $isActiveYear = ($year == $index + 1);
+                                                    $attendance = $attendanceMatrix[$year][$seminar] ?? null;
+                                                    $status = $attendance['status'] ?? null;
+                                                @endphp
+                                                <td class="text-center py-3 {{ $isActiveYear ? 'matrix-cell-active' : '' }}" 
+                                                    style="{{ $isActiveYear ? '--cell-bg: ' . $seminarStyles[$seminar] : '' }}">
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1">
+                                                        @if($isActiveYear)
                                                             <div class="form-check d-flex justify-content-center m-0">
                                                                 <input type="checkbox" 
                                                                        class="attendance-checkbox checkbox-custom form-check-input shadow-sm"
-                                                                       style="width: 1.5rem; height: 1.5rem; border-color: #adb5bd;"
+                                                                       style="width: 1.25rem; height: 1.25rem; border-color: #adb5bd;"
                                                                        data-year="{{ $year }}"
                                                                        data-seminar="{{ $seminar }}"
-                                                                       {{ isset($attendanceMatrix[$year][$seminar]) ? 'checked' : '' }}>
+                                                                       {{ $attendance ? 'checked' : '' }}>
                                                             </div>
+                                                            @if($attendance)
+                                                                <span class="status-badge {{ $status === 'completed' ? 'status-badge-completed' : 'status-badge-attended' }}">
+                                                                    {{ $status === 'completed' ? 'Completed' : 'Attended' }}
+                                                                </span>
+                                                            @endif
                                                         @else
-                                                            <div class="opacity-25 text-gray-300">
-                                                                <i class="bi bi-dash-lg" style="font-size: 1.5rem;"></i>
+                                                            <div class="opacity-10 text-gray-300">
+                                                                <i class="bi bi-dash-lg" style="font-size: 1.25rem;"></i>
                                                             </div>
                                                         @endif
                                                     </div>
@@ -457,6 +588,166 @@
                         </div>
                         <div class="p-4 bg-gray-50 text-sm text-gray-500 border-t border-gray-100">
                             <i class="bi bi-info-circle mr-1"></i> Changes are saved automatically when you click a checkbox.
+                        </div>
+                    </div>
+
+                    <!-- Evaluation Details Section -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="content-card">
+                                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                                    <h3 class="text-lg font-bold text-gray-800 m-0">Seminar Evaluations</h3>
+                                    <span class="badge bg-light text-dark border">{{ $evaluations->count() }} Submissions</span>
+                                </div>
+                                <div class="p-4">
+                                    @if($evaluations->isEmpty())
+                                        <div class="text-center py-5 text-muted">
+                                            <i class="bi bi-clipboard-x display-4 d-block mb-3 opacity-25"></i>
+                                            <p>No evaluations submitted yet.</p>
+                                        </div>
+                                    @else
+                                        <div class="accordion accordion-flush custom-accordion" id="evaluationAccordion">
+                                            @php
+                                                $branding = [
+                                                    'IDREAMS' => ['color' => '#0dcaf0', 'icon' => 'bi-cloud-sun-fill', 'bg' => 'rgba(13, 202, 240, 0.1)'],
+                                                    '10C' => ['color' => '#FFCB05', 'icon' => 'bi-lightbulb-fill', 'bg' => 'rgba(255, 203, 5, 0.1)'],
+                                                    'LEADS' => ['color' => '#0d6efd', 'icon' => 'bi-people-fill', 'bg' => 'rgba(13, 110, 253, 0.1)'],
+                                                    'IMAGE' => ['color' => '#198754', 'icon' => 'bi-image-fill', 'bg' => 'rgba(25, 135, 84, 0.1)']
+                                                ];
+                                            @endphp
+
+                                            @foreach(['IDREAMS', '10C', 'LEADS', 'IMAGE'] as $seminarName)
+                                                @if(isset($evaluations[$seminarName]))
+                                                    @php 
+                                                        $eval = $evaluations[$seminarName];
+                                                        $brand = $branding[$seminarName] ?? ['color' => '#1f7a2d', 'icon' => 'bi-clipboard-check', 'bg' => '#f8f9fa'];
+                                                    @endphp
+                                                    <div class="accordion-item border rounded-3 mb-3 overflow-hidden" 
+                                                         style="--seminar-color: {{ $brand['color'] }}; --seminar-bg: {{ $brand['bg'] }}">
+                                                        <h2 class="accordion-header" id="heading_{{ $seminarName }}">
+                                                            <button class="accordion-button collapsed px-4 py-3" type="button" 
+                                                                    data-bs-toggle="collapse" data-bs-target="#eval_{{ $seminarName }}"
+                                                                    aria-expanded="false" aria-controls="eval_{{ $seminarName }}">
+                                                                <div class="d-flex align-items-center gap-3 w-100">
+                                                                    <div class="seminar-badge-icon" style="background-color: var(--seminar-color); color: white;">
+                                                                        <i class="bi {{ $brand['icon'] }}"></i>
+                                                                    </div>
+                                                                    <div class="flex-grow-1">
+                                                                        <div class="fw-bold text-dark">{{ $seminarName }} Evaluation</div>
+                                                                        <div class="small text-muted">Submitted {{ $eval->created_at->format('M d, Y') }}</div>
+                                                                    </div>
+                                                                    <div class="me-3">
+                                                                        @for($i = 1; $i <= 5; $i++)
+                                                                            <i class="bi bi-star-fill {{ $i <= $eval->rating ? 'text-warning' : 'text-light' }}"></i>
+                                                                        @endfor
+                                                                    </div>
+                                                                </div>
+                                                            </button>
+                                                        </h2>
+                                                        <div id="eval_{{ $seminarName }}" class="accordion-collapse collapse" aria-labelledby="heading_{{ $seminarName }}">
+                                                            <div class="accordion-body bg-light p-4">
+                                                                @php
+                                                                    $questions = [];
+                                                                    $criteria = [
+                                                                        'c1' => 'Useful information',
+                                                                        'c2' => 'Helped learn techniques',
+                                                                        'c3' => 'Strengthened confidence',
+                                                                        'c4' => 'Speaker mastery',
+                                                                        'c5' => 'Program logistics'
+                                                                    ];
+
+                                                                    if($seminarName === 'IMAGE') {
+                                                                        $questions = [
+                                                                            'q1' => '1. Compelling visual as a future employee...',
+                                                                            'q2' => '2. Definition of success',
+                                                                            'q3' => '3. What makes a Filipino leader?',
+                                                                            'q4' => '4. 4 Key traits of GRIT',
+                                                                            'q5' => '5. How to build GRIT as fresh graduate?',
+                                                                            'q6' => '6. Resilient board taker'
+                                                                        ];
+                                                                    } elseif($seminarName === 'IDREAMS') {
+                                                                        $questions = [
+                                                                            'q1' => '1. Emotion is a habit of ____?',
+                                                                            'q2' => '2. Relate is a habit of ____?',
+                                                                            'q3' => '3. Direction is a habit of____?',
+                                                                            'q4' => '4. Initiative is a habit of_____?'
+                                                                        ];
+                                                                    } elseif($seminarName === '10C') {
+                                                                        $questions = [
+                                                                            'q1' => '1. Challenging negative thought',
+                                                                            'q2' => '2. Making the right choice',
+                                                                            'q3' => '3. Solving problem',
+                                                                            'q4' => '4. Learning mindfulness',
+                                                                            'q5' => '5. Recognizing goodness and strengths'
+                                                                        ];
+                                                                    } elseif($seminarName === 'LEADS') {
+                                                                        $questions = [
+                                                                            'q1' => '1. Psychological traits',
+                                                                            'q2' => '2. Reaction to circumstances',
+                                                                            'q3' => "3. Disposition or thought process",
+                                                                            'q4' => "4. Not contributing in personality",
+                                                                            'q5' => '5. Not belonging on ways to make people like you',
+                                                                            'q6' => '6. Why do people get angry?',
+                                                                            'q7' => '7. Reaction to perceived demands/threats',
+                                                                            'q8' => '8. Positive and beneficial stress',
+                                                                            'q9' => "9. Replenishing resources (Self-Care)",
+                                                                            'q10' => '10. Time management: schedule priorities'
+                                                                        ];
+                                                                    }
+                                                                @endphp
+
+                                                                @if(!empty($questions))
+                                                                    <div class="row g-4">
+                                                                        <div class="col-md-7">
+                                                                            <h5 class="eval-section-title" style="color: var(--seminar-color)">Seminar Questions</h5>
+                                                                            @foreach($questions as $key => $label)
+                                                                                <div class="question-card shadow-sm">
+                                                                                    <div class="small fw-bold text-muted mb-1">{{ $label }}</div>
+                                                                                    <div class="text-dark">{{ $eval->answers[$key] ?? 'N/A' }}</div>
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                        <div class="col-md-5">
+                                                                            <h5 class="eval-section-title" style="color: var(--seminar-color)">Satisfaction Criteria</h5>
+                                                                            @foreach($criteria as $key => $label)
+                                                                                <div class="criteria-row shadow-sm">
+                                                                                    <span class="small fw-500">{{ $label }}</span>
+                                                                                    <span class="badge" style="background-color: var(--seminar-color); color: white;">
+                                                                                        {{ $eval->answers[$key] ?? 'N/A' }} / 5
+                                                                                    </span>
+                                                                                </div>
+                                                                            @endforeach
+
+                                                                            <div class="mt-4">
+                                                                                <h5 class="eval-section-title" style="color: var(--seminar-color)">Comments</h5>
+                                                                                <div class="bg-white p-3 rounded-3 shadow-sm italic text-dark border">
+                                                                                    "{{ $eval->comments ?: 'No comments provided.' }}"
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                @else
+                                                                    <div class="bg-white p-4 rounded-3 shadow-sm border">
+                                                                        <h6 class="fw-bold mb-3" style="color: var(--seminar-color)">General Evaluation</h6>
+                                                                        <div class="mb-3">
+                                                                            <span class="text-muted small d-block">Overall Rating</span>
+                                                                            <span class="fw-bold h5 mb-0">{{ $eval->rating }} / 5</span>
+                                                                        </div>
+                                                                        <div>
+                                                                            <span class="text-muted small d-block">Comments</span>
+                                                                            <p class="mb-0 italic">"{{ $eval->comments ?: 'No comments provided.' }}"</p>
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

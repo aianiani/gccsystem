@@ -294,8 +294,8 @@
                                         <span class="context-value">{{ $user->year_level ?? 'N/A' }}</span>
                                     </div>
                                     <div class="context-row">
-                                        <span class="context-label">Gender</span>
-                                        <span class="context-value">{{ ucfirst($user->gender ?? 'N/A') }}</span>
+                                        <span class="context-label">Sex</span>
+                                        <span class="context-value">{{ ucfirst($user->sex ?? 'N/A') }}</span>
                                     </div>
                                     <div class="context-row">
                                         <span class="context-label">Registered</span>

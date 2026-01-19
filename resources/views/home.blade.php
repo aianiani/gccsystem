@@ -4480,11 +4480,12 @@
                                             <div class="mb-3">
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
-                                                    <select class="form-select" name="gender" id="genderSelect" required>
+                                                    <select class="form-select" name="sex" id="sexSelect" required>
                                                         <option value="" selected disabled>Select Sex *</option>
-                                                        <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>
+                                                        <option value="male" {{ old('sex') == 'male' ? 'selected' : '' }}>
                                                             Male</option>
-                                                        <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
+                                                        <option value="female" {{ old('sex') == 'female' ? 'selected' : '' }}>
+                                                            Female</option>
                                                     </select>
                                                 </div>
                                                 <div class="invalid-feedback"></div>
@@ -4926,7 +4927,7 @@
                         'BS in Information Technology',
                         'BS in Mechanical Engineering'
                     ],
-                    'College of Forestry': [
+                    'College of Forestry and Environmental Sciences': [
                         'BS in Environmental Science',
                         'BS in Forestry'
                     ],
@@ -6635,7 +6636,7 @@
                     'BS in Information Technology',
                     'BS in Mechanical Engineering'
                 ],
-                'College of Forestry': [
+                'College of Forestry and Environmental Sciences': [
                     'BS in Environmental Science',
                     'BS in Forestry'
                 ],

@@ -249,7 +249,7 @@
                             </div>
                             @if($user->gender)
                                 <div class="info-row">
-                                    <span class="info-label">Gender:</span>
+                                    <span class="info-label">Sex:</span>
                                     <span class="info-value">{{ ucfirst($user->gender) }}</span>
                                 </div>
                             @endif

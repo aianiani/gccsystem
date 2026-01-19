@@ -383,7 +383,7 @@
                             <div class="dashboard-stat-card ps-3 pe-3">
                                 <div class="stat-content">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <div class="stat-label mb-0">Gender Ratio</div>
+                                        <div class="stat-label mb-0">Sex Ratio</div>
                                         <div class="stat-icon warning" style="width: 32px; height: 32px; font-size: 1rem;">
                                             <i class="bi bi-gender-ambiguous"></i>
                                         </div>
@@ -466,17 +466,17 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label for="gender" class="form-label"
-                                    style="font-weight: 600; color: var(--text-dark);">Gender</label>
-                                <select class="form-select" id="gender" name="gender">
-                                    <option value="">All Genders</option>
-                                    <option value="male" <?php echo e(request('gender') == 'male' ? 'selected' : ''); ?>>Male</option>
-                                    <option value="female" <?php echo e(request('gender') == 'female' ? 'selected' : ''); ?>>Female
+                                <label for="sex" class="form-label"
+                                    style="font-weight: 600; color: var(--text-dark);">Sex</label>
+                                <select class="form-select" id="sex" name="sex">
+                                    <option value="">All Sexes</option>
+                                    <option value="male" <?php echo e(request('sex') == 'male' ? 'selected' : ''); ?>>Male</option>
+                                    <option value="female" <?php echo e(request('sex') == 'female' ? 'selected' : ''); ?>>Female
                                     </option>
-                                    <option value="non-binary" <?php echo e(request('gender') == 'non-binary' ? 'selected' : ''); ?>>
+                                    <option value="non-binary" <?php echo e(request('sex') == 'non-binary' ? 'selected' : ''); ?>>
                                         Non-binary</option>
-                                    <option value="prefer_not_to_say" <?php echo e(request('gender') == 'prefer_not_to_say' ? 'selected' : ''); ?>>Prefer not to say</option>
-                                    <option value="other" <?php echo e(request('gender') == 'other' ? 'selected' : ''); ?>>Other</option>
+                                    <option value="prefer_not_to_say" <?php echo e(request('sex') == 'prefer_not_to_say' ? 'selected' : ''); ?>>Prefer not to say</option>
+                                    <option value="other" <?php echo e(request('sex') == 'other' ? 'selected' : ''); ?>>Other</option>
                                 </select>
                             </div>
                             <div class="col-md-2 d-flex align-items-end gap-2">

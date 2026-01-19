@@ -718,57 +718,8 @@
                 <i class="bi bi-list"></i>
             </button>
             <!-- Sidebar -->
-            <div class="custom-sidebar">
-                <div class="sidebar-logo">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
-                        style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                    <h3
-                        style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">
-                        CMU Guidance and Counseling Center</h3>
-                    <p
-                        style="margin: 0; font-size: 0.8rem; color: #fff; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">
-                        Student Portal</p>
-                </div>
-                <nav class="sidebar-nav">
-                    <a href="{{ route('dashboard') }}"
-                        class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
-                            class="bi bi-house-door"></i>Dashboard</a>
-                    <a href="{{ route('profile') }}"
-                        class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
-                            class="bi bi-person"></i>Profile</a>
-                    <a href="{{ route('appointments.index') }}"
-                        class="sidebar-link{{ request()->routeIs('appointments.*') && !request()->routeIs('appointments.completedWithNotes') ? ' active' : '' }}"><i
-                            class="bi bi-calendar-check"></i>Appointments</a>
-                    <a href="{{ route('appointments.completedWithNotes') }}"
-                        class="sidebar-link{{ request()->routeIs('appointments.completedWithNotes') ? ' active' : '' }}"><i
-                            class="bi bi-journal-text"></i>Sessions & Feedback</a>
-                    <a href="{{ route('assessments.index') }}"
-                        class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i
-                            class="bi bi-clipboard-data"></i>Assessments</a>
-                    <a href="{{ route('chat.selectCounselor') }}"
-                        class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i
-                            class="bi bi-chat-dots"></i>Chat with a Counselor</a>
-
-                    <div class="sidebar-divider my-3" style="border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
-                    <div class="sidebar-resources">
-                        <div class="text-uppercase small px-3 mb-2"
-                            style="color: rgba(255,255,255,0.5); font-weight:700; font-size: 0.75rem; letter-spacing: 1px;">
-                            Resources</div>
-                        <a href="#" class="sidebar-link"><i class="bi bi-play-circle"></i>Orientation</a>
-                        <a href="#" class="sidebar-link"><i class="bi bi-book"></i>Library</a>
-                        <a href="#" class="sidebar-link"><i class="bi bi-gear"></i>Settings</a>
-                    </div>
-                </nav>
-                <div class="sidebar-bottom w-100">
-                    <a href="{{ route('logout') }}" class="sidebar-link logout"
-                        onclick="event.preventDefault(); document.getElementById('logout-form-dashboard').submit();">
-                        <i class="bi bi-box-arrow-right"></i>Logout
-                    </a>
-                    <form id="logout-form-dashboard" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </div>
-            </div>
+            <!-- Sidebar -->
+            @include('student.sidebar')
 
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
@@ -807,14 +758,15 @@
 
                                     @foreach($badges as $seminarName => $style)
                                         @php
-                                            $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]);
+                                            $attendance = $attendanceMatrix[$style['year']][$seminarName] ?? null;
+                                            $isCompleted = $attendance && ($attendance['status'] ?? '') === 'completed';
                                         @endphp
                                         <div class="d-flex align-items-center justify-content-center gap-2 px-3 py-2 rounded-3 border transition-all text-center
-                                                                                                                            {{ $isAttended ? $style['color'] . ' shadow-sm' : 'border-white-10 text-white-50' }}"
-                                            style="background: {{ $isAttended ? '' : 'rgba(255, 255, 255, 0.05)' }}; 
-                                                                                                                                   border-color: {{ $isAttended ? '' : 'rgba(255, 255, 255, 0.1)' }};
-                                                                                                                                   backdrop-filter: blur(4px); min-width: 100px;">
-                                            @if($isAttended)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    {{ $isCompleted ? $style['color'] . ' shadow-sm' : 'border-white-10 text-white-50' }}"
+                                            style="background: {{ $isCompleted ? '' : 'rgba(255, 255, 255, 0.05)' }}; 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           border-color: {{ $isCompleted ? '' : 'rgba(255, 255, 255, 0.1)' }};
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           backdrop-filter: blur(4px); min-width: 100px;">
+                                            @if($isCompleted)
                                                 <i class="bi {{ $style['icon'] }}"></i>
                                                 <span class="fw-bold small">{{ $seminarName }}</span>
                                             @else
@@ -845,6 +797,336 @@
                             align-items: stretch;
                         }
                     </style>
+
+                    {{-- Notification Bell (Same as Counselor) --}}
+                    <style>
+                        .notification-bell {
+                            background: white !important;
+                            border: none !important;
+                            outline: none !important;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                            position: relative;
+                            transition: all 0.3s ease !important;
+                            width: 75px !important;
+                            height: 75px !important;
+                            border-radius: 50% !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            padding: 0 !important;
+                            min-width: 75px !important;
+                        }
+
+                        .notification-bell:hover {
+                            background: var(--yellow-maize);
+                            box-shadow: 0 6px 20px rgba(255, 203, 5, 0.4);
+                            transform: translateY(-2px);
+                        }
+
+                        .notification-bell .bi-bell {
+                            color: var(--forest-green);
+                            font-size: 2.5rem;
+                            transition: all 0.3s ease;
+                        }
+
+                        .notification-bell:hover .bi-bell {
+                            color: var(--forest-green);
+                            transform: scale(1.1);
+                        }
+
+                        .notification-bell.pulse {
+                            animation: bell-shake 0.5s ease-in-out infinite;
+                        }
+
+                        @keyframes bell-shake {
+
+                            0%,
+                            100% {
+                                transform: rotate(0deg);
+                            }
+
+                            25% {
+                                transform: rotate(-10deg);
+                            }
+
+                            75% {
+                                transform: rotate(10deg);
+                            }
+                        }
+
+                        .notification-bell-badge {
+                            background: var(--danger);
+                            color: white;
+                            font-weight: bold;
+                            font-size: 0.75rem;
+                            border: 2px solid #fff;
+                            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+                            padding: 0.2em 0.5em;
+                            border-radius: 999px;
+                            top: -4px;
+                            right: -4px;
+                        }
+
+                        .notification-dropdown-menu {
+                            min-width: 600px;
+                            max-width: 95vw;
+                            max-height: 500px;
+                            overflow-y: auto;
+                            border-radius: 12px;
+                            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+                            border: none;
+                            padding: 0;
+                            margin-top: 0.75rem;
+                            background: white;
+                            overflow: hidden;
+                            z-index: 9999 !important;
+                            position: absolute !important;
+                            right: 0;
+                            top: 70px;
+                            list-style: none;
+                        }
+
+                        .notification-dropdown-header {
+                            background: linear-gradient(135deg, var(--forest-green), var(--forest-green-light));
+                            color: white;
+                            font-weight: 700;
+                            padding: 1.25rem 1.5rem;
+                            font-size: 1.1rem;
+                            border-bottom: none;
+                            font-family: inherit;
+                        }
+
+                        .notification-item {
+                            display: flex;
+                            align-items: flex-start;
+                            gap: 1rem;
+                            padding: 1.25rem 1.5rem;
+                            font-size: 0.95rem;
+                            background: white;
+                            transition: background 0.2s;
+                            border-bottom: 1px solid #f0f0f0;
+                            font-family: inherit;
+                            position: relative;
+                        }
+
+                        .notification-item:last-child {
+                            border-bottom: none;
+                        }
+
+                        .notification-item:hover {
+                            background: #f8f9fa;
+                        }
+
+                        .notification-item .notification-icon {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            flex-shrink: 0;
+                        }
+
+                        .notification-item .notification-icon i {
+                            color: #1976d2;
+                            font-size: 1.1rem;
+                        }
+
+                        .notification-item .notification-content {
+                            flex: 1;
+                            line-height: 1.5;
+                            color: #333;
+                        }
+
+                        .notification-item .notification-content strong {
+                            color: var(--forest-green);
+                            font-weight: 600;
+                        }
+
+                        .notification-item .notification-actions {
+                            display: flex !important;
+                            flex-direction: column !important;
+                            gap: 0.5rem !important;
+                            align-items: center !important;
+                        }
+
+                        .notification-item .btn-view {
+                            background: var(--forest-green);
+                            color: white;
+                            border: none;
+                            border-radius: 50%;
+                            width: 36px;
+                            height: 36px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1rem;
+                            transition: all 0.2s;
+                            padding: 0;
+                        }
+
+                        .notification-item .btn-view:hover {
+                            background: var(--forest-green-light);
+                            transform: scale(1.1);
+                        }
+
+                        .notification-item .btn-link {
+                            color: #dc3545;
+                            font-size: 1rem;
+                            width: 36px;
+                            height: 36px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 0;
+                            transition: all 0.2s;
+                            background: none;
+                            border: none;
+                            border-radius: 50%;
+                        }
+
+                        .notification-item .btn-link:hover {
+                            color: #c82333;
+                            background: rgba(220, 53, 69, 0.1);
+                            transform: scale(1.1);
+                        }
+
+                        .notification-empty {
+                            padding: 2.5rem 1.5rem;
+                            color: #999;
+                            text-align: center;
+                            font-size: 0.95rem;
+                            font-family: inherit;
+                        }
+
+                        .notification-empty i {
+                            font-size: 2.5rem;
+                            color: #ddd;
+                            margin-bottom: 0.75rem;
+                            display: block;
+                        }
+
+                        @media (max-width: 500px) {
+                            .notification-dropdown-menu {
+                                min-width: 90vw;
+                                padding: 0.25rem 0;
+                            }
+
+                            .notification-dropdown-header {
+                                font-size: 1rem;
+                                padding: 0.7rem 1rem;
+                            }
+
+                            .notification-item,
+                            .notification-empty {
+                                padding: 0.7rem 1rem;
+                            }
+                        }
+                    </style>
+                    @php
+                        $unreadCount = auth()->user()->unreadNotifications()->count();
+                        // Show ALL notifications (both read and unread) - most recent 10
+                        $recentNotifications = auth()->user()->notifications()->latest()->take(10)->get();
+                    @endphp
+                    {{-- DEBUG: Notification count: {{ $recentNotifications->count() }}, Unread: {{ $unreadCount }} --}}
+                    <div class="dropdown me-3" style="position: fixed; top: 1.5rem; right: 2.5rem; z-index: 9999;">
+                        <button class="btn notification-bell position-relative p-0{{ $unreadCount > 0 ? ' pulse' : '' }}"
+                            type="button" id="notificationDropdown" onclick="toggleNotificationDropdown()">
+                            <i class="bi bi-bell"></i>
+                            @if($unreadCount > 0)
+                                <span class="position-absolute top-0 start-100 translate-middle badge notification-bell-badge">
+                                    {{ $unreadCount }}
+                                </span>
+                            @endif
+                        </button>
+                        <ul class="notification-dropdown-menu" id="notificationMenu" style="display: none;">
+                            <li class="notification-dropdown-header">Notifications</li>
+                            @forelse($recentNotifications as $notification)
+                                <li class="notification-item{{ is_null($notification->read_at) ? ' bg-light' : '' }}">
+                                    <div class="notification-icon">
+                                        @if(isset($notification->data['appointment_id']))
+                                            <i class="bi bi-calendar-check"></i>
+                                        @else
+                                            <i class="bi bi-info-circle"></i>
+                                        @endif
+                                    </div>
+                                    <div class="notification-content">
+                                        {{ $notification->data['message'] ?? 'You have a new notification.' }}
+                                        @if(is_null($notification->read_at))
+                                            <span class="badge bg-primary ms-2" style="font-size: 0.7rem;">New</span>
+                                        @endif
+                                        <div class="text-muted small mt-1">
+                                            {{ $notification->created_at->diffForHumans() }}
+                                        </div>
+                                    </div>
+                                    <div class="notification-actions">
+                                        @if(isset($notification->data['appointment_id']))
+                                            <a href="{{ route('appointments.index') }}" class="btn-view" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        @elseif(isset($notification->data['type']) && $notification->data['type'] === 'seminar_unlocked')
+                                            <a href="{{ route('student.seminars.index') }}" class="btn-view"
+                                                title="View Guidance Program">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        @endif
+                                        <form method="POST" action="{{ route('notifications.markAsRead', $notification->id) }}"
+                                            class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-link" title="Dismiss">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </li>
+                            @empty
+                                <li class="notification-empty">
+                                    <i class="bi bi-bell-slash"></i>
+                                    <div>No new notifications</div>
+                                </li>
+                            @endforelse
+                        </ul>
+                    </div>
+
+                    <script>
+                        // Custom dropdown toggle function (Bootstrap dropdown wasn't working)
+                        function toggleNotificationDropdown() {
+                            const menu = document.getElementById('notificationMenu');
+                            if (menu) {
+                                if (menu.style.display === 'none' || menu.style.display === '') {
+                                    menu.style.display = 'block';
+                                    console.log('Dropdown opened');
+                                } else {
+                                    menu.style.display = 'none';
+                                    console.log('Dropdown closed');
+                                }
+                            } else {
+                                console.error('Notification menu not found!');
+                            }
+                        }
+
+                        // Close dropdown when clicking outside
+                        document.addEventListener('click', function (event) {
+                            const bell = document.getElementById('notificationDropdown');
+                            const menu = document.getElementById('notificationMenu');
+
+                            if (bell && menu && !bell.contains(event.target) && !menu.contains(event.target)) {
+                                menu.style.display = 'none';
+                            }
+                        });
+
+                        // Shake notification bell only once on page load if there are unread notifications
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const notificationBell = document.getElementById('notificationDropdown');
+                            if (notificationBell && notificationBell.classList.contains('pulse')) {
+                                // Shake for 2 seconds then remove the pulse class
+                                setTimeout(function () {
+                                    notificationBell.classList.remove('pulse');
+                                }, 2000);
+                            }
+                        });
+                    </script>
 
                     <div class="dashboard-layout">
                         <div class="dashboard-stats">
@@ -942,7 +1224,8 @@
                                         <div class="flex-grow-1">
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <h6 class="mb-0 fw-bold text-dark">
-                                                    {{ $appointment->counselor->name ?? 'Counselor' }}</h6>
+                                                    {{ $appointment->counselor->name ?? 'Counselor' }}
+                                                </h6>
                                                 <span
                                                     class="badge bg-primary rounded-pill px-3">{{ $appointment->status === 'accepted' ? 'Approved' : ucfirst($appointment->status) }}</span>
                                             </div>

@@ -116,6 +116,11 @@ Route::middleware('auth')->group(function () {
         Route::post('assessments/neo', [App\Http\Controllers\AssessmentController::class, 'submitNeo'])->name('assessments.neo.submit');
         Route::post('assessments/wvi', [App\Http\Controllers\AssessmentController::class, 'submitWvi'])->name('assessments.wvi.submit');
 
+        // Seminar Evaluation Routes
+        Route::get('seminars', [App\Http\Controllers\Student\SeminarController::class, 'index'])->name('student.seminars.index');
+        Route::get('seminars/{seminar}/evaluate', [App\Http\Controllers\Student\SeminarController::class, 'create'])->name('student.seminars.evaluate');
+        Route::post('seminars/{seminar}/evaluate', [App\Http\Controllers\Student\SeminarController::class, 'store'])->name('student.seminars.store');
+
         // Consent routes
         Route::get('consent', [App\Http\Controllers\ConsentController::class, 'show'])->name('consent.show');
         Route::post('consent', [App\Http\Controllers\ConsentController::class, 'store'])->name('consent.store');
@@ -144,14 +149,14 @@ Route::middleware('auth')->group(function () {
         Route::patch('counselor/session-notes/{id}', [App\Http\Controllers\SessionNoteController::class, 'update'])->name('counselor.session_notes.update');
         Route::post('counselor/session-notes/{id}/remind', [App\Http\Controllers\SessionNoteController::class, 'remind'])->name('counselor.session_notes.remind');
         Route::post('counselor/session-notes/{id}/create-next-appointment', [App\Http\Controllers\SessionNoteController::class, 'createNextAppointment'])->name('counselor.session_notes.create_next_appointment');
-        // Mark notification as read
-        Route::post('notifications/{id}/mark-as-read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
         // Assessment results for counselors
         Route::get('counselor/assessments', [App\Http\Controllers\AssessmentController::class, 'counselorIndex'])->name('counselor.assessments.index');
         Route::get('/counselor/assessments/{assessment}', [App\Http\Controllers\AssessmentController::class, 'show'])->name('counselor.assessments.show');
     });
 
+    // Notification routes - accessible to all authenticated users
     Route::get('notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/mark-as-read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 });
 
 // Password Reset Routes

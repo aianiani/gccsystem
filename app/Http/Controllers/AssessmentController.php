@@ -169,10 +169,10 @@ class AssessmentController extends Controller
             });
         }
 
-        // Filter by Gender
-        if ($request->filled('gender')) {
+        // Filter by Sex
+        if ($request->filled('sex')) {
             $query->whereHas('user', function ($q) use ($request) {
-                $q->where('gender', $request->input('gender'));
+                $q->where('sex', $request->input('sex'));
             });
         }
 

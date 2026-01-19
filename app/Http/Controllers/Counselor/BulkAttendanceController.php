@@ -50,19 +50,33 @@ class BulkAttendanceController extends Controller
         $seminar = Seminar::where('name', $request->seminar_name)->firstOrFail();
 
         foreach ($request->student_ids as $studentId) {
-            SeminarAttendance::updateOrCreate([
+            $attendance = SeminarAttendance::where([
                 'user_id' => $studentId,
-                'seminar_name' => $request->seminar_name, // Use request input for consistent casing
+                'seminar_name' => $request->seminar_name,
                 'year_level' => $request->year_level,
-            ], [
-                'attended_at' => now(),
-            ]);
+            ])->first();
+
+            if (!$attendance || $attendance->status !== 'completed') {
+                $attendance = SeminarAttendance::updateOrCreate([
+                    'user_id' => $studentId,
+                    'seminar_name' => $request->seminar_name,
+                    'year_level' => $request->year_level,
+                ], [
+                    'attended_at' => now(),
+                    'status' => 'unlocked',
+                ]);
+
+                $student = User::find($studentId);
+                if ($student) {
+                    $student->notify(new \App\Notifications\SeminarUnlocked($request->seminar_name));
+                }
+            }
         }
 
-        return redirect()->route('counselor.guidance.bulk.create', [
+        return redirect()->route('counselor.guidance.index', [
             'year_level' => $request->year_level,
             'seminar_name' => $request->seminar_name,
-            'college' => $request->input('college', ''), // Preserve college filter if present
+            'college' => $request->input('college', ''),
         ])->with('success', 'Bulk attendance marked successfully for ' . count($request->student_ids) . ' students.');
     }
 
@@ -113,14 +127,25 @@ class BulkAttendanceController extends Controller
             $student = User::role('student')->where('student_id', $studentIdNumber)->first();
 
             if ($student) {
-                SeminarAttendance::updateOrCreate([
+                $attendance = SeminarAttendance::where([
                     'user_id' => $student->id,
-                    'seminar_name' => $request->seminar_name, // Use request input for consistent casing
+                    'seminar_name' => $request->seminar_name,
                     'year_level' => $request->year_level,
-                ], [
-                    'attended_at' => now(),
-                ]);
-                $count++;
+                ])->first();
+
+                if (!$attendance || $attendance->status !== 'completed') {
+                    SeminarAttendance::updateOrCreate([
+                        'user_id' => $student->id,
+                        'seminar_name' => $request->seminar_name,
+                        'year_level' => $request->year_level,
+                    ], [
+                        'attended_at' => now(),
+                        'status' => 'unlocked',
+                    ]);
+
+                    $student->notify(new \App\Notifications\SeminarUnlocked($request->seminar_name));
+                    $count++;
+                }
             } else {
                 $errors[] = $studentIdNumber;
             }

@@ -466,7 +466,8 @@
                             <div class="info-row">
                                 <div class="info-label">Status:</div>
                                 <div class="info-value">
-                                    <span class="badge bg-warning text-dark">{{ ucfirst($appointment->status) }}</span>
+                                    <span
+                                        class="badge bg-warning text-dark">{{ $appointment->status === 'accepted' ? 'Approved' : ucfirst($appointment->status) }}</span>
                                 </div>
                             </div>
                             @if($appointment->notes)
