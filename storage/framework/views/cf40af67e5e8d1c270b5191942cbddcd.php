@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Appointment Confirmation - <?php echo e($appointment->reference_number); ?></title>
@@ -11,15 +12,18 @@
             margin: 0;
             padding: 20px;
         }
+
         .header {
             border-bottom: 3px solid #237728;
             margin-bottom: 20px;
             padding-bottom: 15px;
         }
+
         .header .logo {
             text-align: center;
             margin-bottom: 10px;
         }
+
         .header h1 {
             color: #237728;
             font-size: 24px;
@@ -27,6 +31,7 @@
             text-align: center;
             margin: 10px 0;
         }
+
         .reference-number {
             background: #eaf5ea;
             padding: 10px;
@@ -36,10 +41,12 @@
             font-size: 14px;
             font-weight: bold;
         }
+
         .section {
             margin-bottom: 20px;
             page-break-inside: avoid;
         }
+
         .section-title {
             color: #237728;
             font-size: 16px;
@@ -48,20 +55,24 @@
             padding-bottom: 5px;
             border-bottom: 2px solid #e0e0e0;
         }
+
         .info-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
         }
+
         .info-table td {
             padding: 8px;
             border-bottom: 1px solid #f0f0f0;
         }
+
         .info-table td:first-child {
             font-weight: bold;
             color: #6c757d;
             width: 200px;
         }
+
         .footer {
             margin-top: 30px;
             padding-top: 15px;
@@ -70,6 +81,7 @@
             font-size: 10px;
             color: #888;
         }
+
         .badge {
             display: inline-block;
             padding: 4px 8px;
@@ -77,12 +89,14 @@
             font-size: 11px;
             font-weight: bold;
         }
+
         .badge-warning {
             background: #ffc107;
             color: #222;
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="logo">
@@ -115,10 +129,10 @@
                 <td><span class="badge badge-warning"><?php echo e(ucfirst($appointment->status)); ?></span></td>
             </tr>
             <?php if($appointment->notes): ?>
-            <tr>
-                <td>Notes:</td>
-                <td><?php echo e($appointment->notes); ?></td>
-            </tr>
+                <tr>
+                    <td>Notes:</td>
+                    <td><?php echo e($appointment->notes); ?></td>
+                </tr>
             <?php endif; ?>
         </table>
     </div>
@@ -131,10 +145,10 @@
                 <td><?php echo e($appointment->nature_of_problem); ?></td>
             </tr>
             <?php if($appointment->nature_of_problem === 'Other' && $appointment->nature_of_problem_other): ?>
-            <tr>
-                <td>Details:</td>
-                <td><?php echo e($appointment->nature_of_problem_other); ?></td>
-            </tr>
+                <tr>
+                    <td>Details:</td>
+                    <td><?php echo e($appointment->nature_of_problem_other); ?></td>
+                </tr>
             <?php endif; ?>
         </table>
     </div>
@@ -155,18 +169,18 @@
                 <td><?php echo e($appointment->guardian1_contact); ?></td>
             </tr>
             <?php if($appointment->guardian2_name): ?>
-            <tr>
-                <td>Guardian 2 Name:</td>
-                <td><?php echo e($appointment->guardian2_name); ?></td>
-            </tr>
-            <tr>
-                <td>Guardian 2 Relationship:</td>
-                <td><?php echo e($appointment->guardian2_relationship); ?></td>
-            </tr>
-            <tr>
-                <td>Guardian 2 Contact:</td>
-                <td><?php echo e($appointment->guardian2_contact); ?></td>
-            </tr>
+                <tr>
+                    <td>Guardian 2 Name:</td>
+                    <td><?php echo e($appointment->guardian2_name); ?></td>
+                </tr>
+                <tr>
+                    <td>Guardian 2 Relationship:</td>
+                    <td><?php echo e($appointment->guardian2_relationship); ?></td>
+                </tr>
+                <tr>
+                    <td>Guardian 2 Contact:</td>
+                    <td><?php echo e($appointment->guardian2_contact); ?></td>
+                </tr>
             <?php endif; ?>
         </table>
     </div>
@@ -192,7 +206,7 @@
             </tr>
             <tr>
                 <td>Sex:</td>
-                <td><?php echo e(ucfirst($appointment->student->gender ?? 'N/A')); ?></td>
+                <td><?php echo e(ucfirst($appointment->student->sex ?? 'N/A')); ?></td>
             </tr>
             <tr>
                 <td>Address:</td>
@@ -217,14 +231,17 @@
                 <td>Completed - Submitted for counselor review</td>
             </tr>
             <?php if($dass42Assessment): ?>
-            <tr>
-                <td>Assessment Date:</td>
-                <td><?php echo e($dass42Assessment->created_at->format('F d, Y')); ?></td>
-            </tr>
+                <tr>
+                    <td>Assessment Date:</td>
+                    <td><?php echo e($dass42Assessment->created_at->format('F d, Y')); ?></td>
+                </tr>
             <?php endif; ?>
         </table>
-        <p style="font-size: 10px; color: #888; margin-top: 10px; font-style: italic; padding: 8px; background: #f8f9fa; border-left: 3px solid #237728;">
-            <strong>Confidentiality Notice:</strong> Assessment scores are confidential and are only accessible to your assigned counselor. Your counselor will review your assessment results and discuss them with you during your counseling session.
+        <p
+            style="font-size: 10px; color: #888; margin-top: 10px; font-style: italic; padding: 8px; background: #f8f9fa; border-left: 3px solid #237728;">
+            <strong>Confidentiality Notice:</strong> Assessment scores are confidential and are only accessible to your
+            assigned counselor. Your counselor will review your assessment results and discuss them with you during your
+            counseling session.
         </p>
     </div>
 
@@ -234,6 +251,5 @@
         <p>If you have any questions or need to reschedule, please contact the guidance office.</p>
     </div>
 </body>
-</html>
 
-<?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/appointments/confirmation-pdf.blade.php ENDPATH**/ ?>
+</html><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/appointments/confirmation-pdf.blade.php ENDPATH**/ ?>

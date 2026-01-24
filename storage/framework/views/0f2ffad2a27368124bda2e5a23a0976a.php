@@ -4928,7 +4928,7 @@
                         'BS in Information Technology',
                         'BS in Mechanical Engineering'
                     ],
-                    'College of Forestry': [
+                    'College of Forestry and Environmental Sciences': [
                         'BS in Environmental Science',
                         'BS in Forestry'
                     ],
@@ -6637,7 +6637,7 @@
                     'BS in Information Technology',
                     'BS in Mechanical Engineering'
                 ],
-                'College of Forestry': [
+                'College of Forestry and Environmental Sciences': [
                     'BS in Environmental Science',
                     'BS in Forestry'
                 ],

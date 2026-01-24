@@ -389,15 +389,15 @@
                                     </div>
                                     <div class="averages-grid">
                                         <div class="avg-item">
-                                            <div class="avg-val" style="color: #0d6efd;">{{ $genderStats['male'] ?? 0 }}</div>
+                                            <div class="avg-val" style="color: #0d6efd;">{{ $sexStats['male'] ?? 0 }}</div>
                                             <div class="avg-label">Male</div>
                                         </div>
                                         <div class="avg-item">
-                                            <div class="avg-val" style="color: #d63384;">{{ $genderStats['female'] ?? 0 }}</div>
+                                            <div class="avg-val" style="color: #d63384;">{{ $sexStats['female'] ?? 0 }}</div>
                                             <div class="avg-label">Female</div>
                                         </div>
                                         @php
-                                            $otherCount = ($genderStats['non-binary'] ?? 0) + ($genderStats['prefer_not_to_say'] ?? 0) + ($genderStats['other'] ?? 0);
+                                            $otherCount = ($sexStats['non-binary'] ?? 0) + ($sexStats['prefer_not_to_say'] ?? 0) + ($sexStats['other'] ?? 0);
                                         @endphp
                                         @if($otherCount > 0)
                                             <div class="avg-item">

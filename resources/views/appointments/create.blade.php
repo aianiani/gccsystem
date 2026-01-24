@@ -535,7 +535,7 @@
                                         <div class="col-md-3">
                                             <label class="form-label">Sex</label>
                                             <input type="text" class="form-control"
-                                                value="{{ ucfirst($student->gender ?? 'N/A') }}" readonly>
+                                                value="{{ ucfirst($student->sex ?? 'N/A') }}" readonly>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Address</label>

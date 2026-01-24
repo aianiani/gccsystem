@@ -518,6 +518,13 @@
                                     </div>
                                 @endforelse
                             </div>
+
+                            <!-- Pagination -->
+                            @if($sessionNotes->hasPages())
+                                <div class="d-flex justify-content-center mt-4">
+                                    {{ $sessionNotes->links('vendor.pagination.bootstrap-5') }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

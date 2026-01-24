@@ -152,7 +152,7 @@ class SessionNoteController extends Controller
                 break;
         }
 
-        $sessionNotes = $query->get();
+        $sessionNotes = $query->paginate(10)->appends($request->except('page'));
 
         return view('counselor.session_notes.index', compact('sessionNotes'));
     }

@@ -131,60 +131,44 @@
     <div class="header">
         <div class="title">Assessment Summary</div>
         <div class="muted">Assessment ID: {{ $assessment->id ?? 'N/A' }} &nbsp;|&nbsp; Date:
-            {{ $assessment->created_at ? $assessment->created_at->format('M d, Y h:i A') : 'N/A' }}</div>
+            {{ $assessment->created_at ? $assessment->created_at->format('M d, Y h:i A') : 'N/A' }}
+            @if(isset($linkedAppointment))
+                &nbsp;|&nbsp; Appt Ref: <strong>{{ $linkedAppointment->reference_number }}</strong>
+            @endif
+        </div>
     </div>
     </div>
     <div class="section box">
-        <table class="info-table">
+        <table class="info-table" style="width: 100%; border-collapse: collapse;">
             <tr>
-                <td style="width:50%; vertical-align: top;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td class="label" style="width: 140px; padding-bottom: 4px;">Student Name:</td>
-                            <td class="value" style="padding-bottom: 4px;">{{ $assessment->user->name ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label" style="padding-bottom: 4px;">Student ID:</td>
-                            <td class="value" style="padding-bottom: 4px;">
-                                {{ $assessment->user->student_id ?? $assessment->user->id ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label" style="padding-bottom: 4px;">College / Course:</td>
-                            <td class="value" style="padding-bottom: 4px;">
-                                {{ ($assessment->user->college ?? '') . (isset($assessment->user->course) ? ' / ' . $assessment->user->course : '') }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label" style="padding-bottom: 4px;">Year / Sex:</td>
-                            <td class="value" style="padding-bottom: 4px;">
-                                {{ $assessment->user->year_level ?? $assessment->user->year ?? 'N/A' }} /
-                                {{ $assessment->user->gender ?? 'N/A' }}</td>
-                        </tr>
-                    </table>
+                <td style="width: 15%; font-weight: bold; padding: 6px;">Student Name:</td>
+                <td style="width: 35%; padding: 6px;">{{ $assessment->user->name ?? 'N/A' }}</td>
+                <td style="width: 15%; font-weight: bold; padding: 6px;">Email:</td>
+                <td style="width: 35%; padding: 6px;">{{ $assessment->user->email ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; padding: 6px;">Student ID:</td>
+                <td style="padding: 6px;">{{ $assessment->user->student_id ?? $assessment->user->id ?? 'N/A' }}</td>
+                <td style="font-weight: bold; padding: 6px;">Contact:</td>
+                <td style="padding: 6px;">
+                    {{ $assessment->user->contact_number ?? $assessment->user->phone ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; padding: 6px;">College / Course:</td>
+                <td style="padding: 6px;">
+                    {{ ($assessment->user->college ?? '') . (isset($assessment->user->course) ? ' / ' . $assessment->user->course : '') }}
                 </td>
-                <td style="width:50%; vertical-align: top;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td class="label" style="width: 100px; padding-bottom: 4px;">Email:</td>
-                            <td class="value" style="padding-bottom: 4px;">{{ $assessment->user->email ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label" style="padding-bottom: 4px;">Contact:</td>
-                            <td class="value" style="padding-bottom: 4px;">
-                                {{ $assessment->user->contact_number ?? $assessment->user->phone ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label" style="padding-bottom: 4px;">Address:</td>
-                            <td class="value small" style="padding-bottom: 4px;">
-                                {{ $assessment->user->address ?? $assessment->user->city ?? 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label" style="padding-bottom: 4px;">Assessed By:</td>
-                            <td class="value" style="font-weight: bold; padding-bottom: 4px;">
-                                {{ auth()->user()->name ?? 'N/A' }}</td>
-                        </tr>
-                    </table>
+                <td style="font-weight: bold; padding: 6px;">Address:</td>
+                <td style="padding: 6px;">{{ $assessment->user->address ?? $assessment->user->city ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; padding: 6px;">Year / Sex:</td>
+                <td style="padding: 6px;">
+                    {{ $assessment->user->year_level ?? $assessment->user->year ?? 'N/A' }} /
+                    {{ ucfirst($assessment->user->sex ?? 'N/A') }}
                 </td>
+                <td style="font-weight: bold; padding: 6px;">Assessed By:</td>
+                <td style="padding: 6px;"><strong>{{ auth()->user()->name ?? 'N/A' }}</strong></td>
             </tr>
         </table>
     </div>

@@ -357,52 +357,20 @@
             </a>
             <a href="<?php echo e(route('admin.registration-approvals.index')); ?>" class="action-button">
                 <i class="bi bi-shield-check"></i>
-                Security Check
+                Student Approvals
             </a>
             <a href="<?php echo e(route('announcements.index')); ?>" class="action-button">
                 <i class="bi bi-broadcast"></i>
-                Global Broadcast
+                Announcements
             </a>
-            <a href="<?php echo e(route('activities')); ?>" class="action-button">
-                <i class="bi bi-journal-text"></i>
-                Audit Logs
+            <a href="<?php echo e(route('admin.reports.index')); ?>" class="action-button">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                Reports
             </a>
         </div>
 
         <!-- Middle Section: Trends & Strategy -->
-        <div class="chart-layout">
-            <!-- Registration Trends -->
-            <div class="premium-card">
-                <div class="card-header-flex">
-                    <h2><i class="bi bi-graph-up-arrow"></i> System Growth Velocity</h2>
-                    <span class="badge bg-success-subtle text-success">Last 7 Days Analysis</span>
-                </div>
-                <div style="height: 320px;">
-                    <canvas id="growthChart"></canvas>
-                </div>
-            </div>
 
-            <!-- Risk Heatmap -->
-            <div class="premium-card">
-                <div class="card-header-flex">
-                    <h2><i class="bi bi-heart-pulse"></i> Wellness Risk Profile</h2>
-                </div>
-                <div style="height: 250px;">
-                    <canvas id="riskDonut"></canvas>
-                </div>
-                <div class="mt-4">
-                    <div class="d-flex justify-content-between small text-muted mb-1">
-                        <span>Critical Reach</span>
-                        <span><?php echo e($analytics['risk']['data']->sum() > 0 ? round(($analytics['critical_alerts']->count() / $analytics['risk']['data']->sum()) * 100) : 0); ?>%</span>
-                    </div>
-                    <div class="progress" style="height: 6px; border-radius: 50px;">
-                        <div class="progress-bar bg-danger"
-                            style="width: <?php echo e($analytics['risk']['data']->sum() > 0 ? round(($analytics['critical_alerts']->count() / $analytics['risk']['data']->sum()) * 100) : 0); ?>%">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- NEW: Demographic Intel Section -->
         <div class="header-title mb-4">
@@ -415,7 +383,7 @@
             <!-- Gender Distribution -->
             <div class="premium-card">
                 <div class="card-header-flex">
-                    <h2 style="font-size: 1.1rem;"><i class="bi bi-gender-ambiguous"></i> Gender Distribution</h2>
+                    <h2 style="font-size: 1.1rem;"><i class="bi bi-gender-ambiguous"></i> Sex Distribution</h2>
                 </div>
                 <div style="height: 220px;">
                     <canvas id="genderDonut"></canvas>
@@ -496,15 +464,44 @@
         </div>
 
         <!-- Last Section: Workforce -->
+        <!-- Last Section: Announcements Preview -->
         <div class="premium-card mb-5">
             <div class="card-header-flex">
-                <h2><i class="bi bi-person-workspace"></i> Counselor Strategic Workload</h2>
-                <a href="#" class="text-decoration-none small fw-bold" style="color: var(--forest-green);">Manage Counselor
-                    Assignments</a>
+                <h2><i class="bi bi-broadcast"></i> Recent Announcements</h2>
+                <a href="<?php echo e(route('announcements.index')); ?>" class="text-decoration-none small fw-bold"
+                    style="color: var(--forest-green);">Manage All</a>
             </div>
-            <div style="height: 350px;">
-                <canvas id="workloadBar"></canvas>
-            </div>
+
+            <?php if($recentAnnouncements->count() > 0): ?>
+                <div class="row">
+                    <?php $__currentLoopData = $recentAnnouncements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $announcement): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 border rounded-4 h-100 position-relative hover-shadow transition-all bg-white">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-3">
+                                        <?php echo e($announcement->created_at->format('M d')); ?>
+
+                                    </span>
+                                </div>
+                                <h5 class="fw-bold mb-2 text-dark"><?php echo e(Str::limit($announcement->title, 40)); ?></h5>
+                                <p class="text-muted small mb-3"><?php echo e(Str::limit(strip_tags($announcement->content), 80)); ?></p>
+                                <a href="<?php echo e(route('announcements.show', $announcement->id)); ?>"
+                                    class="stretched-link text-decoration-none fw-600 small" style="color: var(--forest-green);">
+                                    Read More <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            <?php else: ?>
+                <div class="text-center py-5">
+                    <i class="bi bi-megaphone text-muted display-4 mb-3 opacity-50"></i>
+                    <p class="text-muted fw-500">No recent announcements posted.</p>
+                    <a href="<?php echo e(route('announcements.create')); ?>" class="btn btn-sm btn-outline-success rounded-pill px-4 mt-2">
+                        Create New
+                    </a>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -515,86 +512,16 @@
             Chart.defaults.font.family = "'Plus Jakarta Sans', 'Inter', sans-serif";
             Chart.defaults.color = '#64748b';
 
-            // 1. Growth Chart
-            const growthCtx = document.getElementById('growthChart').getContext('2d');
-            const growthGradient = growthCtx.createLinearGradient(0, 0, 0, 400);
-            growthGradient.addColorStop(0, 'hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.2)');
-            growthGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
-            new Chart(growthCtx, {
-                type: 'line',
-                data: {
-                    labels: <?php echo json_encode($analytics['registration']['labels'], 15, 512) ?>,
-                    datasets: [{
-                        label: 'New Enrollment',
-                        data: <?php echo json_encode($analytics['registration']['data'], 15, 512) ?>,
-                        borderColor: '#1f7a2d',
-                        backgroundColor: growthGradient,
-                        fill: true,
-                        tension: 0.45,
-                        borderWidth: 4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#1f7a2d',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        pointHoverBackgroundColor: '#FFCB05',
-                        pointHoverBorderColor: '#1f7a2d'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.03)' },
-                            ticks: { font: { weight: 600 } }
-                        },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-
-            // 2. Risk Donut
-            const riskCtx = document.getElementById('riskDonut').getContext('2d');
-            new Chart(riskCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: <?php echo json_encode($analytics['risk']['labels'], 15, 512) ?>,
-                    datasets: [{
-                        data: <?php echo json_encode($analytics['risk']['data'], 15, 512) ?>,
-                        backgroundColor: [
-                            '#1f7a2d', // Normal
-                            '#17a2b8', // Mild
-                            '#FFCB05', // Moderate
-                            '#ff7043', // Severe
-                            '#dc3545'  // Extremely Severe
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 20,
-                        borderRadius: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 10, padding: 20, font: { weight: 700 } } }
-                    }
-                }
-            });
 
             // 3. Gender Distribution Donut
             const genderCtx = document.getElementById('genderDonut').getContext('2d');
             new Chart(genderCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: <?php echo json_encode($analytics['demographics']['gender']['labels'], 15, 512) ?>,
+                    labels: <?php echo json_encode($analytics['demographics']['sex']['labels'], 15, 512) ?>,
                     datasets: [{
-                        data: <?php echo json_encode($analytics['demographics']['gender']['data'], 15, 512) ?>,
+                        data: <?php echo json_encode($analytics['demographics']['sex']['data'], 15, 512) ?>,
                         backgroundColor: ['#1f7a2d', '#FFCB05', '#17a2b8', '#ff7043', '#adb5bd'],
                         borderWidth: 0,
                         hoverOffset: 15,
@@ -664,32 +591,7 @@
                 }
             });
 
-            // 6. Workload Bar
-            const workloadCtx = document.getElementById('workloadBar').getContext('2d');
-            new Chart(workloadCtx, {
-                type: 'bar',
-                data: {
-                    labels: <?php echo json_encode($analytics['counselor_workload']['labels'], 15, 512) ?>,
-                    datasets: [{
-                        label: 'Managed Cases',
-                        data: <?php echo json_encode($analytics['counselor_workload']['data'], 15, 512) ?>,
-                        backgroundColor: 'hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.9)',
-                        hoverBackgroundColor: '#FFCB05',
-                        borderRadius: 12,
-                        maxBarThickness: 45
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' } },
-                        y: { grid: { display: false }, ticks: { font: { weight: 700, size: 12 } } }
-                    }
-                }
-            });
+
         });
     </script>
 <?php $__env->stopSection(); ?>

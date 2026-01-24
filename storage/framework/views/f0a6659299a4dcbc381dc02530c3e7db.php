@@ -1,4 +1,6 @@
 <?php $__env->startSection('content'); ?>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* Homepage theme variables */
         :root {
@@ -243,6 +245,20 @@
                 transform: translateX(0);
             }
         }
+
+        /* Privacy Blur */
+        .privacy-blur {
+            filter: blur(8px);
+            user-select: none;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        .privacy-revealed {
+            filter: blur(0);
+            user-select: auto;
+            pointer-events: auto;
+        }
     </style>
 
     <div class="home-zoom">
@@ -325,43 +341,46 @@
 
 
                         <!-- Appointment Info -->
-                        <div class="content-card">
-                            <div class="card-title-styled"><i class="bi bi-clock"></i> Schedule Information</div>
-                            <div class="row">
-                                <div class="col-md-6 info-group">
-                                    <div class="info-label">Date & Time</div>
-                                    <?php
-                                        $start = $appointment->scheduled_at;
-                                        $availability = \App\Models\Availability::where('user_id', $appointment->counselor_id)->where('start', $start)->first();
-                                        $end = $availability ? \Carbon\Carbon::parse($availability->end) : $start->copy()->addMinutes(30);
-                                    ?>
-                                    <div class="info-value">
-                                        <?php echo e($start->format('l, F j, Y')); ?><br>
-                                        <?php echo e($start->format('h:i A')); ?> – <?php echo e($end->format('h:i A')); ?>
+                        <div id="schedulePrivacyContainer" class="privacy-blur">
+                            <div class="content-card">
+                                <div class="card-title-styled"><i class="bi bi-clock"></i> Schedule Information</div>
+                                <div class="row">
+                                    <div class="col-md-6 info-group">
+                                        <div class="info-label">Date & Time</div>
+                                        <?php
+                                            $start = $appointment->scheduled_at;
+                                            $availability = \App\Models\Availability::where('user_id', $appointment->counselor_id)->where('start', $start)->first();
+                                            $end = $availability ? \Carbon\Carbon::parse($availability->end) : $start->copy()->addMinutes(30);
+                                        ?>
+                                        <div class="info-value">
+                                            <?php echo e($start->format('l, F j, Y')); ?><br>
+                                            <?php echo e($start->format('h:i A')); ?> – <?php echo e($end->format('h:i A')); ?>
 
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6 info-group">
-                                    <div class="info-label">Appointment Type</div>
-                                    <div class="info-value"><?php echo e($appointment->appointment_type ?? 'Not specified'); ?></div>
-                                </div>
-                                <div class="col-md-6 info-group">
-                                    <div class="info-label">Nature of Problem</div>
-                                    <div class="info-value">
-                                        <?php echo e($appointment->nature_of_problem ?? 'Not specified'); ?>
-
-                                        <?php if($appointment->nature_of_problem_other): ?>
-                                            <div class="small text-muted">(<?php echo e($appointment->nature_of_problem_other); ?>)</div>
-                                        <?php endif; ?>
+                                    <div class="col-md-6 info-group">
+                                        <div class="info-label">Appointment Type</div>
+                                        <div class="info-value"><?php echo e($appointment->appointment_type ?? 'Not specified'); ?></div>
                                     </div>
-                                </div>
+                                    <div class="col-md-6 info-group">
+                                        <div class="info-label">Nature of Problem</div>
+                                        <div class="info-value">
+                                            <?php echo e($appointment->nature_of_problem ?? 'Not specified'); ?>
 
+                                            <?php if($appointment->nature_of_problem_other): ?>
+                                                <div class="small text-muted">(<?php echo e($appointment->nature_of_problem_other); ?>)</div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                         
                         <!-- Assessment Data -->
                         <?php if(!empty($latestAssessment)): ?>
-                            <div class="content-card">
+                            <div id="assessmentPrivacyContainer" class="privacy-blur">
+                                <div class="content-card">
                                 <div class="card-title-styled"><i class="bi bi-bar-chart-fill"></i> Latest Assessment Data</div>
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div>
@@ -432,10 +451,12 @@
                                     <div class="p-3 bg-light rounded">Score: <?php echo e(is_array($laScores) ? ($laScores['score'] ?? json_encode($laScores)) : ($latestAssessment->score ?? 'N/A')); ?></div>
                                 <?php endif; ?>
                             </div>
+                        </div>
                         <?php endif; ?>
 
                         <!-- Notes Section (Prominent) -->
-                        <div class="content-card notes-card">
+                        <div id="notesPrivacyContainer" class="privacy-blur">
+                            <div class="content-card notes-card">
                             <div class="card-title-styled">
                                 <i class="bi bi-sticky-fill"></i> Student Notes / Concerns
                             </div>
@@ -446,6 +467,7 @@
                             <?php else: ?>
                                 <div class="text-muted fst-italic">No additional notes provided by the student.</div>
                             <?php endif; ?>
+                        </div>
                         </div>
 
                         <!-- Session Notes (If Completed) -->
@@ -475,10 +497,15 @@
 
                     <!-- Right Column (Student Profile) -->
                     <div class="col-lg-4">
-                        <div class="content-card">
-                            <div class="student-profile-header">
-                                <img src="<?php echo e($appointment->student->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($appointment->student->name)); ?>" alt="Student" class="student-avatar">
-                                <h4 class="mb-1 text-dark fw-bold"><?php echo e($appointment->student->name); ?></h4>
+                        <div class="content-card position-relative">
+                            <button id="privacyToggleBtn" class="btn btn-sm btn-light border position-absolute top-0 end-0 m-3" style="z-index: 10;" title="Toggle Privacy">
+                                <i class="bi bi-eye-slash-fill" id="privacyIcon"></i>
+                            </button>
+                            
+                            <div id="studentPrivacyContainer" class="privacy-blur">
+                                <div class="student-profile-header">
+                                    <img src="<?php echo e($appointment->student->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($appointment->student->name)); ?>" alt="Student" class="student-avatar">
+                                    <h4 class="mb-1 text-dark fw-bold"><?php echo e($appointment->student->name); ?></h4>
                                 <div class="badge bg-light text-dark border"><?php echo e($appointment->student->student_id ?? 'No ID'); ?></div>
                             </div>
                             
@@ -508,7 +535,7 @@
                                 </div>
                                 <div class="col-6 info-group">
                                     <div class="info-label">Sex</div>
-                                    <div class="info-value"><?php echo e(ucfirst($appointment->student->gender ?? 'N/A')); ?></div>
+                                    <div class="info-value"><?php echo e(ucfirst($appointment->student->sex ?? 'N/A')); ?></div>
                                 </div>
                             </div>
                             
@@ -522,21 +549,27 @@
                         </div>
 
                         <!-- Guardian Info -->
-                         <div class="content-card">
+
+                        </div>
+                        </div> <!-- End privacy container & card -->
+                         
+                        <div class="content-card">
                             <div class="card-title-styled"><i class="bi bi-shield-check"></i> Guardian</div>
-                            <div class="info-group">
-                                <div class="info-label">Primary Guardian</div>
-                                <div class="info-value"><?php echo e($appointment->guardian1_name ?? 'N/A'); ?></div>
-                                <div class="small text-muted"><?php echo e($appointment->guardian1_relationship); ?> • <?php echo e($appointment->guardian1_contact); ?></div>
-                            </div>
-                            <?php if($appointment->guardian2_name): ?>
-                                <hr class="my-3 text-muted opacity-25">
+                             <div id="guardianPrivacyContainer" class="privacy-blur">
                                 <div class="info-group">
-                                    <div class="info-label">Secondary Guardian</div>
-                                    <div class="info-value"><?php echo e($appointment->guardian2_name); ?></div>
-                                    <div class="small text-muted"><?php echo e($appointment->guardian2_relationship); ?> • <?php echo e($appointment->guardian2_contact); ?></div>
+                                    <div class="info-label">Primary Guardian</div>
+                                    <div class="info-value"><?php echo e($appointment->guardian1_name ?? 'N/A'); ?></div>
+                                    <div class="small text-muted"><?php echo e($appointment->guardian1_relationship); ?> • <?php echo e($appointment->guardian1_contact); ?></div>
                                 </div>
-                            <?php endif; ?>
+                                <?php if($appointment->guardian2_name): ?>
+                                    <hr class="my-3 text-muted opacity-25">
+                                    <div class="info-group">
+                                        <div class="info-label">Secondary Guardian</div>
+                                        <div class="info-value"><?php echo e($appointment->guardian2_name); ?></div>
+                                        <div class="small text-muted"><?php echo e($appointment->guardian2_relationship); ?> • <?php echo e($appointment->guardian2_contact); ?></div>
+                                    </div>
+                                <?php endif; ?>
+                             </div>
                         </div>
                         
                         <!-- History -->
@@ -636,6 +669,107 @@
                 }
                 bsConfirmModal.hide();
             });
+
+
+            // Privacy Toggle Logic
+            const privacyBtn = document.getElementById('privacyToggleBtn');
+            const privacyIcon = document.getElementById('privacyIcon');
+            const studentContainer = document.getElementById('studentPrivacyContainer');
+            const guardianContainer = document.getElementById('guardianPrivacyContainer');
+            const assessmentContainer = document.getElementById('assessmentPrivacyContainer');
+            const scheduleContainer = document.getElementById('schedulePrivacyContainer');
+            const notesContainer = document.getElementById('notesPrivacyContainer');
+            let isRevealed = false;
+
+            if (privacyBtn) {
+                privacyBtn.addEventListener('click', function() {
+                    if (!isRevealed) {
+                        Swal.fire({
+                            title: 'Enter Passkey',
+                            input: 'password',
+                            inputLabel: 'To view student details, please enter the passkey:',
+                            inputPlaceholder: 'Enter passkey',
+                            showCancelButton: true,
+                            confirmButtonText: 'Reveal',
+                            confirmButtonColor: '#1f7a2d',
+                            cancelButtonColor: '#6c757d',
+                            preConfirm: (passkey) => {
+                                if (!passkey) {
+                                    Swal.showValidationMessage('Please enter a passkey');
+                                }
+                                return passkey;
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Default fallback passkey if not set in profile
+                                const userPasskey = '<?php echo e(auth()->user()->passkey ?? "GCC2026"); ?>';
+                                
+                                if (result.value === userPasskey) {
+                                    isRevealed = true;
+                                    studentContainer.classList.remove('privacy-blur');
+                                    studentContainer.classList.add('privacy-revealed');
+                                    guardianContainer.classList.remove('privacy-blur');
+                                    guardianContainer.classList.add('privacy-revealed');
+                                    if(assessmentContainer) {
+                                        assessmentContainer.classList.remove('privacy-blur');
+                                        assessmentContainer.classList.add('privacy-revealed');
+                                    }
+                                    if(scheduleContainer) {
+                                        scheduleContainer.classList.remove('privacy-blur');
+                                        scheduleContainer.classList.add('privacy-revealed');
+                                    }
+                                    if(notesContainer) {
+                                        notesContainer.classList.remove('privacy-blur');
+                                        notesContainer.classList.add('privacy-revealed');
+                                    }
+                                    privacyIcon.classList.remove('bi-eye-slash-fill');
+                                    privacyIcon.classList.add('bi-eye-fill');
+                                    privacyBtn.classList.remove('btn-light');
+                                    privacyBtn.classList.add('btn-warning');
+                                    
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Access Granted',
+                                        text: 'Student details revealed.',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Access Denied',
+                                        text: 'Incorrect passkey.',
+                                        confirmButtonColor: '#dc3545'
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        // Re-hide
+                        isRevealed = false;
+                        studentContainer.classList.add('privacy-blur');
+                        studentContainer.classList.remove('privacy-revealed');
+                        guardianContainer.classList.add('privacy-blur');
+                        guardianContainer.classList.remove('privacy-revealed');
+                        if(assessmentContainer) {
+                            assessmentContainer.classList.add('privacy-blur');
+                            assessmentContainer.classList.remove('privacy-revealed');
+                        }
+                        if(scheduleContainer) {
+                            scheduleContainer.classList.add('privacy-blur');
+                            scheduleContainer.classList.remove('privacy-revealed');
+                        }
+                        if(notesContainer) {
+                            notesContainer.classList.add('privacy-blur');
+                            notesContainer.classList.remove('privacy-revealed');
+                        }
+                        privacyIcon.classList.add('bi-eye-slash-fill');
+                        privacyIcon.classList.remove('bi-eye-fill');
+                        privacyBtn.classList.add('btn-light');
+                        privacyBtn.classList.remove('btn-warning');
+                    }
+                });
+            }
         });
     </script>
 

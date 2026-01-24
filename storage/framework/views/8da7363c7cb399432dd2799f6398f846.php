@@ -42,9 +42,9 @@
         .page-header {
             background: var(--hero-gradient);
             color: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
             box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
@@ -85,6 +85,8 @@
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--gray-100);
             overflow: hidden;
+            width: 100%;
+            margin: 0;
         }
 
         .feedback-form-header {
@@ -102,14 +104,14 @@
         }
 
         .feedback-form-body {
-            padding: 1.25rem;
+            padding: 1rem 1.25rem;
         }
 
         .appointment-summary {
             background: var(--gray-50);
             border-radius: 12px;
             padding: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             border-left: 4px solid var(--forest-green);
             border: 1px solid var(--gray-100);
             transition: all 0.3s ease;
@@ -135,8 +137,8 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 1rem;
-            padding: 0.75rem;
+            margin-bottom: 0;
+            padding: 1rem;
             background: white;
             border-radius: 10px;
             border: 1px solid var(--gray-100);
@@ -166,6 +168,52 @@
 
         .counselor-avatar:hover {
             transform: rotate(5deg) scale(1.05);
+        }
+
+        .session-metadata {
+            padding: 0;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.65rem 0.85rem;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--gray-100);
+            transition: all 0.2s ease;
+            height: 100%;
+        }
+
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            border-color: var(--forest-green-light);
+        }
+
+        .info-item i {
+            font-size: 1.25rem;
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .info-item small {
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item strong {
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .info-item p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            line-height: 1.5;
         }
 
         .rating-stars {
@@ -206,7 +254,7 @@
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .form-label {
@@ -306,73 +354,110 @@
             border-color: rgba(255, 255, 255, 0.5);
         }
 
-        /* Sidebar Styles */
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
+        /* Cleaned up redundant sidebar styles that are already in app.blade.php */
+
+        /* NUCLEAR OPTION - Force full width everywhere */
+        .main-dashboard-content *,
+        .main-dashboard-content .full-width-container,
+        .main-dashboard-content .page-header,
+        .main-dashboard-content .feedback-form-card {
+            box-sizing: border-box !important;
         }
 
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2.5rem 1.5rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.05);
+        body,
+        html {
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow-x: hidden !important;
         }
 
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.25rem 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+        /* Custom full-width container - no Bootstrap constraints */
+        .full-width-container {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
         }
 
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1.1rem;
-            padding: 0.9rem 1.25rem;
-            border-radius: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .custom-sidebar .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            transform: translateX(5px);
-        }
-
-        .custom-sidebar .sidebar-link.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: #f4d03f;
-            font-weight: 600;
-        }
-
-        .custom-sidebar .sidebar-bottom {
-            padding: 1.5rem 1rem;
-            background: rgba(0, 0, 0, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .custom-sidebar .sidebar-link.logout:hover {
-            background: #dc3545;
+        .container-fluid {
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: none !important;
+            width: 100% !important;
         }
 
         .main-dashboard-content {
-            margin-left: 240px;
+            margin-left: 275px !important;
+            padding: 1.5rem !important;
+            width: auto !important;
+            max-width: none !important;
+        }
+
+        @media (max-width: 991.98px) {
+            .main-dashboard-content {
+                margin-left: 200px !important;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .main-dashboard-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+        }
+
+        .main-dashboard-content .full-width-container {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        /* Target the specific cards directly */
+        .main-dashboard-content .page-header {
+            margin: 0 0 0.75rem 0 !important;
+            padding: 1rem 1.25rem !important;
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        .main-dashboard-content .feedback-form-card {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        .main-dashboard-content .feedback-form-header {
+            margin: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        .main-dashboard-content .feedback-form-body {
+            margin: 0 !important;
+            padding: 0.75rem 1rem !important;
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        .main-dashboard-content .appointment-summary {
+            margin: 0 0 1rem 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        /* Remove ANY container constraints */
+        .container,
+        .container-sm,
+        .container-md,
+        .container-lg,
+        .container-xl,
+        .container-xxl {
+            max-width: none !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
         }
     </style>
 
@@ -380,7 +465,7 @@
         <?php echo $__env->make('student.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <div class="main-dashboard-content flex-grow-1">
-            <div class="container-fluid py-4">
+            <div class="full-width-container">
                 <div class="page-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -397,20 +482,21 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-12">
-                        <div class="feedback-form-card">
-                            <div class="feedback-form-header">
-                                <h4 class="mb-0">
-                                    <i class="bi bi-calendar-check me-2"></i>
-                                    Provide Feedback for Your Session
-                                </h4>
-                            </div>
-                            <div class="feedback-form-body">
-                                <!-- Appointment Summary -->
-                                <div class="appointment-summary">
-                                    <h5 class="mb-3">Session Details</h5>
-                                    <div class="counselor-info">
+                <div class="feedback-form-card">
+                    <div class="feedback-form-header">
+                        <h4 class="mb-0">
+                            <i class="bi bi-calendar-check me-2"></i>
+                            Provide Feedback for Your Session
+                        </h4>
+                    </div>
+                    <div class="feedback-form-body">
+                        <!-- Appointment Summary -->
+                        <div class="appointment-summary">
+                            <h5 class="mb-2">Session Details</h5>
+                            <div class="row g-2">
+                                <!-- Left Column: Counselor Info -->
+                                <div class="col-md-3">
+                                    <div class="counselor-info h-100">
                                         <?php if($appointment->counselor->avatar): ?>
                                             <img src="<?php echo e($appointment->counselor->avatar_url); ?>"
                                                 alt="<?php echo e($appointment->counselor->name); ?>" class="counselor-avatar"
@@ -423,164 +509,179 @@
                                         <?php endif; ?>
                                         <div>
                                             <h6 class="mb-1 fw-bold"><?php echo e($appointment->counselor->name ?? 'Counselor'); ?></h6>
-                                            <p class="mb-0 text-muted"><?php echo e($appointment->counselor->email ??
+                                            <p class="mb-0 text-muted small"><?php echo e($appointment->counselor->email ??
                                                 'counselor@example.com'); ?></p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <p class="mb-2">
-                                                <i class="bi bi-calendar me-2 text-primary"></i>
-                                                <strong>Date:</strong> <?php echo e($appointment->scheduled_at->format('F j, Y')); ?>
-
-                                            </p>
-                                            <p class="mb-2">
-                                                <i class="bi bi-clock me-2 text-primary"></i>
-                                                <strong>Time:</strong> <?php echo e($appointment->scheduled_at->format('g:i A')); ?> -
-                                                <?php echo e($appointment->scheduled_at->addMinutes(30)->format('g:i A')); ?>
-
-                                            </p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p class="mb-2">
-                                                <i class="bi bi-hash me-2 text-success"></i>
-                                                <strong>Session Number:</strong> <?php echo e($sessionNumber); ?>
-
-                                            </p>
-                                            <?php if($appointment->notes): ?>
-                                                <p class="mb-2">
-                                                    <i class="bi bi-sticky me-2 text-warning"></i>
-                                                    <strong>Appointment Notes:</strong>
-                                                    <?php echo e(Str::limit($appointment->notes, 100)); ?>
-
-                                                </p>
-                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Feedback Form -->
-                                <form action="<?php echo e(route('session-feedback.store', $appointment->id)); ?>" method="POST">
-                                    <?php echo csrf_field(); ?>
-
-                                    <div class="form-group">
-                                        <label class="form-label">
-                                            <i class="bi bi-star me-2"></i>
-                                            How would you rate your counseling session?
-                                        </label>
-                                        <div class="rating-stars">
-                                            <button type="button" class="star-btn" data-rating="1" title="Poor">
-                                                <i class="bi bi-star"></i>
-                                            </button>
-                                            <button type="button" class="star-btn" data-rating="2" title="Fair">
-                                                <i class="bi bi-star"></i>
-                                            </button>
-                                            <button type="button" class="star-btn" data-rating="3" title="Good">
-                                                <i class="bi bi-star"></i>
-                                            </button>
-                                            <button type="button" class="star-btn" data-rating="4" title="Very Good">
-                                                <i class="bi bi-star"></i>
-                                            </button>
-                                            <button type="button" class="star-btn" data-rating="5" title="Excellent">
-                                                <i class="bi bi-star"></i>
-                                            </button>
+                                <!-- Right Column: Session Info -->
+                                <div class="col-md-9">
+                                    <div class="session-metadata">
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <div class="info-item">
+                                                    <i class="bi bi-calendar me-2 text-primary"></i>
+                                                    <div>
+                                                        <small class="text-muted d-block">Date</small>
+                                                        <strong><?php echo e($appointment->scheduled_at->format('F j, Y')); ?></strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="info-item">
+                                                    <i class="bi bi-clock me-2 text-primary"></i>
+                                                    <div>
+                                                        <small class="text-muted d-block">Time</small>
+                                                        <strong><?php echo e($appointment->scheduled_at->format('g:i A')); ?> -
+                                                            <?php echo e($appointment->scheduled_at->addMinutes(30)->format('g:i A')); ?></strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="info-item">
+                                                    <i class="bi bi-hash me-2 text-success"></i>
+                                                    <div>
+                                                        <small class="text-muted d-block">Session Number</small>
+                                                        <strong><?php echo e($sessionNumber); ?></strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php if($appointment->notes): ?>
+                                                <div class="col-12">
+                                                    <div class="info-item">
+                                                        <i class="bi bi-sticky me-2 text-warning"></i>
+                                                        <div>
+                                                            <small class="text-muted d-block">Session Notes</small>
+                                                            <p class="mb-0"><?php echo e(Str::limit($appointment->notes, 150)); ?></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
-                                        <input type="hidden" name="rating" id="rating" required>
-                                        <?php $__errorArgs = ['rating'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                            <div class="text-danger mt-1"><?php echo e($message); ?></div>
-                                        <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="comments" class="form-label">
-                                            <i class="bi bi-chat-text me-2"></i>
-                                            Please share your thoughts about the session
-                                        </label>
-                                        <textarea name="comments" id="comments" class="form-control" rows="6"
-                                            placeholder="Tell us about your experience with the counselor, what you found helpful, and any suggestions for improvement..."
-                                            required><?php echo e(old('comments')); ?></textarea>
-                                        <?php $__errorArgs = ['comments'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                            <div class="text-danger mt-1"><?php echo e($message); ?></div>
-                                        <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                                    </div>
-
-                                    <div class="d-flex justify-content-end">
-                                        <a href="<?php echo e(route('appointments.completedWithNotes')); ?>" class="btn-cancel">
-                                            Cancel
-                                        </a>
-                                        <button type="submit" class="btn-submit">
-                                            <i class="bi bi-send me-2"></i>
-                                            Submit Feedback
-                                        </button>
-                                    </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Feedback Form -->
+                        <form action="<?php echo e(route('session-feedback.store', $appointment->id)); ?>" method="POST">
+                            <?php echo csrf_field(); ?>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-star me-2"></i>
+                                    How would you rate your counseling session?
+                                </label>
+                                <div class="rating-stars">
+                                    <button type="button" class="star-btn" data-rating="1" title="Poor">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="2" title="Fair">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="3" title="Good">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="4" title="Very Good">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="5" title="Excellent">
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="rating" id="rating" required>
+                                <?php $__errorArgs = ['rating'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="text-danger mt-1"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="comments" class="form-label">
+                                    <i class="bi bi-chat-text me-2"></i>
+                                    Please share your thoughts about the session
+                                </label>
+                                <textarea name="comments" id="comments" class="form-control" rows="6"
+                                    placeholder="Tell us about your experience with the counselor, what you found helpful, and any suggestions for improvement..."
+                                    required><?php echo e(old('comments')); ?></textarea>
+                                <?php $__errorArgs = ['comments'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="text-danger mt-1"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <a href="<?php echo e(route('appointments.completedWithNotes')); ?>" class="btn-cancel">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn-submit">
+                                    <i class="bi bi-send me-2"></i>
+                                    Submit Feedback
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const starButtons = document.querySelectorAll('.star-btn');
-            const ratingInput = document.getElementById('rating');
-            let selectedRating = 0;
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const starButtons = document.querySelectorAll('.star-btn');
+                    const ratingInput = document.getElementById('rating');
+                    let selectedRating = 0;
 
-            starButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const rating = parseInt(this.getAttribute('data-rating'));
-                    selectedRating = rating;
-                    ratingInput.value = rating;
+                    starButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            const rating = parseInt(this.getAttribute('data-rating'));
+                            selectedRating = rating;
+                            ratingInput.value = rating;
 
-                    // Update star display
-                    starButtons.forEach((star, index) => {
-                        if (index < rating) {
-                            star.classList.add('active');
-                            star.innerHTML = '<i class="bi bi-star-fill"></i>';
-                        } else {
-                            star.classList.remove('active');
-                            star.innerHTML = '<i class="bi bi-star"></i>';
-                        }
+                            // Update star display
+                            starButtons.forEach((star, index) => {
+                                if (index < rating) {
+                                    star.classList.add('active');
+                                    star.innerHTML = '<i class="bi bi-star-fill"></i>';
+                                } else {
+                                    star.classList.remove('active');
+                                    star.innerHTML = '<i class="bi bi-star"></i>';
+                                }
+                            });
+                        });
+
+                        // Hover effects
+                        button.addEventListener('mouseenter', function () {
+                            const rating = parseInt(this.getAttribute('data-rating'));
+                            starButtons.forEach((star, index) => {
+                                if (index < rating) {
+                                    star.innerHTML = '<i class="bi bi-star-fill"></i>';
+                                }
+                            });
+                        });
+
+                        button.addEventListener('mouseleave', function () {
+                            starButtons.forEach((star, index) => {
+                                if (index < selectedRating) {
+                                    star.innerHTML = '<i class="bi bi-star-fill"></i>';
+                                } else {
+                                    star.innerHTML = '<i class="bi bi-star"></i>';
+                                }
+                            });
+                        });
                     });
                 });
-
-                // Hover effects
-                button.addEventListener('mouseenter', function () {
-                    const rating = parseInt(this.getAttribute('data-rating'));
-                    starButtons.forEach((star, index) => {
-                        if (index < rating) {
-                            star.innerHTML = '<i class="bi bi-star-fill"></i>';
-                        }
-                    });
-                });
-
-                button.addEventListener('mouseleave', function () {
-                    starButtons.forEach((star, index) => {
-                        if (index < selectedRating) {
-                            star.innerHTML = '<i class="bi bi-star-fill"></i>';
-                        } else {
-                            star.innerHTML = '<i class="bi bi-star"></i>';
-                        }
-                    });
-                });
-            });
-        });
-    </script>
+            </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/session-feedback/create.blade.php ENDPATH**/ ?>

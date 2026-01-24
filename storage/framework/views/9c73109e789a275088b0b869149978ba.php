@@ -565,7 +565,7 @@
                                         </select>
                                     </div>
                                     <div class="col-md-2">
-                                        <label class="form-label mb-1">Gender</label>
+                                        <label class="form-label mb-1">Sex</label>
                                         <select name="gender" class="form-select">
                                             <option value="">All</option>
                                             <option value="Male" <?php if(request('gender') == 'Male'): ?> selected <?php endif; ?>>Male

@@ -23,7 +23,8 @@ class AdminReportsController extends Controller
         'College of Agriculture' => 'COA',
         'College of Information Science and Computing' => 'CISC',
         'College of Education' => 'COED',
-        'College of Engineering' => 'COE'
+        'College of Engineering' => 'COE',
+        'Unspecified' => 'N/A'
     ];
 
     /**
@@ -89,6 +90,7 @@ class AdminReportsController extends Controller
             'Second Year - DASS' => ['type' => ['DASS-42', 'dass42'], 'year_level' => ['2', '2nd Year']],
             'Third Year - NEO' => ['type' => ['NEO-PI-R', 'wellness'], 'year_level' => ['3', '3rd Year']],
             'Graduating - WVI' => ['type' => ['Work Values Inventory', 'academic'], 'year_level' => ['4', '4th Year', '5', '5th Year']],
+            'Others' => ['type' => null, 'year_level' => null],
         ];
 
         $results = [];
@@ -155,19 +157,32 @@ class AdminReportsController extends Controller
             // Iterate through ALL fixed colleges to ensure they are listed
             foreach ($this->collegesList as $collegeName => $acronym) {
                 // Get data for this college if exists, else defaults
-                $data = $aggregates->get($collegeName);
+                // Handle Unspecified mapping from DB empty string/null
+                $lookupName = ($collegeName === 'Unspecified') ? '' : $collegeName;
+                $data = $aggregates->get($lookupName);
+                if (!$data && $collegeName === 'Unspecified')
+                    $data = $aggregates->get(null);
 
                 // Calculate Total Enrolled (Target Population) for this SPECIFIC college and year level logic
                 $totalEnrolledCount = 0;
-                if ($criteria['year_level']) {
+                if ($collegeName !== 'Unspecified') {
+                    if ($criteria['year_level']) {
+                        $totalEnrolledCount = User::where('role', 'student')
+                            ->where('is_active', true)
+                            ->where('registration_status', 'approved')
+                            ->where('college', $collegeName) // Filter by College (Full Name)
+                            ->when(is_array($criteria['year_level']), function ($q) use ($criteria) {
+                                return $q->whereIn('year_level', $criteria['year_level']);
+                            }, function ($q) use ($criteria) {
+                                return $q->where('year_level', $criteria['year_level']);
+                            })
+                            ->count();
+                    }
+                } else {
+                    // For unspecified, count users with no college
                     $totalEnrolledCount = User::where('role', 'student')
-                        ->where('is_active', true)
-                        ->where('registration_status', 'approved')
-                        ->where('college', $collegeName) // Filter by College (Full Name)
-                        ->when(is_array($criteria['year_level']), function ($q) use ($criteria) {
-                            return $q->whereIn('year_level', $criteria['year_level']);
-                        }, function ($q) use ($criteria) {
-                            return $q->where('year_level', $criteria['year_level']);
+                        ->where(function ($q) {
+                            $q->whereNull('college')->orWhere('college', '');
                         })
                         ->count();
                 }
@@ -219,7 +234,7 @@ class AdminReportsController extends Controller
         // If names in DB differ slightly, we might need 'LIKE' queries.
         $fixedTopics = [
             'IDREAMS',
-            '10C RESILIENCY',
+            '10C',
             'LEADS',
             'IMAGE'
         ];
@@ -260,7 +275,7 @@ class AdminReportsController extends Controller
             // Group attendances by User's College
             // We need to map user's college to our fixed list keys if possible, or just string match
             $attendancesByCollege = $allAttendances->groupBy(function ($attendance) {
-                return $attendance->user->college ?? 'Unknown';
+                return $attendance->user->college ?: 'Unspecified';
             });
 
             // Date for display - use the first schedule's date or 'Various Dates'
@@ -287,8 +302,15 @@ class AdminReportsController extends Controller
 
                 $totalEnrolledCount = User::where('role', 'student')
                     ->where('is_active', true)
-                    ->where('registration_status', 'approved')
-                    ->where('college', $collegeName);
+                    ->where('registration_status', 'approved');
+
+                if ($collegeName !== 'Unspecified') {
+                    $totalEnrolledCount->where('college', $collegeName);
+                } else {
+                    $totalEnrolledCount->where(function ($q) {
+                        $q->whereNull('college')->orWhere('college', '');
+                    });
+                }
 
                 if ($targetYearLevel) {
                     $totalEnrolledCount->where('year_level', $targetYearLevel);
@@ -369,7 +391,7 @@ class AdminReportsController extends Controller
 
             // Group these specific appointments by college
             $apptsByCollege = $appts->groupBy(function ($appt) {
-                return $appt->student->college ?? 'Unknown';
+                return $appt->student->college ?: 'Unspecified';
             });
 
             foreach ($this->collegesList as $collegeName => $acronym) {

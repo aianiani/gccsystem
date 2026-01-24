@@ -1,4 +1,6 @@
 <?php $__env->startSection('content'); ?>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <?php
         $studentName = $assessment->user->name ?? 'Student';
         $avatarUrl = $assessment->user->avatar_url ?? ('https://ui-avatars.com/api/?name=' . urlencode($studentName) . '&background=1f7a2d&color=fff&rounded=true&size=128');
@@ -29,12 +31,19 @@
                         <div class="d-flex flex-column flex-md-row align-items-center gap-4 w-100">
                             <!-- Avatar -->
                             <div class="position-relative">
-                                <img src="<?php echo e($avatarUrl); ?>" class="rounded-circle shadow-sm border border-3 border-white"
-                                    width="90" height="90" alt="<?php echo e($studentName); ?>">
+                                <button id="privacyToggleBtn"
+                                    class="btn btn-sm btn-light border position-absolute top-0 start-0 translate-middle-y"
+                                    style="z-index: 10; border-radius: 50%; width: 35px; height: 35px; padding: 0;"
+                                    title="Toggle Privacy">
+                                    <i class="bi bi-eye-slash-fill" id="privacyIcon"></i>
+                                </button>
+                                <img src="<?php echo e($avatarUrl); ?>" class="rounded-circle shadow-sm border border-3 border-white privacy-blur"
+                                    id="avatarPrivacyContainer" width="90" height="90" alt="<?php echo e($studentName); ?>">
                             </div>
 
                             <!-- Student Info -->
-                            <div class="flex-grow-1 text-center text-md-start">
+                            <div class="flex-grow-1 text-center text-md-start privacy-blur" id="studentPrivacyContainer">
+
                                 <h1 class="h3 fw-bold text-white mb-2"><?php echo e($studentName); ?></h1>
 
                                 <!-- Primary Contact Info -->
@@ -134,7 +143,9 @@
                 </div>
 
                 
-                <?php if ($__env->exists('counselor.assessments.partials.summary', ['assessment' => $assessment])) echo $__env->make('counselor.assessments.partials.summary', ['assessment' => $assessment], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                <div id="assessmentPrivacyContainer" class="privacy-blur">
+                    <?php if ($__env->exists('counselor.assessments.partials.summary', ['assessment' => $assessment])) echo $__env->make('counselor.assessments.partials.summary', ['assessment' => $assessment], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                </div>
             </div>
         </div>
     </div>
@@ -155,6 +166,89 @@
                     if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
                         const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
                         if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+
+            // Privacy Toggle Logic
+            const privacyBtn = document.getElementById('privacyToggleBtn');
+            const privacyIcon = document.getElementById('privacyIcon');
+            const studentContainer = document.getElementById('studentPrivacyContainer');
+            const avatarContainer = document.getElementById('avatarPrivacyContainer');
+            const assessmentContainer = document.getElementById('assessmentPrivacyContainer');
+            let isRevealed = false;
+
+            if (privacyBtn) {
+                privacyBtn.addEventListener('click', function () {
+                    if (!isRevealed) {
+                        Swal.fire({
+                            title: 'Enter Passkey',
+                            input: 'password',
+                            inputLabel: 'To view sensitive details, please enter the passkey:',
+                            inputPlaceholder: 'Enter passkey',
+                            showCancelButton: true,
+                            confirmButtonText: 'Reveal',
+                            confirmButtonColor: '#1f7a2d',
+                            cancelButtonColor: '#6c757d',
+                            preConfirm: (passkey) => {
+                                if (!passkey) {
+                                    Swal.showValidationMessage('Please enter a passkey');
+                                }
+                                return passkey;
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Default fallback passkey if not set in profile
+                                const userPasskey = '<?php echo e(auth()->user()->passkey ?? "GCC2026"); ?>';
+
+                                if (result.value === userPasskey) {
+                                    isRevealed = true;
+                                    studentContainer.classList.remove('privacy-blur');
+                                    studentContainer.classList.add('privacy-revealed');
+                                    avatarContainer.classList.remove('privacy-blur');
+                                    avatarContainer.classList.add('privacy-revealed');
+                                    assessmentContainer.classList.remove('privacy-blur');
+                                    assessmentContainer.classList.add('privacy-revealed');
+                                    privacyIcon.classList.remove('bi-eye-slash-fill');
+                                    privacyIcon.classList.add('bi-eye-fill');
+                                    privacyBtn.classList.remove('btn-light');
+                                    privacyBtn.classList.add('btn-warning');
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Access Granted',
+                                        text: 'Sensitive details revealed.',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Access Denied',
+                                        text: 'Incorrect passkey.',
+                                        confirmButtonColor: '#dc3545'
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        // Re-hide
+                        isRevealed = false;
+                        studentContainer.classList.add('privacy-blur');
+                        studentContainer.classList.remove('privacy-revealed');
+                        avatarContainer.classList.add('privacy-blur');
+                        avatarContainer.classList.remove('privacy-revealed');
+                        assessmentContainer.classList.add('privacy-blur');
+                        assessmentContainer.classList.remove('privacy-revealed');
+                        privacyIcon.classList.add('bi-eye-slash-fill');
+                        privacyIcon.classList.remove('bi-eye-fill');
+                        privacyBtn.classList.add('btn-light');
+                        privacyBtn.classList.remove('btn-warning');
                     }
                 });
             }
@@ -204,6 +298,20 @@
                 transform: scale(0.75);
                 transform-origin: top center;
             }
+        }
+
+        /* Privacy Blur */
+        .privacy-blur {
+            filter: blur(8px);
+            user-select: none;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        .privacy-revealed {
+            filter: blur(0);
+            user-select: auto;
+            pointer-events: auto;
         }
 
         body {

@@ -272,7 +272,7 @@
                         <!-- Pagination -->
                         <?php if($feedbacks->hasPages()): ?>
                             <div class="card-footer bg-white border-0 py-3">
-                                <?php echo e($feedbacks->links()); ?>
+                                <?php echo e($feedbacks->links('vendor.pagination.bootstrap-5')); ?>
 
                             </div>
                         <?php endif; ?>

@@ -518,6 +518,14 @@
                                     </div>
                                 <?php endif; ?>
                             </div>
+
+                            <!-- Pagination -->
+                            <?php if($sessionNotes->hasPages()): ?>
+                                <div class="d-flex justify-content-center mt-4">
+                                    <?php echo e($sessionNotes->links('vendor.pagination.bootstrap-5')); ?>
+
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

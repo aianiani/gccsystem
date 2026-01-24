@@ -49,9 +49,9 @@ class UserController extends Controller
         // Get unique colleges and courses for filter dropdowns (like Registration Approval)
         $colleges = User::where('role', 'student')->whereNotNull('college')->distinct()->pluck('college');
         $courses = User::where('role', 'student')->whereNotNull('course')->distinct()->pluck('course');
-        $genders = User::whereNotNull('sex')->distinct()->pluck('sex');
+        $sexes = User::whereNotNull('sex')->distinct()->pluck('sex');
 
-        return view('users.index', compact('users', 'colleges', 'courses', 'genders'));
+        return view('users.index', compact('users', 'colleges', 'courses', 'sexes'));
     }
 
     /**
@@ -481,8 +481,8 @@ class UserController extends Controller
 
         // Base validation rules for all users
         $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
             'contact_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
         ];
@@ -501,6 +501,7 @@ class UserController extends Controller
                 'specialization' => 'nullable|string|max:255',
                 'years_of_experience' => 'nullable|integer|min:0',
                 'education' => 'nullable|string|max:1000',
+                'passkey' => 'nullable|string|max:50',
             ]);
         }
 
@@ -527,7 +528,8 @@ class UserController extends Controller
                 'license_number',
                 'specialization',
                 'years_of_experience',
-                'education'
+                'education',
+                'passkey'
             ]));
         }
 

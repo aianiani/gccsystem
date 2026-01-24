@@ -130,17 +130,7 @@
             color: var(--forest-green-light);
         }
 
-        /* Apply the same page zoom used on the homepage */
-        .home-zoom {
-            zoom: 0.75;
-        }
 
-        @supports not (zoom: 1) {
-            .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
-            }
-        }
 
         body,
         .profile-card,
@@ -278,7 +268,7 @@
         }
     </style>
 
-    <div class="home-zoom">
+    <div>
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
             <button id="counselorSidebarToggle" class="d-md-none">
@@ -436,7 +426,7 @@
         function formatDateTime(iso) {
             if (!iso) return '';
             const d = new Date(iso);
-            return d.toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            return d.toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
         }
         // Helper to render the availability list from backend data
         function renderAvailabilityList(data) {
@@ -460,6 +450,8 @@
             var calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
+                height: 'auto',
+                expandRows: true, // Ensure rows take up full height
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
@@ -470,8 +462,23 @@
                 selectMirror: true,
                 nowIndicator: true,
                 allDaySlot: false,
-                slotMinTime: '07:00:00',
-                slotMaxTime: '20:00:00',
+                slotDuration: '01:30:00',
+                snapDuration: '01:30:00',
+                slotMinTime: '08:00:00',
+                slotMaxTime: '18:00:00',
+                slotLabelFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    omitZeroMinute: false,
+                    meridiem: 'short',
+                    hour12: true
+                },
+                eventTimeFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    meridiem: 'short',
+                    hour12: true
+                },
                 eventColor: '#2d5016',
                 select: function (info) {
                     calendar.addEvent({

@@ -22,7 +22,7 @@ class DashboardController extends Controller
         $stats = [
             'total_users' => User::count(),
             'active_users' => User::where('is_active', true)->count(),
-            'admin_users' => User::where('role', 'admin')->count(),
+            'admin_users' => User::where('role', 'admin')->where('is_active', true)->count(),
             'total_activities' => UserActivity::count(),
         ];
 
@@ -31,11 +31,87 @@ class DashboardController extends Controller
                 $analytics = $this->calculateAdminAnalytics();
                 return view('dashboard_admin', compact('user', 'recentActivities', 'stats', 'recentAnnouncements', 'analytics'));
             case 'counselor':
-                $allAppointments = \App\Models\Appointment::with('student')
-                    ->where('counselor_id', $user->id)
-                    ->orderBy('scheduled_at', 'desc')
+                $counselorId = $user->id;
+
+                // Calendar events
+                $allAppointments = \App\Models\Appointment::with([
+                    'student.assessments' => function ($q) {
+                        $q->latest();
+                    }
+                ])
+                    ->where('counselor_id', $counselorId)
+                    ->orderBy('scheduled_at', 'asc')
                     ->get();
-                return view('dashboard_counselor', compact('user', 'recentActivities', 'stats', 'recentAnnouncements', 'allAppointments'));
+
+                // Stats for top cards
+                $todayAppointments = \App\Models\Appointment::where('counselor_id', $counselorId)
+                    ->whereDate('scheduled_at', today())
+                    ->count();
+
+                $pendingAppointments = \App\Models\Appointment::where('counselor_id', $counselorId)
+                    ->where('status', 'pending')
+                    ->count();
+
+                $completedThisMonth = \App\Models\Appointment::where('counselor_id', $counselorId)
+                    ->where('status', 'completed')
+                    ->whereMonth('scheduled_at', now()->month)
+                    ->whereYear('scheduled_at', now()->year)
+                    ->count();
+
+                $activeStudentsCount = \App\Models\Appointment::where('counselor_id', $counselorId)
+                    ->where('scheduled_at', '>=', now()->subDays(30))
+                    ->distinct('student_id')
+                    ->count('student_id');
+
+                // List of today's appointments for the sidebar agenda
+                $todayAppointmentsList = \App\Models\Appointment::with('student')
+                    ->where('counselor_id', $counselorId)
+                    ->whereDate('scheduled_at', today())
+                    ->orderBy('scheduled_at', 'asc')
+                    ->get();
+
+                // High-Risk/Priority Students
+                $priorityStudents = \App\Models\User::where('role', 'student')
+                    ->whereHas('assessments', function ($q) {
+                        $q->whereIn('risk_level', ['high', 'very-high', 'moderate']);
+                    })
+                    ->whereHas('appointments', function ($q) use ($counselorId) {
+                        $q->where('counselor_id', $counselorId);
+                    })
+                    ->with([
+                        'assessments' => function ($q) {
+                            $q->latest();
+                        }
+                    ])
+                    ->take(5)
+                    ->get();
+
+                $highRiskCasesCount = $priorityStudents->count();
+
+                // Recent Feedback
+                $recentFeedback = \App\Models\SessionFeedback::whereHas('appointment', function ($q) use ($counselorId) {
+                    $q->where('counselor_id', $counselorId);
+                })
+                    ->with(['appointment.student'])
+                    ->orderBy('created_at', 'desc')
+                    ->take(3)
+                    ->get();
+
+                return view('dashboard_counselor', compact(
+                    'user',
+                    'recentActivities',
+                    'stats',
+                    'recentAnnouncements',
+                    'allAppointments',
+                    'todayAppointments',
+                    'pendingAppointments',
+                    'completedThisMonth',
+                    'activeStudentsCount',
+                    'priorityStudents',
+                    'highRiskCasesCount',
+                    'todayAppointmentsList',
+                    'recentFeedback'
+                ));
             case 'student':
                 $studentStats = $this->calculateStudentStats($user);
                 $upcomingAppointments = \App\Models\Appointment::where('student_id', $user->id)
@@ -85,20 +161,29 @@ class DashboardController extends Controller
             $regCounts[] = $registrationData->get($date, 0);
         }
 
-        // 2. Appointment Status Distribution
-        $appointmentStats = \App\Models\Appointment::selectRaw('status, COUNT(*) as count')
+        // 2. Appointment Status Distribution (Active or not, appointments are historical records, but maybe we want only active users? 
+        // usually appointments stats are operational, so we keep all, OR we filter by active students. 
+        // Let's filter by active students to be consistent with "current state".
+        $appointmentStats = \App\Models\Appointment::whereHas('student', function ($q) {
+            $q->where('is_active', true);
+        })
+            ->selectRaw('status, COUNT(*) as count')
             ->groupBy('status')
             ->get()
             ->pluck('count', 'status');
 
-        // 3. Risk Level Distribution (Global)
-        $riskStats = \App\Models\Assessment::selectRaw('risk_level, COUNT(*) as count')
+        // 3. Risk Level Distribution (Global - Active Users Only)
+        $riskStats = \App\Models\Assessment::whereHas('user', function ($q) {
+            $q->where('is_active', true);
+        })
+            ->selectRaw('risk_level, COUNT(*) as count')
             ->groupBy('risk_level')
             ->get()
             ->pluck('count', 'risk_level');
 
         // 4. College-Wise Risk Mapping (High Risk Only: Severe, Extremely Severe)
         $collegeRiskData = \App\Models\Assessment::join('users', 'assessments.user_id', '=', 'users.id')
+            ->where('users.is_active', true)
             ->whereIn('assessments.risk_level', ['severe', 'extremely severe'])
             ->selectRaw('users.college, assessments.risk_level, COUNT(*) as count')
             ->groupBy('users.college', 'assessments.risk_level')
@@ -106,80 +191,55 @@ class DashboardController extends Controller
 
         $collegeRiskMap = [];
         foreach ($collegeRiskData as $item) {
-            $collegeRiskMap[$item->college][$item->risk_level] = $item->count;
+            $college = $item->college ?: 'Unknown';
+            $collegeRiskMap[$college][$item->risk_level] = $item->count;
         }
 
-        // 5. Counselor Workload (Appointments per counselor)
+        // 5. Counselor Workload (Appointments per counselor - Only active counselors)
         $counselorWorkload = User::where('role', 'counselor')
+            ->where('is_active', true)
             ->withCount(['sessionNotes']) // Assuming counselor workload is based on notes/sessions
             ->get()
             ->pluck('session_notes_count', 'name');
 
-        // 6. Critical Alerts (Latest high-risk assessments)
+        // 6. Critical Alerts (Latest high-risk assessments - Active users only)
         $criticalAlerts = \App\Models\Assessment::with('user')
+            ->whereHas('user', function ($q) {
+                $q->where('is_active', true);
+            })
             ->whereIn('risk_level', ['severe', 'extremely severe'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
-        if ($criticalAlerts->isEmpty()) {
-            $criticalAlerts = collect([
-                (object) [
-                    'user' => (object) ['name' => 'John Smith', 'college' => 'CCS'],
-                    'risk_level' => 'extremely severe',
-                    'created_at' => now()->subHours(2)
-                ],
-                (object) [
-                    'user' => (object) ['name' => 'Maria Garcia', 'college' => 'CAS'],
-                    'risk_level' => 'severe',
-                    'created_at' => now()->subHours(5)
-                ]
-            ]);
-        }
-
         // 7. Demographic Breakdown
-        $genderDistribution = User::where('role', 'student')
+        // Helper to safe keys
+        $safeKey = fn($k) => $k ?: 'Unknown';
+
+        $sexDistribution = User::where('role', 'student')
+            ->where('is_active', true)
             ->selectRaw('sex, COUNT(*) as count')
             ->groupBy('sex')
             ->get()
             ->pluck('count', 'sex');
 
-        // FALLBACK: If sparse, inject dummy data for visualization
-        if ($genderDistribution->isEmpty()) {
-            $genderDistribution = collect(['male' => 450, 'female' => 520, 'non-binary' => 15]);
-        }
-
         $collegeDistribution = User::where('role', 'student')
+            ->where('is_active', true)
             ->selectRaw('college, COUNT(*) as count')
             ->groupBy('college')
             ->get()
             ->pluck('count', 'college');
 
-        if ($collegeDistribution->isEmpty()) {
-            $collegeDistribution = collect([
-                'CAS' => 240,
-                'CBA' => 180,
-                'COE' => 310,
-                'CON' => 150,
-                'CCJE' => 200,
-                'CTE' => 120,
-                'CCS' => 280,
-                'CHM' => 90
-            ]);
-        }
-
         $yearLevelDistribution = User::where('role', 'student')
+            ->where('is_active', true)
             ->selectRaw('year_level, COUNT(*) as count')
             ->groupBy('year_level')
             ->orderBy('year_level')
             ->get()
             ->pluck('count', 'year_level');
 
-        if ($yearLevelDistribution->isEmpty()) {
-            $yearLevelDistribution = collect([1 => 350, 2 => 280, 3 => 220, 4 => 180]);
-        }
-
         $topCourses = User::where('role', 'student')
+            ->where('is_active', true)
             ->selectRaw('course, COUNT(*) as count')
             ->groupBy('course')
             ->orderBy('count', 'desc')
@@ -187,34 +247,14 @@ class DashboardController extends Controller
             ->get()
             ->pluck('count', 'course');
 
-        if ($topCourses->isEmpty()) {
-            $topCourses = collect([
-                'BS Computer Science' => 120,
-                'BS Psychology' => 95,
-                'BS Civil Engineering' => 85,
-                'BS Accountancy' => 75,
-                'BS Nursing' => 60
-            ]);
-        }
-
-        // Final Analytics Construction with fallbacks for registration & risk
-        if (count($regCounts) < 7) {
-            $regCounts = [12, 18, 15, 25, 32, 28, 45]; // Dummy registration velocity
-        }
-
-        if ($riskStats->isEmpty()) {
-            $riskStats = collect(['normal' => 150, 'mild' => 80, 'moderate' => 45, 'severe' => 20, 'extremely severe' => 12]);
-        }
-
-        if ($counselorWorkload->isEmpty()) {
-            $counselorWorkload = collect(['Dr. Santos' => 15, 'Prof. Reyes' => 12, 'Ms. Garcia' => 18]);
-        }
-
         // 8. Action Items Summary
         $actionItems = [
-            'pending_approvals' => User::where('registration_status', 'pending')->count() ?: 12,
-            'pending_appointments' => \App\Models\Appointment::where('status', 'pending')->count() ?: 8,
-            'total_students' => User::where('role', 'student')->count() ?: 985,
+            'pending_approvals' => User::where('registration_status', 'pending')->where('is_active', true)->count(),
+            'pending_appointments' => \App\Models\Appointment::where('status', 'pending')
+                ->whereHas('student', function ($q) {
+                    $q->where('is_active', true);
+                })->count(),
+            'total_students' => User::where('role', 'student')->where('is_active', true)->count(),
         ];
 
         return [
@@ -223,11 +263,11 @@ class DashboardController extends Controller
                 'data' => $regCounts,
             ],
             'appointments' => [
-                'labels' => $appointmentStats->keys()->map(fn($k) => ucfirst($k)),
+                'labels' => $appointmentStats->keys()->map(fn($k) => ucfirst($k ?: 'Unknown')),
                 'data' => $appointmentStats->values(),
             ],
             'risk' => [
-                'labels' => $riskStats->keys()->map(fn($k) => ucfirst($k)),
+                'labels' => $riskStats->keys()->map(fn($k) => ucfirst($k ?: 'Unknown')),
                 'data' => $riskStats->values(),
             ],
             'college_risk' => $collegeRiskMap,
@@ -236,20 +276,30 @@ class DashboardController extends Controller
                 'data' => $counselorWorkload->values(),
             ],
             'demographics' => [
-                'gender' => [
-                    'labels' => $genderDistribution->keys()->map(fn($k) => ucfirst(str_replace('_', ' ', $k))),
-                    'data' => $genderDistribution->values(),
+                'sex' => [
+                    'labels' => $sexDistribution->keys()->map(fn($k) => ucfirst(str_replace('_', ' ', $k ?: 'Unknown'))),
+                    'data' => $sexDistribution->values(),
                 ],
                 'college' => [
-                    'labels' => $collegeDistribution->keys(),
+                    'labels' => $collegeDistribution->keys()->map($safeKey),
                     'data' => $collegeDistribution->values(),
                 ],
                 'year_level' => [
-                    'labels' => $yearLevelDistribution->keys()->map(fn($k) => $k . (in_array($k, [1, 2, 3]) ? ['st', 'nd', 'rd'][$k - 1] : 'th') . ' Year'),
+                    'labels' => $yearLevelDistribution->keys()->map(function ($k) {
+                        if (!$k)
+                            return 'Unknown';
+                        $suffix = match ((int) $k) {
+                            1 => 'st',
+                            2 => 'nd',
+                            3 => 'rd',
+                            default => 'th',
+                        };
+                        return $k . $suffix . ' Year';
+                    }),
                     'data' => $yearLevelDistribution->values(),
                 ],
                 'top_courses' => [
-                    'labels' => $topCourses->keys(),
+                    'labels' => $topCourses->keys()->map($safeKey),
                     'data' => $topCourses->values(),
                 ],
             ],

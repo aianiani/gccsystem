@@ -93,13 +93,13 @@ class CounselorStudentController extends Controller
         }
 
         // Sex Counts
-        $genderStats = User::where('role', 'student')
+        $sexStats = User::where('role', 'student')
             ->selectRaw('sex, count(*) as count')
             ->groupBy('sex')
             ->pluck('count', 'sex')
             ->toArray();
 
-        return view('counselor.students.index', compact('students', 'colleges', 'yearLevels', 'totalStudents', 'yearStats', 'genderStats'));
+        return view('counselor.students.index', compact('students', 'colleges', 'yearLevels', 'totalStudents', 'yearStats', 'sexStats'));
     }
 
     /**

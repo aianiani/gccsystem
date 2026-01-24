@@ -426,7 +426,13 @@ class AssessmentController extends Controller
 
         // If this is a DASS-42 assessment, include the questions so the export view
         // can render per-question answers.
-        $viewData = compact('assessment', 'scores', 'score_interpretation');
+        // Find the linked appointment (first one created/scheduled after assessment)
+        $linkedAppointment = \App\Models\Appointment::where('student_id', $assessment->user_id)
+            ->where('created_at', '>=', $assessment->created_at)
+            ->orderBy('created_at', 'asc')
+            ->first();
+
+        $viewData = compact('assessment', 'scores', 'score_interpretation', 'linkedAppointment');
         if ($assessment->type === 'DASS-42') {
             $viewData['dass42_questions'] = $this->getDass42Questions();
         }

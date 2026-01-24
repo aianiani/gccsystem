@@ -566,7 +566,7 @@
                                     class="bi bi-activity"></i>Activity Logs</a>
                             <a href="<?php echo e(route('admin.reports.index')); ?>"
                                 class="sidebar-link<?php echo e(request()->routeIs('admin.reports.*') ? ' active' : ''); ?>"><i
-                                    class="bi bi-file-earmark-bar-graph"></i>Monthly Reports</a>
+                                    class="bi bi-file-earmark-bar-graph"></i>Reports</a>
                             <a href="<?php echo e(route('admin.analytics.index')); ?>"
                                 class="sidebar-link<?php echo e(request()->routeIs('admin.analytics.*') ? ' active' : ''); ?>"><i
                                     class="bi bi-graph-up-arrow"></i>Analytics</a>

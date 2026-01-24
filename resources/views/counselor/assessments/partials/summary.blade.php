@@ -45,9 +45,9 @@
   // compact student meta (only show when present and not placeholder '-')
   $course = $assessment->user->course ?? null;
   $year = $assessment->user->year ?? null;
-  $gender = $assessment->user->gender ?? null;
+  $sex = $assessment->user->sex ?? null;
   $metaParts = [];
-  foreach ([$course, $year, $gender] as $p) {
+  foreach ([$course, $year, $sex] as $p) {
     if ($p && $p !== '-' && trim((string) $p) !== '')
       $metaParts[] = $p;
   }
