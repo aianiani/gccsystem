@@ -450,15 +450,21 @@
                                 @foreach($grit_questions as $idx => $q)
                                     <div class="question-item">
                                         <p class="fw-bold mb-3">{{ $idx + 1 }}. {{ $q }}</p>
-                                        <div class="d-flex flex-wrap gap-3">
-                                            @foreach(['Not at all like me', 'Not much like me', 'Somewhat like me', 'Mostly like me', 'Very much like me'] as $key => $label)
-                                                <label class="option-radio">
-                                                    <input type="radio" name="grit_answers[{{ $idx }}]" value="{{ $key + 1 }}"
-                                                        required>
-                                                    {{ $label }}
-                                                </label>
-                                            @endforeach
-                                        </div>
+                                        @php
+                                            $gritOptions = [
+                                                5 => 'Not at all like me',
+                                                4 => 'Not much like me',
+                                                3 => 'Somewhat like me',
+                                                2 => 'Mostly like me',
+                                                1 => 'Very much like me'
+                                            ];
+                                        @endphp
+                                        @foreach($gritOptions as $val => $label)
+                                            <label class="option-radio">
+                                                <input type="radio" name="grit_answers[{{ $idx }}]" value="{{ $val }}" required>
+                                                {{ $label }}
+                                            </label>
+                                        @endforeach
                                     </div>
                                 @endforeach
 
@@ -486,12 +492,25 @@
                                 @foreach($neo_questions as $idx => $q)
                                     <div class="question-item">
                                         <p class="fw-bold mb-3">{{ $idx + 1 }}. {{ $q }}</p>
-                                        <div class="d-flex flex-wrap gap-3">
-                                            @foreach(['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'] as $key => $label)
-                                                <label class="option-radio">
-                                                    <input type="radio" name="neo_answers[{{ $idx }}]" value="{{ $key + 1 }}"
-                                                        required>
-                                                    {{ $label }}
+                                        <div class="d-flex flex-wrap gap-2 justify-content-between">
+                                            @php
+                                                $neoOptions = [
+                                                    1 => 'Not True',
+                                                    2 => '2',
+                                                    3 => '3',
+                                                    4 => 'Somewhat',
+                                                    5 => '5',
+                                                    6 => '6',
+                                                    7 => 'Very True'
+                                                ];
+                                            @endphp
+                                            @foreach($neoOptions as $val => $label)
+                                                <label
+                                                    class="option-radio flex-fill text-center d-flex flex-column align-items-center p-2"
+                                                    style="min-width: 80px; border: 1px solid #eee;">
+                                                    <span class="small text-muted mb-1">{{ $label }}</span>
+                                                    <input type="radio" name="neo_answers[{{ $idx }}]" value="{{ $val }}" required
+                                                        class="m-0">
                                                 </label>
                                             @endforeach
                                         </div>
@@ -522,12 +541,23 @@
                                 @foreach($wvi_questions as $idx => $q)
                                     <div class="question-item">
                                         <p class="fw-bold mb-3">{{ $idx + 1 }}. {{ $q }}</p>
-                                        <div class="d-flex flex-wrap gap-3">
-                                            @foreach(['Unimportant', 'Of Little Importance', 'Moderately Important', 'Important', 'Very Important'] as $key => $label)
-                                                <label class="option-radio">
-                                                    <input type="radio" name="wvi_answers[{{ $idx }}]" value="{{ $key + 1 }}"
-                                                        required>
-                                                    {{ $label }}
+                                        <div class="d-flex flex-wrap gap-2 justify-content-between">
+                                            @php
+                                                $wviOptions = [
+                                                    5 => 'Very Important',
+                                                    4 => 'Important',
+                                                    3 => 'Moderately Important',
+                                                    2 => 'Of Little Importance',
+                                                    1 => 'Unimportant'
+                                                ];
+                                            @endphp
+                                            @foreach($wviOptions as $val => $label)
+                                                <label
+                                                    class="option-radio flex-fill text-center d-flex flex-column align-items-center p-2"
+                                                    style="min-width: 90px; border: 1px solid #eee;">
+                                                    <span class="small text-muted mb-1">{{ $label }}</span>
+                                                    <input type="radio" name="wvi_answers[{{ $idx }}]" value="{{ $val }}" required
+                                                        class="m-0">
                                                 </label>
                                             @endforeach
                                         </div>
@@ -552,23 +582,25 @@
     </div>
 
     @if(session('show_thank_you'))
-        <div class="modal fade show" id="thankYouModal" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);"
-            aria-modal="true" role="dialog">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header border-0">
-                        <h5 class="modal-title w-100 text-center">Assessment Completed</h5>
-                    </div>
-                    <div class="modal-body text-center">
-                        <p class="mb-4">Thank you for completing the <strong>{{ session('last_assessment_type') }}</strong>.</p>
-                        <p class="text-muted small mb-4">Your results have been submitted to the guidance counselor review.</p>
-                        <a href="{{ route('dashboard') }}" class="btn btn-success px-4">Back to Dashboard</a>
-                        <button type="button" class="btn btn-outline-secondary px-4 ms-2"
-                            onclick="document.getElementById('thankYouModal').style.display='none'">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    title: 'Assessment Completed!',
+                    text: 'Thank you for completing the {{ session('last_assessment_type') }}. Your results have been submitted for review.',
+                    icon: 'success',
+                    confirmButtonText: 'Back to Dashboard',
+                    confirmButtonColor: '#1f7a2d',
+                    showCancelButton: true,
+                    cancelButtonText: 'Stay Here',
+                    cancelButtonColor: '#6c757d',
+                    backdrop: `rgba(31, 122, 45, 0.2)`
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('dashboard') }}";
+                    }
+                });
+            });
+        </script>
     @endif
 
     <script>

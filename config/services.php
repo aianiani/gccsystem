@@ -35,8 +35,4 @@ return [
         ],
     ],
 
-    'cohere' => [
-        'api_key' => env('sx9fiJfVdJ9Q8qSJGKUywiKmTUFli6nmXCIO9ufO'),
-    ],
-
 ];

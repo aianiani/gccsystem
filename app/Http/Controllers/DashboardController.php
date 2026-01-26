@@ -20,7 +20,7 @@ class DashboardController extends Controller
         $recentAnnouncements = Announcement::orderBy('created_at', 'desc')->take(3)->get();
 
         $stats = [
-            'total_users' => User::count(),
+            'total_users' => User::where('role', 'student')->where('is_active', true)->count(),
             'active_users' => User::where('is_active', true)->count(),
             'admin_users' => User::where('role', 'admin')->where('is_active', true)->count(),
             'total_activities' => UserActivity::count(),
@@ -184,7 +184,7 @@ class DashboardController extends Controller
         // 4. College-Wise Risk Mapping (High Risk Only: Severe, Extremely Severe)
         $collegeRiskData = \App\Models\Assessment::join('users', 'assessments.user_id', '=', 'users.id')
             ->where('users.is_active', true)
-            ->whereIn('assessments.risk_level', ['severe', 'extremely severe'])
+            ->whereIn('assessments.risk_level', ['high', 'very-high', 'severe', 'extremely severe'])
             ->selectRaw('users.college, assessments.risk_level, COUNT(*) as count')
             ->groupBy('users.college', 'assessments.risk_level')
             ->get();
@@ -207,7 +207,7 @@ class DashboardController extends Controller
             ->whereHas('user', function ($q) {
                 $q->where('is_active', true);
             })
-            ->whereIn('risk_level', ['severe', 'extremely severe'])
+            ->whereIn('risk_level', ['high', 'very-high', 'severe', 'extremely severe'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
@@ -247,7 +247,19 @@ class DashboardController extends Controller
             ->get()
             ->pluck('count', 'course');
 
-        // 8. Action Items Summary
+        // 8. Expanded Analytics: Nature of Problem
+        $problemDistribution = \App\Models\Appointment::selectRaw('nature_of_problem, COUNT(*) as count')
+            ->groupBy('nature_of_problem')
+            ->get()
+            ->pluck('count', 'nature_of_problem');
+
+        // 9. Expanded Analytics: Referral Sources (Appointment Type)
+        $referralDistribution = \App\Models\Appointment::selectRaw('appointment_type, COUNT(*) as count')
+            ->groupBy('appointment_type')
+            ->get()
+            ->pluck('count', 'appointment_type');
+
+        // 10. Action Items Summary
         $actionItems = [
             'pending_approvals' => User::where('registration_status', 'pending')->where('is_active', true)->count(),
             'pending_appointments' => \App\Models\Appointment::where('status', 'pending')
@@ -302,9 +314,58 @@ class DashboardController extends Controller
                     'labels' => $topCourses->keys()->map($safeKey),
                     'data' => $topCourses->values(),
                 ],
+                'matrix' => \App\Models\User::where('role', 'student')
+                    ->where('is_active', true)
+                    ->selectRaw('college, year_level, count(*) as count')
+                    ->groupBy('college', 'year_level')
+                    ->get()
+                    ->groupBy('college')
+                    ->map(function ($group) {
+                        return $group->pluck('count', 'year_level');
+                    }),
             ],
             'critical_alerts' => $criticalAlerts,
+
             'action_items' => $actionItems,
+            'problem_distribution' => [
+                'labels' => $problemDistribution->keys()->map($safeKey),
+                'data' => $problemDistribution->values(),
+            ],
+            'referral_distribution' => [
+                'labels' => $referralDistribution->keys()->map(fn($k) => ucfirst($k ?: 'Self-Referral')),
+                'data' => $referralDistribution->values(),
+            ],
+            // 11. Reports Generated
+            'reports' => [
+                'counseling_usage' => \App\Models\Appointment::join('users', 'appointments.student_id', '=', 'users.id')
+                    ->whereHas('student', function ($q) {
+                        $q->where('is_active', true);
+                    })
+                    ->selectRaw("users.college, users.year_level, count(*) as count")
+                    ->groupBy('users.college', 'users.year_level')
+                    ->get()
+                    ->groupBy('college')
+                    ->map(function ($group) {
+                        return $group->pluck('count', 'year_level');
+                    }),
+                'high_risk_programs' => \App\Models\Assessment::join('users', 'assessments.user_id', '=', 'users.id')
+                    ->where('users.is_active', true)
+                    ->whereIn('risk_level', ['severe', 'extremely severe'])
+                    ->selectRaw("users.course as program, count(*) as count")
+                    ->groupBy('users.course')
+                    ->orderByDesc('count')
+                    ->limit(5)
+                    ->get()
+                    ->pluck('count', 'program'),
+                'counseling_trend' => \App\Models\Appointment::join('users', 'appointments.student_id', '=', 'users.id')
+                    ->where('users.is_active', true)
+                    ->selectRaw("DATE_FORMAT(appointments.created_at, '%Y-%m') as date, count(*) as count")
+                    ->where('appointments.created_at', '>=', now()->subMonths(6)->startOfMonth())
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get()
+                    ->pluck('count', 'date'),
+            ],
         ];
     }
 

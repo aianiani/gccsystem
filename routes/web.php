@@ -250,6 +250,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin/reports')->name('admin.repor
 // Admin Analytics
 Route::middleware(['auth', 'admin'])->prefix('admin/analytics')->name('admin.analytics.')->group(function () {
     Route::get('/', [AnalyticsController::class, 'index'])->name('index');
+    Route::get('/export', [AnalyticsController::class, 'export'])->name('export');
 });
 
 // Temporary debug route - add at the end of the file

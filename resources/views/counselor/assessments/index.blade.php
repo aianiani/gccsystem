@@ -710,8 +710,10 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="d-flex justify-content-center mt-4">
-                                {{ $assessments->links('vendor.pagination.bootstrap-5') }}
+                            <div class="d-flex justify-content-center mt-5 mb-4 pagination-container">
+                                <div class="shadow-sm rounded-pill p-2 bg-white border">
+                                    {{ $assessments->links('pagination::bootstrap-4') }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -767,12 +769,40 @@
             </div>
         </div>
     @endforeach
-    </div>
-    </div>
-    </div>
 
-    </div>
     <style>
+        .pagination-container .pagination {
+            margin-bottom: 0;
+            gap: 5px;
+        }
+
+        .pagination-container .page-item .page-link {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--forest-green);
+            border: 1px solid #eee;
+            margin: 0 2px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-container .page-item.active .page-link {
+            background-color: var(--forest-green);
+            border-color: var(--forest-green);
+            color: white;
+            box-shadow: 0 4px 10px rgba(31, 122, 45, 0.2);
+        }
+
+        .pagination-container .page-item .page-link:hover {
+            background-color: var(--forest-green-lighter);
+            color: var(--forest-green);
+            transform: translateY(-2px);
+        }
+
         .sticky-top {
             position: sticky !important;
             top: 0;

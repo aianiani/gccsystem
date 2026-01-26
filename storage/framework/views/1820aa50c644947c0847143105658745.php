@@ -369,9 +369,9 @@
                         </label>
                         <select class="form-select" id="sex" name="sex" onchange="this.form.submit()">
                             <option value="">All</option>
-                            <?php $__currentLoopData = $genders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $gender): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($gender); ?>" <?php echo e(request('sex') == $gender ? 'selected' : ''); ?>>
-                                    <?php echo e(ucfirst($gender)); ?>
+                            <?php $__currentLoopData = $sexes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sex): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($sex); ?>" <?php echo e(request('sex') == $sex ? 'selected' : ''); ?>>
+                                    <?php echo e(ucfirst($sex)); ?>
 
                                 </option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -408,7 +408,7 @@
                         <div class="input-group">
                             <input type="date" class="form-control" id="date_to" name="date_to"
                                 value="<?php echo e(request('date_to')); ?>" onchange="this.form.submit()">
-                            <?php if(request()->anyFilled(['search', 'college', 'course', 'year_level', 'role', 'gender', 'status', 'date_from', 'date_to'])): ?>
+                            <?php if(request()->anyFilled(['search', 'college', 'course', 'year_level', 'role', 'sex', 'status', 'date_from', 'date_to'])): ?>
                                 <a href="<?php echo e(route('users.index')); ?>" class="btn btn-outline-danger" title="Clear Filters">
                                     <i class="bi bi-x-lg"></i>
                                 </a>
@@ -1026,12 +1026,12 @@
                             // Display Results in Modal
                             if (resultsDiv) {
                                 resultsDiv.innerHTML = `
-                                                                            <div class="alert alert-success">
-                                                                                <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
-                                                                                <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
-                                                                                <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
-                                                                            </div>
-                                                                        `;
+                                                                                    <div class="alert alert-success">
+                                                                                        <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
+                                                                                        <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
+                                                                                        <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
+                                                                                    </div>
+                                                                                `;
                             }
 
 

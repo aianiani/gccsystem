@@ -220,7 +220,7 @@
                 <button onclick="window.print()" class="btn btn-light no-print">
                     <i class="bi bi-printer me-1"></i> Print
                 </button>
-                <a href="<?php echo e(route('admin.reports.export', ['format' => 'pdf', 'frequency' => $frequency, 'month' => $month, 'year' => $year, 'week' => $week])); ?>"
+                <a href="<?php echo e(route('admin.reports.export', ['format' => 'pdf', 'frequency' => $frequency, 'month' => $month, 'year' => $year, 'week' => $week, 'date' => $date])); ?>"
                     class="btn btn-light no-print">
                     <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
                 </a>
@@ -236,6 +236,7 @@
                 <div class="col-md-3">
                     <label class="form-label">Report Frequency</label>
                     <select name="frequency" id="frequencyStart" class="form-select" onchange="toggleInputs()">
+                        <option value="daily" <?php echo e($frequency == 'daily' ? 'selected' : ''); ?>>Daily</option>
                         <option value="weekly" <?php echo e($frequency == 'weekly' ? 'selected' : ''); ?>>Weekly</option>
                         <option value="monthly" <?php echo e($frequency == 'monthly' ? 'selected' : ''); ?>>Monthly</option>
                         <option value="annual" <?php echo e($frequency == 'annual' ? 'selected' : ''); ?>>Annual</option>
@@ -245,7 +246,9 @@
                 <div class="col-md-3">
                     <label class="form-label">Year</label>
                     <select name="year" class="form-select" required>
-                        <?php $__currentLoopData = range(date('Y') - 5, date('Y') + 2); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $y): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $startYear = 2024;
+                        $endYear = date('Y') + 10; ?>
+                        <?php $__currentLoopData = range($startYear, $endYear); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $y): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($y); ?>" <?php echo e($year == $y ? 'selected' : ''); ?>><?php echo e($y); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
@@ -268,6 +271,11 @@
                     <input type="number" name="week" class="form-control" min="1" max="52" value="<?php echo e($week); ?>">
                 </div>
 
+                <div class="col-md-3 input-date" style="display: <?php echo e($frequency == 'daily' ? 'block' : 'none'); ?>;">
+                    <label class="form-label">Select Date</label>
+                    <input type="date" name="date" class="form-control" value="<?php echo e($date); ?>">
+                </div>
+
                 <div class="col-md-3">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-funnel me-2"></i> Generate Report
@@ -276,14 +284,7 @@
             </form>
         </div>
 
-        <!-- Chart Section -->
-        <div class="row no-print">
-            <div class="col-12">
-                <div class="chart-container">
-                    <canvas id="reportChart"></canvas>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Summary Metrics Cards -->
         <div class="row mb-4 no-print">
@@ -352,26 +353,23 @@
                     <thead>
                         <tr>
                             <th rowspan="2">CLIENT / STUDENTS TEST</th>
-                            <th colspan="5">ADMINISTRATION</th>
-                            <th colspan="4">CHECKING / SCORING</th>
-                            <th colspan="4">INTERPRETATION</th>
-                            <th colspan="4">PSYCHOLOGICAL REPORT/RESULT</th>
+                            <th rowspan="2">COLLEGE</th>
+                            <th colspan="4">ADMINISTRATION</th>
+                            <th colspan="3">CHECKING / SCORING</th>
+                            <th colspan="3">INTERPRETATION</th>
+                            <th colspan="3">PSYCHOLOGICAL REPORT/RESULT</th>
                         </tr>
                         <tr>
-                            <th>College</th>
                             <th>Male</th>
                             <th>Female</th>
                             <th>Total Attendees</th>
                             <th>Total Enrolled</th>
-                            <th>College</th>
                             <th>Male</th>
                             <th>Female</th>
                             <th>Total Attendees</th>
-                            <th>College</th>
                             <th>Male</th>
                             <th>Female</th>
                             <th>Total Attendees</th>
-                            <th>College</th>
                             <th>Male</th>
                             <th>Female</th>
                             <th>Total Attendees</th>
@@ -386,8 +384,8 @@
                         ?>
 
                         <?php $__empty_1 = true; $__currentLoopData = $testingData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $test): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                             <?php $rowCount = count($test['rows']); ?>
-                             <?php $__currentLoopData = $test['rows']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php $rowCount = count($test['rows']); ?>
+                            <?php $__currentLoopData = $test['rows']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
                                     <?php if($index === 0): ?>
                                         <td rowspan="<?php echo e($rowCount); ?>" style="vertical-align: middle; background-color: #f8f9fa;">
@@ -395,51 +393,50 @@
                                         </td>
                                     <?php endif; ?>
 
-                                    <!-- Administration -->
+                                    <!-- College Column (Single) -->
                                     <td class="text-start" style="font-size: 0.75rem;"><?php echo e($row['college']); ?></td>
+
+                                    <!-- Administration -->
                                     <td class="text-center"><?php echo e($row['administration']['male']); ?></td>
                                     <td class="text-center"><?php echo e($row['administration']['female']); ?></td>
                                     <td class="text-center"><strong><?php echo e($row['administration']['total']); ?></strong></td>
                                     <td class="text-center"><strong><?php echo e($row['administration']['total_enrolled']); ?></strong></td>
 
                                     <!-- Checking -->
-                                    <td class="text-start" style="font-size: 0.75rem;"><?php echo e($row['college']); ?></td>
                                     <td class="text-center"><?php echo e($row['checking_scoring']['male']); ?></td>
                                     <td class="text-center"><?php echo e($row['checking_scoring']['female']); ?></td>
                                     <td class="text-center"><strong><?php echo e($row['checking_scoring']['total']); ?></strong></td>
 
                                     <!-- Interpretation -->
-                                    <td class="text-start" style="font-size: 0.75rem;"><?php echo e($row['college']); ?></td>
                                     <td class="text-center"><?php echo e($row['interpretation']['male']); ?></td>
                                     <td class="text-center"><?php echo e($row['interpretation']['female']); ?></td>
                                     <td class="text-center"><strong><?php echo e($row['interpretation']['total']); ?></strong></td>
 
                                     <!-- Report -->
-                                    <td class="text-start" style="font-size: 0.75rem;"><?php echo e($row['college']); ?></td>
                                     <td class="text-center"><?php echo e($row['report_result']['male']); ?></td>
                                     <td class="text-center"><?php echo e($row['report_result']['female']); ?></td>
                                     <td class="text-center"><strong><?php echo e($row['report_result']['total']); ?></strong></td>
                                 </tr>
-                                
+
                                 <?php
                                     $totalAdmin['male'] += $row['administration']['male'];
                                     $totalAdmin['female'] += $row['administration']['female'];
                                     $totalAdmin['total'] += $row['administration']['total'];
                                     $totalAdmin['enrolled'] += $row['administration']['total_enrolled'];
-                                    
+
                                     $totalChecking['male'] += $row['checking_scoring']['male'];
                                     $totalChecking['female'] += $row['checking_scoring']['female'];
                                     $totalChecking['total'] += $row['checking_scoring']['total'];
-                                    
+
                                     $totalInterpretation['male'] += $row['interpretation']['male'];
                                     $totalInterpretation['female'] += $row['interpretation']['female'];
                                     $totalInterpretation['total'] += $row['interpretation']['total'];
-                                    
+
                                     $totalReport['male'] += $row['report_result']['male'];
                                     $totalReport['female'] += $row['report_result']['female'];
                                     $totalReport['total'] += $row['report_result']['total'];
                                 ?>
-                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <tr>
                                 <td colspan="18" class="text-center text-muted py-4">
@@ -450,21 +447,17 @@
 
                         <?php if(count($testingData) > 0): ?>
                             <tr class="total-row">
-                                <td><strong>GRAND TOTAL</strong></td>
-                                <td></td> <!-- College -->
+                                <td colspan="2"><strong>GRAND TOTAL</strong></td>
                                 <td class="text-center"><?php echo e($totalAdmin['male']); ?></td>
                                 <td class="text-center"><?php echo e($totalAdmin['female']); ?></td>
                                 <td class="text-center"><strong><?php echo e($totalAdmin['total']); ?></strong></td>
                                 <td class="text-center"><strong><?php echo e($totalAdmin['enrolled']); ?></strong></td>
-                                <td></td> <!-- College -->
                                 <td class="text-center"><?php echo e($totalChecking['male']); ?></td>
                                 <td class="text-center"><?php echo e($totalChecking['female']); ?></td>
                                 <td class="text-center"><strong><?php echo e($totalChecking['total']); ?></strong></td>
-                                <td></td> <!-- College -->
                                 <td class="text-center"><?php echo e($totalInterpretation['male']); ?></td>
                                 <td class="text-center"><?php echo e($totalInterpretation['female']); ?></td>
                                 <td class="text-center"><strong><?php echo e($totalInterpretation['total']); ?></strong></td>
-                                <td></td> <!-- College -->
                                 <td class="text-center"><?php echo e($totalReport['male']); ?></td>
                                 <td class="text-center"><?php echo e($totalReport['female']); ?></td>
                                 <td class="text-center"><strong><?php echo e($totalReport['total']); ?></strong></td>
@@ -515,7 +508,7 @@
                                             <strong><?php echo e($guidance['topic']); ?></strong>
                                         </td>
                                     <?php endif; ?>
-                                    
+
                                     <td class="text-start" style="font-size: 0.75rem;"><?php echo e($row['college']); ?></td>
                                     <td class="text-center"><?php echo e($row['male']); ?></td>
                                     <td class="text-center"><?php echo e($row['female']); ?></td>
@@ -587,7 +580,7 @@
                                             <strong><?php echo e($counseling['nature']); ?></strong>
                                         </td>
                                     <?php endif; ?>
-                                    
+
                                     <td class="text-start" style="font-size: 0.75rem;"><?php echo e($row['college']); ?></td>
                                     <td class="text-center"><?php echo e($row['year_level']); ?></td>
                                     <td class="text-start" style="font-size: 0.75rem;"><?php echo e($row['presenting_problem']); ?></td>
@@ -625,63 +618,24 @@
     </div>
 
     <script>
-        function toggleInputs() {
-            const freq = document.getElementById('frequencyStart').value;
-            const monthDiv = document.querySelector('.input-month');
-            const weekDiv = document.querySelector('.input-week');
+        const freq = document.getElementById('frequencyStart').value;
+        const monthDiv = document.querySelector('.input-month');
+        const weekDiv = document.querySelector('.input-week');
+        const dateDiv = document.querySelector('.input-date');
 
-            if (freq === 'weekly') {
-                monthDiv.style.display = 'none';
-                weekDiv.style.display = 'block';
-            } else if (freq === 'monthly') {
-                monthDiv.style.display = 'block';
-                weekDiv.style.display = 'none';
-            } else { // annual
-                monthDiv.style.display = 'none';
-                weekDiv.style.display = 'none';
-            }
+        monthDiv.style.display = 'none';
+        weekDiv.style.display = 'none';
+        dateDiv.style.display = 'none';
+
+        if (freq === 'weekly') {
+            weekDiv.style.display = 'block';
+        } else if (freq === 'monthly') {
+            monthDiv.style.display = 'block';
+        } else if (freq === 'daily') {
+            dateDiv.style.display = 'block';
         }
-
-        // Initialize Chart
-        const ctx = document.getElementById('reportChart').getContext('2d');
-        const reportChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Tested', 'Guided', 'Counseled (In Session)'],
-                datasets: [{
-                    label: 'Total Count',
-                    data: [<?php echo e($totalTested ?? 0); ?>, <?php echo e($totalGuided ?? 0); ?>, <?php echo e($totalCounseled ?? 0); ?>],
-                    backgroundColor: [
-                        'rgba(31, 122, 45, 0.7)', // Forest Green
-                        'rgba(255, 203, 5, 0.7)', // Maize Yellow
-                        'rgba(3, 105, 161, 0.7)'  // Blue
-                    ],
-                    borderColor: [
-                        'rgba(31, 122, 45, 1)',
-                        'rgba(255, 203, 5, 1)',
-                        'rgba(3, 105, 161, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    title: {
-                        display: true,
-                        text: 'Overview Summary'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
-                    }
                 }
-            }
-        });
+
     </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/admin/reports/index.blade.php ENDPATH**/ ?>

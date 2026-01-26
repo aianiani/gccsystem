@@ -367,9 +367,9 @@
                         </label>
                         <select class="form-select" id="sex" name="sex" onchange="this.form.submit()">
                             <option value="">All</option>
-                            @foreach($genders as $gender)
-                                <option value="{{ $gender }}" {{ request('sex') == $gender ? 'selected' : '' }}>
-                                    {{ ucfirst($gender) }}
+                            @foreach($sexes as $sex)
+                                <option value="{{ $sex }}" {{ request('sex') == $sex ? 'selected' : '' }}>
+                                    {{ ucfirst($sex) }}
                                 </option>
                             @endforeach
                         </select>
@@ -405,7 +405,7 @@
                         <div class="input-group">
                             <input type="date" class="form-control" id="date_to" name="date_to"
                                 value="{{ request('date_to') }}" onchange="this.form.submit()">
-                            @if(request()->anyFilled(['search', 'college', 'course', 'year_level', 'role', 'gender', 'status', 'date_from', 'date_to']))
+                            @if(request()->anyFilled(['search', 'college', 'course', 'year_level', 'role', 'sex', 'status', 'date_from', 'date_to']))
                                 <a href="{{ route('users.index') }}" class="btn btn-outline-danger" title="Clear Filters">
                                     <i class="bi bi-x-lg"></i>
                                 </a>
@@ -1019,12 +1019,12 @@
                             // Display Results in Modal
                             if (resultsDiv) {
                                 resultsDiv.innerHTML = `
-                                                                            <div class="alert alert-success">
-                                                                                <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
-                                                                                <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
-                                                                                <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
-                                                                            </div>
-                                                                        `;
+                                                                                    <div class="alert alert-success">
+                                                                                        <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
+                                                                                        <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
+                                                                                        <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
+                                                                                    </div>
+                                                                                `;
                             }
 
 

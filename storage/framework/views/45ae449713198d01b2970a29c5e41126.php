@@ -319,6 +319,150 @@
                     </td>
                 </tr>
             </table>
+        <?php elseif($assessment->type === 'Work Values Inventory'): ?>
+            <div class="box">
+                <div style="font-weight:700; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">Work Values Inventory Profile</div>
+                <table style="width:100%; font-size: 11px;">
+                    <?php
+                        $scales = $scores['scales'] ?? [];
+                        $getWviColor = function ($sum) {
+                            if ($sum >= 13) return '#198754';
+                            if ($sum >= 10) return '#20c997';
+                            if ($sum >= 7)  return '#ffb300';
+                            if ($sum >= 4)  return '#fd7e14';
+                            return '#6c757d';
+                        };
+                    ?>
+                    <?php $__currentLoopData = $scales; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name => $sum): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <tr>
+                            <td style="padding:4px; width:40%;"><strong><?php echo e($name); ?>:</strong></td>
+                            <td style="padding:4px; width:20%; text-align:right;"><strong><?php echo e($sum); ?></strong></td>
+                            <td style="padding:4px; width:40%;">
+                                <div style="height:10px; background:#eee; border-radius:5px; overflow:hidden;">
+                                    <?php $percent = ($sum / 15) * 100; ?>
+                                    <div style="height:100%; width:<?php echo e($percent); ?>%; background:<?php echo e($getWviColor($sum)); ?>;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </table>
+            </div>
+
+            <?php if(isset($wvi_questions)): ?>
+                <div class="section" style="margin-top:20px;">
+                    <div style="font-weight:700; margin-bottom:6px;">Detailed Item Responses</div>
+                    <table class="interpretation" style="width:100%; border:1px solid #ddd; font-size: 11px;">
+                        <thead>
+                            <tr style="background:#f3f3f3;">
+                                <th style="padding:5px; border:1px solid #ddd; width:30px; text-align:center;">#</th>
+                                <th style="padding:5px; border:1px solid #ddd;">Question</th>
+                                <th style="padding:5px; border:1px solid #ddd; width:60px; text-align:center;">Response</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $__currentLoopData = $wvi_questions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $q): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr>
+                                    <td style="padding:5px; border:1px solid #ddd; text-align:center;"><?php echo e($idx + 1); ?></td>
+                                    <td style="padding:5px; border:1px solid #ddd;"><?php echo e($q); ?></td>
+                                    <td style="padding:5px; border:1px solid #ddd; text-align:center;"><strong><?php echo e($scores['answers'][$idx] ?? '-'); ?></strong></td>
+                                </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        <?php elseif($assessment->type === 'Personality (NEO-FFI)'): ?>
+            <div class="box">
+                <div style="font-weight:700; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">Big Five Personality Profile (NEO-FFI)</div>
+                <table style="width:100%;">
+                    <?php
+                        $domainColors = [
+                            'Neuroticism' => '#dc3545',
+                            'Extroversion' => '#fd7e14',
+                            'Openness' => '#0d6efd',
+                            'Agreeableness' => '#20c997',
+                            'Conscientiousness' => '#198754'
+                        ];
+                    ?>
+                    <?php $__currentLoopData = $scores['domains'] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $domain => $score): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <tr>
+                            <td style="padding:4px; width:40%;"><strong><?php echo e($domain); ?>:</strong></td>
+                            <td style="padding:4px; width:20%; text-align:right;"><strong><?php echo e($score); ?></strong></td>
+                            <td style="padding:4px; width:40%;">
+                                <div style="height:10px; background:#eee; border-radius:5px; overflow:hidden;">
+                                    <?php $percent = (($score - 12) / (84 - 12)) * 100; ?>
+                                    <div style="height:100%; width:<?php echo e($percent); ?>%; background:<?php echo e($domainColors[$domain] ?? '#666'); ?>;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </table>
+            </div>
+
+            <?php if(isset($neo_questions)): ?>
+                <div class="section" style="margin-top:20px;">
+                    <div style="font-weight:700; margin-bottom:6px;">Detailed Item Responses</div>
+                    <table class="interpretation" style="width:100%; border:1px solid #ddd; font-size: 11px;">
+                        <thead>
+                            <tr style="background:#f3f3f3;">
+                                <th style="padding:5px; border:1px solid #ddd; width:30px; text-align:center;">#</th>
+                                <th style="padding:5px; border:1px solid #ddd;">Question</th>
+                                <th style="padding:5px; border:1px solid #ddd; width:60px; text-align:center;">Response</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $__currentLoopData = $neo_questions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $q): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr>
+                                    <td style="padding:5px; border:1px solid #ddd; text-align:center;"><?php echo e($idx + 1); ?></td>
+                                    <td style="padding:5px; border:1px solid #ddd;"><?php echo e($q); ?></td>
+                                    <td style="padding:5px; border:1px solid #ddd; text-align:center;"><strong><?php echo e($scores['answers'][$idx] ?? '-'); ?></strong></td>
+                                </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        <?php elseif($assessment->type === 'GRIT Scale'): ?>
+            <div class="box">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="padding:4px;"><strong>Total Grit Score Index:</strong></td>
+                        <td style="padding:4px; text-align:right;"><strong><?php echo e($scores['total_index'] ?? 'N/A'); ?></strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px;"><strong>Passion Score Index:</strong></td>
+                        <td style="padding:4px; text-align:right;"><?php echo e($scores['passion_index'] ?? 'N/A'); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px;"><strong>Perseverance Score Index:</strong></td>
+                        <td style="padding:4px; text-align:right;"><?php echo e($scores['perseverance_index'] ?? 'N/A'); ?></td>
+                    </tr>
+                </table>
+            </div>
+
+            <?php if(isset($grit_questions)): ?>
+                <div class="section" style="margin-top:20px;">
+                    <div style="font-weight:700; margin-bottom:6px;">Detailed Responses (GRIT Scale)</div>
+                    <table class="interpretation" style="width:100%; border:1px solid #ddd;">
+                        <thead>
+                            <tr style="background:#f3f3f3;">
+                                <th style="padding:8px; border:1px solid #ddd; width:40px;">#</th>
+                                <th style="padding:8px; border:1px solid #ddd;">Question</th>
+                                <th style="padding:8px; border:1px solid #ddd; width:80px; text-align:center;">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $__currentLoopData = $grit_questions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $q): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr>
+                                    <td style="padding:8px; border:1px solid #ddd; text-align:center;"><?php echo e($idx + 1); ?></td>
+                                    <td style="padding:8px; border:1px solid #ddd;"><?php echo e($q); ?></td>
+                                    <td style="padding:8px; border:1px solid #ddd; text-align:center;"><?php echo e($scores['answers'][$idx] ?? '-'); ?></td>
+                                </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         <?php else: ?>
             <div class="box">Total Score: <?php echo e($graph_data['scores'][0] ?? '-'); ?> / <?php echo e($graph_data['max'] ?? '-'); ?> <span
                     class="badge bg-info"><?php echo e($graph_data['score_level'] ?? ''); ?></span></div>
@@ -332,6 +476,7 @@
         <div class="box" style="min-height:70px;"><?php echo e($assessment->case_notes ?? ''); ?></div>
     </div>
 
+    <?php if($assessment->type === 'DASS-42'): ?>
     <div class="mt-4 section">
         <div style="font-weight:700; margin-bottom:6px;">Table. Interpretation guide for scores</div>
         <table style="width:100%; border-collapse:collapse; font-size:12px; border:1px solid #ddd;">
@@ -377,6 +522,18 @@
             </tbody>
         </table>
     </div>
+    <?php elseif($assessment->type === 'GRIT Scale'): ?>
+    <div class="mt-4 section">
+        <div style="font-weight:700; margin-bottom:6px;">Score Interpretation Guide (GRIT)</div>
+        <div class="box">
+            <ul style="margin: 0; padding-left: 20px;">
+                <li><strong>High Grit:</strong> 3.5 - 5.0 (Low Risk)</li>
+                <li><strong>Moderate Grit:</strong> 3.0 - 3.4 (Moderate Risk)</li>
+                <li><strong>Low Grit:</strong> Below 3.0 (High Risk)</li>
+            </ul>
+        </div>
+    </div>
+    <?php endif; ?>
 
 </body>
 

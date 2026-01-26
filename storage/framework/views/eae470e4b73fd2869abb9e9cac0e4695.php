@@ -45,9 +45,9 @@
   // compact student meta (only show when present and not placeholder '-')
   $course = $assessment->user->course ?? null;
   $year = $assessment->user->year ?? null;
-  $gender = $assessment->user->gender ?? null;
+  $sex = $assessment->user->sex ?? null;
   $metaParts = [];
-  foreach ([$course, $year, $gender] as $p) {
+  foreach ([$course, $year, $sex] as $p) {
     if ($p && $p !== '-' && trim((string) $p) !== '')
       $metaParts[] = $p;
   }
@@ -193,6 +193,155 @@
         </div>
       </div>
 
+    <?php elseif($assessment->type === 'GRIT Scale'): ?>
+      <!-- GRIT Scale Visuals -->
+      <div class="row g-4 mb-4">
+        <?php
+          $totalIdx = $scores['total_index'] ?? 0;
+          $passionIdx = $scores['passion_index'] ?? 0;
+          $perseveranceIdx = $scores['perseverance_index'] ?? 0;
+
+          $getGritColor = function ($idx) {
+            if ($idx >= 3.5)
+              return '#198754'; // High Grit
+            if ($idx >= 3.0)
+              return '#ffb300'; // Moderate
+            return '#dc3545'; // Low Grit
+          };
+        ?>
+
+        <!-- Total Grit Card -->
+        <div class="col-md-4">
+          <div class="content-card h-100 text-center p-3">
+            <div class="mb-2">
+              <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; background: #e8f5e9; color: #2e7d32;">
+                <i class="bi bi-star-fill fs-5"></i>
+              </div>
+            </div>
+            <div class="fw-bold text-muted small text-uppercase mb-1">Total Grit Score</div>
+            <div class="h2 fw-bold mb-1" style="color: <?php echo e($getGritColor($totalIdx)); ?>;"><?php echo e($totalIdx); ?></div>
+            <span class="badge rounded-pill px-2 py-1 small"
+              style="background-color: <?php echo e($getGritColor($totalIdx)); ?>;">Index</span>
+          </div>
+        </div>
+
+        <!-- Passion Card -->
+        <div class="col-md-4">
+          <div class="content-card h-100 text-center p-3">
+            <div class="mb-2">
+              <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; background: #fff8e1; color: #ffa000;">
+                <i class="bi bi-heart-fill fs-5"></i>
+              </div>
+            </div>
+            <div class="fw-bold text-muted small text-uppercase mb-1">Passion Score</div>
+            <div class="h2 fw-bold mb-1" style="color: #ffa000;"><?php echo e($passionIdx); ?></div>
+            <span class="badge rounded-pill px-2 py-1 small text-dark" style="background-color: #ffca28;">Index</span>
+          </div>
+        </div>
+
+        <!-- Perseverance Card -->
+        <div class="col-md-4">
+          <div class="content-card h-100 text-center p-3">
+            <div class="mb-2">
+              <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; background: #e3f2fd; color: #1976d2;">
+                <i class="bi bi-shield-fill-check fs-5"></i>
+              </div>
+            </div>
+            <div class="fw-bold text-muted small text-uppercase mb-1">Perseverance Score</div>
+            <div class="h2 fw-bold mb-1" style="color: #1976d2;"><?php echo e($perseveranceIdx); ?></div>
+            <span class="badge rounded-pill px-2 py-1 small" style="background-color: #1976d2;">Index</span>
+          </div>
+        </div>
+      </div>
+    <?php elseif($assessment->type === 'Personality (NEO-FFI)'): ?>
+      <!-- Personality (NEO-FFI) Visuals -->
+      <div class="row g-3 mb-4">
+        <?php
+          $domains = $scores['domains'] ?? [];
+          $domainConfigs = [
+            'Neuroticism' => ['color' => '#dc3545', 'icon' => 'bi-wind', 'bg' => '#fdecea'],
+            'Extroversion' => ['color' => '#fd7e14', 'icon' => 'bi-people', 'bg' => '#fff4e6'],
+            'Openness' => ['color' => '#0d6efd', 'icon' => 'bi-lightbulb', 'bg' => '#e7f1ff'],
+            'Agreeableness' => ['color' => '#20c997', 'icon' => 'bi-hand-thumbs-up', 'bg' => '#e6fcf5'],
+            'Conscientiousness' => ['color' => '#198754', 'icon' => 'bi-check-circle', 'bg' => '#eaf5ea'],
+          ];
+        ?>
+
+        <?php $__currentLoopData = $domainConfigs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name => $conf): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+          <div class="col-md-4 col-sm-6">
+            <div class="content-card h-100 p-3" style="border-left: 4px solid <?php echo e($conf['color']); ?> !important;">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <div class="fw-bold text-muted small text-uppercase mb-0"><?php echo e($name); ?></div>
+                  <div class="h3 fw-bold mb-0" style="color: <?php echo e($conf['color']); ?>;"><?php echo e($domains[$name] ?? 12); ?></div>
+                </div>
+                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                  style="width: 36px; height: 36px; background: <?php echo e($conf['bg']); ?>; color: <?php echo e($conf['color']); ?>;">
+                  <i class="bi <?php echo e($conf['icon']); ?> fs-5"></i>
+                </div>
+              </div>
+              <div class="progress" style="height: 4px; border-radius: 2px;">
+                <?php $percent = (($domains[$name] ?? 12) - 12) / (84 - 12) * 100; ?>
+                <div class="progress-bar" style="width: <?php echo e($percent); ?>%; background-color: <?php echo e($conf['color']); ?>;"></div>
+              </div>
+              <div class="d-flex justify-content-between mt-1 text-muted" style="font-size: 0.65rem;">
+                <span>Min: 12</span>
+                <span>Max: 84</span>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+      </div>
+    <?php elseif($assessment->type === 'Work Values Inventory'): ?>
+      <!-- Work Values Inventory (WVI) Visuals -->
+      <div class="row g-2 mb-4">
+        <?php
+          $scales = $scores['scales'] ?? [];
+          $getWviColor = function ($sum) {
+            if ($sum >= 13)
+              return '#198754'; // Very Important
+            if ($sum >= 10)
+              return '#20c997'; // Important
+            if ($sum >= 7)
+              return '#ffb300'; // Moderately
+            if ($sum >= 4)
+              return '#fd7e14'; // Little Importance
+            return '#6c757d'; // Unimportant
+          };
+          $getWviLabel = function ($sum) {
+            if ($sum >= 13)
+              return 'Very Important';
+            if ($sum >= 10)
+              return 'Important';
+            if ($sum >= 7)
+              return 'Moderately Important';
+            if ($sum >= 4)
+              return 'Little Importance';
+            return 'Unimportant';
+          };
+        ?>
+
+        <?php $__currentLoopData = $scales; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name => $sum): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+          <div class="col-md-4 col-sm-6">
+            <div class="card h-100 p-2 border-0 shadow-sm"
+              style="border-left: 3px solid <?php echo e($getWviColor($sum)); ?> !important; background: #fafafa;">
+              <div class="d-flex justify-content-between align-items-center">
+                <div style="min-width: 0;">
+                  <div class="fw-bold x-small text-uppercase text-muted" style="font-size: 0.65rem;"><?php echo e($name); ?></div>
+                  <div class="fw-bold" style="font-size: 1.1rem; color: <?php echo e($getWviColor($sum)); ?>;"><?php echo e($sum); ?></div>
+                </div>
+                <div class="text-end">
+                  <div class="badge rounded-pill" style="background-color: <?php echo e($getWviColor($sum)); ?>; font-size: 0.6rem;">
+                    <?php echo e($getWviLabel($sum)); ?></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+      </div>
     <?php else: ?>
       <!-- Non-DASS Fallback -->
       <div class="content-card p-4 text-center">
@@ -213,22 +362,24 @@
     aria-labelledby="score-tab-<?php echo e($assessment->id); ?>">
     <div class="card shadow-sm p-3 dass-score-sheet">
       <div class="card-header">
-        <h5 class="mb-0"><i class="bi bi-grid-1x2 me-2"></i> DASS-42 Score Sheet Table</h5>
+        <h5 class="mb-0"><i class="bi bi-grid-1x2 me-2"></i> <?php echo e($assessment->type); ?> Score Sheet Table</h5>
       </div>
       <div class="card-body p-3">
         <?php if ($__env->exists('counselor.assessments.partials.score_sheet')) echo $__env->make('counselor.assessments.partials.score_sheet', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
       </div>
-      <div class="card-footer bg-white border-0 pt-3">
-        <div class="interpretation-guide small text-muted">
-          <h6 class="fw-bold">DASS-42 Interpretation Guide</h6>
-          <p class="mb-1">The DASS-42 contains three subscales:</p>
-          <ul class="mb-0">
-            <li><strong>Depression (14 items):</strong> 3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42</li>
-            <li><strong>Anxiety (14 items):</strong> 2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41</li>
-            <li><strong>Stress (14 items):</strong> 1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39</li>
-          </ul>
+      <?php if($assessment->type === 'DASS-42'): ?>
+        <div class="card-footer bg-white border-0 pt-3">
+          <div class="interpretation-guide small text-muted">
+            <h6 class="fw-bold">DASS-42 Interpretation Guide</h6>
+            <p class="mb-1">The DASS-42 contains three subscales:</p>
+            <ul class="mb-0">
+              <li><strong>Depression (14 items):</strong> 3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42</li>
+              <li><strong>Anxiety (14 items):</strong> 2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41</li>
+              <li><strong>Stress (14 items):</strong> 1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39</li>
+            </ul>
+          </div>
         </div>
-      </div>
+      <?php endif; ?>
     </div>
   </div>
 
@@ -270,7 +421,6 @@
       </div>
     </div>
   </div>
-</div>
 </div>
 </div>
 

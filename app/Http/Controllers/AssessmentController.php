@@ -190,48 +190,70 @@ class AssessmentController extends Controller
             'grit_answers.*' => 'required|in:1,2,3,4,5',
         ]);
 
-        // GRIT Scoring (Reverse scored items: 1, 3, 5, 6 in 8-item scale)
-        // 1=Not at all like me, 5=Very much like me
-        $reverse_items = [0, 2, 4, 5]; // 0-indexed indices for Q1, Q3, Q5, Q6
-        $score = 0;
+        // GRIT Scoring (Based on user image 10-item scale)
+        // Questions 1, 3, 5, 7, 9 = Passion
+        // Questions 2, 4, 6, 8, 10 = Perseverance
+        // Score Mapping:
+        // Not at all like me = 5
+        // Not much like me = 4
+        // Somewhat like me = 3
+        // Mostly like me = 2
+        // Very much like me = 1
+
         $answers = $request->input('grit_answers');
+        $passion_indices = [0, 2, 4, 6, 8];
+        $perseverance_indices = [1, 3, 5, 7, 9];
+
+        $passion_sum = 0;
+        $perseverance_sum = 0;
 
         foreach ($answers as $idx => $val) {
             $val = (int) $val;
-            if (in_array($idx, $reverse_items)) {
-                // Reverse: 1->5, 2->4, 3->3, 4->2, 5->1
-                $score += (6 - $val);
+            if (in_array($idx, $passion_indices)) {
+                // Passion: raw value
+                $passion_sum += $val;
             } else {
-                $score += $val;
+                // Perseverance: reverse scored (6 - raw value)
+                $perseverance_sum += (6 - $val);
             }
         }
-        $final_score = $score / count($questions); // Average score 1-5
 
-        $risk_level = 'low'; // High grit = low risk? Or just categorized.
-        // Interpretation: 
-        // 4.5-5: Extremely Gritty
-        // 4.0-4.4: Very Gritty
-        // 3.5-3.9: Gritty
-        // 3.0-3.4: Somewhat Gritty
-        // <3.0: Not Gritty
+        $passion_index = $passion_sum / 5;
+        $perseverance_index = $perseverance_sum / 5;
+        $total_grit_index = ($passion_index + $perseverance_index) / 2;
 
-        // Mapping to system "risk_level" (used for flagging purposes)
-        // perhaps "high" risk if low grit?
-        if ($final_score < 3.0)
+        $risk_level = 'low';
+        // Interpretation for flagging:
+        // High grit (Total Index >= 3.5) = low risk
+        // Moderate grit (Total Index 3.0 - 3.4) = moderate risk
+        // Low grit (Total Index < 3.0) = high risk
+        if ($total_grit_index < 3.0) {
             $risk_level = 'high';
-        elseif ($final_score < 3.5)
+        } elseif ($total_grit_index < 3.5) {
             $risk_level = 'moderate';
+        }
+
+        $scorePayload = [
+            'total_index' => number_format($total_grit_index, 2),
+            'passion_index' => number_format($passion_index, 2),
+            'perseverance_index' => number_format($perseverance_index, 2),
+            'answers' => $answers
+        ];
 
         $comment = $request->input('student_comment');
 
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
             'type' => 'GRIT Scale',
-            'score' => number_format($final_score, 2),
+            'score' => json_encode($scorePayload),
             'risk_level' => $risk_level,
             'student_comment' => $comment,
         ]);
-        return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'GRIT Scale']);
+        return redirect()->route('assessments.index')->with([
+            'show_thank_you' => true,
+            'last_assessment_type' => 'GRIT Scale',
+            'success' => 'GRIT assessment completed successfully!'
+        ]);
     }
 
     // Handle NEO-FFI submission
@@ -240,21 +262,86 @@ class AssessmentController extends Controller
         $questions = $this->getNeoQuestions();
         $request->validate([
             'neo_answers' => 'required|array|size:' . count($questions),
-            'neo_answers.*' => 'required|in:1,2,3,4,5',
+            'neo_answers.*' => 'required|in:1,2,3,4,5,6,7',
         ]);
 
-        // Simple aggregate for demo purposes (real scoring is complex)
-        $answers = $request->input('neo_answers');
-        $scorePayload = $answers;
+        $answers = $request->input('neo_answers'); // 0-indexed internally
+
+        // OCEAN Domain Scoring (1-indexed mapping from image)
+        // Convert 1-indexed to 0-indexed: subtract 1
+        $domains = [
+            'Neuroticism' => [
+                'pos' => [6, 11, 21, 26, 36, 41, 51, 56],
+                'neg' => [1, 16, 31, 46]
+            ],
+            'Extroversion' => [
+                'pos' => [2, 7, 17, 22, 32, 37, 47, 52], // Note: user's list says "3+7..." but item 3 is O-. Item 2 is "I like to have a lot of people..." which is E+.
+                'neg' => [12, 27, 42, 57]
+            ],
+            'Openness' => [
+                'pos' => [13, 28, 43, 53, 58],
+                'neg' => [3, 8, 18, 23, 33, 38, 48]
+            ],
+            'Agreeableness' => [
+                'pos' => [4, 19, 34, 49],
+                'neg' => [9, 14, 24, 29, 39, 44, 54, 59]
+            ],
+            'Conscientiousness' => [
+                'pos' => [5, 10, 20, 25, 35, 40, 50, 60],
+                'neg' => [15, 30, 45, 55]
+            ],
+        ];
+
+        // Self-correction on Extroversion: image says 3, but the text for item 3 is daydreaming.
+        // Let's re-verify from the text provided by user:
+        // E+: 2, 7, 17, 22, 32, 37, 47, 52
+        // E-: 12, 27, 42, 57
+        // Wait, image says E = (3+7+17+22+32+37+47+52) - (12+27+42+57)
+        // Let's check text again: 3. I don't like to waste my time daydreaming.
+        // That's typically Openness (low daydreaming).
+        // Let's stick to the mapping provided in the image for the indexing, but adjust to 0-based.
+        // Correction: The image's handwritten/typed scoring key:
+        // O = (13+28+43+53+58) - (3+8+18+23+33+38+48) -> Item 3 is here!
+        // E = (2+7+17+22+32+37+47+52) - (12+27+42+57) -> Item 2 is here.
+        // Wait, let me look at image 2 again. 
+        // E = (2+7... wait, is that a 2 or a 3? Looks like a 2 in my previous thought, let me look closer at the image.
+        // Ah, it actually says 2+7. My bad.
+
+        $results = [];
+        foreach ($domains as $domain => $config) {
+            $sum = 0;
+            foreach ($config['pos'] as $item) {
+                $sum += (int) ($answers[$item - 1] ?? 0);
+            }
+            foreach ($config['neg'] as $item) {
+                // For 1-7 scale, reverse is 8 - X
+                $val = (int) ($answers[$item - 1] ?? 0);
+                if ($val > 0) {
+                    $sum += (8 - $val);
+                }
+            }
+            $results[$domain] = $sum;
+        }
+
+        $scorePayload = [
+            'domains' => $results,
+            'answers' => $answers,
+            'scale' => 7
+        ];
 
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
-            'type' => 'NEO-PI-R',
+            'type' => 'Personality (NEO-FFI)',
             'score' => json_encode($scorePayload),
-            'risk_level' => 'normal', // Personality has no inherent risk
+            'risk_level' => 'normal',
             'student_comment' => $request->input('student_comment'),
         ]);
-        return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'NEO-PI-R']);
+
+        return redirect()->route('assessments.index')->with([
+            'show_thank_you' => true,
+            'last_assessment_type' => 'NEO-FFI',
+            'success' => 'NEO-FFI assessment completed successfully!'
+        ]);
     }
 
     // Handle Work Values Inventory submission
@@ -266,7 +353,41 @@ class AssessmentController extends Controller
             'wvi_answers.*' => 'required|in:1,2,3,4,5',
         ]);
 
-        $scorePayload = $request->input('wvi_answers');
+        $answers = $request->input('wvi_answers'); // 0-indexed internally
+
+        // Value Scales (1-indexed mapping from image)
+        $scales = [
+            'Creativity' => [15, 16, 45],
+            'Management' => [14, 24, 37],
+            'Achievement' => [13, 17, 44],
+            'Surroundings' => [12, 25, 36],
+            'Supervisory Relationships' => [11, 18, 43],
+            'Way of Life' => [10, 26, 35],
+            'Security' => [9, 19, 42],
+            'Associates' => [8, 27, 34],
+            'Aesthetic' => [7, 20, 41],
+            'Prestige' => [6, 28, 33],
+            'Independence' => [5, 21, 40],
+            'Variety' => [4, 29, 32],
+            'Economic Return' => [3, 22, 39],
+            'Altruism' => [2, 30, 31],
+            'Intellectual Stimulation' => [1, 23, 38],
+        ];
+
+        $results = [];
+        foreach ($scales as $name => $items) {
+            $sum = 0;
+            foreach ($items as $item) {
+                $sum += (int) ($answers[$item - 1] ?? 0);
+            }
+            $results[$name] = $sum;
+        }
+
+        $scorePayload = [
+            'scales' => $results,
+            'answers' => $answers,
+            'scale_range' => 5
+        ];
 
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
@@ -275,7 +396,12 @@ class AssessmentController extends Controller
             'risk_level' => 'normal',
             'student_comment' => $request->input('student_comment'),
         ]);
-        return redirect()->route('assessments.index')->with(['show_thank_you' => true, 'last_assessment_type' => 'Work Values Inventory']);
+
+        return redirect()->route('assessments.index')->with([
+            'show_thank_you' => true,
+            'last_assessment_type' => 'Work Values Inventory',
+            'success' => 'Work Values Inventory completed successfully!'
+        ]);
     }
 
     // Helper for DASS-42 questions
@@ -327,52 +453,138 @@ class AssessmentController extends Controller
         ];
     }
 
-    // Helper for GRIT questions (Short Grit Scale)
-    private function getGritQuestions()
+    public function getGritQuestions()
     {
         return [
-            'New ideas and projects sometimes distract me from previous ones.',
+            'New ideas and projects sometimes distract me from previous ones',
             'Setbacks don\'t discourage me. I don\'t give up easily.',
-            'I have been obsessed with a certain idea or project for a short time but later lost interest.',
-            'I am a hard worker.',
             'I often set a goal but later choose to pursue a different one.',
+            'I am a hard worker.',
             'I have difficulty maintaining my focus on projects that take more than a few months to complete.',
             'I finish whatever I begin.',
+            'My interests change from year to year.',
             'I am diligent. I never give up.',
+            'I have been obsessed with a certain idea or project for a short time but later lost interest.',
+            'I have overcome setbacks to conquer an important challenge.',
         ];
     }
 
     // Helper for NEO questions (Short Big Five)
-    private function getNeoQuestions()
+    public function getNeoQuestions()
     {
         return [
-            'I am the life of the party.',
-            'I feel little concern for others.',
-            'I am always prepared.',
-            'I get stressed out easily.',
-            'I have a rich vocabulary.',
-            'I don\'t talk a lot.',
-            'I am interested in people.',
-            'I leave my belongings around.',
-            'I am relaxed most of the time.',
-            'I have difficulty understanding abstract ideas.',
+            'I am not a worrier.',
+            'I like to have a lot of people around me.',
+            'I don\'t like to waste my time daydreaming.',
+            'I try to be courteous to everyone I meet.',
+            'I keep my belongings clean and neat.',
+            'I often feel inferior to others.',
+            'I laugh easily.',
+            'Once I find the right way to do something, I stick to it.',
+            'I often get into arguments with my family and co-workers.',
+            'I\'m pretty good about pacing myself so as to get things done on time.',
+            'When I\'m under a great deal of stress, sometimes I feel like I\'m going to pieces.',
+            'I don\'t consider myself especially "lighthearted."',
+            'I am intrigued by the patterns I find in art and nature.',
+            'Some people think I\'m selfish and egotistical.',
+            'I am not a very methodical person.',
+            'I rarely feel lonely or blue.',
+            'I really enjoy talking to people.',
+            'I believe letting students hear controversial speakers can only confuse and mislead them.',
+            'I would rather cooperate with others than compete with them.',
+            'I try to perform all the tasks assigned to me conscientiously.',
+            'I often feel tense and jittery.',
+            'I like to be where the action is.',
+            'Poetry has little or no effect on me.',
+            'I tend to be cynical and skeptical of other\'s intentions.',
+            'I have a clear set of goals and work toward them in an orderly fashion.',
+            'Sometimes I feel completely worthless.',
+            'I usually prefer to do things alone.',
+            'I often try new and foreign foods.',
+            'I believe that most people will take advantage of you if you let them.',
+            'I waste a lot of time before settling down to work.',
+            'I rarely feel fearful or anxious.',
+            'I often feel as if I am bursting with energy.',
+            'I seldom notice the moods or feelings that different environments produce.',
+            'Most people I know like me.',
+            'I work hard to accomplish my goals.',
+            'I often get angry at the way people treat me.',
+            'I am a cheerful, high-spirited person.',
+            'I believe we should look to our religious authorities for decisions on moral issues.',
+            'Some people think of me as cold and calculating.',
+            'When I make a commitment, I can always be counted on to follow through.',
+            'Too often, when things go wrong, I get discouraged and feel like giving up.',
+            'I am not a cheerful optimist.',
+            'Sometimes when I am reading poetry or looking at a work of art, I feel a chill or wave of excitement.',
+            'I\'m hard-headed and tough-minded in my attitudes.',
+            'Sometimes I\'m not as dependable or reliable as I should be.',
+            'I am seldom sad or depressed.',
+            'My life is fast-paced.',
+            'I have little interest in speculating on the nature of the universe or the human condition.',
+            'I generally try to be thoughtful and considerate.',
+            'I am a productive person who always gets the job done.',
+            'I often feel helpless and want someone else to solve my problems.',
+            'I am a very active person.',
+            'I have a lot of intellectual curiosity.',
+            'If I don\'t like people, I let them know it.',
+            'I never seem to be able to get organized.',
+            'At times I have been so ashamed I just wanted to hide.',
+            'I would rather go my own way than be a leader of others.',
+            'I often enjoy playing with theories or abstract ideas.',
+            'If necessary, I am willing to manipulate people.',
+            'I strive for excellence in everything I do.',
         ];
     }
 
     // Helper for WVI questions
-    private function getWviQuestions()
+    public function getWviQuestions()
     {
         return [
-            'It is important to me to have a secure job.',
-            'I want to help others in my work.',
-            'High income is my top priority.',
-            'I want to be creative and original in my work.',
-            'I prefer to work independently.',
-            'I want a job with prestige and status.',
-            'I value variety and change in my work.',
-            'I want to have authority over others.',
-            'I want to work in a pleasant environment.',
-            'I want a job that contributes to society.',
+            'have to keep solving problems',
+            'help others',
+            'can get a raise',
+            'look forward to changes in your job',
+            'have freedom in your area',
+            'gain prestige in your field',
+            'need to have artistic ability',
+            'are one of the gang',
+            'know your job will last',
+            'can be the kind of person you would like to be',
+            'have a boss who gives you a fair deal',
+            'like the setting in which your work is done',
+            'get the feeling of having done a good day\'s work',
+            'have the authority over others',
+            'try out new ideas and suggestions',
+            'create something new',
+            'know by the results when you\'ve done a good job',
+            'have a boss who is reasonable',
+            'are sure of always having a job',
+            'add beauty to the world',
+            'make your own decisions',
+            'have pay increases that keep up with the cost of living',
+            'are mentally challenged',
+            'use leadership abilities',
+            'have adequate lounge, toilet and other facilities',
+            'have a way of life, while not on the job, that you like',
+            'form friendships with your fellow employees',
+            'know that others consider your work important',
+            'do not do the same thing all the time',
+            'feel you have helped another person',
+            'add to the well-being of other people',
+            'do many different things',
+            'are looked up to by others',
+            'have good connections with fellow workers',
+            'lead the kind of life you most enjoy',
+            'have a good place in which to work (quiet, calm, etc.)',
+            'plan and organize the work of others',
+            'need to be mentally alert',
+            'are paid enough to live very well',
+            'are your own boss',
+            'make attractive products',
+            'are sure of another job in the company if your present job ends',
+            'have a supervisor who is considerate',
+            'see the result of your efforts',
+            'contribute new ideas',
         ];
     }
 
@@ -394,7 +606,11 @@ class AssessmentController extends Controller
             $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
         }
 
-        return view('counselor.assessments.show', compact('assessment', 'scores', 'score_interpretation'));
+        $grit_questions = $assessment->type === 'GRIT Scale' ? $this->getGritQuestions() : [];
+        $neo_questions = $assessment->type === 'Personality (NEO-FFI)' ? $this->getNeoQuestions() : [];
+        $wvi_questions = $assessment->type === 'Work Values Inventory' ? $this->getWviQuestions() : [];
+
+        return view('counselor.assessments.show', compact('assessment', 'scores', 'score_interpretation', 'grit_questions', 'neo_questions', 'wvi_questions'));
     }
 
     public function saveNotes(Request $request, $id)
@@ -435,6 +651,12 @@ class AssessmentController extends Controller
         $viewData = compact('assessment', 'scores', 'score_interpretation', 'linkedAppointment');
         if ($assessment->type === 'DASS-42') {
             $viewData['dass42_questions'] = $this->getDass42Questions();
+        } elseif ($assessment->type === 'GRIT Scale') {
+            $viewData['grit_questions'] = $this->getGritQuestions();
+        } elseif ($assessment->type === 'Personality (NEO-FFI)') {
+            $viewData['neo_questions'] = $this->getNeoQuestions();
+        } elseif ($assessment->type === 'Work Values Inventory') {
+            $viewData['wvi_questions'] = $this->getWviQuestions();
         }
 
         $pdf = Pdf::loadView('counselor.assessments.export', $viewData);

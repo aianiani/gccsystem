@@ -316,6 +316,150 @@
                     </td>
                 </tr>
             </table>
+        @elseif($assessment->type === 'Work Values Inventory')
+            <div class="box">
+                <div style="font-weight:700; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">Work Values Inventory Profile</div>
+                <table style="width:100%; font-size: 11px;">
+                    @php
+                        $scales = $scores['scales'] ?? [];
+                        $getWviColor = function ($sum) {
+                            if ($sum >= 13) return '#198754';
+                            if ($sum >= 10) return '#20c997';
+                            if ($sum >= 7)  return '#ffb300';
+                            if ($sum >= 4)  return '#fd7e14';
+                            return '#6c757d';
+                        };
+                    @endphp
+                    @foreach($scales as $name => $sum)
+                        <tr>
+                            <td style="padding:4px; width:40%;"><strong>{{ $name }}:</strong></td>
+                            <td style="padding:4px; width:20%; text-align:right;"><strong>{{ $sum }}</strong></td>
+                            <td style="padding:4px; width:40%;">
+                                <div style="height:10px; background:#eee; border-radius:5px; overflow:hidden;">
+                                    @php $percent = ($sum / 15) * 100; @endphp
+                                    <div style="height:100%; width:{{ $percent }}%; background:{{ $getWviColor($sum) }};"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+
+            @if(isset($wvi_questions))
+                <div class="section" style="margin-top:20px;">
+                    <div style="font-weight:700; margin-bottom:6px;">Detailed Item Responses</div>
+                    <table class="interpretation" style="width:100%; border:1px solid #ddd; font-size: 11px;">
+                        <thead>
+                            <tr style="background:#f3f3f3;">
+                                <th style="padding:5px; border:1px solid #ddd; width:30px; text-align:center;">#</th>
+                                <th style="padding:5px; border:1px solid #ddd;">Question</th>
+                                <th style="padding:5px; border:1px solid #ddd; width:60px; text-align:center;">Response</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($wvi_questions as $idx => $q)
+                                <tr>
+                                    <td style="padding:5px; border:1px solid #ddd; text-align:center;">{{ $idx + 1 }}</td>
+                                    <td style="padding:5px; border:1px solid #ddd;">{{ $q }}</td>
+                                    <td style="padding:5px; border:1px solid #ddd; text-align:center;"><strong>{{ $scores['answers'][$idx] ?? '-' }}</strong></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        @elseif($assessment->type === 'Personality (NEO-FFI)')
+            <div class="box">
+                <div style="font-weight:700; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">Big Five Personality Profile (NEO-FFI)</div>
+                <table style="width:100%;">
+                    @php
+                        $domainColors = [
+                            'Neuroticism' => '#dc3545',
+                            'Extroversion' => '#fd7e14',
+                            'Openness' => '#0d6efd',
+                            'Agreeableness' => '#20c997',
+                            'Conscientiousness' => '#198754'
+                        ];
+                    @endphp
+                    @foreach($scores['domains'] ?? [] as $domain => $score)
+                        <tr>
+                            <td style="padding:4px; width:40%;"><strong>{{ $domain }}:</strong></td>
+                            <td style="padding:4px; width:20%; text-align:right;"><strong>{{ $score }}</strong></td>
+                            <td style="padding:4px; width:40%;">
+                                <div style="height:10px; background:#eee; border-radius:5px; overflow:hidden;">
+                                    @php $percent = (($score - 12) / (84 - 12)) * 100; @endphp
+                                    <div style="height:100%; width:{{ $percent }}%; background:{{ $domainColors[$domain] ?? '#666' }};"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+
+            @if(isset($neo_questions))
+                <div class="section" style="margin-top:20px;">
+                    <div style="font-weight:700; margin-bottom:6px;">Detailed Item Responses</div>
+                    <table class="interpretation" style="width:100%; border:1px solid #ddd; font-size: 11px;">
+                        <thead>
+                            <tr style="background:#f3f3f3;">
+                                <th style="padding:5px; border:1px solid #ddd; width:30px; text-align:center;">#</th>
+                                <th style="padding:5px; border:1px solid #ddd;">Question</th>
+                                <th style="padding:5px; border:1px solid #ddd; width:60px; text-align:center;">Response</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($neo_questions as $idx => $q)
+                                <tr>
+                                    <td style="padding:5px; border:1px solid #ddd; text-align:center;">{{ $idx + 1 }}</td>
+                                    <td style="padding:5px; border:1px solid #ddd;">{{ $q }}</td>
+                                    <td style="padding:5px; border:1px solid #ddd; text-align:center;"><strong>{{ $scores['answers'][$idx] ?? '-' }}</strong></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        @elseif($assessment->type === 'GRIT Scale')
+            <div class="box">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="padding:4px;"><strong>Total Grit Score Index:</strong></td>
+                        <td style="padding:4px; text-align:right;"><strong>{{ $scores['total_index'] ?? 'N/A' }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px;"><strong>Passion Score Index:</strong></td>
+                        <td style="padding:4px; text-align:right;">{{ $scores['passion_index'] ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px;"><strong>Perseverance Score Index:</strong></td>
+                        <td style="padding:4px; text-align:right;">{{ $scores['perseverance_index'] ?? 'N/A' }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            @if(isset($grit_questions))
+                <div class="section" style="margin-top:20px;">
+                    <div style="font-weight:700; margin-bottom:6px;">Detailed Responses (GRIT Scale)</div>
+                    <table class="interpretation" style="width:100%; border:1px solid #ddd;">
+                        <thead>
+                            <tr style="background:#f3f3f3;">
+                                <th style="padding:8px; border:1px solid #ddd; width:40px;">#</th>
+                                <th style="padding:8px; border:1px solid #ddd;">Question</th>
+                                <th style="padding:8px; border:1px solid #ddd; width:80px; text-align:center;">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($grit_questions as $idx => $q)
+                                <tr>
+                                    <td style="padding:8px; border:1px solid #ddd; text-align:center;">{{ $idx + 1 }}</td>
+                                    <td style="padding:8px; border:1px solid #ddd;">{{ $q }}</td>
+                                    <td style="padding:8px; border:1px solid #ddd; text-align:center;">{{ $scores['answers'][$idx] ?? '-' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         @else
             <div class="box">Total Score: {{ $graph_data['scores'][0] ?? '-' }} / {{ $graph_data['max'] ?? '-' }} <span
                     class="badge bg-info">{{ $graph_data['score_level'] ?? '' }}</span></div>
@@ -329,6 +473,7 @@
         <div class="box" style="min-height:70px;">{{ $assessment->case_notes ?? '' }}</div>
     </div>
 
+    @if($assessment->type === 'DASS-42')
     <div class="mt-4 section">
         <div style="font-weight:700; margin-bottom:6px;">Table. Interpretation guide for scores</div>
         <table style="width:100%; border-collapse:collapse; font-size:12px; border:1px solid #ddd;">
@@ -374,6 +519,18 @@
             </tbody>
         </table>
     </div>
+    @elseif($assessment->type === 'GRIT Scale')
+    <div class="mt-4 section">
+        <div style="font-weight:700; margin-bottom:6px;">Score Interpretation Guide (GRIT)</div>
+        <div class="box">
+            <ul style="margin: 0; padding-left: 20px;">
+                <li><strong>High Grit:</strong> 3.5 - 5.0 (Low Risk)</li>
+                <li><strong>Moderate Grit:</strong> 3.0 - 3.4 (Moderate Risk)</li>
+                <li><strong>Low Grit:</strong> Below 3.0 (High Risk)</li>
+            </ul>
+        </div>
+    </div>
+    @endif
 
 </body>
 

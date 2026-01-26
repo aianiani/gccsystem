@@ -21,10 +21,9 @@ class AdminReportsController extends Controller
         'College of Nursing' => 'CON',
         'College of Human Ecology' => 'CHE',
         'College of Agriculture' => 'COA',
-        'College of Information Science and Computing' => 'CISC',
+        'College of Information Sciences and Computing' => 'CISC',
         'College of Education' => 'COED',
-        'College of Engineering' => 'COE',
-        'Unspecified' => 'N/A'
+        'College of Engineering' => 'COE'
     ];
 
     /**
@@ -36,6 +35,7 @@ class AdminReportsController extends Controller
         $year = $request->input('year', now()->year);
         $month = $request->input('month', now()->month);
         $week = $request->input('week', now()->weekOfYear);
+        $date = $request->input('date', now()->format('Y-m-d'));
 
         // Determine Date Range
         if ($frequency === 'annual') {
@@ -47,6 +47,10 @@ class AdminReportsController extends Controller
             $startDate = Carbon::now()->setISODate($year, $week)->startOfWeek();
             $endDate = Carbon::now()->setISODate($year, $week)->endOfWeek();
             $bannerText = "Weekly Report - Week {$week}, {$year} (" . $startDate->format('M d') . " - " . $endDate->format('M d') . ")";
+        } elseif ($frequency === 'daily') {
+            $startDate = Carbon::parse($date)->startOfDay();
+            $endDate = Carbon::parse($date)->endOfDay();
+            $bannerText = "Daily Report - " . $startDate->format('F j, Y');
         } else { // monthly or default
             $startDate = Carbon::create($year, $month, 1)->startOfMonth();
             $endDate = Carbon::create($year, $month, 1)->endOfMonth();
@@ -74,6 +78,7 @@ class AdminReportsController extends Controller
             'year',
             'month',
             'week',
+            'date',
             'bannerText'
         ));
     }
@@ -90,7 +95,6 @@ class AdminReportsController extends Controller
             'Second Year - DASS' => ['type' => ['DASS-42', 'dass42'], 'year_level' => ['2', '2nd Year']],
             'Third Year - NEO' => ['type' => ['NEO-PI-R', 'wellness'], 'year_level' => ['3', '3rd Year']],
             'Graduating - WVI' => ['type' => ['Work Values Inventory', 'academic'], 'year_level' => ['4', '4th Year', '5', '5th Year']],
-            'Others' => ['type' => null, 'year_level' => null],
         ];
 
         $results = [];
@@ -360,27 +364,33 @@ class AdminReportsController extends Controller
         ];
 
         foreach ($appointments as $appointment) {
-            $type = 'WALK-IN'; // Default
-
-            // Logic to classify
-            // Check for Follow-up (Session > 1)
-            // Note: This logic assumes 'session_number' > 1 means follow up. 
-            // Ideally we check if it's the 2nd+ appointment for the same case, but this is a reasonable proxy given the schema.
+            // Priority 1: Check for Follow-up (Session > 1)
             $hasFollowUpNote = $appointment->sessionNotes->contains(function ($note) {
                 return $note->session_number > 1;
             });
 
             if ($hasFollowUpNote) {
                 $type = 'FOLLOW-UP';
-            } elseif ($appointment->guardian1_name || $appointment->guardian2_name) {
-                // Assuming referral if guardian info is used/present implies it came from outside? 
-                // Or we can add a 'referral' field logic if exists. Sticking to previous logic.
-                $type = 'REFERRAL';
-            }
-            // Call-in logic? Currently no strict field. Leaving as default Walk-in unless specified.
-            // If there's an 'appointment_type' or similar, strict check would be here.
+            } else {
+                // Priority 2: Use explicit Appointment Type from DB
+                // Map DB values (Walk-in, Called-in, Referral) to Report Keys (WALK-IN, CALL-IN, REFERRAL)
+                $dbType = strtoupper($appointment->appointment_type ?? 'WALK-IN');
 
-            $counselingTypes[$type]->push($appointment);
+                if ($dbType === 'CALLED-IN') {
+                    $type = 'CALL-IN';
+                } elseif (in_array($dbType, ['WALK-IN', 'REFERRAL'])) {
+                    $type = $dbType;
+                } else {
+                    $type = 'WALK-IN'; // Fallback
+                }
+            }
+
+            // Ensure the key exists in our fixed list (WALK-IN, REFERRAL, CALL-IN, FOLLOW-UP)
+            if (isset($counselingTypes[$type])) {
+                $counselingTypes[$type]->push($appointment);
+            } else {
+                $counselingTypes['WALK-IN']->push($appointment);
+            }
         }
 
         $results = [];
@@ -442,6 +452,7 @@ class AdminReportsController extends Controller
         $year = $request->input('year', now()->year);
         $month = $request->input('month', now()->month);
         $week = $request->input('week', now()->weekOfYear);
+        $date = $request->input('date', now()->format('Y-m-d'));
 
         if ($frequency === 'annual') {
             $startDate = Carbon::create($year, 1, 1)->startOfDay();
@@ -451,6 +462,14 @@ class AdminReportsController extends Controller
             $startDate = Carbon::now()->setISODate($year, $week)->startOfWeek();
             $endDate = Carbon::now()->setISODate($year, $week)->endOfWeek();
             $filename = "weekly_report_{$year}_week{$week}";
+        } elseif ($frequency === 'daily') {
+            $startDate = Carbon::parse($date)->startOfDay();
+            $endDate = Carbon::parse($date)->endOfDay();
+            $filename = "daily_report_{$date}";
+        } elseif ($frequency === 'custom' && $request->has(['start_date', 'end_date'])) {
+            $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
+            $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
+            $filename = "custom_report_{$startDate->format('Ymd')}_{$endDate->format('Ymd')}";
         } else {
             $startDate = Carbon::create($year, $month, 1)->startOfMonth();
             $endDate = Carbon::create($year, $month, 1)->endOfMonth();
@@ -461,7 +480,7 @@ class AdminReportsController extends Controller
         $guidanceData = $this->getGuidanceData($startDate, $endDate);
         $counselingData = $this->getCounselingData($startDate, $endDate);
 
-        $data = compact('testingData', 'guidanceData', 'counselingData', 'year', 'month', 'week', 'frequency');
+        $data = compact('testingData', 'guidanceData', 'counselingData', 'year', 'month', 'week', 'date', 'frequency');
 
         if ($format === 'pdf') {
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.reports.export_pdf', $data);

@@ -4,18 +4,23 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>
-        @if($frequency == 'annual')
-            Annual Report - {{ $year }}
-        @elseif($frequency == 'weekly')
-            Weekly Report - Week {{ $week }}, {{ $year }}
-        @elseif($frequency == 'daily')
-            Daily Report - {{ Carbon\Carbon::parse($date)->format('F j, Y') }}
-        @elseif($frequency == 'custom')
-            Custom Report - {{ Carbon\Carbon::parse($startDate ?? $date)->format('M d, Y') }} to
-            {{ Carbon\Carbon::parse($endDate ?? $date)->format('M d, Y') }}
-        @else
-            Monthly Report - {{ DateTime::createFromFormat('!m', $month)->format('F') }} {{ $year }}
-        @endif
+        <?php if($frequency == 'annual'): ?>
+            Annual Report - <?php echo e($year); ?>
+
+        <?php elseif($frequency == 'weekly'): ?>
+            Weekly Report - Week <?php echo e($week); ?>, <?php echo e($year); ?>
+
+        <?php elseif($frequency == 'daily'): ?>
+            Daily Report - <?php echo e(Carbon\Carbon::parse($date)->format('F j, Y')); ?>
+
+        <?php elseif($frequency == 'custom'): ?>
+            Custom Report - <?php echo e(Carbon\Carbon::parse($startDate ?? $date)->format('M d, Y')); ?> to
+            <?php echo e(Carbon\Carbon::parse($endDate ?? $date)->format('M d, Y')); ?>
+
+        <?php else: ?>
+            Monthly Report - <?php echo e(DateTime::createFromFormat('!m', $month)->format('F')); ?> <?php echo e($year); ?>
+
+        <?php endif; ?>
     </title>
     <style>
         body {
@@ -125,31 +130,36 @@
 <body>
     <div class="header">
         <h1>
-            @if($frequency == 'annual')
+            <?php if($frequency == 'annual'): ?>
                 Annual Admin Report
-            @elseif($frequency == 'weekly')
+            <?php elseif($frequency == 'weekly'): ?>
                 Weekly Admin Report
-            @elseif($frequency == 'daily')
+            <?php elseif($frequency == 'daily'): ?>
                 Daily Admin Report
-            @elseif($frequency == 'custom')
+            <?php elseif($frequency == 'custom'): ?>
                 Custom Period Admin Report
-            @else
+            <?php else: ?>
                 Monthly Admin Report
-            @endif
+            <?php endif; ?>
         </h1>
         <p>
-            @if($frequency == 'annual')
-                Year: {{ $year }}
-            @elseif($frequency == 'weekly')
-                Week {{ $week }}, {{ $year }}
-            @elseif($frequency == 'daily')
-                {{ Carbon\Carbon::parse($date)->format('F j, Y') }}
-            @elseif($frequency == 'custom')
-                {{ Carbon\Carbon::parse($startDate ?? $date)->format('M d, Y') }} -
-                {{ Carbon\Carbon::parse($endDate ?? $date)->format('M d, Y') }}
-            @else
-                {{ DateTime::createFromFormat('!m', $month)->format('F') }} {{ $year }}
-            @endif
+            <?php if($frequency == 'annual'): ?>
+                Year: <?php echo e($year); ?>
+
+            <?php elseif($frequency == 'weekly'): ?>
+                Week <?php echo e($week); ?>, <?php echo e($year); ?>
+
+            <?php elseif($frequency == 'daily'): ?>
+                <?php echo e(Carbon\Carbon::parse($date)->format('F j, Y')); ?>
+
+            <?php elseif($frequency == 'custom'): ?>
+                <?php echo e(Carbon\Carbon::parse($startDate ?? $date)->format('M d, Y')); ?> -
+                <?php echo e(Carbon\Carbon::parse($endDate ?? $date)->format('M d, Y')); ?>
+
+            <?php else: ?>
+                <?php echo e(DateTime::createFromFormat('!m', $month)->format('F')); ?> <?php echo e($year); ?>
+
+            <?php endif; ?>
         </p>
         <p style="font-size: 8pt; font-weight: normal; margin-top: 2px;">GCC System Generated Report</p>
     </div>
@@ -186,20 +196,20 @@
             </tr>
         </thead>
         <tbody>
-            @php
+            <?php
                 $totalAdmin = ['male' => 0, 'female' => 0, 'total' => 0, 'enrolled' => 0];
                 $totalChecking = ['male' => 0, 'female' => 0, 'total' => 0];
                 $totalInterpretation = ['male' => 0, 'female' => 0, 'total' => 0];
                 $totalReport = ['male' => 0, 'female' => 0, 'total' => 0];
-            @endphp
+            ?>
         </tbody>
 
-        @forelse($testingData as $test)
+        <?php $__empty_1 = true; $__currentLoopData = $testingData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $test): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <tbody style="page-break-inside: avoid;">
-                @php $rowCount = count($test['rows']); @endphp
-                @foreach($test['rows'] as $index => $row)
+                <?php $rowCount = count($test['rows']); ?>
+                <?php $__currentLoopData = $test['rows']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        @php
+                        <?php
                             $borderStyle = 'border-bottom: 1px solid #444;';
                             if ($rowCount > 1) {
                                 if ($index === 0) {
@@ -210,39 +220,39 @@
                                     $borderStyle = 'border-top: none; border-bottom: none;';
                                 }
                             }
-                        @endphp
-                        <td style="vertical-align: middle; background-color: #f8f9fa; {{ $borderStyle }}">
-                            @if($index === 0)
-                                <strong>{{ $test['category'] }}</strong>
-                            @endif
+                        ?>
+                        <td style="vertical-align: middle; background-color: #f8f9fa; <?php echo e($borderStyle); ?>">
+                            <?php if($index === 0): ?>
+                                <strong><?php echo e($test['category']); ?></strong>
+                            <?php endif; ?>
                         </td>
 
                         <!-- College -->
-                        <td class="text-start" style="font-size: 7pt;">{{ $row['college'] }}</td>
+                        <td class="text-start" style="font-size: 7pt;"><?php echo e($row['college']); ?></td>
 
                         <!-- Administration -->
-                        <td class="text-center">{{ $row['administration']['male'] }}</td>
-                        <td class="text-center">{{ $row['administration']['female'] }}</td>
-                        <td class="text-center"><strong>{{ $row['administration']['total'] }}</strong></td>
-                        <td class="text-center">{{ $row['administration']['total_enrolled'] }}</td>
+                        <td class="text-center"><?php echo e($row['administration']['male']); ?></td>
+                        <td class="text-center"><?php echo e($row['administration']['female']); ?></td>
+                        <td class="text-center"><strong><?php echo e($row['administration']['total']); ?></strong></td>
+                        <td class="text-center"><?php echo e($row['administration']['total_enrolled']); ?></td>
 
                         <!-- Checking -->
-                        <td class="text-center">{{ $row['checking_scoring']['male'] }}</td>
-                        <td class="text-center">{{ $row['checking_scoring']['female'] }}</td>
-                        <td class="text-center"><strong>{{ $row['checking_scoring']['total'] }}</strong></td>
+                        <td class="text-center"><?php echo e($row['checking_scoring']['male']); ?></td>
+                        <td class="text-center"><?php echo e($row['checking_scoring']['female']); ?></td>
+                        <td class="text-center"><strong><?php echo e($row['checking_scoring']['total']); ?></strong></td>
 
                         <!-- Interpretation -->
-                        <td class="text-center">{{ $row['interpretation']['male'] }}</td>
-                        <td class="text-center">{{ $row['interpretation']['female'] }}</td>
-                        <td class="text-center"><strong>{{ $row['interpretation']['total'] }}</strong></td>
+                        <td class="text-center"><?php echo e($row['interpretation']['male']); ?></td>
+                        <td class="text-center"><?php echo e($row['interpretation']['female']); ?></td>
+                        <td class="text-center"><strong><?php echo e($row['interpretation']['total']); ?></strong></td>
 
                         <!-- Report -->
-                        <td class="text-center">{{ $row['report_result']['male'] }}</td>
-                        <td class="text-center">{{ $row['report_result']['female'] }}</td>
-                        <td class="text-center"><strong>{{ $row['report_result']['total'] }}</strong></td>
+                        <td class="text-center"><?php echo e($row['report_result']['male']); ?></td>
+                        <td class="text-center"><?php echo e($row['report_result']['female']); ?></td>
+                        <td class="text-center"><strong><?php echo e($row['report_result']['total']); ?></strong></td>
                     </tr>
 
-                    @php
+                    <?php
                         $totalAdmin['male'] += $row['administration']['male'];
                         $totalAdmin['female'] += $row['administration']['female'];
                         $totalAdmin['total'] += $row['administration']['total'];
@@ -259,37 +269,37 @@
                         $totalReport['male'] += $row['report_result']['male'];
                         $totalReport['female'] += $row['report_result']['female'];
                         $totalReport['total'] += $row['report_result']['total'];
-                    @endphp
-                @endforeach
+                    ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
-        @empty
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tbody>
                 <tr>
                     <td colspan="18" class="text-center">No testing data available</td>
                 </tr>
             </tbody>
-        @endforelse
+        <?php endif; ?>
 
-        @if(count($testingData) > 0)
+        <?php if(count($testingData) > 0): ?>
             <tbody style="page-break-inside: avoid;">
                 <tr class="total-row">
                     <td colspan="2">GRAND TOTAL</td>
-                    <td class="text-center">{{ $totalAdmin['male'] }}</td>
-                    <td class="text-center">{{ $totalAdmin['female'] }}</td>
-                    <td class="text-center">{{ $totalAdmin['total'] }}</td>
-                    <td class="text-center">{{ $totalAdmin['enrolled'] }}</td>
-                    <td class="text-center">{{ $totalChecking['male'] }}</td>
-                    <td class="text-center">{{ $totalChecking['female'] }}</td>
-                    <td class="text-center">{{ $totalChecking['total'] }}</td>
-                    <td class="text-center">{{ $totalInterpretation['male'] }}</td>
-                    <td class="text-center">{{ $totalInterpretation['female'] }}</td>
-                    <td class="text-center">{{ $totalInterpretation['total'] }}</td>
-                    <td class="text-center">{{ $totalReport['male'] }}</td>
-                    <td class="text-center">{{ $totalReport['female'] }}</td>
-                    <td class="text-center">{{ $totalReport['total'] }}</td>
+                    <td class="text-center"><?php echo e($totalAdmin['male']); ?></td>
+                    <td class="text-center"><?php echo e($totalAdmin['female']); ?></td>
+                    <td class="text-center"><?php echo e($totalAdmin['total']); ?></td>
+                    <td class="text-center"><?php echo e($totalAdmin['enrolled']); ?></td>
+                    <td class="text-center"><?php echo e($totalChecking['male']); ?></td>
+                    <td class="text-center"><?php echo e($totalChecking['female']); ?></td>
+                    <td class="text-center"><?php echo e($totalChecking['total']); ?></td>
+                    <td class="text-center"><?php echo e($totalInterpretation['male']); ?></td>
+                    <td class="text-center"><?php echo e($totalInterpretation['female']); ?></td>
+                    <td class="text-center"><?php echo e($totalInterpretation['total']); ?></td>
+                    <td class="text-center"><?php echo e($totalReport['male']); ?></td>
+                    <td class="text-center"><?php echo e($totalReport['female']); ?></td>
+                    <td class="text-center"><?php echo e($totalReport['total']); ?></td>
                 </tr>
             </tbody>
-        @endif
+        <?php endif; ?>
     </table>
 
     <!-- B. GUIDANCE -->
@@ -308,20 +318,20 @@
             </tr>
         </thead>
         <tbody>
-            @php
+            <?php
                 $totalMale = 0;
                 $totalFemale = 0;
                 $totalAttended = 0;
                 $totalEnrolled = 0;
-            @endphp
+            ?>
         </tbody>
 
-        @forelse($guidanceData as $guidance)
+        <?php $__empty_1 = true; $__currentLoopData = $guidanceData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $guidance): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <tbody style="page-break-inside: avoid;">
-                @php $rowCount = count($guidance['rows']); @endphp
-                @foreach($guidance['rows'] as $index => $row)
+                <?php $rowCount = count($guidance['rows']); ?>
+                <?php $__currentLoopData = $guidance['rows']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        @php
+                        <?php
                             $borderStyle = 'border-bottom: 1px solid #444;';
                             if ($rowCount > 1) {
                                 if ($index === 0) {
@@ -332,57 +342,58 @@
                                     $borderStyle = 'border-top: none; border-bottom: none;';
                                 }
                             }
-                        @endphp
-                        <td style="vertical-align: middle; background-color: #f8f9fa; {{ $borderStyle }}">
-                            @if($index === 0)
-                                {{ $guidance['date'] }}
-                            @endif
+                        ?>
+                        <td style="vertical-align: middle; background-color: #f8f9fa; <?php echo e($borderStyle); ?>">
+                            <?php if($index === 0): ?>
+                                <?php echo e($guidance['date']); ?>
+
+                            <?php endif; ?>
                         </td>
-                        <td style="vertical-align: middle; background-color: #f8f9fa; {{ $borderStyle }}">
-                            @if($index === 0)
-                                <strong>{{ $guidance['topic'] }}</strong>
-                            @endif
+                        <td style="vertical-align: middle; background-color: #f8f9fa; <?php echo e($borderStyle); ?>">
+                            <?php if($index === 0): ?>
+                                <strong><?php echo e($guidance['topic']); ?></strong>
+                            <?php endif; ?>
                         </td>
 
-                        <td class="text-start" style="font-size: 7pt;">{{ $row['college'] }}</td>
-                        <td class="text-center">{{ $row['male'] }}</td>
-                        <td class="text-center">{{ $row['female'] }}</td>
-                        <td class="text-center"><strong>{{ $row['total_attended'] }}</strong></td>
-                        <td class="text-center">{{ $row['total_enrolled'] }}</td>
+                        <td class="text-start" style="font-size: 7pt;"><?php echo e($row['college']); ?></td>
+                        <td class="text-center"><?php echo e($row['male']); ?></td>
+                        <td class="text-center"><?php echo e($row['female']); ?></td>
+                        <td class="text-center"><strong><?php echo e($row['total_attended']); ?></strong></td>
+                        <td class="text-center"><?php echo e($row['total_enrolled']); ?></td>
                         <td></td> <!-- Evaluation -->
                     </tr>
-                    @php
+                    <?php
                         $totalMale += $row['male'];
                         $totalFemale += $row['female'];
                         $totalAttended += $row['total_attended'];
                         $totalEnrolled += $row['total_enrolled'];
-                    @endphp
-                @endforeach
+                    ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
-        @empty
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tbody>
                 <tr>
                     <td colspan="8" class="text-center">No guidance data available</td>
                 </tr>
             </tbody>
-        @endforelse
+        <?php endif; ?>
 
-        @if(count($guidanceData) > 0)
+        <?php if(count($guidanceData) > 0): ?>
             <tbody style="page-break-inside: avoid;">
                 <tr class="total-row">
                     <td colspan="3">GRAND TOTAL</td>
-                    <td class="text-center">{{ $totalMale }}</td>
-                    <td class="text-center">{{ $totalFemale }}</td>
-                    <td class="text-center">{{ $totalAttended }}</td>
-                    <td class="text-center">{{ $totalEnrolled }}</td>
+                    <td class="text-center"><?php echo e($totalMale); ?></td>
+                    <td class="text-center"><?php echo e($totalFemale); ?></td>
+                    <td class="text-center"><?php echo e($totalAttended); ?></td>
+                    <td class="text-center"><?php echo e($totalEnrolled); ?></td>
                     <td></td>
                 </tr>
             </tbody>
-        @endif
+        <?php endif; ?>
     </table>
 
-    {{-- Force page break if needed, but often fits in landscape --}}
-    {{-- <div class="page-break"></div> --}}
+    
+    
 
     <!-- C. COUNSELING -->
     <div class="section-header">C. COUNSELING SERVICES</div>
@@ -399,19 +410,19 @@
             </tr>
         </thead>
         <tbody>
-            @php
+            <?php
                 $totalMale = 0;
                 $totalFemale = 0;
                 $totalCount = 0;
-            @endphp
+            ?>
         </tbody>
 
-        @forelse($counselingData as $counseling)
+        <?php $__empty_1 = true; $__currentLoopData = $counselingData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $counseling): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <tbody style="page-break-inside: avoid;">
-                @php $rowCount = count($counseling['rows']); @endphp
-                @foreach($counseling['rows'] as $index => $row)
+                <?php $rowCount = count($counseling['rows']); ?>
+                <?php $__currentLoopData = $counseling['rows']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        @php
+                        <?php
                             $borderStyle = 'border-bottom: 1px solid #444;';
                             if ($rowCount > 1) {
                                 if ($index === 0) {
@@ -422,50 +433,51 @@
                                     $borderStyle = 'border-top: none; border-bottom: none;';
                                 }
                             }
-                        @endphp
-                        <td style="vertical-align: middle; background-color: #f8f9fa; {{ $borderStyle }}">
-                            @if($index === 0)
-                                <strong>{{ $counseling['nature'] }}</strong>
-                            @endif
+                        ?>
+                        <td style="vertical-align: middle; background-color: #f8f9fa; <?php echo e($borderStyle); ?>">
+                            <?php if($index === 0): ?>
+                                <strong><?php echo e($counseling['nature']); ?></strong>
+                            <?php endif; ?>
                         </td>
 
-                        <td class="text-start" style="font-size: 7pt;">{{ $row['college'] }}</td>
-                        <td class="text-center" style="font-size: 7pt;">{{ $row['year_level'] }}</td>
-                        <td class="text-start" style="font-size: 7pt;">{{ $row['presenting_problem'] }}</td>
-                        <td class="text-center">{{ $row['male'] }}</td>
-                        <td class="text-center">{{ $row['female'] }}</td>
-                        <td class="text-center"><strong>{{ $row['total'] }}</strong></td>
+                        <td class="text-start" style="font-size: 7pt;"><?php echo e($row['college']); ?></td>
+                        <td class="text-center" style="font-size: 7pt;"><?php echo e($row['year_level']); ?></td>
+                        <td class="text-start" style="font-size: 7pt;"><?php echo e($row['presenting_problem']); ?></td>
+                        <td class="text-center"><?php echo e($row['male']); ?></td>
+                        <td class="text-center"><?php echo e($row['female']); ?></td>
+                        <td class="text-center"><strong><?php echo e($row['total']); ?></strong></td>
                     </tr>
-                    @php
+                    <?php
                         $totalMale += $row['male'];
                         $totalFemale += $row['female'];
                         $totalCount += $row['total'];
-                    @endphp
-                @endforeach
+                    ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
-        @empty
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tbody>
                 <tr>
                     <td colspan="7" class="text-center">No counseling data available</td>
                 </tr>
             </tbody>
-        @endforelse
+        <?php endif; ?>
 
-        @if(count($counselingData) > 0)
+        <?php if(count($counselingData) > 0): ?>
             <tbody style="page-break-inside: avoid;">
                 <tr class="total-row">
                     <td colspan="4">GRAND TOTAL</td>
-                    <td class="text-center">{{ $totalMale }}</td>
-                    <td class="text-center">{{ $totalFemale }}</td>
-                    <td class="text-center">{{ $totalCount }}</td>
+                    <td class="text-center"><?php echo e($totalMale); ?></td>
+                    <td class="text-center"><?php echo e($totalFemale); ?></td>
+                    <td class="text-center"><?php echo e($totalCount); ?></td>
                 </tr>
             </tbody>
-        @endif
+        <?php endif; ?>
     </table>
 
     <div class="footer">
-        Generated on {{ now()->format('F j, Y, g:i a') }} by {{ auth()->user()->name }}
+        Generated on <?php echo e(now()->format('F j, Y, g:i a')); ?> by <?php echo e(auth()->user()->name); ?>
+
     </div>
 </body>
 
-</html>
+</html><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/admin/reports/export_pdf.blade.php ENDPATH**/ ?>

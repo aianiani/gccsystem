@@ -37,7 +37,8 @@
                                     title="Toggle Privacy">
                                     <i class="bi bi-eye-slash-fill" id="privacyIcon"></i>
                                 </button>
-                                <img src="<?php echo e($avatarUrl); ?>" class="rounded-circle shadow-sm border border-3 border-white privacy-blur"
+                                <img src="<?php echo e($avatarUrl); ?>"
+                                    class="rounded-circle shadow-sm border border-3 border-white privacy-blur"
                                     id="avatarPrivacyContainer" width="90" height="90" alt="<?php echo e($studentName); ?>">
                             </div>
 
@@ -86,9 +87,9 @@
 
                                         </div>
                                     <?php endif; ?>
-                                    <?php if($assessment->user->gender): ?>
+                                    <?php if($assessment->user->sex): ?>
                                         <div class="d-flex align-items-center gap-1">
-                                            <i class="bi bi-person"></i> <?php echo e(ucfirst($assessment->user->gender)); ?>
+                                            <i class="bi bi-person"></i> <?php echo e(ucfirst($assessment->user->sex)); ?>
 
                                         </div>
                                     <?php endif; ?>

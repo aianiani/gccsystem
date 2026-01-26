@@ -323,7 +323,7 @@
                 <i class="bi bi-people-fill stat-icon"></i>
                 <div class="stat-info">
                     <div class="value">{{ number_format($stats['total_users']) }}</div>
-                    <div class="label">Total Workforce</div>
+                    <div class="label">Total Enrolled</div>
                 </div>
             </div>
             <div class="premium-stat-card">
@@ -369,10 +369,13 @@
             </a>
         </div>
 
-        <!-- Middle Section: Trends & Strategy -->
+        <!-- NEW: Reports Generated Section -->
 
 
-        <!-- NEW: Demographic Intel Section -->
+
+
+
+        <!-- Student Demographic Intel Section -->
         <div class="header-title mb-4">
             <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--forest-green-dark);">Student Demographic
                 Intelligence</h2>
@@ -420,49 +423,62 @@
             </div>
         </div>
 
-        <div class="chart-layout">
-            <!-- College Enrollment Heatmap -->
+        <!-- NEW: College Distribution & Population Table -->
+        <div class="chart-layout" style="grid-template-columns: 1fr;">
+            <!-- College Distribution Bar -->
             <div class="premium-card">
                 <div class="card-header-flex">
-                    <h2><i class="bi bi-building"></i> Multi-College Enrollment Map</h2>
-                    <span class="badge bg-light text-dark">Total Enrollment:
-                        {{ number_format($stats['total_users']) }}</span>
+                    <h2 style="font-size: 1.1rem;"><i class="bi bi-building"></i> Students by College</h2>
                 </div>
-                <div style="height: 350px;">
+                <div style="height: 300px;">
                     <canvas id="collegeBar"></canvas>
-                </div>
-            </div>
-
-            <!-- Critical Notifications Panel -->
-            <div class="premium-card">
-                <div class="card-header-flex">
-                    <h2><i class="bi bi-exclamation-triangle-fill text-danger"></i> High-Priority Alerts</h2>
-                </div>
-                <div class="alert-container">
-                    @forelse($analytics['critical_alerts'] as $alert)
-                        <div class="alert-item">
-                            <div class="alert-icon">
-                                <i class="bi bi-person-fill-exclamation"></i>
-                            </div>
-                            <div class="alert-details">
-                                <h4>{{ $alert->user->name }}</h4>
-                                <p>{{ $alert->user->college }} • {{ $alert->created_at->format('M d, g:i A') }}</p>
-                            </div>
-                            <div class="alert-risk risk-{{ Str::slug($alert->risk_level) }}">
-                                {{ $alert->risk_level }}
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-5">
-                            <i class="bi bi-shield-check text-success display-4 mb-3"></i>
-                            <p class="text-muted fw-500">No critical alerts detected.</p>
-                        </div>
-                    @endforelse
                 </div>
             </div>
         </div>
 
-        <!-- Last Section: Workforce -->
+        <div class="premium-card mb-4">
+            <div class="card-header-flex">
+                <h2 style="font-size: 1.1rem;"><i class="bi bi-table"></i> Student Population Matrix (College x Year Level)
+                </h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-3">College</th>
+                            <th class="text-center">1st Year</th>
+                            <th class="text-center">2nd Year</th>
+                            <th class="text-center">3rd Year</th>
+                            <th class="text-center">4th Year+</th>
+                            <th class="text-center fw-bold">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($analytics['demographics']['college']['labels'] as $college)
+                            @php
+                                $matrixRow = $analytics['demographics']['matrix'][$college] ?? collect([]);
+                                // Handle potential Year Level formats (1 vs 1st Year)
+                                $y1 = $matrixRow['1'] ?? $matrixRow['1st Year'] ?? 0;
+                                $y2 = $matrixRow['2'] ?? $matrixRow['2nd Year'] ?? 0;
+                                $y3 = $matrixRow['3'] ?? $matrixRow['3rd Year'] ?? 0;
+                                $y4 = ($matrixRow['4'] ?? 0) + ($matrixRow['4th Year'] ?? 0) + ($matrixRow['5'] ?? 0) + ($matrixRow['5th Year'] ?? 0);
+                                $total = $y1 + $y2 + $y3 + $y4;
+                            @endphp
+                            <tr>
+                                <td class="ps-3 fw-600 text-dark">{{ $college ?: 'Unassigned' }}</td>
+                                <td class="text-center">{{ $y1 ?: '-' }}</td>
+                                <td class="text-center">{{ $y2 ?: '-' }}</td>
+                                <td class="text-center">{{ $y3 ?: '-' }}</td>
+                                <td class="text-center">{{ $y4 ?: '-' }}</td>
+                                <td class="text-center fw-bold text-success">{{ $total }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
         <!-- Last Section: Announcements Preview -->
         <div class="premium-card mb-5">
             <div class="card-header-flex">
@@ -510,9 +526,7 @@
             Chart.defaults.font.family = "'Plus Jakarta Sans', 'Inter', sans-serif";
             Chart.defaults.color = '#64748b';
 
-
-
-            // 3. Gender Distribution Donut
+            // 1. Gender Distribution Donut
             const genderCtx = document.getElementById('genderDonut').getContext('2d');
             new Chart(genderCtx, {
                 type: 'doughnut',
@@ -536,7 +550,7 @@
                 }
             });
 
-            // 4. Year Level Bar
+            // 2. Year Level Bar
             const yearCtx = document.getElementById('yearLevelBar').getContext('2d');
             new Chart(yearCtx, {
                 type: 'bar',
@@ -562,34 +576,33 @@
                 }
             });
 
-            // 5. College Bar
+
+
+
+
+            // 8. College Distribution Bar
             const collegeCtx = document.getElementById('collegeBar').getContext('2d');
             new Chart(collegeCtx, {
                 type: 'bar',
                 data: {
                     labels: @json($analytics['demographics']['college']['labels']),
                     datasets: [{
-                        label: 'Total Enrollment',
+                        label: 'Total Students',
                         data: @json($analytics['demographics']['college']['data']),
                         backgroundColor: '#1f7a2d',
-                        hoverBackgroundColor: '#FFCB05',
-                        borderRadius: 10,
-                        maxBarThickness: 50
+                        borderRadius: 6
                     }]
                 },
                 options: {
-                    indexAxis: 'y',
+                    indexAxis: 'x', // Vertical bars
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { weight: 600 } } },
-                        y: { grid: { display: false }, ticks: { font: { weight: 700, size: 11 } } }
+                        y: { beginAtZero: true }
                     }
                 }
             });
-
-
         });
     </script>
 @endsection

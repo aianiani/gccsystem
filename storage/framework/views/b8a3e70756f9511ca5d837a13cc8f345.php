@@ -723,9 +723,9 @@
                     toast: true,
                     position: 'top-end',
                     icon: 'success',
-                    title: 'Success',
+                    title: "<?php echo e(session('success')); ?>",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 4000,
                     timerProgressBar: true,
                 });
             <?php elseif(session('error')): ?>
@@ -733,9 +733,9 @@
                     toast: true,
                     position: 'top-end',
                     icon: 'error',
-                    title: 'Error',
+                    title: "<?php echo e(session('error')); ?>",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 4000,
                     timerProgressBar: true,
                 });
             <?php elseif(session('warning')): ?>
@@ -743,9 +743,9 @@
                     toast: true,
                     position: 'top-end',
                     icon: 'warning',
-                    title: 'Warning',
+                    title: "<?php echo e(session('warning')); ?>",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 4000,
                     timerProgressBar: true,
                 });
             <?php elseif(session('info')): ?>
@@ -753,9 +753,9 @@
                     toast: true,
                     position: 'top-end',
                     icon: 'info',
-                    title: 'Info',
+                    title: "<?php echo e(session('info')); ?>",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 4000,
                     timerProgressBar: true,
                 });
             <?php endif; ?>
