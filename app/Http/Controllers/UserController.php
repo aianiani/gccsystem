@@ -444,6 +444,69 @@ class UserController extends Controller
     }
 
     /**
+     * Bulk promote students to the next year level
+     */
+    public function bulkPromote(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $count = 0;
+        $authId = auth()->id();
+        $promotionMap = [
+            '1st Year' => '2nd Year',
+            '2nd Year' => '3rd Year',
+            '3rd Year' => '4th Year',
+            '4th Year' => 'Graduated',
+            '1' => '2',
+            '2' => '3',
+            '3' => '4',
+            '4' => 'Graduated',
+        ];
+
+        foreach ($request->user_ids as $userId) {
+            $user = User::find($userId);
+
+            if ($user && $user->role === 'student' && $user->year_level !== 'Graduated') {
+                $currentYear = $user->year_level;
+                $newYear = null;
+
+                // Check exact map match
+                if (isset($promotionMap[$currentYear])) {
+                    $newYear = $promotionMap[$currentYear];
+                }
+                // Handle "X Year", "Xth Year" formats loosely if strict map fails
+                elseif (preg_match('/^(\d+)/', $currentYear, $matches)) {
+                    $yearNum = intval($matches[1]);
+                    if ($yearNum >= 1 && $yearNum < 4) {
+                        $newYear = ($yearNum + 1) . 'th Year'; // Default to "Xth Year" format
+                        if ($newYear == '2th Year')
+                            $newYear = '2nd Year'; // Fix suffix
+                        if ($newYear == '3th Year')
+                            $newYear = '3rd Year'; // Fix suffix
+                    } elseif ($yearNum >= 4) {
+                        $newYear = 'Graduated';
+                    }
+                }
+
+                if ($newYear) {
+                    $user->update(['year_level' => $newYear]);
+                    UserActivity::log($authId, 'bulk_promote_student', "Promoted student: {$user->name} from {$currentYear} to {$newYear}", [
+                        'user_id' => $userId,
+                        'old_year' => $currentYear,
+                        'new_year' => $newYear
+                    ]);
+                    $count++;
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', "Successfully promoted {$count} student(s) to their next year level.");
+    }
+
+    /**
      * Show the authenticated user's profile.
      */
     public function profile()

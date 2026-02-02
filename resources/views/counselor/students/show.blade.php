@@ -345,6 +345,7 @@
                                         <div class="row g-2">
                                             @php
                                                 $badges = [
+                                                    'New Student Orientation Program' => ['color' => 'bg-secondary bg-opacity-25 text-white border-secondary', 'icon' => 'bi-compass-fill', 'year' => 1, 'label' => 'Orientation'],
                                                     'IDREAMS' => ['color' => 'bg-info bg-opacity-25 text-white border-info', 'icon' => 'bi-clouds-fill', 'year' => 1],
                                                     '10C' => ['color' => 'bg-warning bg-opacity-25 text-white border-warning', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
                                                     'LEADS' => ['color' => 'bg-primary bg-opacity-25 text-white border-primary', 'icon' => 'bi-people-fill', 'year' => 3],
@@ -352,17 +353,20 @@
                                                 ];
                                             @endphp
                                             @foreach($badges as $seminarName => $style)
-                                                @php $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]); @endphp
-                                                <div class="col-6 col-sm-3">
-                                                    <div class="d-flex align-items-center justify-content-center gap-2 py-2 rounded-3 border transition-all text-center
+                                                @php 
+                                                    $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]); 
+                                                    $displayName = $style['label'] ?? $seminarName;
+                                                @endphp
+                                                <div class="col-6 col-md-auto" style="flex: 1 0 0;">
+                                                    <div class="d-flex align-items-center justify-content-center gap-2 py-2 rounded-3 border transition-all text-center h-100
                                                         {{ $isAttended ? $style['color'] . ' shadow-sm' : 'bg-white/5 border-white/10 text-white-50' }}"
                                                         style="backdrop-filter: blur(4px);">
                                                         @if($isAttended)
                                                             <i class="bi {{ $style['icon'] }}"></i>
-                                                            <span class="fw-bold small">{{ $seminarName }}</span>
+                                                            <span class="fw-bold small">{{ $displayName }}</span>
                                                         @else
                                                             <i class="bi bi-lock-fill opacity-50"></i>
-                                                            <span class="small opacity-75">{{ $seminarName }}</span>
+                                                            <span class="small opacity-75">{{ $displayName }}</span>
                                                         @endif
                                                     </div>
                                                 </div>

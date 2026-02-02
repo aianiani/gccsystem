@@ -240,7 +240,8 @@ class AdminReportsController extends Controller
             'IDREAMS',
             '10C',
             'LEADS',
-            'IMAGE'
+            'IMAGE',
+            'New Student Orientation Program'
         ];
 
         $results = [];

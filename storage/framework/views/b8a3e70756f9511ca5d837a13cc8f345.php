@@ -350,151 +350,38 @@
         /* Shared custom-sidebar styles to match student dashboard theme
                Increased specificity and some !important flags to ensure the
                sidebar appearance overrides other stylesheet rules. */
+        /* Shared custom-sidebar styles to match student dashboard theme
+           Enhanced with glassmorphism and smoother transitions. */
         .custom-sidebar,
         aside.custom-sidebar {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             bottom: 0 !important;
-            height: auto !important;
-            width: 275px !important;
-            background: var(--forest-green, #2d5016) !important;
+            height: 100% !important;
+            width: 280px !important;
+            background: linear-gradient(165deg, #1b5e20 0%, #003300 100%) !important;
             color: #fff !important;
-            z-index: 1040 !important;
+            z-index: 2000 !important;
             display: flex !important;
             flex-direction: column !important;
-            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15) !important;
             overflow-y: auto !important;
             box-sizing: border-box !important;
-            transition: width 0.18s ease, padding 0.18s ease, transform 0.18s ease !important;
-            padding-bottom: 1rem !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            padding-bottom: 1.5rem !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
 
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 1.6rem 1rem 0.6rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .custom-sidebar .sidebar-logo img {
-            display: block;
-            margin: 0 auto 0.5rem;
-        }
-
-        .custom-sidebar .sidebar-logo h3 {
-            margin: 0.25rem 0 0;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--yellow-maize, #f4d03f);
-        }
-
-        .custom-sidebar .sidebar-logo p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #fff;
-            opacity: 0.85;
-        }
-
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1rem 0.5rem 0.5rem 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .custom-sidebar .sidebar-link {
-            display: flex !important;
-            align-items: center !important;
-            gap: 0.9rem !important;
-            padding: 0.75rem 1rem !important;
-            border-radius: 10px !important;
-            color: #fff !important;
-            text-decoration: none !important;
-            font-weight: 600 !important;
-            transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease !important;
-            position: relative !important;
-            overflow: visible !important;
-        }
-
-        .custom-sidebar .sidebar-link i {
-            font-size: 1.12rem;
-            width: 26px;
-            text-align: center;
-        }
-
-        /* Active / hover state: light rounded panel with yellow accent */
-        .custom-sidebar .sidebar-link.active,
-        .custom-sidebar .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.05) !important;
-            color: var(--yellow-maize) !important;
-            transform: translateX(4px) !important;
-        }
-
-        .custom-sidebar .sidebar-link.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 20%;
-            bottom: 20%;
-            width: 4px;
-            background: var(--yellow-maize);
-            border-radius: 0 4px 4px 0;
-            box-shadow: 0 0 10px rgba(255, 203, 5, 0.4);
-        }
-
-        .custom-sidebar .sidebar-divider {
-            margin: 0.75rem 0;
-        }
-
-        .custom-sidebar .sidebar-resources .text-uppercase {
-            color: rgba(255, 255, 255, 0.75) !important;
-            font-weight: 700;
-        }
-
-        .custom-sidebar .sidebar-bottom {
-            padding: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .custom-sidebar .logout {
-            background: transparent !important;
-            color: #fff !important;
-            border-radius: 8px;
-            padding: 0.6rem 0.75rem;
-            font-weight: 700;
-        }
-
-        .custom-sidebar .logout i {
-            margin-right: 0.55rem;
-        }
-
-        .custom-sidebar .logout:hover {
-            background: rgba(255, 255, 255, 0.03) !important;
-            color: #fff !important;
-        }
-
-        /* Ensure main content is pushed to the right when sidebar exists */
-        #mainContent {
-            margin-left: 275px !important;
-            transition: margin-left 0.18s ease !important;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px !important;
-            }
-
-            #mainContent {
-                margin-left: 200px !important;
-            }
-        }
-
+        /* Glassmorphism effect on mobile */
         @media (max-width: 767.98px) {
             .custom-sidebar {
+                width: 85% !important;
+                max-width: 320px !important;
+                background: linear-gradient(165deg, rgba(27, 94, 32, 0.95) 0%, rgba(0, 51, 0, 0.98) 100%) !important;
+                backdrop-filter: blur(15px) !important;
+                -webkit-backdrop-filter: blur(15px) !important;
                 transform: translateX(-100%);
-                position: fixed;
             }
 
             .custom-sidebar.show {
@@ -504,6 +391,184 @@
             #mainContent {
                 margin-left: 0 !important;
             }
+
+            /* Enhanced toggle button for mobile */
+            #studentSidebarToggle,
+            #adminSidebarToggle {
+                position: fixed !important;
+                top: 1.25rem !important;
+                left: 1rem !important;
+                z-index: 1050 !important;
+                background: white !important;
+                color: var(--forest-green) !important;
+                border: none !important;
+                border-radius: 12px !important;
+                width: 45px !important;
+                height: 45px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 1.5rem !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+                transition: all 0.2s ease !important;
+            }
+
+            #studentSidebarToggle:active,
+            #adminSidebarToggle:active {
+                transform: scale(0.9) !important;
+            }
+        }
+
+        .custom-sidebar .btn-close-sidebar {
+            position: absolute;
+            top: 1.25rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .custom-sidebar .btn-close-sidebar:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .custom-sidebar .sidebar-logo {
+            text-align: center;
+            padding: 2.5rem 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .custom-sidebar .logo-wrapper {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 1.25rem;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-sidebar .logo-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .custom-sidebar .sidebar-logo h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--yellow-maize, #FFCB05);
+            line-height: 1.4;
+            letter-spacing: -0.2px;
+        }
+
+        .custom-sidebar .sidebar-logo p {
+            margin: 0.5rem 0 0;
+            font-size: 0.75rem;
+            color: #fff;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .custom-sidebar .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .custom-sidebar .sidebar-link {
+            display: flex !important;
+            align-items: center !important;
+            gap: 1rem !important;
+            padding: 0.85rem 1.25rem !important;
+            border-radius: 14px !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            text-decoration: none !important;
+            font-weight: 500 !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            position: relative !important;
+            border: 1px solid transparent !important;
+        }
+
+        .custom-sidebar .sidebar-link i {
+            font-size: 1.25rem;
+            transition: transform 0.2s;
+        }
+
+        .custom-sidebar .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+            color: #fff !important;
+            transform: translateX(5px);
+        }
+
+        .custom-sidebar .sidebar-link.active {
+            background: rgba(255, 203, 5, 0.15) !important;
+            color: var(--yellow-maize) !important;
+            font-weight: 700 !important;
+            border-color: rgba(255, 203, 5, 0.2) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .custom-sidebar .sidebar-link.active i {
+            color: var(--yellow-maize);
+            transform: scale(1.1);
+        }
+
+        .custom-sidebar .sidebar-link.active::after {
+            content: '';
+            position: absolute;
+            right: 1.25rem;
+            width: 6px;
+            height: 6px;
+            background: var(--yellow-maize);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--yellow-maize);
+        }
+
+        .custom-sidebar .sidebar-divider-text {
+            padding: 1.5rem 1.25rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .custom-sidebar .sidebar-bottom {
+            padding: 1.25rem;
+            margin-top: auto;
+        }
+
+        .custom-sidebar .logout {
+            background: rgba(220, 53, 69, 0.1) !important;
+            color: #ff4d4d !important;
+            border: 1px solid rgba(220, 53, 69, 0.2) !important;
+        }
+
+        .custom-sidebar .logout:hover {
+            background: rgba(220, 53, 69, 0.2) !important;
+            color: #fff !important;
+            border-color: rgba(220, 53, 69, 0.3) !important;
+        }
+
+        #mainContent {
+            margin-left: 280px !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
     </style>
 </head>
@@ -512,6 +577,7 @@
 
     <?php if(auth()->guard()->check()): ?>
         <?php if(auth()->user()->isAdmin()): ?>
+            
             <div class="home-zoom">
                 <div class="d-flex">
                     <!-- Mobile Sidebar Toggle -->
@@ -634,7 +700,7 @@
                 }
 
                 .custom-sidebar .sidebar-link.logout:hover {
-                    background: #b52a37 !important;
+                    background: #dc3545 !important;
                     color: #fff !important;
                 }
 
@@ -697,9 +763,13 @@
             </script>
         <?php else: ?>
             <main class="fade-in">
-                <div class="container py-4">
+                <?php if (! empty(trim($__env->yieldContent('full_width')))): ?>
                     <?php echo $__env->yieldContent('content'); ?>
-                </div>
+                <?php else: ?>
+                    <div class="container py-4">
+                        <?php echo $__env->yieldContent('content'); ?>
+                    </div>
+                <?php endif; ?>
             </main>
         <?php endif; ?>
     <?php endif; ?>
@@ -712,7 +782,7 @@
     <?php endif; ?>
 
     <!-- Bootstrap JS -->
-    <script src="<?php echo e(asset('vendor/bootstrap/js/bootstrap.bundle.min.js')); ?>"></script>
+
     <!-- SweetAlert2 -->
     <script src="<?php echo e(asset('vendor/sweetalert2/sweetalert2.min.js')); ?>"></script>
     <script>
@@ -759,6 +829,29 @@
                     timerProgressBar: true,
                 });
             <?php endif; ?>
+
+            // Global SweetAlert2 Confirmation for Delete Actions
+            document.body.addEventListener('submit', function (e) {
+                if (e.target.classList.contains('delete-form')) {
+                    e.preventDefault();
+                    var form = e.target;
+                    var message = form.getAttribute('data-confirm-message') || 'You won\'t be able to revert this!';
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                }
+            });
         });
     </script>
     <?php if(auth()->guard()->check()): ?>

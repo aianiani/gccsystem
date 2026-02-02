@@ -37,17 +37,7 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply the same page zoom used on the homepage */
-        .home-zoom {
-            zoom: 0.75;
-        }
 
-        @supports not (zoom: 1) {
-            .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
-            }
-        }
 
         body,
         .profile-card,
@@ -204,7 +194,8 @@
 
             .main-dashboard-content {
                 margin-left: 0;
-                padding: 1rem;
+                padding: 3rem 0.5rem 1rem 0.5rem;
+                /* Drastic reduction */
             }
 
             /* Toggle button */
@@ -459,19 +450,19 @@
                         <!-- Progress Header -->
                         <div class="scheduler-header">
                             <h3><i class="bi bi-calendar-plus me-2"></i>Schedule Your Counseling Session</h3>
-                            <div class="scheduler-nav">
+                            <div class="scheduler-nav overflow-auto py-2"
+                                style="white-space: nowrap; -webkit-overflow-scrolling: touch;">
                                 <button class="nav-step active" data-step="1">
                                     <i class="bi bi-person-badge"></i>
-                                    Personal & Guardian Info
+                                    Info
                                 </button>
                                 <button class="nav-step" data-step="2">
-                                    <i class="bi bi-person-badge"></i>
-                                    Select Counselor
+                                    <i class="bi bi-person"></i>
+                                    Counselor
                                 </button>
                                 <button class="nav-step" data-step="3">
-                                    <i class="bi bi-calendar-alt"></i>
-                                    Select Date
-                                    & Time
+                                    <i class="bi bi-calendar-event"></i>
+                                    Date & Time
                                 </button>
                                 <button class="nav-step" data-step="4">
                                     <i class="bi bi-check-circle"></i>
@@ -698,11 +689,19 @@
                                         </div>
                                     </div>
                                     <div class="mt-3" id="referral_reason_container" style="display:none;">
-                                        <label class="form-label">Reason for Referral <span
-                                                class="text-danger">*</span></label>
-                                        <textarea class="form-control" name="referral_reason" id="referral_reason"
-                                            placeholder="Please state the reason for referral..." rows="3"
-                                            style="resize:vertical;"></textarea>
+                                        <div class="mb-3">
+                                            <label class="form-label">Referrer Name <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="referrer_name" id="referrer_name"
+                                                placeholder="Who referred you? (e.g., Prof. Cruz, Guidance Office)">
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Reason for Referral <span
+                                                    class="text-danger">*</span></label>
+                                            <textarea class="form-control" name="referral_reason" id="referral_reason"
+                                                placeholder="Please state the reason for referral..." rows="3"
+                                                style="resize:vertical;"></textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -997,8 +996,8 @@
 
         .nature-problem-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
         }
 
         .form-check-square {
@@ -1162,8 +1161,14 @@
 
         .counselor-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        @media (max-width: 576px) {
+            .counselor-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .counselor-card {
@@ -1274,7 +1279,7 @@
         }
 
         .calendar-container {
-            max-width: 650px;
+            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -1328,7 +1333,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: var(--shadow-sm);
-            max-width: 650px;
+            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -1418,8 +1423,8 @@
 
         .time-slots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.75rem;
         }
 
         .time-slot {
@@ -1572,6 +1577,109 @@
             }
         }
 
+        @media (max-width: 767.98px) {
+            .scheduler-actions {
+                padding: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .scheduler-actions button {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .calendar-day {
+                min-height: 40px;
+                font-size: 0.85rem;
+            }
+
+            .calendar-weekdays {
+                font-size: 0.8rem;
+            }
+
+            .step-content {
+                padding: 1rem;
+            }
+
+            .scheduler-header {
+                padding: 1rem;
+            }
+
+            /* Disable hover effects on mobile to prevent "zoom" feeling */
+            .calendar-day:hover:not(.disabled),
+            .time-slot:hover,
+            .counselor-card:hover {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+
+            .calendar-day.available:hover {
+                background: var(--yellow-maize-light);
+                color: var(--text-dark);
+            }
+
+            /* Aggressive whitespace reduction for mobile */
+            .scheduler-header,
+            .step-content,
+            .counselor-selection-header,
+            .calendar-header,
+            .time-slots-header,
+            .summary-header {
+                margin-bottom: 0.75rem !important;
+                padding: 0.75rem !important;
+            }
+
+            .step-content {
+                padding: 0.75rem !important;
+            }
+
+            .scheduler-header h3,
+            .counselor-selection-header h3,
+            .calendar-header h3,
+            .time-slots-title,
+            .summary-title {
+                margin-bottom: 0.5rem !important;
+                font-size: 1.15rem !important;
+            }
+
+            .scheduler-container {
+                padding-bottom: 80px;
+                /* Reduced from 100px */
+            }
+
+            .form-section {
+                margin-bottom: 1rem;
+                padding: 1rem;
+            }
+
+            h3 {
+                font-size: 1.25rem !important;
+            }
+
+            /* Horizontal scrolling navigation for mobile */
+            .scheduler-nav {
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                padding-bottom: 0.5rem;
+                gap: 0.5rem;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                /* Hide scrollbar Firefox */
+            }
+
+            .scheduler-nav::-webkit-scrollbar {
+                display: none;
+                /* Hide scrollbar Chrome/Safari */
+            }
+
+            .nav-step {
+                flex-shrink: 0;
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+                white-space: nowrap;
+            }
+        }
+
         .btn {
             display: flex;
             align-items: center;
@@ -1683,7 +1791,7 @@
     </style>
 
     <script>
-        // Make these variables global
+        // Make these var    iables global
         let selectedCounselor = null;
         let selectedDate = null;
         let selectedTime = null;
@@ -1712,6 +1820,7 @@
                     nature_of_problem_other: document.querySelector('textarea[name="nature_of_problem_other"]')?.value || '',
                     appointment_type: document.querySelector('input[name="appointment_type"]:checked')?.value || '',
                     referral_reason: document.querySelector('textarea[name="referral_reason"]')?.value || '',
+                    referrer_name: document.querySelector('input[name="referrer_name"]')?.value || '',
                     selectedCounselor: selectedCounselor,
                     selectedDate: selectedDate,
                     selectedTime: selectedTime,
@@ -1739,6 +1848,7 @@
                     if (formData.guardian2_relationship_other) document.querySelector('input[name="guardian2_relationship_other"]').value = formData.guardian2_relationship_other;
                     if (formData.nature_of_problem_other) document.querySelector('textarea[name="nature_of_problem_other"]').value = formData.nature_of_problem_other;
                     if (formData.referral_reason) document.querySelector('textarea[name="referral_reason"]').value = formData.referral_reason;
+                    if (formData.referrer_name) document.querySelector('input[name="referrer_name"]').value = formData.referrer_name;
                     if (formData.notes) document.querySelector('textarea[name="notes"]').value = formData.notes;
 
                     // Restore selects
@@ -1944,8 +2054,13 @@
                         }
                         if (appointmentType === 'Referral') {
                             const referralReason = document.querySelector('[name="referral_reason"]')?.value;
+                            const referrerName = document.querySelector('[name="referrer_name"]')?.value;
                             if (!referralReason || referralReason.trim() === '') {
                                 console.log('Missing referral reason');
+                                return false;
+                            }
+                            if (!referrerName || referrerName.trim() === '') {
+                                console.log('Missing referrer name');
                                 return false;
                             }
                         }
@@ -2488,7 +2603,11 @@
                         if (appointmentTypeRadio.value === 'Referral') {
                             if (summaryReferralReasonContainer) summaryReferralReasonContainer.style.display = 'flex';
                             const referralReasonText = document.querySelector('[name="referral_reason"]')?.value;
-                            if (summaryReferralReason) summaryReferralReason.textContent = referralReasonText || 'Not provided';
+                            const referrerNameText = document.querySelector('[name="referrer_name"]')?.value;
+                            if (summaryReferralReason) {
+                                summaryReferralReason.innerHTML = (referralReasonText || 'Not provided') +
+                                    (referrerNameText ? `<br><small class="text-muted">Referred by: ${referrerNameText}</small>` : '');
+                            }
                         } else {
                             if (summaryReferralReasonContainer) summaryReferralReasonContainer.style.display = 'none';
                         }
@@ -2690,17 +2809,24 @@
             const typeRadios = document.querySelectorAll('input[name="appointment_type"]');
             const referralReasonContainer = document.getElementById('referral_reason_container');
             const referralReason = document.getElementById('referral_reason');
+            const referrerName = document.getElementById('referrer_name');
 
             typeRadios.forEach(radio => {
                 radio.addEventListener('change', function () {
                     if (this.value === 'Referral') {
                         if (referralReasonContainer) referralReasonContainer.style.display = 'block';
                         if (referralReason) referralReason.setAttribute('required', 'required');
+                        if (referrerName) referrerName.setAttribute('required', 'required');
                     } else {
                         if (referralReasonContainer) referralReasonContainer.style.display = 'none';
                         if (referralReason) {
                             referralReason.removeAttribute('required');
                             referralReason.value = '';
+                        }
+                        const referrerName = document.getElementById('referrer_name');
+                        if (referrerName) {
+                            referrerName.removeAttribute('required');
+                            referrerName.value = '';
                         }
                     }
                 });

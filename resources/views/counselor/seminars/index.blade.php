@@ -385,8 +385,8 @@
                                                         Edit
                                                     </a>
                                                     <form action="{{ route('counselor.seminars.destroy', $seminar) }}"
-                                                        method="POST" class="inline-block"
-                                                        onsubmit="return confirm('Are you sure you want to delete this seminar?');">
+                                                        method="POST" class="inline-block delete-form"
+                                                        data-confirm-message="Are you sure you want to delete this seminar?">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"

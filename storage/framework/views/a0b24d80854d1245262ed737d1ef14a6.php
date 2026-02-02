@@ -158,14 +158,16 @@
     <div class="home-zoom" style="position: relative;">
 
         <!-- Header -->
-        <header class="mb-5 d-flex justify-content-between align-items-end px-3">
+        <header class="mb-3 d-flex justify-content-between align-items-center px-3">
             <div>
-                <h1 class="display-5 fw-bold" style="color: var(--forest-green-dark);">Analytics Overview</h1>
-                <p class="text-muted fw-500 mb-0">Three-pillar analysis of system performance.</p>
+                <h1 class="display-6 fw-bold" style="color: var(--forest-green-dark); margin-bottom: 0.2rem;">Analytics
+                    Overview</h1>
+                <p class="text-muted fw-500 small mb-0">Three-pillar analysis of system performance.</p>
             </div>
             <div class="d-flex gap-2">
-                <a href="<?php echo e(route('admin.analytics.export', ['start_date' => $startDate->format('Y-m-d'), 'end_date' => $endDate->format('Y-m-d')])); ?>"
-                    class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" target="_blank">
+                <a href="<?php echo e(route('admin.analytics.export', request()->all())); ?>"
+                    class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold shadow-sm d-flex align-items-center"
+                    target="_blank">
                     <i class="bi bi-file-earmark-pdf-fill me-2"></i>Export PDF
                 </a>
             </div>
@@ -173,30 +175,55 @@
 
         <!-- Filter Selection (Always Visible) -->
         <div class="mb-4 px-3">
-            <div class="analytics-card p-4">
-                <form action="<?php echo e(route('admin.analytics.index')); ?>" method="GET" class="row g-3">
-                    <!-- ... Copied filter inputs from previous version, concise ... -->
-                    <div class="col-md-3">
-                        <label class="small fw-bold text-muted">Start Date</label>
-                        <input type="date" name="start_date" class="form-control" value="<?php echo e($startDate->format('Y-m-d')); ?>">
+            <div class="analytics-card p-3">
+                <form action="<?php echo e(route('admin.analytics.index')); ?>" method="GET" class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="small fw-bold text-muted mb-1">Frequency</label>
+                        <select name="frequency" class="form-select form-select-sm">
+                            <option value="daily" <?php echo e(request('frequency') == 'daily' ? 'selected' : ''); ?>>Daily</option>
+                            <option value="weekly" <?php echo e(request('frequency') == 'weekly' ? 'selected' : ''); ?>>Weekly</option>
+                            <option value="monthly" <?php echo e(request('frequency', 'monthly') == 'monthly' ? 'selected' : ''); ?>>
+                                Monthly</option>
+                            <option value="annual" <?php echo e(request('frequency') == 'annual' ? 'selected' : ''); ?>>Annual</option>
+                        </select>
                     </div>
-                    <div class="col-md-3">
-                        <label class="small fw-bold text-muted">End Date</label>
-                        <input type="date" name="end_date" class="form-control" value="<?php echo e($endDate->format('Y-m-d')); ?>">
+                    <div class="col-md-2">
+                        <label class="small fw-bold text-muted mb-1">Start Date</label>
+                        <input type="date" name="start_date" class="form-control form-control-sm"
+                            value="<?php echo e($startDate->format('Y-m-d')); ?>">
                     </div>
-                    <div class="col-md-3">
-                        <label class="small fw-bold text-muted">College</label>
-                        <select name="college" class="form-select">
+                    <div class="col-md-2">
+                        <label class="small fw-bold text-muted mb-1">End Date</label>
+                        <input type="date" name="end_date" class="form-control form-control-sm"
+                            value="<?php echo e($endDate->format('Y-m-d')); ?>">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="small fw-bold text-muted mb-1">College</label>
+                        <select name="college" class="form-select form-select-sm">
                             <option value="">All Colleges</option>
                             <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $col): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <option value="<?php echo e($col); ?>" <?php echo e(request('college') == $col ? 'selected' : ''); ?>><?php echo e($col); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
-                    <div class="col-md-3 d-flex flex-column justify-content-end">
-                        <a href="<?php echo e(route('admin.analytics.index')); ?>"
-                            class="small text-danger fw-bold text-decoration-none text-end mb-2">Clear Filters</a>
-                        <button type="submit" class="btn btn-success w-100 fw-bold">Apply Filters</button>
+                    <div class="col-md-2">
+                        <label class="small fw-bold text-muted mb-1">Program</label>
+                        <select name="program" class="form-select form-select-sm">
+                            <option value="">All Programs</option>
+                            <?php $__currentLoopData = $programs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($prog); ?>" <?php echo e(request('program') == $prog ? 'selected' : ''); ?>>
+                                    <?php echo e(Str::limit($prog, 15)); ?>
+
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-success btn-sm w-100 fw-bold">Apply</button>
+                        <a href="<?php echo e(route('admin.analytics.index')); ?>" class="btn btn-light btn-sm w-auto"
+                            title="Clear Filters">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
                     </div>
                 </form>
             </div>
@@ -228,7 +255,7 @@
             <div class="row g-4 mb-4">
                 <div class="col-md-3">
                     <div class="analytics-card kpi-stat-card">
-                        <div class="kpi-icon-box bg-success bg-opacity-10 text-success">
+                        <div class="kpi-icon-box bg-primary bg-opacity-10 text-primary">
                             <i class="bi bi-calendar-check-fill"></i>
                         </div>
                         <div class="kpi-content">
@@ -237,35 +264,35 @@
                         </div>
                     </div>
                 </div>
-                <!-- Wait Time -->
+                <!-- Satisfaction -->
                 <div class="col-md-3">
                     <div class="analytics-card kpi-stat-card">
-                        <div class="kpi-icon-box bg-warning bg-opacity-10 text-warning">
-                            <i class="bi bi-hourglass-split"></i>
+                        <div class="kpi-icon-box bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-star-fill"></i>
                         </div>
                         <div class="kpi-content">
-                            <h3><?php echo e(number_format($avgWaitTime, 1)); ?> <span class="fs-6 text-muted fw-normal">days</span>
+                            <h3><?php echo e(number_format($sentimentScore, 1)); ?><span class="fs-6 text-muted fw-normal">/5.0</span>
                             </h3>
-                            <p>Avg Wait Time</p>
+                            <p>Avg. Satisfaction</p>
                         </div>
                     </div>
                 </div>
-                <!-- Efficiency: Cancellation Rate -->
+                <!-- Unique Reach -->
                 <div class="col-md-3">
                     <div class="analytics-card kpi-stat-card">
-                        <div class="kpi-icon-box bg-danger bg-opacity-10 text-danger">
-                            <i class="bi bi-x-circle-fill"></i>
+                        <div class="kpi-icon-box bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-person-check-fill"></i>
                         </div>
                         <div class="kpi-content">
-                            <h3><?php echo e(number_format($cancellationRate, 1)); ?>%</h3>
-                            <p>Cancellation Rate</p>
+                            <h3><?php echo e(number_format($uniqueStudentsReached)); ?></h3>
+                            <p>Unique Students</p>
                         </div>
                     </div>
                 </div>
                 <!-- Pending -->
                 <div class="col-md-3">
                     <div class="analytics-card kpi-stat-card">
-                        <div class="kpi-icon-box bg-info bg-opacity-10 text-info">
+                        <div class="kpi-icon-box bg-warning bg-opacity-10 text-warning">
                             <i class="bi bi-clock-history"></i>
                         </div>
                         <div class="kpi-content">
@@ -336,7 +363,7 @@
                 </div>
             </div>
 
-            <!-- Row 2: Trend & Usage -->
+            <!-- Row 2: Trend & Sex by College -->
             <div class="row g-4 mb-4">
                 <div class="col-md-6">
                     <div class="analytics-card">
@@ -349,22 +376,36 @@
                         </div>
                     </div>
                 </div>
+                <!-- NEW: Sex by College -->
                 <div class="col-md-6">
                     <div class="analytics-card">
                         <div class="card-header-row">
-                            <div class="card-title-text"><i class="bi bi-bar-chart-steps text-primary"></i> Counseling Usage
-                                (Year & College)</div>
+                            <div class="card-title-text"><i class="bi bi-buildings text-primary"></i> Counseling by College
+                                (Sex)</div>
                         </div>
                         <div style="height: 300px;">
-                            <canvas id="counselingUsageChart"></canvas>
+                            <canvas id="counselingCollegeSexChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Row 3: Problems -->
+            <!-- Row 3: Sex by Year & Problems -->
             <div class="row g-4">
-                <div class="col-md-12">
+                <!-- NEW: Sex by Year -->
+                <div class="col-md-6">
+                    <div class="analytics-card">
+                        <div class="card-header-row">
+                            <div class="card-title-text"><i class="bi bi-bar-chart-steps text-primary"></i> Counseling by
+                                Year Level (Sex)</div>
+                        </div>
+                        <div style="height: 250px;">
+                            <canvas id="counselingYearSexChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
                     <div class="analytics-card">
                         <div class="card-header-row">
                             <div class="card-title-text"><i class="bi bi-list-ul text-warning"></i> Top Presenting Problems
@@ -400,13 +441,12 @@
                 </div>
                 <div class="col-md-6">
                     <div class="analytics-card kpi-stat-card">
-                        <div class="kpi-icon-box bg-danger bg-opacity-10 text-danger">
-                            <i class="bi bi-heart-pulse"></i>
+                        <div class="kpi-icon-box bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-clipboard-data-fill"></i>
                         </div>
                         <div class="kpi-content">
-                            <!-- Placeholder for 'Avg Mood Score' if we had scalar, simplified here -->
-                            <h3>Live</h3>
-                            <p>Wellness Tracking</p>
+                            <h3><?php echo e(number_format($totalAssessments)); ?></h3>
+                            <p>Total Assessments</p>
                         </div>
                     </div>
                 </div>
@@ -464,7 +504,7 @@
             <div class="row g-4 mb-4">
                 <div class="col-md-4">
                     <div class="analytics-card kpi-stat-card">
-                        <div class="kpi-icon-box bg-info bg-opacity-10 text-info">
+                        <div class="kpi-icon-box bg-primary bg-opacity-10 text-primary">
                             <i class="bi bi-easel-fill"></i>
                         </div>
                         <div class="kpi-content">
@@ -475,7 +515,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="analytics-card kpi-stat-card">
-                        <div class="kpi-icon-box bg-info bg-opacity-10 text-info">
+                        <div class="kpi-icon-box bg-success bg-opacity-10 text-success">
                             <i class="bi bi-people-fill"></i>
                         </div>
                         <div class="kpi-content">
@@ -490,8 +530,9 @@
                             <i class="bi bi-star-fill"></i>
                         </div>
                         <div class="kpi-content">
-                            <h3><?php echo e(number_format($sentimentScore, 1)); ?></h3>
-                            <p>Avg Rating</p>
+                            <h3><?php echo e(number_format($avgSeminarRating, 1)); ?><span class="fs-6 text-muted fw-normal">/5.0</span>
+                            </h3>
+                            <p>Seminar Satisfaction</p>
                         </div>
                     </div>
                 </div>
@@ -577,8 +618,7 @@
                                     <p class="mb-0 text-secondary" style="font-size: 0.95rem; font-style: italic;">
                                         "<?php echo e($fb->comments); ?>"</p>
                                     <div class="mt-2 text-end small fw-bold text-forest-green">
-                                        - <?php echo e($fb->appointment->student->college_acronym ?? 'Student'); ?>
-
+                                        <?php echo e($fb->appointment->student->name); ?> <span class="text-muted fw-normal">(<?php echo e($fb->appointment->student->college_acronym); ?>)</span>
                                     </div>
                                 </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -610,154 +650,294 @@
             const commonOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
             };
 
             const colors = {
-                primary: '#1f7a2d',
-                danger: '#dc3545',
-                warning: '#FFCB05',
-                info: '#0dcaf0',
+                primary: '#1f7a2d', // Forest Green (Completed)
+                secondary: '#6c757d',
+                success: '#28a745', // Green (Accepted/Approved)
+                danger: '#dc3545',  // Red (Cancelled/Declined)
+                warning: '#FFCB05', // Yellow (Pending)
+                info: '#0dcaf0',    // Cyan (Rescheduled)
                 gray: '#cbd5e1'
             };
 
-            // 1. Status Chart (Donut)
+            // 1. Status Chart (Donut) - Correctly Mapped Colors
+            const statusKeys = <?php echo json_encode($appointmentStatus->keys(), 15, 512) ?>;
+            const statusValues = <?php echo json_encode($appointmentStatus->values(), 15, 512) ?>;
+            const statusColorMap = {
+                'pending': colors.warning,
+                'accepted': colors.success,
+                'completed': colors.primary,
+                'cancelled': colors.danger,
+                'declined': colors.danger,
+                'rescheduled_pending': colors.info
+            };
+            const statusBg = statusKeys.map(k => statusColorMap[k] || colors.gray);
+
             new Chart(document.getElementById('statusChart').getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: <?php echo json_encode($appointmentStatus->keys()->map(fn($k) => ucfirst($k)), 15, 512) ?>,
+                    labels: statusKeys.map(k => k.charAt(0).toUpperCase() + k.slice(1).replace('_', ' ')),
                     datasets: [{
-                        data: <?php echo json_encode($appointmentStatus->values(), 15, 512) ?>,
-                        backgroundColor: [colors.primary, colors.danger, colors.warning, colors.info],
+                        data: statusValues,
+                        backgroundColor: statusBg,
                         borderWidth: 0
                     }]
                 },
-                options: { ...commonOptions, cutout: '70%', plugins: { legend: { display: true, position: 'right' } } }
-            });
+                options: {                 ...commonOptions,
+                            cutout: '70%',
+                            plugins: {
+                                legend: { display: true, position: 'right' },
+                                tooltip: { callbacks: { label: (c) => ` ${c.label}: ${c.raw}` } }
+                            },
+                            scales: { x: { display: false }, y: { display: false } }
+                        }
+                    });
 
-            // 2. Demand Trend (Line)
-            new Chart(document.getElementById('demandChart').getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: <?php echo json_encode($counselingTrend->keys(), 15, 512) ?>,
-                    datasets: [{
-                        label: 'Sessions',
-                        data: <?php echo json_encode($counselingTrend->values(), 15, 512) ?>,
-                        borderColor: colors.primary,
-                        backgroundColor: 'rgba(31, 122, 45, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: { ...commonOptions, scales: { y: { beginAtZero: true } } }
-            });
+                    // 2. Demand Trend (Sessions over Time) - Simplified Bar
+                    new Chart(document.getElementById('demandChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: <?php echo json_encode($counselingTrend->keys(), 15, 512) ?>,
+                            datasets: [{
+                                label: 'Total Sessions',
+                                data: <?php echo json_encode($counselingTrend->values(), 15, 512) ?>,
+                                backgroundColor: colors.primary,
+                                borderRadius: 4,
+                                maxBarThickness: 50
+                            }]
+                        },
+                        options: { 
+                            ...commonOptions, 
+                            scales: { 
+                                y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'No. of Sessions' } },
+                                x: { grid: { display: false } }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { callbacks: { label: (c) => ` Sessions: ${c.raw}` } }
+                            }
+                        }
+                    });
 
-            // 3. Counseling Usage (Stacked Bar)
-            const usageCtx = document.getElementById('counselingUsageChart').getContext('2d');
-            const usageData = <?php echo json_encode($counselingUsage, 15, 512) ?>;
-            const usageLabels = Object.keys(usageData); // Colleges
-            const yearLevels = ['1', '2', '3', '4'];
-            const usageDatasets = yearLevels.map((year, i) => ({
-                label: 'Year ' + year,
-                data: usageLabels.map(col => (usageData[col] && usageData[col][year]) ? usageData[col][year] : 0),
-                backgroundColor: ['#1f7a2d', '#FFCB05', '#17a2b8', '#ff7043'][i] || '#adb5bd',
-                borderRadius: 4
-            }));
+                    // 3. Counseling by College (Sex) - Stacked
+                    const collegeSexCtx = document.getElementById('counselingCollegeSexChart').getContext('2d');
+                    const cSexData = <?php echo json_encode($counselingSexByCollege, 15, 512) ?>;
+                    const cSexLabels = Object.keys(cSexData);
 
-            new Chart(usageCtx, {
-                type: 'bar',
-                data: {
-                    labels: usageLabels,
-                    datasets: usageDatasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { stacked: true, grid: { display: false } },
-                        y: { stacked: true, beginAtZero: true }
+                    new Chart(collegeSexCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: cSexLabels,
+                            datasets: [
+                                {
+                                    label: 'Male',
+                                    data: cSexLabels.map(col => cSexData[col]['Male'] || 0),
+                                    backgroundColor: '#0dcaf0',
+                                    borderRadius: 4
+                                },
+                                {
+                                    label: 'Female',
+                                    data: cSexLabels.map(col => cSexData[col]['Female'] || 0),
+                                    backgroundColor: '#d63384',
+                                    borderRadius: 4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { stacked: true, grid: { display: false } },
+                                y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }
+                            }
+                        }
+                    });
+
+                    // 4. Counseling by Year (Sex) - Stacked
+                    const yearSexCtx = document.getElementById('counselingYearSexChart').getContext('2d');
+                    const ySexData = <?php echo json_encode($counselingSexByYear, 15, 512) ?>;
+                    const ySexLabels = ['1', '2', '3', '4']; // Ensure sorted order
+
+                    new Chart(yearSexCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ySexLabels.map(y => 'Year ' + y),
+                            datasets: [
+                                {
+                                    label: 'Male',
+                                    data: ySexLabels.map(y => (ySexData[y] && ySexData[y]['Male']) ? ySexData[y]['Male'] : 0),
+                                    backgroundColor: '#0dcaf0',
+                                    borderRadius: 4
+                                },
+                                {
+                                    label: 'Female',
+                                    data: ySexLabels.map(y => (ySexData[y] && ySexData[y]['Female']) ? ySexData[y]['Female'] : 0),
+                                    backgroundColor: '#d63384',
+                                    borderRadius: 4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { stacked: true, grid: { display: false } },
+                                y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }
+                            }
+                        }
+                    });
+
+                    // 3. Problems (Bar)
+                    new Chart(document.getElementById('problemChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: <?php echo json_encode($problemDistribution->keys()->take(5), 15, 512) ?>,
+                            datasets: [{
+                                data: <?php echo json_encode($problemDistribution->values()->take(5), 15, 512) ?>,
+                                backgroundColor: colors.warning,
+                                borderRadius: 5
+                            }]
+                        },
+                        options: {
+                            ...commonOptions,
+                            indexAxis: 'y',
+                            scales: {
+                                x: { beginAtZero: true, ticks: { precision: 0 } },
+                                y: { grid: { display: false } }
+                            }
+                        }
+                    });
+
+                    // 4. Mood (Bar)
+                    new Chart(document.getElementById('moodChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: <?php echo json_encode($moodTrend->keys(), 15, 512) ?>,
+                            datasets: [{
+                                label: 'Avg Severity Score',
+                                data: <?php echo json_encode($moodTrend->values(), 15, 512) ?>,
+                                backgroundColor: colors.danger,
+                                borderRadius: 4,
+                                maxBarThickness: 50
+                            }]
+                        },
+                        options: {
+                            ...commonOptions,
+                            scales: { y: { beginAtZero: true, ticks: { precision: 0 }, title: {display: true, text: 'Avg Severity'} } }
+                        }
+                    });
+
+                    // 5. Risk Dist (Pie) - Correct Colors
+                    const riskLabels = <?php echo json_encode($riskDistribution->keys(), 15, 512) ?>;
+                    const riskData   = <?php echo json_encode($riskDistribution->values(), 15, 512) ?>;
+                    const riskColorMap = {
+                        'Normal': colors.success,
+                        'Mild': colors.info,
+                        'Moderate': colors.warning,
+                        'High': '#fd7e14',           // Orange
+                        'Severe': colors.danger,     // Red
+                        'Extremely Severe': '#8B0000' // Dark Red
+                    };
+
+                    new Chart(document.getElementById('riskChart').getContext('2d'), {
+                        type: 'pie',
+                        data: {
+                            labels: riskLabels,
+                            datasets: [{
+                                data: riskData,
+                                backgroundColor: riskLabels.map(l => riskColorMap[l] || '#6c757d'),
+                                borderWidth: 0
+                            }]
+                        },
+                        options: { ...commonOptions, plugins: { legend: { display: true, position: 'bottom' } } }
+                    });
+
+                    // 6. College Risk (Bar)
+                    new Chart(document.getElementById('collegeRiskChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: <?php echo json_encode($collegeRiskMap->keys(), 15, 512) ?>,
+                            datasets: [{
+                                data: <?php echo json_encode($collegeRiskMap->values(), 15, 512) ?>,
+                                backgroundColor: colors.danger,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: { ...commonOptions }
+                    });
+
+                    // 7. Seminar (Bar - Horizontal)
+                    new Chart(document.getElementById('seminarChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: <?php echo json_encode($seminarAttendance->keys(), 15, 512) ?>,
+                            datasets: [{
+                                label: 'Attendees',
+                                data: <?php echo json_encode($seminarAttendance->values(), 15, 512) ?>,
+                                backgroundColor: colors.info,
+                                borderRadius: 4,
+                                maxBarThickness: 40
+                            }]
+                        },
+                        options: { 
+                            ...commonOptions, 
+                            indexAxis: 'y',
+                            scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { grid: { display: false } } } 
+                        }
+                    });
+
+
+
+                    // Auto-update dates on frequency change
+                    const fSelect = document.querySelector('select[name="frequency"]');
+                    const sInput = document.querySelector('input[name="start_date"]');
+                    const eInput = document.querySelector('input[name="end_date"]');
+
+                    if (fSelect && sInput && eInput) {
+                        fSelect.addEventListener('change', function () {
+                            const freq = this.value;
+                            const end = new Date();
+                            let start = new Date();
+
+                            switch (freq) {
+                                case 'daily': start.setDate(end.getDate() - 30); break;
+                                case 'weekly': start.setDate(end.getDate() - 90); break;
+                                case 'monthly': start.setFullYear(end.getFullYear() - 1); start.setDate(1); break;
+                                case 'annual': start.setFullYear(end.getFullYear() - 5); start.setMonth(0, 1); break;
+                            }
+
+                            const fmt = (date) => {
+                                let d = new Date(date),
+                                    month = '' + (d.getMonth() + 1),
+                                    day = '' + d.getDate(),
+                                    year = d.getFullYear();
+
+                                if (month.length < 2) month = '0' + month;
+                                if (day.length < 2) day = '0' + day;
+
+                                return [year, month, day].join('-');
+                            };
+
+                            sInput.value = fmt(start);
+                            eInput.value = fmt(end);
+                        });
                     }
-                }
-            });
 
-            // 3. Problems (Bar)
-            new Chart(document.getElementById('problemChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: <?php echo json_encode($problemDistribution->keys()->take(5), 15, 512) ?>,
-                    datasets: [{
-                        data: <?php echo json_encode($problemDistribution->values()->take(5), 15, 512) ?>,
-                        backgroundColor: colors.warning,
-                        borderRadius: 5
-                    }]
-                },
-                options: { ...commonOptions, indexAxis: 'y' }
-            });
-
-            // 4. Mood (Line)
-            new Chart(document.getElementById('moodChart').getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: <?php echo json_encode($moodTrend->keys(), 15, 512) ?>,
-                    datasets: [{
-                        label: 'Severity',
-                        data: <?php echo json_encode($moodTrend->values(), 15, 512) ?>,
-                        borderColor: colors.danger,
-                        backgroundColor: 'rgba(220, 53, 69, 0.05)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: { ...commonOptions, scales: { y: { beginAtZero: true } } }
-            });
-
-            // 5. Risk Dist (Pie)
-            new Chart(document.getElementById('riskChart').getContext('2d'), {
-                type: 'pie',
-                data: {
-                    labels: <?php echo json_encode($riskDistribution->keys()->map(fn($k) => ucfirst($k)), 15, 512) ?>,
-                    datasets: [{
-                        data: <?php echo json_encode($riskDistribution->values(), 15, 512) ?>,
-                        backgroundColor: [colors.primary, colors.warning, colors.info, '#fd7e14', colors.danger],
-                        borderWidth: 0
-                    }]
-                },
-                options: { ...commonOptions, plugins: { legend: { display: true, position: 'bottom' } } }
-            });
-
-            // 6. College Risk (Bar)
-            new Chart(document.getElementById('collegeRiskChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: <?php echo json_encode($collegeRiskMap->keys(), 15, 512) ?>,
-                    datasets: [{
-                        data: <?php echo json_encode($collegeRiskMap->values(), 15, 512) ?>,
-                        backgroundColor: colors.danger,
-                        borderRadius: 4
-                    }]
-                },
-                options: { ...commonOptions }
-            });
-
-            // 7. Seminar (Bar)
-            new Chart(document.getElementById('seminarChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: <?php echo json_encode($seminarAttendance->keys(), 15, 512) ?>,
-                    datasets: [{
-                        label: 'Attendees',
-                        data: <?php echo json_encode($seminarAttendance->values(), 15, 512) ?>,
-                        backgroundColor: colors.info,
-                        borderRadius: 8
-                    }]
-                },
-                options: { ...commonOptions, scales: { y: { beginAtZero: true } } }
-            });
+                });
 
 
-        });
-
-
-    </script>
+            </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/admin/analytics/index.blade.php ENDPATH**/ ?>

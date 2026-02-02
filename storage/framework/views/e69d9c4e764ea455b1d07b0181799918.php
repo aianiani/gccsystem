@@ -388,8 +388,8 @@
                                                         Edit
                                                     </a>
                                                     <form action="<?php echo e(route('counselor.seminars.destroy', $seminar)); ?>"
-                                                        method="POST" class="inline-block"
-                                                        onsubmit="return confirm('Are you sure you want to delete this seminar?');">
+                                                        method="POST" class="inline-block delete-form"
+                                                        data-confirm-message="Are you sure you want to delete this seminar?">
                                                         <?php echo csrf_field(); ?>
                                                         <?php echo method_field('DELETE'); ?>
                                                         <button type="submit"

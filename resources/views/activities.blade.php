@@ -16,14 +16,10 @@
         }
 
         /* Match admin zoom standard */
-        .home-zoom {
-            zoom: 0.75;
-        }
-
-        @supports not (zoom: 1) {
+        @media (max-width: 768px) {
             .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
+                zoom: 1 !important;
+                transform: none !important;
             }
         }
 

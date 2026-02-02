@@ -31,7 +31,7 @@ class GuidanceReportController extends Controller
         $data = $this->getReportData($request);
         $filename = 'guidance_report_' . date('Ymd_His');
 
-        if ($request->format === 'pdf') {
+        if ($request->input('format') === 'pdf') {
             $pdf = Pdf::loadView('counselor.guidance.reports.pdf', $data);
             return $pdf->download($filename . '.pdf');
         } else {
@@ -93,14 +93,18 @@ class GuidanceReportController extends Controller
                     // Check all required seminars for their year
                     // Simplified logic: Check if they missed the seminar for their CURRENT year
                     // (Assuming 1 seminar per year for simplicity as per requirements)
-                    $requiredSeminarName = $this->getRequiredSeminarForYear($student->year_level);
-                    if ($requiredSeminarName) {
+                    $requiredSeminars = $this->getRequiredSeminarForYear($student->year_level);
+                    foreach ($requiredSeminars as $seminarName) {
                         $attended = $student->seminarAttendances()
-                            ->where('seminar_name', $requiredSeminarName)
+                            ->where('seminar_name', $seminarName)
                             ->exists();
                         if (!$attended) {
                             $include = true;
-                            $status = 'Missing ' . $requiredSeminarName;
+                            $status = 'Missing ' . $seminarName;
+                            // If missing multiple, maybe concatenate or just show one. 
+                            // For simplicity, last missing one overwrites or we break.
+                            // Let's break to just show at least one missing.
+                            break;
                         }
                     }
                 }
@@ -113,7 +117,10 @@ class GuidanceReportController extends Controller
                     if ($attended) {
                         $include = true;
                         $status = 'Completed ' . $seminar->name;
-                        $details = $student->seminarAttendances()->where('seminar_name', $seminar->name)->first()->attended_at->format('M d, Y');
+                        $attendanceRecord = $student->seminarAttendances()->where('seminar_name', $seminar->name)->first();
+                        $date = $attendanceRecord->attended_at;
+                        // If it's a string, parse it. If it's a Carbon object, format it.
+                        $details = $date instanceof \Carbon\Carbon ? $date->format('M d, Y') : \Carbon\Carbon::parse($date)->format('M d, Y');
                     }
                 } else {
                     // Completed ALL required up to their level?
@@ -154,11 +161,11 @@ class GuidanceReportController extends Controller
     private function getRequiredSeminarForYear($year)
     {
         $map = [
-            1 => 'IDREAMS',
-            2 => '10C',
-            3 => 'LEADS',
-            4 => 'IMAGE'
+            1 => ['New Student Orientation Program', 'IDREAMS'],
+            2 => ['10C'],
+            3 => ['LEADS'],
+            4 => ['IMAGE']
         ];
-        return $map[$year] ?? null;
+        return $map[$year] ?? [];
     }
 }

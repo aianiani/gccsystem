@@ -37,15 +37,10 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply the same page zoom used on the homepage */
-        .home-zoom {
-            zoom: 0.75;
-        }
-
-        @supports not (zoom: 1) {
+        @media (max-width: 768px) {
             .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
+                zoom: 1 !important;
+                transform: none !important;
             }
         }
 
@@ -202,6 +197,12 @@
             transition: margin-left 0.2s;
         }
 
+        @media (max-width: 768px) {
+            .main-dashboard-content {
+                padding: 1rem 0.75rem;
+            }
+        }
+
         /* Constrain inner content and center it within the available area */
         .main-dashboard-inner {
             max-width: 1180px;
@@ -299,11 +300,11 @@
         }
 
         /*
-            .dass42-option-check[data-value="0"] { min-height: 42px; font-size: 0.94rem; padding: 0.45rem 0.6rem; }
-            .dass42-option-check[data-value="1"] { min-height: 50px; font-size: 0.96rem; padding: 0.5rem 0.65rem; }
-            .dass42-option-check[data-value="2"] { min-height: 58px; font-size: 0.99rem; padding: 0.55rem 0.7rem; }
-            .dass42-option-check[data-value="3"] { min-height: 66px; font-size: 1.02rem; padding: 0.6rem 0.75rem; }
-            */
+                    .dass42-option-check[data-value="0"] { min-height: 42px; font-size: 0.94rem; padding: 0.45rem 0.6rem; }
+                    .dass42-option-check[data-value="1"] { min-height: 50px; font-size: 0.96rem; padding: 0.5rem 0.65rem; }
+                    .dass42-option-check[data-value="2"] { min-height: 58px; font-size: 0.99rem; padding: 0.55rem 0.7rem; }
+                    .dass42-option-check[data-value="3"] { min-height: 66px; font-size: 1.02rem; padding: 0.6rem 0.75rem; }
+                    */
         .dass42-option-check {
             transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, min-height 0.18s ease, padding 0.18s ease;
         }
@@ -370,6 +371,23 @@
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
+        }
+
+        @media (max-width: 576px) {
+            .dass42-sticky-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .dass42-sticky-header h3 {
+                font-size: 1.2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .progress {
+                width: 100% !important;
+            }
         }
 
         .dass42-sticky-header h3 {

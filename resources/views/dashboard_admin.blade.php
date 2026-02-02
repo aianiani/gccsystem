@@ -382,7 +382,7 @@
             <p style="font-size: 0.9rem;">Deep-dive into organizational composition and distribution.</p>
         </div>
 
-        <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 2.5rem;">
+        <div class="stat-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 2.5rem;">
             <!-- Gender Distribution -->
             <div class="premium-card">
                 <div class="card-header-flex">
@@ -393,15 +393,7 @@
                 </div>
             </div>
 
-            <!-- Year Level -->
-            <div class="premium-card">
-                <div class="card-header-flex">
-                    <h2 style="font-size: 1.1rem;"><i class="bi bi-mortarboard"></i> Population by Year</h2>
-                </div>
-                <div style="height: 220px;">
-                    <canvas id="yearLevelBar"></canvas>
-                </div>
-            </div>
+
 
             <!-- Top Programs -->
             <div class="premium-card">
@@ -419,6 +411,29 @@
                                 class="badge bg-light text-dark">{{ $analytics['demographics']['top_courses']['data'][$index] }}</span>
                         </div>
                     @endforeach
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW: Detailed Gender Analytics -->
+        <div class="chart-layout">
+            <!-- Gender by College -->
+            <div class="premium-card">
+                <div class="card-header-flex">
+                    <h2 style="font-size: 1.1rem;"><i class="bi bi-buildings"></i> Sex Distribution by College</h2>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="genderCollegeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Gender by Year Level -->
+            <div class="premium-card">
+                <div class="card-header-flex">
+                    <h2 style="font-size: 1.1rem;"><i class="bi bi-mortarboard-fill"></i> Sex Distribution by Year</h2>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="genderYearChart"></canvas>
                 </div>
             </div>
         </div>
@@ -442,7 +457,7 @@
                 </h2>
             </div>
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle" id="demographicsTable">
                     <thead class="bg-light">
                         <tr>
                             <th class="ps-3">College</th>
@@ -454,27 +469,81 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $grandTotalY1 = 0;
+                            $grandTotalY2 = 0;
+                            $grandTotalY3 = 0;
+                            $grandTotalY4 = 0;
+                            $grandTotal = 0;
+                            $maxVal = 0;
+
+                            // Pre-calculate max value for heatmap
+                            foreach ($analytics['demographics']['college']['labels'] as $college) {
+                                $row = $analytics['demographics']['matrix'][$college] ?? collect([]);
+                                $v1 = $row['1'] ?? $row['1st Year'] ?? 0;
+                                $v2 = $row['2'] ?? $row['2nd Year'] ?? 0;
+                                $v3 = $row['3'] ?? $row['3rd Year'] ?? 0;
+                                $v4 = ($row['4'] ?? 0) + ($row['4th Year'] ?? 0) + ($row['5'] ?? 0) + ($row['5th Year'] ?? 0);
+                                $maxVal = max($maxVal, $v1, $v2, $v3, $v4);
+                            }
+                        @endphp
+
                         @foreach($analytics['demographics']['college']['labels'] as $college)
                             @php
                                 $matrixRow = $analytics['demographics']['matrix'][$college] ?? collect([]);
-                                // Handle potential Year Level formats (1 vs 1st Year)
                                 $y1 = $matrixRow['1'] ?? $matrixRow['1st Year'] ?? 0;
                                 $y2 = $matrixRow['2'] ?? $matrixRow['2nd Year'] ?? 0;
                                 $y3 = $matrixRow['3'] ?? $matrixRow['3rd Year'] ?? 0;
                                 $y4 = ($matrixRow['4'] ?? 0) + ($matrixRow['4th Year'] ?? 0) + ($matrixRow['5'] ?? 0) + ($matrixRow['5th Year'] ?? 0);
                                 $total = $y1 + $y2 + $y3 + $y4;
+
+                                $grandTotalY1 += $y1;
+                                $grandTotalY2 += $y2;
+                                $grandTotalY3 += $y3;
+                                $grandTotalY4 += $y4;
+                                $grandTotal += $total;
                             @endphp
                             <tr>
                                 <td class="ps-3 fw-600 text-dark">{{ $college ?: 'Unassigned' }}</td>
-                                <td class="text-center">{{ $y1 ?: '-' }}</td>
-                                <td class="text-center">{{ $y2 ?: '-' }}</td>
-                                <td class="text-center">{{ $y3 ?: '-' }}</td>
-                                <td class="text-center">{{ $y4 ?: '-' }}</td>
+                                <td class="text-center heat-cell" data-value="{{ $y1 }}">{{ $y1 ?: '-' }}</td>
+                                <td class="text-center heat-cell" data-value="{{ $y2 }}">{{ $y2 ?: '-' }}</td>
+                                <td class="text-center heat-cell" data-value="{{ $y3 }}">{{ $y3 ?: '-' }}</td>
+                                <td class="text-center heat-cell" data-value="{{ $y4 }}">{{ $y4 ?: '-' }}</td>
                                 <td class="text-center fw-bold text-success">{{ $total }}</td>
                             </tr>
                         @endforeach
                     </tbody>
+                    <tfoot class="bg-light fw-bold">
+                        <tr>
+                            <td class="ps-3 text-dark">TOTAL</td>
+                            <td class="text-center text-primary">{{ $grandTotalY1 }}</td>
+                            <td class="text-center text-primary">{{ $grandTotalY2 }}</td>
+                            <td class="text-center text-primary">{{ $grandTotalY3 }}</td>
+                            <td class="text-center text-primary">{{ $grandTotalY4 }}</td>
+                            <td class="text-center text-success fs-6">{{ $grandTotal }}</td>
+                        </tr>
+                    </tfoot>
                 </table>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const maxVal = {{ $maxVal > 0 ? $maxVal : 1 }};
+                        const cells = document.querySelectorAll('.heat-cell');
+
+                        cells.forEach(cell => {
+                            const val = parseInt(cell.getAttribute('data-value')) || 0;
+                            if (val > 0) {
+                                const intensity = val / maxVal;
+                                // Forest green base: 31, 122, 45. Alpha varies.
+                                cell.style.backgroundColor = `rgba(31, 122, 45, ${intensity * 0.25})`; // Much softer alpha
+                                if (intensity > 0.7) {
+                                    cell.style.backgroundColor = `rgba(31, 122, 45, ${intensity * 0.6})`; // Stronger for high values
+                                    cell.style.color = 'white';
+                                    cell.style.fontWeight = 'bold';
+                                }
+                            }
+                        });
+                    });
+                </script>
             </div>
         </div>
 
@@ -550,42 +619,111 @@
                 }
             });
 
-            // 2. Year Level Bar
-            const yearCtx = document.getElementById('yearLevelBar').getContext('2d');
-            new Chart(yearCtx, {
+
+
+
+
+
+
+            // 3. Gender Contribution by College (Stacked)
+            const genderCollegeCtx = document.getElementById('genderCollegeChart').getContext('2d');
+            const collegeKeys = @json($analytics['demographics']['gender_by_college']->keys());
+            const collegeLabels = collegeKeys.map(name => {
+                if (!name) return 'Unknown';
+                // Extract all uppercase letters to form acronym (e.g., "College of Arts and Sciences" -> "CAS")
+                const matches = name.match(/[A-Z]/g);
+                return matches ? matches.join('') : name.substring(0, 3).toUpperCase();
+            });
+            const collegeMales = @json($analytics['demographics']['gender_by_college']->pluck('male'));
+            const collegeFemales = @json($analytics['demographics']['gender_by_college']->pluck('female'));
+
+            new Chart(genderCollegeCtx, {
                 type: 'bar',
                 data: {
-                    labels: @json($analytics['demographics']['year_level']['labels']),
-                    datasets: [{
-                        label: 'Students',
-                        data: @json($analytics['demographics']['year_level']['data']),
-                        backgroundColor: 'hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.8)',
-                        hoverBackgroundColor: '#FFCB05',
-                        borderRadius: 6,
-                        maxBarThickness: 30
-                    }]
+                    labels: collegeLabels,
+                    datasets: [
+                        { label: 'Male', data: collegeMales, backgroundColor: '#1f7a2d', stack: 'Stack 0' },
+                        { label: 'Female', data: collegeFemales, backgroundColor: '#FFCB05', stack: 'Stack 0' }
+                    ]
                 },
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                        x: {
+                            stacked: true,
+                            grid: { display: false },
+                            ticks: { precision: 0 }
+                        },
+                        y: {
+                            stacked: true,
+                            grid: { display: false },
+                            ticks: { font: { size: 9 } }
+                        }
                     }
                 }
             });
 
+            // 4. Gender Contribution by Year Level (Stacked)
+            const genderYearCtx = document.getElementById('genderYearChart').getContext('2d');
+            const yearKeys = @json($analytics['demographics']['gender_by_year']->keys());
+            const yearLabels = yearKeys.map(k => {
+                if (String(k).toLowerCase().includes('year')) return k;
+                const map = { '1': 'st', '2': 'nd', '3': 'rd' };
+                return k + (map[k] || 'th') + ' Year';
+            });
+            const yearMales = @json($analytics['demographics']['gender_by_year']->pluck('male'));
+            const yearFemales = @json($analytics['demographics']['gender_by_year']->pluck('female'));
 
-
-
+            new Chart(genderYearCtx, {
+                type: 'bar',
+                data: {
+                    labels: yearLabels,
+                    datasets: [
+                        { label: 'Male', data: yearMales, backgroundColor: '#1f7a2d', stack: 'Stack 0' },
+                        { label: 'Female', data: yearFemales, backgroundColor: '#FFCB05', stack: 'Stack 0' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: { display: false }
+                        },
+                        y: {
+                            stacked: true,
+                            grid: { color: 'rgba(0,0,0,0.03)' },
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
 
             // 8. College Distribution Bar
             const collegeCtx = document.getElementById('collegeBar').getContext('2d');
+            const collegeGeneralKeys = @json($analytics['demographics']['college']['labels']);
+            const collegeGeneralLabels = collegeGeneralKeys.map(name => {
+                if (!name) return 'Unknown';
+                // Extract all uppercase letters to form acronym
+                const matches = name.match(/[A-Z]/g);
+                return matches ? matches.join('') : name.substring(0, 3).toUpperCase();
+            });
+
             new Chart(collegeCtx, {
                 type: 'bar',
                 data: {
-                    labels: @json($analytics['demographics']['college']['labels']),
+                    labels: collegeGeneralLabels,
                     datasets: [{
                         label: 'Total Students',
                         data: @json($analytics['demographics']['college']['data']),
@@ -599,7 +737,10 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true }
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
                     }
                 }
             });

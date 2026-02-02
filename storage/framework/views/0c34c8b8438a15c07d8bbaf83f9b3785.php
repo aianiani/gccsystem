@@ -168,14 +168,10 @@
         }
 
         /* Apply page zoom */
-        .home-zoom {
-            zoom: 0.75;
-        }
-
-        @supports not (zoom: 1) {
+        @media (max-width: 768px) {
             .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
+                zoom: 1 !important;
+                transform: none !important;
             }
         }
 
@@ -235,9 +231,14 @@
                         <div class="consent-content">
                             <h3>CONSENT</h3>
                             <div class="consent-text">
-                                <p>I consent to avail the counseling services. For purposes of self-awareness, assessment and the like, I am therefore willing to submit information through interviews, data sheets, worksheets, and psychological tests.</p>
-                                <p>Nonetheless, I would like my right to privacy and confidentiality to be appropriately upheld, except situations in which I am perceived as been abused, suicidal, or a threat to the safety of others, or in which my counselor is called to testify in court.</p>
-                                <p class="mb-0">In addition, I want my right to be acknowledged when I choose to discontinue with the service that is no longer helpful in my development.</p>
+                                <p>I consent to avail the counseling services. For purposes of self-awareness, assessment
+                                    and the like, I am therefore willing to submit information through interviews, data
+                                    sheets, worksheets, and psychological tests.</p>
+                                <p>Nonetheless, I would like my right to privacy and confidentiality to be appropriately
+                                    upheld, except situations in which I am perceived as been abused, suicidal, or a threat
+                                    to the safety of others, or in which my counselor is called to testify in court.</p>
+                                <p class="mb-0">In addition, I want my right to be acknowledged when I choose to discontinue
+                                    with the service that is no longer helpful in my development.</p>
                             </div>
                         </div>
 

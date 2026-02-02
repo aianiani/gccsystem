@@ -36,15 +36,10 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply the same page zoom used on the homepage */
-        .home-zoom {
-            zoom: 0.75;
-        }
-
-        @supports not (zoom: 1) {
+        @media (max-width: 768px) {
             .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
+                zoom: 1 !important;
+                transform: none !important;
             }
         }
 
@@ -245,7 +240,14 @@
             min-height: 100vh;
             padding: 1rem 1.5rem;
             margin-left: 240px;
-            transition: margin-left 0.2s;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .main-dashboard-content {
+                margin-left: 0;
+                padding: 1rem 0.75rem !important;
+            }
         }
 
         /* Constrain inner content and center it within the available area */

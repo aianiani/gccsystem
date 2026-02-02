@@ -7,6 +7,7 @@ use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use App\Models\Announcement;
 use App\Models\SeminarAttendance;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -311,9 +312,51 @@ class DashboardController extends Controller
                     'data' => $yearLevelDistribution->values(),
                 ],
                 'top_courses' => [
-                    'labels' => $topCourses->keys()->map($safeKey),
+                    'labels' => $topCourses->keys()->map(function ($course) {
+                        if (!$course)
+                            return 'Unknown';
+
+                        // Standardize common degree prefixes
+                        $name = preg_replace('/^Bachelor of Science in /i', 'BS ', $course);
+                        $name = preg_replace('/^BS in /i', 'BS ', $name);
+                        $name = preg_replace('/^Bachelor of Arts in /i', 'AB ', $name);
+                        $name = preg_replace('/^AB in /i', 'AB ', $name);
+                        $name = preg_replace('/^Bachelor of /i', 'B ', $name);
+
+                        // Extract capital letters to form acronym
+                        preg_match_all('/[A-Z]/', $name, $matches);
+                        $acronym = implode('', $matches[0]);
+
+                        // Fail-safe: if acronym is too short (e.g. "B" for Biology), return truncated original
+                        return strlen($acronym) > 1 ? $acronym : Str::limit($course, 10);
+                    }),
                     'data' => $topCourses->values(),
                 ],
+                // NEW: Detailed Gender Analytics
+                'gender_by_college' => \App\Models\User::where('role', 'student')
+                    ->where('is_active', true)
+                    ->selectRaw('college, sex, count(*) as count')
+                    ->groupBy('college', 'sex')
+                    ->get()
+                    ->groupBy('college')
+                    ->map(function ($group) {
+                        return [
+                            'male' => $group->where('sex', 'male')->sum('count'),
+                            'female' => $group->where('sex', 'female')->sum('count')
+                        ];
+                    }),
+                'gender_by_year' => \App\Models\User::where('role', 'student')
+                    ->where('is_active', true)
+                    ->selectRaw('year_level, sex, count(*) as count')
+                    ->groupBy('year_level', 'sex')
+                    ->get()
+                    ->groupBy('year_level')
+                    ->map(function ($group) {
+                        return [
+                            'male' => $group->where('sex', 'male')->sum('count'),
+                            'female' => $group->where('sex', 'female')->sum('count')
+                        ];
+                    }),
                 'matrix' => \App\Models\User::where('role', 'student')
                     ->where('is_active', true)
                     ->selectRaw('college, year_level, count(*) as count')

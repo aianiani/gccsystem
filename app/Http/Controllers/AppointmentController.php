@@ -139,6 +139,7 @@ class AppointmentController extends Controller
             'nature_of_problem_other' => 'nullable|string|max:500',
             'appointment_type' => 'required|in:Walk-in,Called-in,Referral',
             'referral_reason' => 'required_if:appointment_type,Referral|nullable|string|max:500',
+            'referrer_name' => 'required_if:appointment_type,Referral|nullable|string|max:255',
         ]);
 
         // Normalize scheduled_at to Asia/Manila and format for DB
@@ -206,6 +207,7 @@ class AppointmentController extends Controller
             'nature_of_problem_other' => $request->nature_of_problem_other,
             'appointment_type' => $request->appointment_type,
             'referral_reason' => $request->referral_reason,
+            'referrer_name' => $request->referrer_name,
             'reference_number' => $referenceNumber,
         ]);
 
@@ -376,11 +378,18 @@ class AppointmentController extends Controller
         $request->validate([
             'scheduled_at' => 'required|date|after:now',
             'notes' => 'nullable|string',
+            'referral_reason' => 'nullable|string|max:500',
+            'referrer_name' => 'nullable|string|max:255',
         ]);
         // Store the old scheduled_at before updating
         $appointment->previous_scheduled_at = $appointment->scheduled_at;
         $appointment->scheduled_at = \Carbon\Carbon::parse($request->scheduled_at)->timezone('Asia/Manila')->format('Y-m-d H:i:s');
         $appointment->notes = $request->notes;
+        // Only update these if provided (e.g. from existing values or if UI allows editing)
+        if ($request->has('referral_reason'))
+            $appointment->referral_reason = $request->referral_reason;
+        if ($request->has('referrer_name'))
+            $appointment->referrer_name = $request->referrer_name;
         $appointment->status = 'rescheduled_pending';
         $appointment->save();
         // Notify the student (implement a notification class for reschedule)

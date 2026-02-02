@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/users-export', [UserController::class, 'export'])->name('users.export');
         // Bulk actions
         Route::post('/users/bulk-activate', [UserController::class, 'bulkActivate'])->name('users.bulk-activate');
+        Route::post('/users/bulk-promote', [UserController::class, 'bulkPromote'])->name('users.bulk-promote');
         Route::post('/users/bulk-deactivate', [UserController::class, 'bulkDeactivate'])->name('users.bulk-deactivate');
         Route::post('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulk-delete');
         Route::post('/users/bulk-role-change', [UserController::class, 'bulkRoleChange'])->name('users.bulk-role-change');

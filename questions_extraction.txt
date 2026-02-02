@@ -1,0 +1,103 @@
+
+1. A student who is registered for formal academic credits but he/she is not carrying a regular load in a given semester as prescribed in the curriculum for which he/she is registered.
+Options: Shiftee Student, Irregular Student, Transferee Student, Regular Student
+
+2. What grade does a student get when he/she drops a subject after the midterm examination but his class standing is above the passing mark?
+Options: A grade of 5, A grade of 3, A grade of W, None of the above
+
+3. The following situations are the reasons why a student is given a grade of INC except one?
+Options:
+- The student was unable to take the final examination because of failure to present an examination permit.
+- The student was not able to complete the requirements for the course during the semester/midyear.
+- The student was not able to get a score of 50% or higher in the removal examiantion.
+- There is no grade in either lecture or laboratory class for subjects with combined lecture laboratory grade.
+
+4. The service units under the Office of Student Affairs are the following except one.
+Options: Student Organization and Activities, Student Discipline and Grievance, Guidance and Counseling Center, Student Housing and Residential Services, Student Assistantship Program, Gender and Development Service Unit
+
+5. This unit coordinates the conduct of the new students orientation program, career orientation seminar, learning session according to the needs of the students, counseling services, and psychological testing.
+Options: Student Organization and Activities, Student Discipline and Grievance, Guidance and Counseling Center, Student Housing and Residential Services, Student Assistantship Program
+
+6. The first year students are encouraged to get involve in extracurricular activities by joining student groups or organizations except for this category.
+Options: Athletic and sports club, Class or departmental organizations, Religious and cultural groups, Fraternities and Sororities
+
+7. What is the required General Weighed Average (GWA) to be able to qualify as a university scholar for the 2nd or succeeding semesters?
+Options: 1.0000-1.2500, 1.0000-1.4500, 1.2501-1.4500, 1.4501-1.7500
+
+8. The following are the requirements for the CHED Full Merit Scholarship Grant except one?
+Options: GWA of 2.5 or better, Grade slip or checklist from the previous semester, Barangay clearance, Income tax return, tax exemption or certificate of indigency from DSWD
+
+9. This unit provides best possible facilities and technology in the deliverance of the basic acceptable, high quality health care service for the care, relief, and cure of ailments as well as prevention and control of diseases that may injure every constituent of CMU community.
+Options: University Food and Lodging Services Unit, Disaster Risk Reduction and Management Office, Security Services Unit, University Hospital
+
+10. What are services that can be availed from our University Hospital?
+Options: 24/7 Emergency Room Service, Outpatient Consultation, Pharmacy Services, In-patient Monitoring and Care, Dental Services, All of the above
+
+11. This office monitors and evaluates the implementation of policies, programs and services geared towards gender equality and women empowerment in the university.
+Options: Legal Office, University Center for Gender and Development, Vice President for Administration, Human Resource Management Office, Guidance and Counseling Center
+
+12. The following are the services offered by our Security Services Unit except one.
+Options:
+- Facilitates the licensing and renewal of firearms in the university
+- Protect the university personnel, students, properties and projects and enforce all university policies, rules and regulations.
+- Conducts spot investigations on reported cases of misbehavior or illegal activities.
+- Coordinate with local law enforcement agencies whenever necessary for the maintenance of peace and order
+
+13. The following are the goals of RA10173 except one:
+Options:
+- Protects the privacy of individuals while ensuring free flow of information to promote innovation and growth
+- Mandates to administer and implement the Data Privacy Act, and to monitor and ensure compliance
+- Regulates the collection, recording, organization, storage, modification, retrieval, consultation, blocking
+- Ensure that personal information and communications systems in the government and in the private sector are secured and protected
+
+14. This refers to any freely given, specific, informed indication of will, whereby the data subject agrees to the collection and processing of his or her personal, sensitive personal, or privileged information.
+Options: Data Processing, Data Information, Consent, Will
+
+15. Where can we seek for assistance concerning issues or problems with our institutional email?
+Options: Data Transformation Office, Data Privacy Office, Security Services Unit, Public Information and Relations Office
+
+16. The official name of the socio-cultural troupe of the university.
+Options: Kalimulan, Sidlak, Lamdag, Bidlisiw
+
+17. The following are the objectives of the Legal Office except one.
+Options:
+- To present a procedure on providing assistance in the formulation and interpretation of laws, rules and regulations
+- To provide a procedure on handling or assisting in the investigation of administrative cases
+- To provide procedure on drafting, reviewing and notarizing contracts, MOAs / MOUs, and deeds
+- To represent the students who are pursuing legal cases
+
+18. Central Mindanao University is the center of excellence in the following programs except one.
+Options: Agriculture, Biology, Forestry, Environmental Science, Veterinary Medicine
+
+19. Fill-in the missing words of this line from the CMU Hymn, "We shall strive to work with ___ and ___."
+Options: bulwark - fatherland, mind - true heart, alma matter - beloved, sons - daughters all, honor - boundless fame
+
+20. "We shall become the ___ of our ___." What are these missing words of the said sentence from the CMU Hymn?
+Options: honor - boundless fame, mind - true heart, alma matter - beloved, bulwark - fatherland, sons - daughters all
+
+21. An act regulating hazing and other forms of initiation rites in fraternities and sororities, and other organizations and providing penalties therefor.
+Options: R.A. No. 10121, R.A. No. 11053, R.A. No. 8049, None of the Above
+
+22. It is the "pre-requisite for admission into membership in a fraternity, sorority or organization".
+Options: Initiation rite, Acceptance, Dare, Hazing, Violence
+
+23. This action refers to ceremonies, practices, rituals, or other acts, whether formal or informal, that a person must perform perform or take part in order to be accepted into a fraternity, sorority, or organization as a full-fledged member.
+Options: Initiation, Hazing, Rite of Passage, Acceptance
+
+24. The following shall not be considered as hazing, except...
+Options:
+- Similar procedures and practices approved by the respective heads of other uniformed learning institutions as to their prospective members.
+- Any customary athletic event or other similar contests or competitions, subject to prior submission of a medical clearance or certificate.
+- Any activity or conduct that furthers a legal and legitimate objectives, subject also to prior submission of a medical clearance or certificate.
+- None of the above
+- All of the above
+
+25. The following are roles of educational institution with regards to the regulation of school-based institution rites, except...
+Options:
+- Promulgation of guidelines by appropriate school authorities for the approval or denial of applications to conduct initiation rites.
+- Exercise reasonable supervision in loco parentis over the conduct of its students.
+- Schools shall implement an information dissemination campaign at the start of every semester or trimester.
+- To facilitate an orientation program relating to membership in a fraternity, sorority, or organization.
+- All of the above
+- None of the above
+- Only choices A, B, and C

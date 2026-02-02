@@ -195,8 +195,8 @@
                                             <i class="fas fa-edit" style="font-size: 0.8rem;"></i>
                                         </a>
                                         <form action="{{ route('admin.hero-images.destroy', $image->id) }}" method="POST"
-                                            class="d-inline"
-                                            onsubmit="return confirm('Are you sure you want to delete this image?');">
+                                            class="d-inline delete-form"
+                                            data-confirm-message="Are you sure you want to delete this image?">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm btn-action" title="Delete">

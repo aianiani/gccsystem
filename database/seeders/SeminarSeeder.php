@@ -33,6 +33,11 @@ class SeminarSeeder extends Seeder
                 'description' => 'Seminar for 4th Year Students focusing on career preparation and professional image.',
                 'target_year_level' => 4,
             ],
+            [
+                'name' => 'New Student Orientation Program',
+                'description' => 'Official New Student Orientation Program for all incoming students.',
+                'target_year_level' => 1,
+            ],
         ];
 
         foreach ($seminars as $seminar) {

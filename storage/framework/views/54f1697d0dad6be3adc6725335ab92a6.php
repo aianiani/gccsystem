@@ -33,10 +33,42 @@
         .home-zoom .container {
             max-width: 100%;
         }
+
+        /* Mobile specific fixes */
+        @media (max-width: 768px) {
+            .home-zoom {
+                zoom: 1 !important;
+                transform: none !important;
+            }
+
+            .announcement-header-bg {
+                padding: 1.5rem 1rem !important;
+            }
+
+            .announcement-content-card {
+                padding: 1.5rem 1rem !important;
+            }
+
+            .announcement-title {
+                font-size: 1.5rem !important;
+            }
+        }
+
+        .announcement-body-content {
+            line-height: 1.8;
+            color: #2c3e50;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .announcement-body-content a {
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
     </style>
     <div class="home-zoom">
-        <div class="container">
-            <div class="py-4 px-4 px-lg-5 mb-4 rounded-4"
+        <div class="container px-0 px-md-3">
+            <div class="py-4 px-4 px-lg-5 mb-4 rounded-4 announcement-header-bg"
                 style="background: linear-gradient(135deg, #228B22, #0f3d1e); color: #fff;">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div>
@@ -47,15 +79,16 @@
                                 <span class="me-1">&larr;</span> Back
                             </a>
                         </div>
-                        <h1 class="h3 fw-bold mb-2"><?php echo e($announcement->title); ?></h1>
-                        <div class="d-flex align-items-center gap-2 small">
+                        <h1 class="h3 fw-bold mb-2 announcement-title"><?php echo e($announcement->title); ?></h1>
+                        <div class="d-flex align-items-center flex-wrap gap-2 small">
                             <span class="badge rounded-pill"
                                 style="background: rgba(255,203,5,0.15); color:#ffdf66;"><?php echo e(optional($announcement->created_at)->format('M d, Y')); ?></span>
                             <span class="text-white-50">&middot;</span>
                             <span class="text-white-75">Posted
                                 <?php echo e(optional($announcement->created_at)->diffForHumans()); ?></span>
                             <?php if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14))): ?>
-                                <span class="badge" style="background:#FFCB05; color:#1a1a1a; font-weight:700;">NEW</span>
+                                <span class="badge"
+                                    style="background:#FFCB05; color:#1a1a1a; font-weight:700; font-size: 0.65rem; padding: 0.35em 0.65em;">NEW</span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -65,8 +98,8 @@
             <div class="row justify-content-center">
                 <div class="col-12">
                     <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-body p-4 p-lg-5">
-                            <div class="mb-4" style="line-height: 1.8; color:#2c3e50;">
+                        <div class="card-body p-4 p-lg-5 announcement-content-card">
+                            <div class="mb-4 announcement-body-content">
                                 <?php echo nl2br(e($announcement->content)); ?>
 
                             </div>
@@ -77,11 +110,11 @@
                             ?>
                             <?php if($attachmentPath): ?>
                                 <?php if($isImage): ?>
-                                    <div class="rounded-3 overflow-hidden mb-3"
-                                        style="background:#f5f7f6;border:1px solid rgba(0,0,0,0.06);">
-                                        <a href="<?php echo e($attachmentUrl); ?>" target="_blank" class="d-block">
-                                            <img src="<?php echo e($attachmentUrl); ?>" alt="Announcement Attachment" class="img-fluid w-100"
-                                                style="display:block;object-fit:cover;">
+                                    <div class="rounded-3 overflow-hidden mb-3 d-flex justify-content-center bg-light"
+                                        style="border:1px solid rgba(0,0,0,0.06);">
+                                        <a href="<?php echo e($attachmentUrl); ?>" target="_blank" class="d-inline-block position-relative">
+                                            <img src="<?php echo e($attachmentUrl); ?>" alt="Announcement Attachment" class="img-fluid"
+                                                style="display:block; object-fit: contain; max-height: 600px; max-width: 100%; width: auto; margin: 0 auto;">
                                         </a>
                                     </div>
                                     <div class="text-muted small mb-2">Click the image to open in a new tab.</div>
@@ -111,42 +144,89 @@
                                     <h5 class="mb-3" style="color:#2e7d32; font-weight:600;">
                                         <i class="bi bi-images me-2"></i>Gallery
                                     </h5>
-                                    <div class="row g-3">
+                                    <div class="row g-2 g-md-3">
                                         <?php $__currentLoopData = $announcement->images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <div class="col-md-3 col-sm-4 col-6">
+                                            <div class="col-6 col-sm-4 col-md-3">
                                                 <div class="position-relative rounded-3 overflow-hidden shadow-sm"
                                                     style="cursor: pointer;">
                                                     <img src="<?php echo e(asset('storage/' . $image)); ?>"
                                                         alt="Announcement Image <?php echo e($index + 1); ?>" class="img-fluid w-100"
                                                         style="height: 200px; object-fit: cover;"
-                                                        onclick="openImageModal('<?php echo e(asset('storage/' . $image)); ?>')">
+                                                        onclick="openImageModal(<?php echo e($index); ?>)">
                                                 </div>
                                             </div>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
                                 </div>
 
-                                <!-- Image Modal -->
-                                <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered modal-lg">
-                                        <div class="modal-content bg-transparent border-0">
-                                            <div class="modal-header border-0">
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body p-0">
-                                                <img id="modalImage" src="" class="img-fluid w-100 rounded">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
 
                                 <script>
-                                    function openImageModal(imageSrc) {
-                                        document.getElementById('modalImage').src = imageSrc;
+                                    const galleryImages = <?php echo json_encode($announcement->images ? collect($announcement->images)->map(fn($img) => asset('storage/' . $img)) : [], 15, 512) ?>;
+                                    let currentImageIndex = 0;
+
+                                    function openImageModal(index) {
+                                        currentImageIndex = index;
+                                        updateModalImage();
                                         const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
                                         imageModal.show();
                                     }
+
+                                    function updateModalImage() {
+                                        if (galleryImages.length > 0) {
+                                            document.getElementById('modalImage').src = galleryImages[currentImageIndex];
+                                            updateNavButtons();
+                                        }
+                                    }
+
+                                    function nextImage() {
+                                        if (currentImageIndex < galleryImages.length - 1) {
+                                            currentImageIndex++;
+                                            updateModalImage();
+                                        } else {
+                                            // Optional: Loop back to start
+                                            currentImageIndex = 0;
+                                            updateModalImage();
+                                        }
+                                    }
+
+                                    function prevImage() {
+                                        if (currentImageIndex > 0) {
+                                            currentImageIndex--;
+                                            updateModalImage();
+                                        } else {
+                                            // Optional: Loop to end
+                                            currentImageIndex = galleryImages.length - 1;
+                                            updateModalImage();
+                                        }
+                                    }
+
+                                    function updateNavButtons() {
+                                        // You can add logic here to hide/disable buttons if needed,
+                                        // or handled by the loop logic above.
+                                        const prevBtn = document.getElementById('modalPrevBtn');
+                                        const nextBtn = document.getElementById('modalNextBtn');
+
+                                        if (galleryImages.length <= 1) {
+                                            if (prevBtn) prevBtn.style.display = 'none';
+                                            if (nextBtn) nextBtn.style.display = 'none';
+                                        } else {
+                                            if (prevBtn) prevBtn.style.display = 'flex';
+                                            if (nextBtn) nextBtn.style.display = 'flex';
+                                        }
+                                    }
+
+                                    // Keyboard navigation
+                                    document.addEventListener('keydown', function (event) {
+                                        const modal = document.getElementById('imageModal');
+                                        if (modal && modal.classList.contains('show')) {
+                                            if (event.key === 'ArrowLeft') {
+                                                prevImage();
+                                            } else if (event.key === 'ArrowRight') {
+                                                nextImage();
+                                            }
+                                        }
+                                    });
                                 </script>
                             <?php endif; ?>
 
@@ -172,7 +252,36 @@
 
         </div>
     </div>
-    <!-- Confirmation modal + handler (lightweight) -->
+
+    <!-- Image Modal (Moved outside zoom container) -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 text-center position-relative">
+                    <img id="modalImage" src="" class="img-fluid rounded shadow-lg"
+                        style="max-height: 85vh; width: auto; max-width: 100%; display: inline-block;">
+
+                    <!-- Navigation Buttons -->
+                    <button id="modalPrevBtn"
+                        class="position-absolute top-50 start-0 translate-middle-y btn p-0 ms-1 d-flex align-items-center justify-content-center border-0"
+                        style="width: 50px; height: 100%; background: transparent; opacity: 0.8;" onclick="prevImage()">
+                        <i class="fas fa-chevron-left text-white display-4"
+                            style="text-shadow: 0 2px 10px rgba(0,0,0,0.8);"></i>
+                    </button>
+                    <button id="modalNextBtn"
+                        class="position-absolute top-50 end-0 translate-middle-y btn p-0 me-1 d-flex align-items-center justify-content-center border-0"
+                        style="width: 50px; height: 100%; background: transparent; opacity: 0.8;" onclick="nextImage()">
+                        <i class="fas fa-chevron-right text-white display-4"
+                            style="text-shadow: 0 2px 10px rgba(0,0,0,0.8);"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">

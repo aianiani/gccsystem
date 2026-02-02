@@ -472,7 +472,7 @@
                                                 </td>
                                                 <td class="text-right align-top">
                                                     <form action="{{ route('counselor.seminars.schedules.destroy', $schedule) }}"
-                                                        method="POST" onsubmit="return confirm('Delete this schedule?');">
+                                                        method="POST" class="delete-form" data-confirm-message="Delete this schedule?">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"

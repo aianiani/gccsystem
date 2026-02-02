@@ -46,15 +46,10 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply the same page zoom used on the homepage */
-        .home-zoom {
-            zoom: 0.75;
-        }
-
-        @supports not (zoom: 1) {
+        @media (max-width: 768px) {
             .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
+                zoom: 1 !important;
+                transform: none !important;
             }
         }
 
@@ -255,7 +250,14 @@
             min-height: 100vh;
             padding: 1rem 1.5rem;
             margin-left: 240px;
-            transition: margin-left 0.2s;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .main-dashboard-content {
+                margin-left: 0;
+                padding: 1rem 0.75rem !important;
+            }
         }
 
         /* Constrain inner content and center it within the available area */
@@ -514,6 +516,26 @@
             overflow: hidden;
             height: calc(100vh - 100px);
             min-height: 600px;
+        }
+
+        @media (max-width: 768px) {
+            .chat-card {
+                height: calc(100vh - 80px);
+                min-height: 500px;
+            }
+
+            .inbox-sidebar {
+                display: none;
+                /* simple mobile chat: show conversation only if active */
+            }
+
+            .chat-main {
+                width: 100%;
+            }
+
+            .message-bubble {
+                max-width: 85%;
+            }
         }
 
         /* Sidebar Styles */
@@ -838,204 +860,204 @@
                             messageInput.value = '';
                             removeImage();
 
-                                // Append the sent message to the view immediately
-                                appendMessage(data.message, true); // true = isSelf
-                                scrollToBottom();
-                            } else {
-                                console.log('Message not sent:', data.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                });
-
-                // Handle image selection
-                imageInput.addEventListener('change', function (e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        // Validate file type
-                        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-                        if (!allowedTypes.includes(file.type)) {
-                            alert('Please select a valid image file (JPEG, PNG, or GIF).');
-                            imageInput.value = '';
-                            return;
-                        }
-
-                        // Validate file size (2MB limit)
-                        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
-                        if (file.size > maxSize) {
-                            alert('Image size must be less than 2MB.');
-                            imageInput.value = '';
-                            return;
-                        }
-
-                        // Display file information
-                        const fileName = document.getElementById('file-name');
-                        const fileSize = document.getElementById('file-size');
-
-                        fileName.textContent = file.name;
-                        fileSize.textContent = formatFileSize(file.size);
-
-                        // Show preview
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            previewImg.src = e.target.result;
-                            imagePreview.style.display = 'block';
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-
-                // Remove image function
-                window.removeImage = function () {
-                    imageInput.value = '';
-                    imagePreview.style.display = 'none';
-                };
-
-                // Format file size function
-                function formatFileSize(bytes) {
-                    if (bytes === 0) return '0 Bytes';
-                    const k = 1024;
-                    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                    const i = Math.floor(Math.log(bytes) / Math.log(k));
-                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-                }
-
-                // Open image modal function
-                window.openImageModal = function (imageSrc) {
-                    const modalImage = document.getElementById('modalImage');
-                    const downloadImage = document.getElementById('downloadImage');
-
-                    modalImage.src = imageSrc;
-                    downloadImage.href = imageSrc;
-
-                    const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-                    modal.show();
-                };
-
-                // Append message function
-                function appendMessage(message, isSelf = false) {
-                    const messagesContainer = document.getElementById('messages-container');
-                    const scrollAnchor = document.getElementById('scroll-anchor');
-
-                    const wrapperDiv = document.createElement('div');
-                    wrapperDiv.className = `message-wrapper ${isSelf ? 'own' : 'other'}`;
-
-                    let messageContent = '';
-                    if (message.message) {
-                        messageContent += `<div class="message-text">${message.message}</div>`;
-                    }
-                    if (message.image) {
-                        messageContent += `<div class="message-image mt-2">
-                                            <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
-                                        </div>`;
-                    }
-
-                    // Avatar for other user
-                    let avatarHtml = '';
-                    if (!isSelf) {
-                        avatarHtml = `<img src="{{ $otherUser->avatar_url }}" class="rounded-circle me-2 align-self-end mb-1" style="width: 28px; height: 28px; object-fit: cover;">`;
-                    }
-
-                    wrapperDiv.innerHTML = `
-                                        ${avatarHtml}
-                                        <div class="message-bubble">
-                                            ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
-                                            ${messageContent}
-                                            <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                        </div>
-                                    `;
-
-                    messagesContainer.insertBefore(wrapperDiv, scrollAnchor);
-                }
-
-                // Listen for new messages using Laravel Echo
-                console.log('Listening on channel: chat.{{ auth()->id() }}');
-
-                window.Echo.private(`chat.{{ auth()->id() }}`)
-                    .listen('.message.sent', (data) => {
-                        console.log('Message received:', data);
-                        // Check if the message is from the user we are currently chatting with
-                        if (parseInt(data.sender_id) === {{ $otherUser->id }}) {
-                            appendMessage(data, false);
+                            // Append the sent message to the view immediately
+                            appendMessage(data.message, true); // true = isSelf
                             scrollToBottom();
-
-                            // Optional: Mark as read via AJAX if window is focused
                         } else {
-                            // Optional: Show notification for other users
+                            console.log('Message not sent:', data.message);
                         }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
                     });
+            });
 
-                // Handle Enter key
-                messageInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        chatForm.dispatchEvent(new Event('submit'));
+            // Handle image selection
+            imageInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Please select a valid image file (JPEG, PNG, or GIF).');
+                        imageInput.value = '';
+                        return;
+                    }
+
+                    // Validate file size (2MB limit)
+                    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+                    if (file.size > maxSize) {
+                        alert('Image size must be less than 2MB.');
+                        imageInput.value = '';
+                        return;
+                    }
+
+                    // Display file information
+                    const fileName = document.getElementById('file-name');
+                    const fileSize = document.getElementById('file-size');
+
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+
+                    // Show preview
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImg.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Remove image function
+            window.removeImage = function () {
+                imageInput.value = '';
+                imagePreview.style.display = 'none';
+            };
+
+            // Format file size function
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Open image modal function
+            window.openImageModal = function (imageSrc) {
+                const modalImage = document.getElementById('modalImage');
+                const downloadImage = document.getElementById('downloadImage');
+
+                modalImage.src = imageSrc;
+                downloadImage.href = imageSrc;
+
+                const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+                modal.show();
+            };
+
+            // Append message function
+            function appendMessage(message, isSelf = false) {
+                const messagesContainer = document.getElementById('messages-container');
+                const scrollAnchor = document.getElementById('scroll-anchor');
+
+                const wrapperDiv = document.createElement('div');
+                wrapperDiv.className = `message-wrapper ${isSelf ? 'own' : 'other'}`;
+
+                let messageContent = '';
+                if (message.message) {
+                    messageContent += `<div class="message-text">${message.message}</div>`;
+                }
+                if (message.image) {
+                    messageContent += `<div class="message-image mt-2">
+                                                    <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
+                                                </div>`;
+                }
+
+                // Avatar for other user
+                let avatarHtml = '';
+                if (!isSelf) {
+                    avatarHtml = `<img src="{{ $otherUser->avatar_url }}" class="rounded-circle me-2 align-self-end mb-1" style="width: 28px; height: 28px; object-fit: cover;">`;
+                }
+
+                wrapperDiv.innerHTML = `
+                                                ${avatarHtml}
+                                                <div class="message-bubble">
+                                                    ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
+                                                    ${messageContent}
+                                                    <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                </div>
+                                            `;
+
+                messagesContainer.insertBefore(wrapperDiv, scrollAnchor);
+            }
+
+            // Listen for new messages using Laravel Echo
+            console.log('Listening on channel: chat.{{ auth()->id() }}');
+
+            window.Echo.private(`chat.{{ auth()->id() }}`)
+                .listen('.message.sent', (data) => {
+                    console.log('Message received:', data);
+                    // Check if the message is from the user we are currently chatting with
+                    if (parseInt(data.sender_id) === {{ $otherUser->id }}) {
+                        appendMessage(data, false);
+                        scrollToBottom();
+
+                        // Optional: Mark as read via AJAX if window is focused
+                    } else {
+                        // Optional: Show notification for other users
                     }
                 });
 
-                // Auto-focus input
-                messageInput.focus();
-
-                // Drag and drop functionality
-                const messageInputArea = document.querySelector('.chat-input-wrapper');
-
-                if (messageInputArea) {
-                    messageInputArea.addEventListener('dragover', function (e) {
-                        e.preventDefault();
-                        messageInputArea.style.backgroundColor = '#f8f9fa';
-                        messageInputArea.style.borderTop = '2px dashed #007bff';
-                    });
-
-                    messageInputArea.addEventListener('dragleave', function (e) {
-                        e.preventDefault();
-                        messageInputArea.style.backgroundColor = '';
-                        messageInputArea.style.borderTop = '';
-                    });
-
-                    messageInputArea.addEventListener('drop', function (e) {
-                        e.preventDefault();
-                        messageInputArea.style.backgroundColor = '';
-                        messageInputArea.style.borderTop = '';
-
-                        const files = e.dataTransfer.files;
-                        if (files.length > 0) {
-                            const file = files[0];
-                            if (file.type.startsWith('image/')) {
-                                imageInput.files = files;
-                                imageInput.dispatchEvent(new Event('change'));
-                            } else {
-                                alert('Please drop an image file.');
-                            }
-                        }
-                    });
+            // Handle Enter key
+            messageInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatForm.dispatchEvent(new Event('submit'));
                 }
             });
-        </script>
-        <script>
-            // Sidebar toggle for mobile
-            document.addEventListener('DOMContentLoaded', function () {
-                const sidebar = document.querySelector('.custom-sidebar');
-                const toggleBtn = document.getElementById('studentSidebarToggle');
-                if (toggleBtn && sidebar) {
-                    toggleBtn.addEventListener('click', function () {
-                        if (window.innerWidth < 768) {
-                            sidebar.classList.toggle('show');
+
+            // Auto-focus input
+            messageInput.focus();
+
+            // Drag and drop functionality
+            const messageInputArea = document.querySelector('.chat-input-wrapper');
+
+            if (messageInputArea) {
+                messageInputArea.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    messageInputArea.style.backgroundColor = '#f8f9fa';
+                    messageInputArea.style.borderTop = '2px dashed #007bff';
+                });
+
+                messageInputArea.addEventListener('dragleave', function (e) {
+                    e.preventDefault();
+                    messageInputArea.style.backgroundColor = '';
+                    messageInputArea.style.borderTop = '';
+                });
+
+                messageInputArea.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    messageInputArea.style.backgroundColor = '';
+                    messageInputArea.style.borderTop = '';
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const file = files[0];
+                        if (file.type.startsWith('image/')) {
+                            imageInput.files = files;
+                            imageInput.dispatchEvent(new Event('change'));
+                        } else {
+                            alert('Please drop an image file.');
                         }
-                    });
-                    document.addEventListener('click', function (e) {
-                        if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                            const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                            if (!clickInside) sidebar.classList.remove('show');
-                        }
-                    });
-                    document.addEventListener('keydown', function (e) {
-                        if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                            sidebar.classList.remove('show');
-                        }
-                    });
-                }
-            });
-        </script>
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('studentSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function () {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
 @endsection

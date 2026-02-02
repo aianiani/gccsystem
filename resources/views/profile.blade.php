@@ -1,7 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
+@section('full_width', true)
     <style>
+        /* Sidebar Alignment Fix */
+        .main-dashboard-content {
+            margin-left: 280px !important;
+            /* Force margin to match sidebar */
+            padding: 2rem;
+            /* Added padding for spacing */
+            transition: margin-left 0.3s ease;
+            width: auto !important;
+            /* Ensure it takes available width */
+        }
+
+        @media (max-width: 991.98px) {
+            .main-dashboard-content {
+                margin-left: 0 !important;
+            }
+        }
+
         /* Premium Design Variables */
         :root {
             /* Primary Brand Colors - Richer & Deep */
@@ -51,15 +69,10 @@
         }
 
         /* Home Zoom Wrapper */
-        .home-zoom {
-            zoom: 0.75;
-            /* Slightly increased for better visibility */
-        }
-
-        @supports not (zoom: 1) {
+        @media (max-width: 768px) {
             .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
+                zoom: 1 !important;
+                transform: none !important;
             }
         }
 
@@ -67,28 +80,15 @@
                                                Layout & Sidebar 
                                                ---------------------- */
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
-
         .main-dashboard-content {
             background: var(--bg-body);
             min-height: 100vh;
-            padding: 1.5rem 2rem;
-            margin-left: 240px;
-            transition: margin-left 0.2s;
+        }
+
+        @media (max-width: 768px) {
+            .main-dashboard-content {
+                padding: 1rem 0.75rem !important;
+            }
         }
 
         /* Ensure sidebar links are styled if not inherited */
@@ -199,6 +199,75 @@
             /* Adjusted padding */
             color: white;
             z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header-wrapper {
+                margin-bottom: 60px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-banner {
+                min-height: auto;
+                height: auto;
+                padding: 1.5rem 1rem;
+            }
+
+            .banner-content {
+                padding: 0;
+                text-align: center;
+                flex-direction: column !important;
+                gap: 1.25rem;
+            }
+
+            .banner-content .d-flex.flex-column {
+                align-items: center !important;
+                width: 100%;
+                text-align: center;
+            }
+
+            .banner-content .d-flex.flex-wrap {
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 0.5rem !important;
+            }
+
+            .banner-content .d-flex.flex-wrap > div {
+                justify-content: center !important;
+            }
+
+            .banner-content .text-truncate {
+                max-width: 100% !important;
+                white-space: normal !important;
+            }
+
+            .profile-avatar-wrapper {
+                position: relative;
+                bottom: 0;
+                right: 0;
+                margin-top: -50px;
+                margin-bottom: 0;
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                z-index: 5;
+            }
+
+            .profile-avatar-lg {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .flex-shrink-0.ms-4.position-relative {
+                margin-left: 0 !important;
+                margin-top: 1rem;
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            }
         }
 
         /* Fixed Floating Avatar to align relative to the wrapper, not the clipped banner */
@@ -425,46 +494,11 @@
 
         /* Mobile Sidebar adjustments */
         @media (max-width: 767.98px) {
-            .profile-banner {
-                height: 160px;
-            }
-
-            .banner-content {
-                padding: 20px;
-            }
-
-            .profile-avatar-wrapper {
-                bottom: -40px;
-                right: 20px;
-            }
-
-            .profile-avatar-lg {
-                width: 80px;
-                height: 80px;
-            }
-
             .welcome-text {
-                font-size: 1.5rem;
+                font-size: 1.35rem;
             }
 
-            /* Off-canvas behavior on mobile for sidebar */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                flex-direction: column;
-                padding: 0;
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
-            }
-
-            .custom-sidebar.show {
-                transform: translateX(0);
-            }
+            /* Mobile Adjustments handled in app.blade.php */
         }
     </style>
 
@@ -556,6 +590,7 @@
                                                         <div class="d-flex gap-1">
                                                             @php
                                                                 $badges = [
+                                                                    'New Student Orientation Program' => ['icon' => 'bi-compass-fill', 'year' => 1],
                                                                     'IDREAMS' => ['icon' => 'bi-clouds-fill', 'year' => 1],
                                                                     '10C' => ['icon' => 'bi-lightbulb-fill', 'year' => 2],
                                                                     'LEADS' => ['icon' => 'bi-people-fill', 'year' => 3],
@@ -603,11 +638,11 @@
                                                         @endif
 
                                                         @if($user->college)
-                                                            <DIV class="d-flex align-items-center gap-2">
+                                                            <div class="d-flex align-items-center gap-2">
                                                                 <i class="bi bi-building text-warning"></i>
                                                                 <span class="text-white text-truncate"
                                                                     style="max-width: 200px;">{{ $user->college }}</span>
-                                                            </DIV>
+                                                            </div>
                                                         @endif
                                                     </div>
 
@@ -642,9 +677,9 @@
                                                         style="display:none" onchange="this.form.submit()">
                                                     <label for="avatarInput" class="avatar-edit-overlay"
                                                         title="Change Photo"
-                                                        style="width: 30px; height: 30px; right: 0; bottom: 0;">
+                                                        style="width: 28px; height: 28px; right: 5px; bottom: 5px;">
                                                         <i class="bi bi-camera-fill text-white"
-                                                            style="font-size: 0.8rem;"></i>
+                                                            style="font-size: 0.75rem;"></i>
                                                     </label>
                                                 </form>
                                             </div>
@@ -725,6 +760,7 @@
                                                     <div class="d-flex flex-column gap-2">
                                                         @php
                                                             $badges = [
+                                                                'New Student Orientation Program' => ['color' => 'bg-secondary-subtle text-secondary', 'icon' => 'bi-compass-fill', 'year' => 1, 'label' => 'NSOP'],
                                                                 'IDREAMS' => ['color' => 'bg-primary-subtle text-primary', 'icon' => 'bi-clouds-fill', 'year' => 1],
                                                                 '10C' => ['color' => 'bg-warning-subtle text-warning', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
                                                                 'LEADS' => ['color' => 'bg-info-subtle text-info', 'icon' => 'bi-people-fill', 'year' => 3],
@@ -744,7 +780,7 @@
                                                                 <div class="flex-grow-1">
                                                                     <div
                                                                         class="fw-bold {{ $isAttended ? 'text-dark' : 'text-muted' }}">
-                                                                        {{ $seminarName }}
+                                                                        {{ $style['label'] ?? $seminarName }}
                                                                     </div>
                                                                     <div
                                                                         class="small {{ $isAttended ? 'text-success' : 'text-muted' }}">

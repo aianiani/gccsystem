@@ -1,12 +1,15 @@
-<div class="custom-sidebar">
+<div class="custom-sidebar" id="studentSidebar">
+    {{-- Mobile Close Button --}}
+    <button class="btn-close-sidebar d-md-none" id="studentSidebarClose">
+        <i class="bi bi-x-lg"></i>
+    </button>
+
     <div class="sidebar-logo">
-        <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
-            style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-        <h3 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">
-            CMU Guidance and Counseling Center</h3>
-        <p
-            style="margin: 0; font-size: 0.8rem; color: #fff; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">
-            Student Portal</p>
+        <div class="logo-wrapper">
+            <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo">
+        </div>
+        <h3>CMU Guidance and Counseling Center</h3>
+        <p>Student Portal</p>
     </div>
     <nav class="sidebar-nav">
         <a href="{{ route('dashboard') }}" class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
@@ -27,14 +30,14 @@
                 class="bi bi-award"></i>Guidance Program</a>
         <a href="{{ route('chat.selectCounselor') }}"
             class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i
-                class="bi bi-chat-dots"></i>Talk with Counselor</a>
+                class="bi bi-headset"></i>Talk with Counselor</a>
 
         <div class="sidebar-divider my-3" style="border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
         <div class="sidebar-resources">
             <div class="text-uppercase small px-3 mb-2"
                 style="color: rgba(255,255,255,0.5); font-weight:700; font-size: 0.75rem; letter-spacing: 1px;">
                 Resources</div>
-            <a href="#" class="sidebar-link"><i class="bi bi-play-circle"></i>Orientation</a>
+            <a href="#" class="sidebar-link"><i class="bi bi-info-circle-fill"></i>Orientation</a>
             <a href="#" class="sidebar-link"><i class="bi bi-book"></i>Library</a>
             <a href="#" class="sidebar-link"><i class="bi bi-gear"></i>Settings</a>
         </div>

@@ -214,7 +214,7 @@
                                                 class="bi bi-person-badge"></i><span><?php echo e($student->student_id ?? 'N/A'); ?></span>
                                         </div>
                                         <div class="hero-meta small"><i
-                                                class="bi bi-gender-ambiguous"></i><span><?php echo e($student->gender ? ucfirst($student->gender) : 'N/A'); ?></span>
+                                                class="bi bi-gender-ambiguous"></i><span><?php echo e($student->sex ? ucfirst($student->sex) : 'N/A'); ?></span>
                                         </div>
                                     </div>
                                 </div>

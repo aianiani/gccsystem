@@ -187,7 +187,7 @@
 
             .main-dashboard-content {
                 margin-left: 0;
-                padding: 1rem;
+                padding: 1rem 0.75rem;
             }
 
             #studentSidebarToggle {
@@ -221,6 +221,7 @@
             font-size: 1rem;
             margin-bottom: 1.5rem;
             text-align: center;
+            padding: 0 1rem;
         }
 
         .assessment-cards-row {
@@ -243,6 +244,13 @@
             margin-bottom: 1rem;
             transition: box-shadow 0.2s;
             position: relative;
+        }
+
+        @media (max-width: 576px) {
+            .assessment-card {
+                width: 100%;
+                max-width: 340px;
+            }
         }
 
         .assessment-card:hover {

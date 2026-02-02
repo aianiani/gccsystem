@@ -1,4 +1,5 @@
 <?php $__env->startSection('content'); ?>
+<?php $__env->startSection('full_width', true); ?>
     <style>
         /* Homepage theme variables (mapped into existing dashboard vars) */
         :root {
@@ -35,15 +36,10 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply the same page zoom used on the homepage */
-        .home-zoom {
-            zoom: 0.75;
-        }
-
-        @supports not (zoom: 1) {
+        @media (max-width: 768px) {
             .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
+                zoom: 1 !important;
+                transform: none !important;
             }
         }
 
@@ -54,187 +50,20 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
-
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .custom-sidebar .sidebar-logo h3 {
-            font-family: 'Outfit', sans-serif;
-            letter-spacing: 0.5px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .custom-sidebar .sidebar-logo p {
-            letter-spacing: 1px;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem !important;
-        }
-
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.25rem 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1.1rem;
-            padding: 0.9rem 1.25rem;
-            border-radius: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            margin: 0.1rem 0;
-        }
-
-        .custom-sidebar .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            transform: translateX(5px);
-        }
-
-        .custom-sidebar .sidebar-link.active {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            color: #f4d03f;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .custom-sidebar .sidebar-link.active::before {
-            content: '';
-            position: absolute;
-            left: -0.75rem;
-            top: 15%;
-            bottom: 15%;
-            width: 5px;
-            background: #f4d03f;
-            border-radius: 0 6px 6px 0;
-            box-shadow: 2px 0 15px rgba(244, 208, 63, 0.5);
-        }
-
-        .custom-sidebar .sidebar-link .bi {
-            font-size: 1.25rem;
-            transition: all 0.3s ease;
-        }
-
-        .custom-sidebar .sidebar-link.active .bi {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 5px rgba(244, 208, 63, 0.3));
-        }
-
-        .custom-sidebar .sidebar-bottom {
-            padding: 1.5rem 1rem;
-            background: rgba(0, 0, 0, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .custom-sidebar .sidebar-link.logout {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            text-align: left;
-            padding: 0.85rem 1.25rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 1.1rem;
-        }
-
-        .custom-sidebar .sidebar-link.logout:hover {
-            background: #dc3545;
-            color: #fff;
-            border-color: #dc3545;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.4);
+        /* Appointments Page Custom Styles */
+        .main-dashboard-content {
+            margin-left: 280px !important;
+            padding: 2rem;
+            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+            width: auto !important;
         }
 
         @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
-
             .main-dashboard-content {
-                margin-left: 200px;
+                margin-left: 0 !important;
             }
-        }
-
-        @media (max-width: 767.98px) {
-
-            /* Off-canvas behavior on mobile */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                flex-direction: column;
-                padding: 0;
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
-            }
-
-            .custom-sidebar.show {
-                transform: translateX(0);
-            }
-
-            .main-dashboard-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-
-            /* Toggle button */
-            #studentSidebarToggle {
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1100;
-                background: var(--forest-green);
-                color: #fff;
-                border: none;
-                border-radius: 10px;
-                padding: 0.6rem 0.8rem;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                display: flex !important;
-                align-items: center;
-                justify-content: center;
-            }
-        }
-
-        .main-dashboard-content {
-            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
-            min-height: 100vh;
-            padding: 1rem 1.5rem;
-            margin-left: 240px;
-            transition: margin-left 0.2s;
         }
 
         /* Constrain inner content and center it within the available area */
@@ -465,20 +294,66 @@
 
                             .session-indicator {
                                 position: absolute;
-                                top: 1rem;
-                                right: 1rem;
-                                font-size: 0.75rem;
-                                font-weight: 700;
+                                top: 1.25rem;
+                                right: 1.25rem;
+                                font-size: 0.7rem;
+                                font-weight: 800;
                                 text-transform: uppercase;
-                                letter-spacing: 0.5px;
-                                color: var(--text-light);
-                                background: #f0f2f5;
-                                padding: 0.25rem 0.75rem;
-                                border-radius: 4px;
+                                letter-spacing: 0.8px;
+                                color: var(--forest-green);
+                                background: var(--light-green);
+                                padding: 0.35rem 0.75rem;
+                                border-radius: 6px;
+                                border: 1px solid rgba(31, 122, 45, 0.1);
+                            }
+
+                            @media (max-width: 576px) {
+                                .page-header {
+                                    text-align: center;
+                                    flex-direction: column;
+                                    gap: 1.5rem;
+                                    margin-bottom: 2rem;
+                                }
+
+                                .page-title {
+                                    justify-content: center;
+                                    font-size: 1.5rem;
+                                }
+
+                                .appointment-card {
+                                    border-radius: 20px;
+                                }
+
+                                .card-header-styled {
+                                    padding: 1.25rem;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    text-align: center;
+                                    gap: 1rem;
+                                }
+
+                                .counselor-info {
+                                    flex-direction: column;
+                                    gap: 0.75rem;
+                                }
+
+                                .session-indicator {
+                                    position: static;
+                                    margin-top: 0.25rem;
+                                }
+
+                                .card-body-styled {
+                                    padding: 1.25rem;
+                                }
+
+                                .time-badge {
+                                    padding: 0.75rem;
+                                    justify-content: center;
+                                }
                             }
                         </style>
 
-                        <div class="page-header">
+                        <div class="page-header flex-wrap gap-3">
                             <div>
                                 <h1 class="page-title">
                                     <i class="bi bi-calendar-check-fill"></i>
@@ -489,9 +364,9 @@
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stats-pill d-none d-md-flex">
                                     <i class="bi bi-graph-up"></i>
-                                    <?php echo e($appointments->count()); ?> Total
+                                    <?php echo e(count($appointments)); ?> Total
                                 </div>
-                                <a href="<?php echo e(route('appointments.create')); ?>" class="btn-book-new">
+                                <a href="<?php echo e(route('appointments.create')); ?>" class="btn-book-new w-100 justify-content-center">
                                     <i class="bi bi-plus-lg"></i>
                                     <span>Book Appointment</span>
                                 </a>
@@ -505,7 +380,7 @@
                             </div>
                         <?php endif; ?>
 
-                        <?php if($appointments->count()): ?>
+                        <?php if(count($appointments)): ?>
                             <div class="row g-4">
                                 <?php $__currentLoopData = $appointments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $appointment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <?php

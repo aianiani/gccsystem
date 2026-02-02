@@ -485,6 +485,8 @@
                                     <select name="seminar_name" class="form-select-custom w-100"
                                         onchange="this.form.submit()">
                                         <option value="">All Seminars</option>
+                                        <option value="New Student Orientation Program" <?php echo e(request('seminar_name') == 'New Student Orientation Program' ? 'selected' : ''); ?>>
+                                            New Student Orientation Program</option>
                                         <option value="IDREAMS" <?php echo e(request('seminar_name') == 'IDREAMS' ? 'selected' : ''); ?>>
                                             IDREAMS</option>
                                         <option value="10C" <?php echo e(request('seminar_name') == '10C' ? 'selected' : ''); ?>>10C
@@ -557,7 +559,7 @@
                                         ?>
                                         <?php $__empty_1 = true; $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $student): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                             <?php
-                                                $seminarMap = ['IDREAMS' => 1, '10C' => 2, 'LEADS' => 3, 'IMAGE' => 4];
+                                                $seminarMap = ['New Student Orientation Program' => 1, 'IDREAMS' => 1, '10C' => 2, 'LEADS' => 3, 'IMAGE' => 4];
                                                 $completedCount = 0;
                                                 $totalRequiredSoFar = 0;
                                                 foreach ($seminarMap as $name => $targetYear) {
@@ -696,6 +698,7 @@
                                     <select name="seminar_name" class="form-select-custom form-select-sm" required
                                         style="min-width: 150px;">
                                         <option value="">Select Seminar...</option>
+                                        <option value="New Student Orientation Program">New Student Orientation Program</option>
                                         <option value="IDREAMS">IDREAMS</option>
                                         <option value="10C">10C</option>
                                         <option value="LEADS">LEADS</option>
@@ -742,6 +745,7 @@
                             <label class="form-label fw-bold small text-uppercase">Seminar</label>
                             <select name="seminar_name" class="form-select-custom w-100" required>
                                 <option value="">Select Seminar...</option>
+                                <option value="New Student Orientation Program">New Student Orientation Program (Year 1)</option>
                                 <option value="IDREAMS">IDREAMS (Year 1)</option>
                                 <option value="10C">10C (Year 2)</option>
                                 <option value="LEADS">LEADS (Year 3)</option>

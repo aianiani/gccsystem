@@ -206,6 +206,13 @@
             margin-left: auto;
         }
 
+        @media (max-width: 768px) {
+            .hero-illustration {
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
         .hero-illustration img {
             width: 100%;
             height: auto;
@@ -400,7 +407,6 @@
             overflow: hidden;
             position: relative;
             width: 100%;
-            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -421,6 +427,7 @@
             border-radius: 20px;
             padding: 0;
             height: 100%;
+            width: 100%;
             position: relative;
             overflow: hidden;
         }
@@ -428,9 +435,10 @@
         .announcement-content {
             display: flex;
             align-items: center;
-            min-height: 200px;
-            padding: 2rem;
+            padding: 3rem;
             position: relative;
+            width: 100%;
+            flex-grow: 1;
         }
 
         .announcement-header {
@@ -438,19 +446,19 @@
             flex-direction: column;
             align-items: center;
             margin-right: 2rem;
-            min-width: 120px;
+            min-width: 100px;
         }
 
         .announcement-icon-large {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, var(--accent-green), var(--primary-green));
             color: white;
-            font-size: 2rem;
+            font-size: 1.5rem;
             box-shadow: 0 8px 25px rgba(34, 139, 34, 0.25);
             margin-bottom: 1rem;
         }
@@ -484,7 +492,9 @@
 
         .announcement-body {
             flex: 1;
+            width: 100%;
             padding-left: 1rem;
+            min-width: 0;
         }
 
         .announcement-title {
@@ -505,16 +515,24 @@
         .announcement-action {
             display: inline-flex;
             align-items: center;
-            gap: 0.75rem;
+            justify-content: center;
+            gap: 0.5rem;
             color: var(--accent-green);
             text-decoration: none;
             font-weight: 600;
-            font-size: 1.1rem;
-            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            padding: 0.6rem 1.2rem;
             border: 2px solid var(--accent-green);
             border-radius: 25px;
             transition: all 0.3s ease;
             background: rgba(34, 139, 34, 0.05);
+            line-height: 1;
+        }
+
+        .announcement-action i {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
         }
 
         .announcement-action:hover {
@@ -659,26 +677,36 @@
             }
 
             .announcement-content {
-                padding: 1rem;
+                padding: 1.5rem 1rem;
+                flex-direction: column !important;
+                align-items: flex-start !important;
             }
 
             .announcement-title {
                 font-size: 1.3rem;
+                text-align: left !important;
             }
 
             .announcement-excerpt {
                 font-size: 0.9rem;
+                text-align: left !important;
+            }
+
+            .announcement-date {
+                text-align: left !important;
             }
 
             .announcement-icon-large {
-                width: 60px;
-                height: 60px;
-                font-size: 1.5rem;
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
             }
 
             .announcement-action {
                 font-size: 0.9rem;
                 padding: 0.6rem 1.2rem;
+                align-self: flex-start !important;
             }
         }
 
@@ -1283,16 +1311,36 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
+
+            /* General container reset for mobile */
+            .container-fluid {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .navbar-brand {
+                margin-left: 0;
+                font-size: 1rem;
+            }
+
+            /* Fix Hero Spacing */
+            .hero {
+                padding-top: 130px;
+                /* Increased to push content down (User Request) */
+            }
+
             .hero-title {
-                font-size: 2.5rem;
+                font-size: 2rem;
+                /* Reduced from 2.5rem */
             }
 
             .hero-description {
-                font-size: 1.1rem;
+                font-size: 1rem;
             }
 
             .hero-content {
                 text-align: center !important;
+                padding-left: 0;
             }
 
             .hero-buttons {
@@ -1321,48 +1369,60 @@
                 padding: 0 1rem;
             }
 
-            .testimonials-container {
-                max-width: 100%;
-                margin: 0;
-                width: 100%;
-            }
-
-            .testimonials-track {
-                width: 100% !important;
-            }
-
-            .testimonial-slide {
-                width: 100% !important;
-                flex-shrink: 0;
-            }
-
-            .testimonial-card {
-                margin: 0;
-                padding: 2rem;
-                width: 100%;
-            }
-
-            .testimonial-nav {
-                width: 40px;
-                height: 40px;
+            /* Adjust button sizes for mobile */
+            .btn-primary-custom,
+            .btn-secondary-custom {
+                padding: 0.8rem 1.5rem;
                 font-size: 1rem;
+                width: 100%;
+                /* Full width buttons on mobile look better */
+                display: flex;
+                justify-content: center;
             }
+        }
 
-            .testimonial-prev {
-                left: 10px;
-            }
+        .testimonials-container {
+            max-width: 100%;
+            margin: 0;
+            width: 100%;
+        }
 
-            .testimonial-next {
-                right: 10px;
-            }
+        .testimonials-track {
+            width: 100% !important;
+        }
 
-            .testimonial-text {
-                font-size: 1rem;
-            }
+        .testimonial-slide {
+            width: 100% !important;
+            flex-shrink: 0;
+        }
 
-            .testimonial-author {
-                font-size: 0.9rem;
-            }
+        .testimonial-card {
+            margin: 0;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .testimonial-nav {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .testimonial-prev {
+            left: 10px;
+        }
+
+        .testimonial-next {
+            right: 10px;
+        }
+
+        .testimonial-text {
+            font-size: 1rem;
+        }
+
+        .testimonial-author {
+            font-size: 0.9rem;
+        }
         }
 
         @media (max-width: 992px) {
@@ -1435,8 +1495,9 @@
 
         /* Anchor offset for fixed navbar */
         #home,
+        #announcements,
         #counselors,
-        #services,
+        #faq,
         #contact {
             scroll-margin-top: 90px;
         }
@@ -1631,11 +1692,15 @@
                             <a class="nav-link active" href="#home">Home</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="#announcements">Announcements</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#counselors">Counselors</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#services">Services</a>
+                            <a class="nav-link" href="#faq">FAQs</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#contact">Contact</a>
                         </li>
@@ -1681,7 +1746,7 @@
                     </div>
 
                     <!-- Right Column - Illustration Carousel -->
-                    <div class="col-lg-5 col-md-6 d-none d-md-block">
+                    <div class="col-lg-5 col-md-6 mt-5 mt-md-0">
                         <div class="hero-illustration">
                             <div class="hero-carousel">
                                 <?php $__empty_1 = true; $__currentLoopData = $heroImages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
@@ -1712,7 +1777,7 @@
 
         <!-- Announcements Section -->
         <section id="announcements" class="py-5" style="background: var(--bg-light);">
-            <div class="container">
+            <div class="container-fluid px-4 px-lg-5">
                 <div class="section-header">
                     <h2 style="color: var(--primary-green);">Latest Announcements</h2>
                     <div class="section-divider" style="background: var(--accent-orange);"></div>
@@ -1724,34 +1789,106 @@
                         <div class="announcements-track d-flex" id="announcementsTrack">
                             <?php $__empty_1 = true; $__currentLoopData = $announcements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $announcement): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <div class="announcement-slide flex-shrink-0" style="width: 100%;">
-                                    <div class="announcement-card-horizontal">
-                                        <div class="announcement-content">
-                                            <div class="announcement-header">
-                                                <div class="announcement-icon-large">
-                                                    <i class="fas fa-bullhorn"></i>
-                                                </div>
-                                                <div class="announcement-meta">
-                                                    <span
-                                                        class="announcement-date"><?php echo e(optional($announcement->created_at)->format('M d, Y')); ?></span>
-                                                    <?php if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14))): ?>
-                                                        <span class="badge-new">NEW</span>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                            <div class="announcement-body">
-                                                <h3 class="announcement-title"><?php echo e($announcement->title); ?></h3>
-                                                <p class="announcement-excerpt">
-                                                    <?php echo e(\Illuminate\Support\Str::limit(strip_tags($announcement->content ?? $announcement->body ?? ''), 200)); ?>
 
-                                                </p>
-                                                <a href="<?php echo e(route('announcements.show', $announcement)); ?>"
-                                                    class="announcement-action"
-                                                    aria-label="Read more about <?php echo e($announcement->title); ?>">
-                                                    <span>Read Full Announcement</span>
-                                                    <i class="fas fa-arrow-right"></i>
-                                                </a>
+                                    <div class="announcement-card-horizontal">
+                                        <?php
+                                            $homeAttachmentPath = $announcement->attachment ?? null;
+                                            $homeIsImage = $homeAttachmentPath && preg_match('/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i', $homeAttachmentPath);
+                                        ?>
+
+                                        <?php if($homeIsImage): ?>
+                                            <!-- Layout with Featured Image (Split Image/Content) -->
+                                            <div class="row g-0 h-100">
+                                                <div class="col-lg-5 col-md-12">
+                                                    <div class="h-100 position-relative" style="min-height: 550px;">
+                                                        <img src="<?php echo e(asset('storage/' . $homeAttachmentPath)); ?>"
+                                                            alt="<?php echo e($announcement->title); ?>" class="w-100 h-100"
+                                                            style="object-fit: cover; position: absolute; inset: 0;">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <div class="announcement-content h-100"
+                                                        style="min-height: auto; padding: 2.5rem;">
+                                                        <div class="announcement-header me-4 align-items-start">
+                                                            <div class="announcement-meta align-items-start">
+                                                                <span
+                                                                    class="announcement-date"><?php echo e(optional($announcement->created_at)->format('M d, Y')); ?></span>
+                                                                <?php if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14))): ?>
+                                                                    <span class="badge-new">NEW</span>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        </div>
+                                                        <div class="announcement-body p-0" style="flex: 1; width: 100%;">
+                                                            <h3 class="announcement-title mb-3"><?php echo e($announcement->title); ?></h3>
+                                                            <p class="announcement-excerpt mb-4"
+                                                                style="font-size: 1.05rem; line-height: 1.7;">
+                                                                <?php echo e(\Illuminate\Support\Str::limit(strip_tags($announcement->content ?? $announcement->body ?? ''), 600)); ?>
+
+                                                            </p>
+                                                            <a href="<?php echo e(route('announcements.show', $announcement)); ?>"
+                                                                class="announcement-action"
+                                                                aria-label="Read more about <?php echo e($announcement->title); ?>">
+                                                                <span>Read Full Announcement</span>
+                                                                <i class="fas fa-arrow-right"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        <?php else: ?>
+                                            <!-- Standard Layout (No Image) -Redesigned for More Content -->
+                                            <div class="announcement-content"
+                                                style="display: flex; align-items: flex-start; gap: 1rem; padding: 2rem; width: 100%;">
+                                                <div style="flex-shrink: 0;">
+                                                    <div class="announcement-icon-large"
+                                                        style="width: 50px; height: 50px; font-size: 1.25rem; border-radius: 12px;">
+                                                        <i class="fas fa-bullhorn"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="announcement-body"
+                                                    style="display: flex; flex-direction: column; height: 100%; padding-left: 0; flex: 1; width: 100%;">
+                                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                                        <span class="announcement-date"
+                                                            style="font-size: 0.85rem;"><?php echo e(optional($announcement->created_at)->format('M d, Y')); ?></span>
+                                                        <?php if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14))): ?>
+                                                            <span class="badge-new">NEW</span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <h3 class="announcement-title"
+                                                        style="font-size: 1.75rem; margin-bottom: 1rem;">
+                                                        <?php echo e($announcement->title); ?>
+
+                                                    </h3>
+                                                    <p class="announcement-excerpt"
+                                                        style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 1rem; color: #5a5a5a; text-align: left;">
+                                                        <?php echo e(\Illuminate\Support\Str::limit(strip_tags($announcement->content ?? $announcement->body ?? ''), 1000)); ?>
+
+                                                    </p>
+
+                                                    <?php if(!empty($announcement->images) && is_array($announcement->images) && count($announcement->images) > 0): ?>
+                                                        <!-- Display all gallery images in a grid -->
+                                                        <div
+                                                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+                                                            <?php $__currentLoopData = $announcement->images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <a href="<?php echo e(route('announcements.show', $announcement)); ?>"
+                                                                    style="display: block;">
+                                                                    <img src="<?php echo e(asset('storage/' . $image)); ?>"
+                                                                        alt="<?php echo e($announcement->title); ?>"
+                                                                        style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.3s ease;">
+                                                                </a>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <a href="<?php echo e(route('announcements.show', $announcement)); ?>"
+                                                        class="announcement-action"
+                                                        aria-label="Read more about <?php echo e($announcement->title); ?>"
+                                                        style="margin-top: auto; align-self: flex-start;">
+                                                        <span>Read Full Announcement</span>
+                                                        <i class="fas fa-arrow-right"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -1813,62 +1950,7 @@
             </div>
         </section>
 
-        <!-- Features Section -->
-        <section id="services" class="features py-5" style="background: var(--bg-light);">
-            <div class="container">
-                <div class="section-header">
-                    <h2 style="color: var(--primary-green);">Our Services</h2>
-                    <div class="section-divider" style="background: var(--accent-orange);"></div>
-                    <p>We provide comprehensive mental health support tailored to student needs</p>
-                </div>
 
-                <div class="row g-4">
-                    <div class="col-md-6 col-lg-3">
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <h5>Easy Scheduling</h5>
-                            <p>Book appointments seamlessly with our intuitive online system. Choose your preferred time
-                                and counselor with just a few clicks.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3">
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-comments"></i>
-                            </div>
-                            <h5>Live Chat Support</h5>
-                            <p>Get immediate assistance through our secure real-time chat system. Available 24/7 for
-                                crisis support and general guidance.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3">
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <h5>100% Confidential</h5>
-                            <p>All sessions and communications are strictly confidential. Your privacy and trust are our
-                                top priorities.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3">
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-book-open"></i>
-                            </div>
-                            <h5>Resource Library</h5>
-                            <p>Access comprehensive self-help materials, guides, and tools designed to support your
-                                mental health journey.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- Counselors Section -->
         <section id="counselors" class="counselors py-5" style="background: var(--bg-light);">
@@ -2089,7 +2171,7 @@
 
 
         <!-- FAQ Section -->
-        <section class="faq py-5" style="background: white;">
+        <section id="faq" class="faq py-5" style="background: white;">
             <div class="container">
                 <div class="section-header">
                     <h2 style="color: var(--primary-green);">Frequently Asked Questions</h2>
@@ -2292,7 +2374,7 @@
                             <h6>Quick Links</h6>
                             <a href="#home">Home</a>
                             <a href="#counselors">Our Counselors</a>
-                            <a href="#services">Services</a>
+
                             <a href="<?php echo e(route('resources')); ?>">Resources</a>
                             <a href="#contact">Contact Us</a>
                         </div>
@@ -3229,15 +3311,10 @@
             if (announcementAutoPlayInterval) clearInterval(announcementAutoPlayInterval);
         }
 
-        // Pause auto-play on hover
+        // Pause auto-play on hover - DISABLED since autoplay is off
         function attachHoverListeners() {
-            if (announcementCarousel && typeof announcementCarousel.addEventListener === 'function') {
-                announcementCarousel.addEventListener('mouseenter', stopAnnouncementAutoPlay);
-                announcementCarousel.addEventListener('mouseleave', startAnnouncementAutoPlay);
-                console.log('Hover listeners attached');
-            } else {
-                console.log('Carousel element not found or not ready');
-            }
+            // Autoplay disabled, hover listeners not needed
+            console.log('Hover listeners skipped (autoplay disabled)');
         }
 
         // Initialize announcements carousel
@@ -3277,8 +3354,8 @@
             attachAnnouncementEventListeners();
             attachHoverListeners();
             updateAnnouncementCarousel();
-            startAnnouncementAutoPlay();
-            console.log('Announcement carousel fully initialized');
+            // startAnnouncementAutoPlay(); // DISABLED: Autoplay removed per user request
+            console.log('Announcement carousel fully initialized (autoplay disabled)');
         }
 
         // Handle window resize and orientation change
@@ -4840,21 +4917,113 @@
         
 
         <script>
-            // Auto-open relevant modal based on session fla            sh
+            // Auto-open relevant modal based on session flash
             document.addEventListener('DOMContentLoaded', function () {
+                // Priority: Attach Login Handler immediately
+                const loginForm = document.getElementById('modalLoginForm');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', async function (e) {
+                        e.preventDefault();
+                        console.log('Login form submitted (handler v2)');
+                        const submitBtn = loginForm.querySelector('button[type="submit"]');
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+
+                        try {
+                            const formData = new FormData(loginForm);
+                            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                            const resp = await fetch(loginForm.action, {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': csrfToken || '',
+                                    'Accept': 'application/json'
+                                },
+                                body: formData,
+                                credentials: 'include'
+                            });
+
+                            const data = await resp.json();
+                            console.log('Login response:', data);
+
+                            // Handle 2FA required
+                            if (data.status === '2fa_required') {
+                                console.log('2FA required, showing modal');
+                                safeHideModal('loginModal');
+                                setTimeout(() => {
+                                    const twoFactorModal = document.getElementById('twoFactorModal');
+                                    if (twoFactorModal && window.bootstrap) {
+                                        bootstrap.Modal.getOrCreateInstance(twoFactorModal).show();
+                                    }
+                                }, 300);
+                                return;
+                            }
+
+                            // Handle success
+                            if (data.status === 'success') {
+                                if (window.Swal) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Login Successful!',
+                                        text: data.message || 'Welcome back!',
+                                        timer: 2000
+                                    }).then(() => {
+                                        window.location.href = data.redirect || '/dashboard';
+                                    });
+                                } else {
+                                    window.location.href = data.redirect || '/dashboard';
+                                }
+                                return;
+                            }
+
+                            // Handle error
+                            const errorMsg = data.message || 'Login failed. Please try again.';
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Login Failed',
+                                    text: errorMsg
+                                });
+                            } else {
+                                alert(errorMsg);
+                            }
+
+                        } catch (err) {
+                            console.error('Login error:', err);
+                            const msg = 'Network error. Please check your connection and try again.';
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: msg
+                                });
+                            } else {
+                                alert(msg);
+                            }
+                        } finally {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Login';
+                        }
+                    });
+                }
+
                 // Tab indicator alignment
                 // Use simple active border underline to avoid disappearing indicator
                 const loginTabBtn = document.getElementById('tab-login');
                 const signupTabBtn = document.getElementById('tab-signup');
                 if (loginTabBtn && signupTabBtn) {
                     const updateBorders = () => {
-                        loginTabBtn.classList.toggle('active', document.getElementById('pane-login').classList.contains('active'));
-                        signupTabBtn.classList.toggle('active', document.getElementById('pane-signup').classList.contains('active'));
+                        const paneLogin = document.getElementById('pane-login');
+                        const paneSignup = document.getElementById('pane-signup');
+                        if (paneLogin) loginTabBtn.classList.toggle('active', paneLogin.classList.contains('active'));
+                        if (paneSignup) signupTabBtn.classList.toggle('active', paneSignup.classList.contains('active'));
                     };
                     loginTabBtn.addEventListener('shown.bs.tab', updateBorders);
                     signupTabBtn.addEventListener('shown.bs.tab', updateBorders);
                     setTimeout(updateBorders, 0);
                 }
+
                 // Password visibility toggles
                 const toggle = (btnId, inputId) => {
                     const btn = document.getElementById(btnId);
@@ -4957,7 +5126,8 @@
                     // Populate colleges
                     for (const college of Object.keys(collegeToCourses)) {
                         const opt = document.createElement('option');
-                        opt.value = college; opt.textContent = college;
+                        opt.value = college;
+                        opt.textContent = college;
                         collegeSelect.appendChild(opt);
                     }
                     const populateCourses = () => {
@@ -4966,7 +5136,8 @@
                         const courses = collegeToCourses[selected] || [];
                         for (const c of courses) {
                             const opt = document.createElement('option');
-                            opt.value = c; opt.textContent = c;
+                            opt.value = c;
+                            opt.textContent = c;
                             courseSelect.appendChild(opt);
                         }
                     };
@@ -4980,7 +5151,6 @@
                 }
 
                 // Helper function to safely get or create modal instance
-                // Note: Bootstrap Modal.getOrCreateInstance is already patched earlier in the page
                 function safeGetModalInstance(element) {
                     if (!element) return null;
                     if (typeof bootstrap === 'undefined' || !bootstrap.Modal) return null;
@@ -5040,91 +5210,8 @@
                 }
 
                 // AJAX login -> intercept 2FA redirect and open modal instead
-                const loginForm = document.getElementById('modalLoginForm');
-                if (loginForm) {
-                    loginForm.addEventListener('submit', async function (e) {
-                        e.preventDefault();
-                        const submitBtn = loginForm.querySelector('button[type="submit"]');
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
-
-                        try {
-                            const formData = new FormData(loginForm);
-                            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-                            const resp = await fetch(loginForm.action, {
-                                method: 'POST',
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'X-CSRF-TOKEN': csrfToken || '',
-                                    'Accept': 'application/json'
-                                },
-                                body: formData,
-                                credentials: 'include'
-                            });
-
-                            const data = await resp.json();
-                            console.log('Login response:', data);
-
-                            // Handle 2FA required
-                            if (data.status === '2fa_required') {
-                                console.log('2FA required, showing modal');
-                                safeHideModal('loginModal');
-                                setTimeout(() => {
-                                    const twoFactorModal = document.getElementById('twoFactorModal');
-                                    if (twoFactorModal && window.bootstrap) {
-                                        bootstrap.Modal.getOrCreateInstance(twoFactorModal).show();
-                                    }
-                                }, 300);
-                                return;
-                            }
-
-                            // Handle success
-                            if (data.status === 'success') {
-                                if (window.Swal) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Login Successful!',
-                                        text: data.message || 'Welcome back!',
-                                        timer: 2000
-                                    }).then(() => {
-                                        window.location.href = data.redirect || '/dashboard';
-                                    });
-                                } else {
-                                    window.location.href = data.redirect || '/dashboard';
-                                }
-                                return;
-                            }
-
-                            // Handle error
-                            const errorMsg = data.message || 'Login failed. Please try again.';
-                            if (window.Swal) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Login Failed',
-                                    text: errorMsg
-                                });
-                            } else {
-                                alert(errorMsg);
-                            }
-
-                        } catch (err) {
-                            console.error('Login error:', err);
-                            const msg = 'Network error. Please check your connection and try again.';
-                            if (window.Swal) {
-                                Swal.fire({ icon: 'error', title: 'Error', text: msg });
-                            } else {
-                                alert(msg);
-                            }
-                        } finally {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Login';
-                        }
-                    });
-                }
 
                 // Old AJAX handler removed - logic moved to enhanceFormSubmission
-
                 // AJAX 2FA verify to avoid navigation (enhanced: paste support, UI, resend timer)
                 const twofaForm = document.getElementById('modal2faForm');
                 if (twofaForm) {
@@ -5150,9 +5237,7 @@
                         });
 
                         input.addEventListener('keydown', (e) => {
-                            if (e.key === 'Backspace' && !input.value && idx > 0) {
-                                otpInputs[idx - 1].focus();
-                            }
+                            if (e.key === 'Backspace' && !input.value && idx > 0) { otpInputs[idx - 1].focus(); }
                             // allow navigation with arrow keys
                             if (e.key === 'ArrowLeft' && idx > 0) otpInputs[idx - 1].focus();
                             if (e.key === 'ArrowRight' && idx < otpInputs.length - 1) otpInputs[idx + 1].focus();
@@ -5187,11 +5272,13 @@
                         clearInterval(resendInterval);
                         resendSeconds = seconds;
                         if (resendBtn) resendBtn.disabled = true;
+
                         const tick = () => {
                             if (!resendTimerEl) return;
                             const mm = String(Math.floor(resendSeconds / 60)).padStart(2, '0');
                             const ss = String(resendSeconds % 60).padStart(2, '0');
                             resendTimerEl.textContent = `You can resend in ${mm}:${ss}`;
+
                             if (resendSeconds <= 0) {
                                 clearInterval(resendInterval);
                                 resendTimerEl.textContent = '';
@@ -5208,6 +5295,7 @@
                         resendForm.addEventListener('submit', async function (e) {
                             e.preventDefault();
                             if (resendBtn) resendBtn.disabled = true;
+
                             try {
                                 const fd = new FormData(resendForm);
                                 const resp = await fetch(resendForm.action, {
@@ -5219,6 +5307,7 @@
                                     body: fd,
                                     credentials: 'same-origin'
                                 });
+
                                 const data = await resp.json();
 
                                 if (resp.ok) {
@@ -5245,6 +5334,7 @@
                             // focus first input
                             setTimeout(() => { otpInputs[0]?.focus(); }, 120);
                         });
+
                         twoFactorModalEl.addEventListener('hidden.bs.modal', function () {
                             // clear inputs when closing
                             otpInputs.forEach(i => i.value = '');
@@ -5293,563 +5383,464 @@
                         }
                     });
                 }
+            }); // Closing DOMContentLoaded
+            // Enhanced Signup Form Functionality
+            // Declare these in outer scope so they can be accessed by modal event handlers
+            let enhanceStepNavigation, validateStep, updateStepProgress;
 
-                // Enhanced Signup Form Functionality
-                // Declare these in outer scope so they can be accessed by modal event handlers
-                let enhanceStepNavigation, validateStep, updateStepProgress;
+            function initializeEnhancedSignup() {
+                console.log('=== initializeEnhancedSignup START ===');
 
-                function initializeEnhancedSignup() {
-                    console.log('=== initializeEnhancedSignup START ===');
+                // Step Progress Management
+                updateStepProgress = function (currentStep) {
+                    const progressFill = document.getElementById('progressFill');
+                    const progressText = document.getElementById('progressText');
+                    const progressLabel = document.getElementById('progressLabel');
+                    const stepLabels = { 1: 'Personal Information', 2: 'Account & Student Details', 3: 'Verification Document' };
 
-                    // Step Progress Management
-                    // Step Progress Management
-                    // Step Progress Management
-                    // Step Progress Management
-                    updateStepProgress = function (currentStep) {
-                        const progressFill = document.getElementById('progressFill');
-                        const progressText = document.getElementById('progressText');
-                        const progressLabel = document.getElementById('progressLabel');
+                    if (progressFill) {
+                        // Force width using !important to override any CSS specificity issues
+                        const percentage = (currentStep / 3) * 100;
+                        progressFill.style.setProperty('width', `${percentage}%`, 'important');
+                        // Remove step classes to avoid conflict, just keep base class
+                        progressFill.className = 'progress-fill';
+                        progressFill.classList.add(`step-${currentStep}`);
+                    }
+                    if (progressText) {
+                        progressText.textContent = `Step ${currentStep} of 3`;
+                    }
+                    if (progressLabel && stepLabels[currentStep]) {
+                        progressLabel.textContent = stepLabels[currentStep];
+                    }
+                };
 
-                        const stepLabels = {
-                            1: 'Personal Information',
-                            2: 'Account & Student Details',
-                            3: 'Verification Document'
-                        };
+                // Enhanced Form Validation
+                validateStep = function (stepElement) {
+                    let isValid = true;
+                    const requiredFields = stepElement.querySelectorAll('input[required], select[required]');
 
-                        if (progressFill) {
-                            // Force width using !important to override any CSS specificity issues
-                            const percentage = (currentStep / 3) * 100;
-                            progressFill.style.setProperty('width', `${percentage}%`, 'important');
+                    requiredFields.forEach(field => {
+                        const feedback = field.closest('.mb-3')?.querySelector('.invalid-feedback');
+                        // Clear previous validation
+                        field.classList.remove('is-invalid', 'is-valid');
+                        if (feedback) feedback.textContent = '';
 
-                            // Remove step classes to avoid conflict, just keep base class
-                            progressFill.className = 'progress-fill';
-                            progressFill.classList.add(`step-${currentStep}`);
-                        }
+                        // Validate field
+                        if (!field.value.trim() && field.type !== 'file') {
+                            field.classList.add('is-invalid');
+                            if (feedback) feedback.textContent = 'This field is required';
+                            isValid = false;
+                        } else if (field.type === 'file' && field.files.length === 0) {
+                            field.classList.add('is-invalid');
+                            if (feedback) feedback.textContent = 'This field is required';
+                            isValid = false;
+                        } else {
+                            field.classList.add('is-valid');
 
-                        if (progressText) {
-                            progressText.textContent = `Step ${currentStep} of 3`;
-                        }
-
-                        if (progressLabel && stepLabels[currentStep]) {
-                            progressLabel.textContent = stepLabels[currentStep];
-                        }
-                    };
-
-                    // Enhanced Form Validation
-                    validateStep = function (stepElement) {
-                        let isValid = true;
-                        const requiredFields = stepElement.querySelectorAll('input[required], select[required]');
-
-                        requiredFields.forEach(field => {
-                            const feedback = field.closest('.mb-3')?.querySelector('.invalid-feedback');
-
-                            // Clear previous validation
-                            field.classList.remove('is-invalid', 'is-valid');
-                            if (feedback) feedback.textContent = '';
-
-                            // Validate field
-                            if (!field.value.trim() && field.type !== 'file') {
-                                field.classList.add('is-invalid');
-                                if (feedback) feedback.textContent = 'This field is required';
-                                isValid = false;
-                            } else if (field.type === 'file' && field.files.length === 0) {
-                                field.classList.add('is-invalid');
-                                if (feedback) feedback.textContent = 'This field is required';
-                                isValid = false;
-                            } else {
-                                field.classList.add('is-valid');
-
-                                // Additional validation for specific fields
-                                if (field.type === 'email') {
-                                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                                    if (!emailRegex.test(field.value)) {
-                                        field.classList.remove('is-valid');
-                                        field.classList.add('is-invalid');
-                                        if (feedback) feedback.textContent = 'Please enter a valid email address';
-                                        isValid = false;
-                                    }
-                                }
-
-                                // Password confirmation matching
-                                if (field.name === 'password_confirmation') {
-                                    // UPDATED ID: Reference the v2 password field
-                                    const passwordField = document.getElementById('signupPassword_v2');
-                                    if (passwordField && field.value !== passwordField.value) {
-                                        field.classList.remove('is-valid');
-                                        field.classList.add('is-invalid');
-                                        if (feedback) feedback.textContent = 'Passwords do not match';
-                                        isValid = false;
-                                    }
-                                }
-
-                                // File upload validation (size and type)
-                                if (field.type === 'file' && field.files.length > 0) {
-                                    const file = field.files[0];
-                                    const maxSize = 5 * 1024 * 1024; // 5MB
-                                    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
-
-                                    if (file.size > maxSize) {
-                                        field.classList.remove('is-valid');
-                                        field.classList.add('is-invalid');
-                                        if (feedback) feedback.textContent = 'File size must be less than 5MB';
-                                        isValid = false;
-                                    } else if (!allowedTypes.includes(file.type)) {
-                                        field.classList.remove('is-valid');
-                                        field.classList.add('is-invalid');
-                                        if (feedback) feedback.textContent = 'File must be PDF, JPG, or PNG';
-                                        isValid = false;
-                                    }
+                            // Additional validation for specific fields
+                            if (field.type === 'email') {
+                                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                if (!emailRegex.test(field.value)) {
+                                    field.classList.remove('is-valid');
+                                    field.classList.add('is-invalid');
+                                    if (feedback) feedback.textContent = 'Please enter a valid email address';
+                                    isValid = false;
                                 }
                             }
-                        });
 
-                        return isValid;
-                    }
+                            // Password confirmation matching
+                            if (field.name === 'password_confirmation') {
+                                // UPDATED ID: Reference the v2 password field
+                                const passwordField = document.getElementById('signupPassword_v2');
+                                if (passwordField && field.value !== passwordField.value) {
+                                    field.classList.remove('is-valid');
+                                    field.classList.add('is-invalid');
+                                    if (feedback) feedback.textContent = 'Passwords do not match';
+                                    isValid = false;
+                                }
+                            }
 
+                            // File upload validation (size and type)
+                            if (field.type === 'file' && field.files.length > 0) {
+                                const file = field.files[0];
+                                const maxSize = 5 * 1024 * 1024; // 5MB
+                                const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
 
-                        ;
+                                if (file.size > maxSize) {
+                                    field.classList.remove('is-valid');
+                                    field.classList.add('is-invalid');
+                                    if (feedback) feedback.textContent = 'File size must be less than 5MB';
+                                    isValid = false;
+                                } else if (!allowedTypes.includes(file.type)) {
+                                    field.classList.remove('is-valid');
+                                    field.classList.add('is-invalid');
+                                    if (feedback) feedback.textContent = 'File must be PDF, JPG, or PNG';
+                                    isValid = false;
+                                }
+                            }
+                        }
+                    });
+                    return isValid;
+                };
 
+                // Password Strength Indicator
+                function addPasswordStrengthIndicator() {
+                    const passwordField = document.getElementById('signupPassword');
+                    if (!passwordField) return;
 
-                    // Password Strength Indicator
-                    function addPasswordStrengthIndicator() {
-                        const passwordField = document.getElementById('signupPassword');
-                        if (!passwordField) return;
-
-                        const strengthContainer = document.createElement('div');
+                    let strengthContainer = passwordField.parentElement.querySelector('.password-strength');
+                    if (!strengthContainer) {
+                        strengthContainer = document.createElement('div');
                         strengthContainer.className = 'password-strength';
                         strengthContainer.innerHTML = '<div class="password-strength-bar"></div>';
-
                         const parentDiv = passwordField.closest('.mb-3');
                         if (parentDiv) {
                             parentDiv.appendChild(strengthContainer);
                         }
-
-                        passwordField.addEventListener('input', function () {
-                            const password = this.value;
-                            const strengthBar = strengthContainer.querySelector('.password-strength-bar');
-
-                            let strength = 'weak';
-                            if (password.length >= 8) {
-                                if (password.match(/[a-z]/) && password.match(/[A-Z]/) && password.match(/[0-9]/) && password.match(/[^a-zA-Z0-9]/)) {
-                                    strength = 'strong';
-                                } else if (password.match(/[a-z]/) && password.match(/[A-Z]/) && password.match(/[0-9]/)) {
-                                    strength = 'good';
-                                } else if (password.match(/[a-z]/) && password.match(/[A-Z]/)) {
-                                    strength = 'fair';
-                                }
-                            }
-
-                            strengthContainer.className = `password-strength ${strength}`;
-                        });
                     }
 
-                    // Password Confirmation Validation
-                    function addPasswordConfirmationValidation() {
-                        const passwordField = document.getElementById('signupPassword_v2');
-                        const confirmField = document.getElementById('signupPasswordConfirm_v2');
-
-                        if (!passwordField || !confirmField) return;
-
-                        confirmField.addEventListener('input', function () {
-                            const password = passwordField.value;
-                            const confirmation = this.value;
-                            const feedback = this.closest('.mb-3')?.querySelector('.invalid-feedback');
-
-                            this.classList.remove('is-invalid', 'is-valid');
-                            if (feedback) feedback.textContent = '';
-
-                            if (confirmation && password !== confirmation) {
-                                this.classList.add('is-invalid');
-                                if (feedback) feedback.textContent = 'Passwords do not match';
-                            } else if (confirmation && password === confirmation) {
-                                this.classList.add('is-valid');
+                    passwordField.addEventListener('input', function () {
+                        const password = this.value;
+                        let strength = 'weak';
+                        if (password.length >= 8) {
+                            if (password.match(/[a-z]/) && password.match(/[A-Z]/) && password.match(/[0-9]/) && password.match(/[^a-zA-Z0-9]/)) {
+                                strength = 'strong';
+                            } else if (password.match(/[a-z]/) && password.match(/[A-Z]/) && password.match(/[0-9]/)) {
+                                strength = 'good';
+                            } else if (password.match(/[a-z]/) && password.match(/[A-Z]/)) {
+                                strength = 'fair';
                             }
-                        });
-                    }
-
-                    // Enhanced Step Navigation (per-button listeners reattached on modal show)
-                    enhanceStepNavigation = function () {
-                        console.log('enhanceStepNavigation called');
-
-                        // helper to safely attach a click handler by replacing the button (removes old listeners)
-                        function attach(id, handler) {
-                            const btn = document.getElementById(id);
-                            console.log(`Attaching listener to ${id}, button found:`, !!btn);
-                            if (!btn) return;
-                            const cloned = btn.cloneNode(true);
-                            btn.parentNode.replaceChild(cloned, btn);
-                            cloned.addEventListener('click', handler);
                         }
+                        strengthContainer.className = `password-strength ${strength}`;
+                    });
+                }
 
-                        attach('goToStep2', function () {
-                            console.log('goToStep2 clicked!');
-                            const step1 = document.getElementById('signupStep1');
-                            const step2 = document.getElementById('signupStep2');
-                            console.log('step1:', !!step1, 'step2:', !!step2);
-                            if (validateStep(step1)) {
-                                console.log('Step 1 validation passed, moving to step 2');
-                                step1.classList.add('d-none');
-                                step2.classList.remove('d-none');
-                                updateStepProgress(2);
-                                const firstField = step2.querySelector('input, select');
-                                if (firstField) firstField.focus();
-                            } else {
-                                console.log('Step 1 validation failed');
-                            }
-                        });
+                // Password Confirmation Validation
+                function addPasswordConfirmationValidation() {
+                    const passwordField = document.getElementById('signupPassword_v2');
+                    const confirmField = document.getElementById('signupPasswordConfirm_v2');
+                    if (!passwordField || !confirmField) return;
 
-                        attach('backToStep1', function () {
-                            const step1 = document.getElementById('signupStep1');
-                            const step2 = document.getElementById('signupStep2');
-                            step2.classList.add('d-none');
-                            step1.classList.remove('d-none');
-                            updateStepProgress(1);
-                        });
+                    confirmField.addEventListener('input', function () {
+                        const password = passwordField.value;
+                        const confirmation = this.value;
+                        const feedback = this.closest('.mb-3')?.querySelector('.invalid-feedback');
 
-                        attach('goToStep3', function () {
-                            const step2 = document.getElementById('signupStep2');
-                            const step3 = document.getElementById('signupStep3');
-                            if (validateStep(step2)) {
-                                step2.classList.add('d-none');
-                                step3.classList.remove('d-none');
-                                updateStepProgress(3);
-                                const firstField = step3.querySelector('input, select');
-                                if (firstField) firstField.focus();
-                            }
-                        });
+                        this.classList.remove('is-invalid', 'is-valid');
+                        if (feedback) feedback.textContent = '';
 
-                        attach('backToStep2', function () {
-                            const step2 = document.getElementById('signupStep2');
-                            const step3 = document.getElementById('signupStep3');
-                            step3.classList.add('d-none');
+                        if (confirmation && password !== confirmation) {
+                            this.classList.add('is-invalid');
+                            if (feedback) feedback.textContent = 'Passwords do not match';
+                        } else if (confirmation && password === confirmation) {
+                            this.classList.add('is-valid');
+                        }
+                    });
+                }
+
+                // Enhanced Step Navigation
+                enhanceStepNavigation = function () {
+                    console.log('enhanceStepNavigation called');
+                    function attach(id, handler) {
+                        const btn = document.getElementById(id);
+                        if (!btn) return;
+                        const cloned = btn.cloneNode(true);
+                        btn.parentNode.replaceChild(cloned, btn);
+                        cloned.addEventListener('click', handler);
+                    }
+
+                    attach('goToStep2', function () {
+                        const step1 = document.getElementById('signupStep1');
+                        const step2 = document.getElementById('signupStep2');
+                        if (validateStep(step1)) {
+                            step1.classList.add('d-none');
                             step2.classList.remove('d-none');
                             updateStepProgress(2);
-                        });
+                            const firstField = step2.querySelector('input, select');
+                            if (firstField) firstField.focus();
+                        }
+                    });
 
-                        attach('goToStep4', function () {
-                            const step3 = document.getElementById('signupStep3');
-                            const step4 = document.getElementById('signupStep4');
-                            if (validateStep(step3)) {
-                                step3.classList.add('d-none');
-                                step4.classList.remove('d-none');
-                                updateStepProgress(4);
-                                const firstField = step4.querySelector('input, select');
-                                if (firstField) firstField.focus();
-                            }
-                        });
+                    attach('backToStep1', function () {
+                        const step1 = document.getElementById('signupStep1');
+                        const step2 = document.getElementById('signupStep2');
+                        step2.classList.add('d-none');
+                        step1.classList.remove('d-none');
+                        updateStepProgress(1);
+                    });
 
-                        attach('backToStep3', function () {
-                            const step3 = document.getElementById('signupStep3');
-                            const step4 = document.getElementById('signupStep4');
-                            step4.classList.add('d-none');
+                    attach('goToStep3', function () {
+                        const step2 = document.getElementById('signupStep2');
+                        const step3 = document.getElementById('signupStep3');
+                        if (validateStep(step2)) {
+                            step2.classList.add('d-none');
                             step3.classList.remove('d-none');
                             updateStepProgress(3);
-                        });
-                    }
-
-                        ;
-
-                    // Real-time Field Validation
-                    function addRealTimeValidation() {
-                        const inputs = document.querySelectorAll('#signupForm input, #signupForm select');
-                        inputs.forEach(input => {
-                            input.addEventListener('blur', function () {
-                                const feedback = this.closest('.mb-3')?.querySelector('.invalid-feedback');
-
-                                if (this.hasAttribute('required') && !this.value.trim()) {
-                                    this.classList.add('is-invalid');
-                                    if (feedback) feedback.textContent = 'This field is required';
-                                } else if (this.value.trim()) {
-                                    this.classList.remove('is-invalid');
-                                    this.classList.add('is-valid');
-                                    if (feedback) feedback.textContent = '';
-                                }
-                            });
-                        });
-                    }
-
-                    // Enhanced Form Submission
-                    function enhanceFormSubmission() {
-                        const signupForm = document.getElementById('signupForm');
-                        if (!signupForm) return;
-
-                        signupForm.addEventListener('submit', async function (e) {
-                            console.log('Signup form submission started');
-                            e.preventDefault(); // Always prevent default for AJAX
-
-                            // Validate all steps before submission
-                            const step1 = document.getElementById('signupStep1');
-                            const step2 = document.getElementById('signupStep2');
-                            const step3 = document.getElementById('signupStep3');
-                            const step4 = document.getElementById('signupStep4');
-
-                            let allValid = true;
-
-                            // Validate each step
-                            if (!validateStep(step1)) allValid = false;
-                            if (!validateStep(step2)) allValid = false;
-                            if (!validateStep(step3)) allValid = false;
-                            if (!validateStep(step4)) allValid = false;
-
-                            if (!allValid) {
-                                console.log('Form validation failed');
-                                // Show the first invalid step
-                                if (step1.querySelector('.is-invalid')) {
-                                    step1.classList.remove('d-none');
-                                    step2.classList.add('d-none');
-                                    step3.classList.add('d-none');
-                                    step4.classList.add('d-none');
-                                    updateStepProgress(1);
-                                } else if (step2.querySelector('.is-invalid')) {
-                                    step1.classList.add('d-none');
-                                    step2.classList.remove('d-none');
-                                    step3.classList.add('d-none');
-                                    step4.classList.add('d-none');
-                                    updateStepProgress(2);
-                                } else if (step3.querySelector('.is-invalid')) {
-                                    step1.classList.add('d-none');
-                                    step2.classList.add('d-none');
-                                    step3.classList.remove('d-none');
-                                    step4.classList.add('d-none');
-                                    updateStepProgress(3);
-                                } else if (step4.querySelector('.is-invalid')) {
-                                    step1.classList.add('d-none');
-                                    step2.classList.add('d-none');
-                                    step3.classList.add('d-none');
-                                    step4.classList.remove('d-none');
-                                    updateStepProgress(4);
-                                }
-                                return false;
-                            }
-
-                            console.log('Form validation passed, submitting via AJAX...');
-
-                            const submitBtn = this.querySelector('button[type="submit"]') || document.getElementById('signupSubmitBtn');
-                            const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
-
-                            if (submitBtn) {
-                                submitBtn.disabled = true;
-                                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Registering...';
-                            }
-
-                            try {
-                                const formData = new FormData(signupForm);
-                                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                                const url = signupForm.dataset.ajaxUrl || '/register';
-
-                                const resp = await fetch(url, {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-Requested-With': 'XMLHttpRequest',
-                                        'X-CSRF-TOKEN': csrfToken || '',
-                                        'Accept': 'application/json'
-                                    },
-                                    body: formData,
-                                    credentials: 'include'
-                                });
-
-                                const contentType = resp.headers.get('content-type');
-                                let data;
-                                if (contentType && contentType.includes('application/json')) {
-                                    data = await resp.json();
-                                } else {
-                                    const text = await resp.text();
-                                    console.error('Non-JSON response:', text);
-                                    throw new Error('Server returned an invalid response format (not JSON).');
-                                }
-
-                                console.log('Registration response:', data);
-
-                                if (resp.ok || data.status === 'success') {
-                                    safeHideModal('loginModal');
-                                    if (window.Swal) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Registration Successful!',
-                                            html: 'Please check your email to verify your account.<br><br><b>Note:</b> You must verify your email AND wait for Admin approval before you can log in.',
-                                            confirmButtonText: 'OK, got it',
-                                            allowOutsideClick: false
-                                        }).then(() => {
-                                            window.location.href = '/';
-                                        });
-                                    } else {
-                                        alert('Registration successful! Please verify your email and wait for Admin approval.');
-                                        window.location.href = '/';
-                                    }
-                                } else {
-                                    const errorMsg = data.message || 'Registration failed.';
-
-                                    // Display field-specific errors
-                                    if (data.errors) {
-                                        Object.keys(data.errors).forEach(key => {
-                                            const input = signupForm.querySelector(`[name="${key}"]`);
-                                            if (input) {
-                                                input.classList.add('is-invalid');
-                                                const feedback = input.closest('.mb-3')?.querySelector('.invalid-feedback');
-                                                if (feedback) feedback.textContent = data.errors[key][0];
-
-                                                // If the input is in a hidden step, we might want to switch to it, 
-                                                // but for now let's just mark it invalid so if they go back they see it.
-                                            }
-                                        });
-                                    }
-
-                                    if (window.Swal) {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Registration Failed',
-                                            text: errorMsg
-                                        });
-                                    } else {
-                                        alert(errorMsg);
-                                    }
-                                }
-                            } catch (err) {
-                                console.error('Registration error:', err);
-                                if (window.Swal) {
-                                    Swal.fire({ icon: 'error', title: 'Error', text: 'Network error. Please try again.' });
-                                } else {
-                                    alert('Network error. Please try again.');
-                                }
-                            } finally {
-                                if (submitBtn) {
-                                    submitBtn.disabled = false;
-                                    submitBtn.innerHTML = originalBtnText;
-                                }
-                            }
-                        });
-
-                        // Ensure the Submit button triggers the form submit event
-                        const doneBtn = document.getElementById('signupSubmitBtn');
-                        if (doneBtn) {
-                            // Remove existing listeners by cloning (if any)
-                            const newBtn = doneBtn.cloneNode(true);
-                            doneBtn.parentNode.replaceChild(newBtn, doneBtn);
-
-                            newBtn.addEventListener('click', function () {
-                                signupForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-                            });
+                            const firstField = step3.querySelector('input, select');
+                            if (firstField) firstField.focus();
                         }
-                    }
-
-                    // Initialize all enhancements
-                    addPasswordStrengthIndicator();
-                    addPasswordConfirmationValidation();
-                    enhanceStepNavigation();
-                    addRealTimeValidation();
-                    enhanceFormSubmission();
-
-                    // Initialize step progress
-                    updateStepProgress(1);
-                }
-
-                // Initialize enhanced signup when DOM is ready
-                console.log('Checking if should initialize signup..., readyState:', document.readyState);
-                if (document.readyState === 'loading') {
-                    console.log('DOM still loading, adding event listener');
-                    document.addEventListener('DOMContentLoaded', function () {
-                        console.log('DOMContentLoaded fired, initializing signup');
-                        initializeEnhancedSignup();
-                    });
-                } else {
-                    console.log('DOM already ready, initializing signup immediately');
-                    initializeEnhancedSignup();
-                }
-
-                // Enhanced Modal Behavior
-                function enhanceModalBehavior() {
-                    const loginModal = document.getElementById('loginModal');
-                    if (!loginModal) return;
-
-                    const signupTab = document.getElementById('tab-signup');
-                    const loginTab = document.getElementById('tab-login');
-                    const modalDialog = loginModal.querySelector('.modal-dialog');
-
-                    // Function to update modal scale based on active tab
-                    const updateModalScale = (targetId) => {
-                        if (targetId === '#pane-signup') {
-                            modalDialog.classList.add('modal-signup-scale');
-                        } else {
-                            modalDialog.classList.remove('modal-signup-scale');
-                        }
-                    };
-
-                    // Initial check
-                    const activeTab = loginModal.querySelector('.nav-link.active');
-                    if (activeTab) {
-                        updateModalScale(activeTab.getAttribute('data-bs-target'));
-                    }
-
-                    // Listen for tab changes
-                    const tabs = loginModal.querySelectorAll('[data-bs-toggle="tab"]');
-                    tabs.forEach(tab => {
-                        tab.addEventListener('shown.bs.tab', function (event) {
-                            updateModalScale(event.target.getAttribute('data-bs-target'));
-                        });
                     });
 
-                    // Prevent click inside modal from closing it
-                    const modalContent = loginModal.querySelector('.modal-content');
-                    if (modalContent) {
-                        modalContent.addEventListener('click', function (e) {
-                            e.stopPropagation();
-                        });
-                    }
+                    attach('backToStep2', function () {
+                        const step2 = document.getElementById('signupStep2');
+                        const step3 = document.getElementById('signupStep3');
+                        step3.classList.add('d-none');
+                        step2.classList.remove('d-none');
+                        updateStepProgress(2);
+                    });
 
-                    // Rest of the logic...
-                    // Reset form when modal is hidden
-                    loginModal.addEventListener('hidden.bs.modal', function () {
-                        const forms = this.querySelectorAll('form');
-                        forms.forEach(form => {
-                            form.reset();
-                            // Clear validation states
-                            const inputs = form.querySelectorAll('input, select');
-                            inputs.forEach(input => {
-                                input.classList.remove('is-invalid', 'is-valid');
-                            });
-                            const feedbacks = form.querySelectorAll('.invalid-feedback');
-                            feedbacks.forEach(feedback => {
-                                feedback.textContent = '';
-                            });
-                        });
+                    attach('goToStep4', function () {
+                        const step3 = document.getElementById('signupStep3');
+                        const step4 = document.getElementById('signupStep4');
+                        if (validateStep(step3)) {
+                            step3.classList.add('d-none');
+                            step4.classList.remove('d-none');
+                            updateStepProgress(4);
+                            const firstField = step4.querySelector('input, select');
+                            if (firstField) firstField.focus();
+                        }
+                    });
 
-                        // Reset to first step
+                    attach('backToStep3', function () {
+                        const step3 = document.getElementById('signupStep3');
+                        const step4 = document.getElementById('signupStep4');
+                        step4.classList.add('d-none');
+                        step3.classList.remove('d-none');
+                        updateStepProgress(3);
+                    });
+                };
+
+                // Real-time Field Validation
+                function addRealTimeValidation() {
+                    const inputs = document.querySelectorAll('#signupForm input, #signupForm select');
+                    inputs.forEach(input => {
+                        input.addEventListener('blur', function () {
+                            const feedback = this.closest('.mb-3')?.querySelector('.invalid-feedback');
+                            if (this.hasAttribute('required') && !this.value.trim()) {
+                                this.classList.add('is-invalid');
+                                if (feedback) feedback.textContent = 'This field is required';
+                            } else if (this.value.trim()) {
+                                this.classList.remove('is-invalid');
+                                this.classList.add('is-valid');
+                                if (feedback) feedback.textContent = '';
+                            }
+                        });
+                    });
+                }
+
+                // Enhanced Form Submission
+                function enhanceFormSubmission() {
+                    const signupForm = document.getElementById('signupForm');
+                    if (!signupForm) return;
+
+                    signupForm.addEventListener('submit', async function (e) {
+                        e.preventDefault();
                         const step1 = document.getElementById('signupStep1');
                         const step2 = document.getElementById('signupStep2');
                         const step3 = document.getElementById('signupStep3');
                         const step4 = document.getElementById('signupStep4');
 
-                        if (step1 && step2 && step3 && step4) {
-                            step1.classList.remove('d-none');
-                            step2.classList.add('d-none');
-                            step3.classList.add('d-none');
-                            step4.classList.add('d-none');
-                            updateStepProgress(1);
+                        let allValid = true;
+                        if (!validateStep(step1)) allValid = false;
+                        if (!validateStep(step2)) allValid = false;
+                        if (!validateStep(step3)) allValid = false;
+                        if (!validateStep(step4)) allValid = false;
+
+                        if (!allValid) {
+                            if (step1.querySelector('.is-invalid')) {
+                                step1.classList.remove('d-none'); step2.classList.add('d-none'); step3.classList.add('d-none'); step4.classList.add('d-none'); updateStepProgress(1);
+                            } else if (step2.querySelector('.is-invalid')) {
+                                step1.classList.add('d-none'); step2.classList.remove('d-none'); step3.classList.add('d-none'); step4.classList.add('d-none'); updateStepProgress(2);
+                            } else if (step3.querySelector('.is-invalid')) {
+                                step1.classList.add('d-none'); step2.classList.add('d-none'); step3.classList.remove('d-none'); step4.classList.add('d-none'); updateStepProgress(3);
+                            } else if (step4.querySelector('.is-invalid')) {
+                                step1.classList.add('d-none'); step2.classList.add('d-none'); step3.classList.add('d-none'); step4.classList.remove('d-none'); updateStepProgress(4);
+                            }
+                            return false;
+                        }
+
+                        const submitBtn = this.querySelector('button[type="submit"]') || document.getElementById('signupSubmitBtn');
+                        const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Registering...';
+                        }
+
+                        try {
+                            const formData = new FormData(signupForm);
+                            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                            const url = signupForm.dataset.ajaxUrl || '/register';
+
+                            const resp = await fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': csrfToken || '',
+                                    'Accept': 'application/json'
+                                },
+                                body: formData,
+                                credentials: 'include'
+                            });
+
+                            const contentType = resp.headers.get('content-type');
+                            let data;
+                            if (contentType && contentType.includes('application/json')) {
+                                data = await resp.json();
+                            } else {
+                                const text = await resp.text();
+                                throw new Error('Server returned an invalid response format.');
+                            }
+
+                            if (resp.ok || data.status === 'success') {
+                                if (window.Swal) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Registration Successful!',
+                                        html: 'Please check your email to verify your account.<br><br><b>Note:</b> You must verify your email AND wait for Admin approval before you can log in.',
+                                        confirmButtonText: 'OK, got it',
+                                        allowOutsideClick: false
+                                    }).then(() => { window.location.href = '/'; });
+                                } else {
+                                    alert('Registration successful! Please verify your email.');
+                                    window.location.href = '/';
+                                }
+                            } else {
+                                const errorMsg = data.message || 'Registration failed.';
+                                if (data.errors) {
+                                    Object.keys(data.errors).forEach(key => {
+                                        const input = signupForm.querySelector(`[name="${key}"]`);
+                                        if (input) {
+                                            input.classList.add('is-invalid');
+                                            const feedback = input.closest('.mb-3')?.querySelector('.invalid-feedback');
+                                            if (feedback) feedback.textContent = data.errors[key][0];
+                                        }
+                                    });
+                                }
+                                if (window.Swal) { Swal.fire({ icon: 'error', title: 'Registration Failed', text: errorMsg }); } else { alert(errorMsg); }
+                            }
+                        } catch (err) {
+                            console.error('Registration error:', err);
+                            if (window.Swal) { Swal.fire({ icon: 'error', title: 'Error', text: 'Network error. Please try again.' }); } else { alert('Network error. Please try again.'); }
+                        } finally {
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalBtnText;
+                            }
                         }
                     });
 
-                    // Focus management
-                    loginModal.addEventListener('shown.bs.modal', function () {
-                        const activeTab = this.querySelector('.nav-link.active');
-                        if (activeTab) {
-                            const targetPane = this.querySelector(activeTab.getAttribute('data-bs-target'));
-                            const firstInput = targetPane?.querySelector('input, select');
-                            if (firstInput) {
-                                setTimeout(() => firstInput.focus(), 100);
-                            }
-                        }
-                        // Reattach step navigation handlers when modal is shown (fixes lost listeners)
-                        try { enhanceStepNavigation(); } catch (e) { console.error('enhanceStepNavigation error', e); }
+                    const doneBtn = document.getElementById('signupSubmitBtn');
+                    if (doneBtn) {
+                        const newBtn = doneBtn.cloneNode(true);
+                        doneBtn.parentNode.replaceChild(newBtn, doneBtn);
+                        newBtn.addEventListener('click', function () {
+                            signupForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                        });
+                    }
+                }
+
+                // Initialize all enhancements
+                addPasswordStrengthIndicator();
+                addPasswordConfirmationValidation();
+                enhanceStepNavigation();
+                addRealTimeValidation();
+                enhanceFormSubmission();
+                updateStepProgress(1);
+            }
+
+            // Enhanced Modal Behavior
+            function enhanceModalBehavior() {
+                const loginModal = document.getElementById('loginModal');
+                if (!loginModal) return;
+
+                const modalDialog = loginModal.querySelector('.modal-dialog');
+
+                // Function to update modal scale based on active tab
+                const updateModalScale = (targetId) => {
+                    if (targetId === '#pane-signup') {
+                        modalDialog.classList.add('modal-signup-scale');
+                    } else {
+                        modalDialog.classList.remove('modal-signup-scale');
+                    }
+                };
+
+                // Initial check
+                const activeTab = loginModal.querySelector('.nav-link.active');
+                if (activeTab) {
+                    updateModalScale(activeTab.getAttribute('data-bs-target'));
+                }
+
+                // Listen for tab changes
+                const tabs = loginModal.querySelectorAll('[data-bs-toggle="tab"]');
+                tabs.forEach(tab => {
+                    tab.addEventListener('shown.bs.tab', function (event) {
+                        updateModalScale(event.target.getAttribute('data-bs-target'));
+                    });
+                });
+
+                // Prevent click inside modal from closing it
+                const modalContent = loginModal.querySelector('.modal-content');
+                if (modalContent) {
+                    modalContent.addEventListener('click', function (e) {
+                        e.stopPropagation();
                     });
                 }
 
-                // Initialize modal enhancements
-                enhanceModalBehavior();
+                // Reset form when modal is hidden
+                loginModal.addEventListener('hidden.bs.modal', function () {
+                    const forms = this.querySelectorAll('form');
+                    forms.forEach(form => {
+                        form.reset();
+                        // Clear validation states
+                        const inputs = form.querySelectorAll('input, select');
+                        inputs.forEach(input => {
+                            input.classList.remove('is-invalid', 'is-valid');
+                        });
+                        const feedbacks = form.querySelectorAll('.invalid-feedback');
+                        feedbacks.forEach(feedback => {
+                            feedback.textContent = '';
+                        });
+                    });
 
-                // Let Bootstrap handle modal opening naturally via data-bs-toggle
-                // Only add a fallback handler if Bootstrap fails
-                // Don't interfere with Bootstrap's native event handling
-            });
+                    // Reset to first step
+                    const step1 = document.getElementById('signupStep1');
+                    const step2 = document.getElementById('signupStep2');
+                    const step3 = document.getElementById('signupStep3');
+                    const step4 = document.getElementById('signupStep4');
+
+                    if (step1 && step2 && step3 && step4) {
+                        step1.classList.remove('d-none');
+                        step2.classList.add('d-none');
+                        step3.classList.add('d-none');
+                        step4.classList.add('d-none');
+                        // Ensure updateStepProgress is defined before calling
+                        if (typeof updateStepProgress === 'function') {
+                            updateStepProgress(1);
+                        }
+                    }
+                });
+
+                // Focus management
+                loginModal.addEventListener('shown.bs.modal', function () {
+                    const activeTab = this.querySelector('.nav-link.active');
+                    if (activeTab) {
+                        const targetPane = this.querySelector(activeTab.getAttribute('data-bs-target'));
+                        const firstInput = targetPane?.querySelector('input, select');
+                        if (firstInput) {
+                            setTimeout(() => firstInput.focus(), 100);
+                        }
+                    }
+                    // Reattach step navigation handlers when modal is shown
+                    try {
+                        if (typeof enhanceStepNavigation === 'function') {
+                            enhanceStepNavigation();
+                        }
+                    } catch (e) {
+                        console.error('enhanceStepNavigation error', e);
+                    }
+                });
+            }
+            // Let Bootstrap handle modal opening naturally via data-bs-toggle             // Only add a fallback handler if Bootstrap fails             // Don't interfere with Bootstrap's native event handling         });
         </script>
 
     <?php endif; ?>
@@ -5914,24 +5905,110 @@
             } catch (e) {
                 console.error('Error opening modal:', e);
             }
+            // Enhanced Modal Behavior
+            function enhanceModalBehavior() {
+                const loginModal = document.getElementById('loginModal');
+                if (!loginModal) return;
+
+                const modalDialog = loginModal.querySelector('.modal-dialog');
+
+                // Function to update modal scale based on active tab
+                const updateModalScale = (targetId) => {
+                    if (targetId === '#pane-signup') {
+                        modalDialog.classList.add('modal-signup-scale');
+                    } else {
+                        modalDialog.classList.remove('modal-signup-scale');
+                    }
+                };
+
+                // Initial check
+                const activeTab = loginModal.querySelector('.nav-link.active');
+                if (activeTab) {
+                    updateModalScale(activeTab.getAttribute('data-bs-target'));
+                }
+
+                // Listen for tab changes
+                const tabs = loginModal.querySelectorAll('[data-bs-toggle="tab"]');
+                tabs.forEach(tab => {
+                    tab.addEventListener('shown.bs.tab', function (event) {
+                        updateModalScale(event.target.getAttribute('data-bs-target'));
+                    });
+                });
+
+                // Prevent click inside modal from closing it
+                const modalContent = loginModal.querySelector('.modal-content');
+                if (modalContent) {
+                    modalContent.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                    });
+                }
+
+                // Reset form when modal is hidden
+                loginModal.addEventListener('hidden.bs.modal', function () {
+                    const forms = this.querySelectorAll('form');
+                    forms.forEach(form => {
+                        form.reset();
+                        // Clear validation states
+                        const inputs = form.querySelectorAll('input, select');
+                        inputs.forEach(input => {
+                            input.classList.remove('is-invalid', 'is-valid');
+                        });
+                        const feedbacks = form.querySelectorAll('.invalid-feedback');
+                        feedbacks.forEach(feedback => {
+                            feedback.textContent = '';
+                        });
+                    });
+
+                    // Reset to first step
+                    const step1 = document.getElementById('signupStep1');
+                    const step2 = document.getElementById('signupStep2');
+                    const step3 = document.getElementById('signupStep3');
+                    const step4 = document.getElementById('signupStep4');
+
+                    if (step1 && step2 && step3 && step4) {
+                        step1.classList.remove('d-none');
+                        step2.classList.add('d-none');
+                        step3.classList.add('d-none');
+                        step4.classList.add('d-none');
+                        // Ensure updateStepProgress is defined before calling
+                        if (typeof updateStepProgress === 'function') {
+                            updateStepProgress(1);
+                        }
+                    }
+                });
+
+                // Focus management
+                loginModal.addEventListener('shown.bs.modal', function () {
+                    const activeTab = this.querySelector('.nav-link.active');
+                    if (activeTab) {
+                        const targetPane = this.querySelector(activeTab.getAttribute('data-bs-target'));
+                        const firstInput = targetPane?.querySelector('input, select');
+                        if (firstInput) {
+                            setTimeout(() => firstInput.focus(), 100);
+                        }
+                    }
+                    // Reattach step navigation handlers when modal is shown
+                    try {
+                        if (typeof enhanceStepNavigation === 'function') {
+                            enhanceStepNavigation();
+                        }
+                    } catch (e) {
+                        console.error('enhanceStepNavigation error', e);
+                    }
+                });
+            }
+
+            // Initialize modal enhancements
+            enhanceModalBehavior();
+
+            // Initialize enhanced signup
+            initializeEnhancedSignup();
+
         });
     </script>
     
     <?php if(session('registration_success_message')): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                if (window.Swal) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Registration Successful!',
-                        html: '<?php echo e(session('registration_success_message')); ?>',
-                        confirmButtonText: 'OK, got it',
-                        allowOutsideClick: false
-                    });
-                } else {
-                    alert('<?php echo e(session('registration_success_message')); ?>');
-                }
-            });
+        <script>         document.addEventListener('DOMContentLoaded', function () { if (window.Swal) { Swal.fire({ icon: 'success', title: 'Registration Successful!', html: '<?php echo e(session('registration_success_message')); ?>', confirmButtonText: 'OK, got it', allowOutsideClick: false }); } else { alert('<?php echo e(session('registration_success_message')); ?>'); } });
         </script>
     <?php endif; ?>
     <!-- Daily Quote Script -->

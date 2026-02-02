@@ -367,11 +367,7 @@
 
         /* Fast transition to minimize flickering in zoomed layout without breaking Bootstrap transitions */
         .custom-accordion .accordion-collapse {
-            transition: height 0.15s ease-out !important;
-        }
-        
-        .custom-accordion .accordion-collapse.collapse.show {
-            display: block !important;
+            transition: height 0.15s ease-out;
         }
     </style>
 
@@ -468,6 +464,7 @@
                                         <div class="row g-2">
                                             @php
                                                 $badges = [
+                                                    'New Student Orientation Program' => ['color' => 'bg-secondary bg-opacity-25 text-white border-secondary', 'icon' => 'bi-compass-fill', 'year' => 1, 'label' => 'Orientation'],
                                                     'IDREAMS' => ['color' => 'bg-info bg-opacity-25 text-white border-info', 'icon' => 'bi-clouds-fill', 'year' => 1],
                                                     '10C' => ['color' => 'bg-warning bg-opacity-25 text-white border-warning', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
                                                     'LEADS' => ['color' => 'bg-primary bg-opacity-25 text-white border-primary', 'icon' => 'bi-people-fill', 'year' => 3],
@@ -478,17 +475,18 @@
                                                 @php 
                                                     $isAttended = isset($attendanceMatrix[$style['year']][$seminarName]);
                                                     $isCompleted = $isAttended && ($attendanceMatrix[$style['year']][$seminarName]['status'] ?? '') === 'completed';
+                                                    $displayName = $style['label'] ?? $seminarName;
                                                 @endphp
-                                                <div class="col-6 col-sm-3">
-                                                    <div class="d-flex align-items-center justify-content-center gap-2 py-2 rounded-3 border transition-all text-center
+                                                <div class="col-6 col-md-auto" style="flex: 1 0 0;">
+                                                    <div class="d-flex align-items-center justify-content-center gap-2 py-2 rounded-3 border transition-all text-center h-100
                                                         {{ $isCompleted ? $style['color'] . ' shadow-sm' : 'bg-white/5 border-white/10 text-white-50' }}"
                                                         style="backdrop-filter: blur(4px);">
                                                         @if($isCompleted)
                                                             <i class="bi {{ $style['icon'] }}"></i>
-                                                            <span class="fw-bold small">{{ $seminarName }}</span>
+                                                            <span class="fw-bold small">{{ $displayName }}</span>
                                                         @else
                                                             <i class="bi bi-lock-fill opacity-50"></i>
-                                                            <span class="small opacity-75">{{ $seminarName }}</span>
+                                                            <span class="small opacity-75">{{ $displayName }}</span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -515,6 +513,7 @@
                                     <tr>
                                         <th style="width: 20%;">Year Level</th>
                                         @foreach([
+                                            'New Student Orientation Program' => ['icon' => 'bi-compass-fill', 'color' => 'text-secondary'],
                                             'IDREAMS' => ['icon' => 'bi-clouds-fill', 'color' => 'text-info'], 
                                             '10C' => ['icon' => 'bi-lightbulb-fill', 'color' => 'text-warning'], 
                                             'LEADS' => ['icon' => 'bi-people-fill', 'color' => 'text-primary'], 
@@ -535,12 +534,13 @@
                                             <td class="font-bold text-gray-700 py-3">
                                                 @php
                                                     $suffixes = [1 => 'st', 2 => 'nd', 3 => 'rd', 4 => 'th'];
-                                                    $seminarMap = ['IDREAMS', '10C', 'LEADS', 'IMAGE'];
+                                                    $seminarMap = ['New Student Orientation Program', 'IDREAMS', '10C', 'LEADS', 'IMAGE'];
                                                     $seminarStyles = [
                                                         'IDREAMS' => 'rgba(13, 202, 240, 0.05)',
                                                         '10C' => 'rgba(255, 203, 5, 0.05)',
                                                         'LEADS' => 'rgba(13, 110, 253, 0.05)',
-                                                        'IMAGE' => 'rgba(25, 135, 84, 0.08)'
+                                                        'IMAGE' => 'rgba(25, 135, 84, 0.08)',
+                                                        'New Student Orientation Program' => 'rgba(111, 66, 193, 0.08)'
                                                     ];
                                                 @endphp
                                                 <div class="d-flex align-items-center justify-content-between pe-4">
@@ -552,7 +552,14 @@
                                             </td>
                                             @foreach($seminarMap as $index => $seminar)
                                                 @php 
-                                                    $isActiveYear = ($year == $index + 1);
+                                                    $seminarYearMap = [
+                                                      'New Student Orientation Program' => 1,
+                                                      'IDREAMS' => 1,
+                                                      '10C' => 2,
+                                                      'LEADS' => 3,
+                                                      'IMAGE' => 4
+                                                    ];
+                                                    $isActiveYear = ($year == ($seminarYearMap[$seminar] ?? 0));
                                                     $attendance = $attendanceMatrix[$year][$seminar] ?? null;
                                                     $status = $attendance['status'] ?? null;
                                                 @endphp
@@ -606,28 +613,33 @@
                                             <p>No evaluations submitted yet.</p>
                                         </div>
                                     @else
-                                        <div class="accordion accordion-flush custom-accordion" id="evaluationAccordion">
+                                        <div class="accordion" id="evaluationAccordion">
                                             @php
                                                 $branding = [
                                                     'IDREAMS' => ['color' => '#0dcaf0', 'icon' => 'bi-cloud-sun-fill', 'bg' => 'rgba(13, 202, 240, 0.1)'],
                                                     '10C' => ['color' => '#FFCB05', 'icon' => 'bi-lightbulb-fill', 'bg' => 'rgba(255, 203, 5, 0.1)'],
                                                     'LEADS' => ['color' => '#0d6efd', 'icon' => 'bi-people-fill', 'bg' => 'rgba(13, 110, 253, 0.1)'],
-                                                    'IMAGE' => ['color' => '#198754', 'icon' => 'bi-image-fill', 'bg' => 'rgba(25, 135, 84, 0.1)']
+                                                    'IMAGE' => ['color' => '#198754', 'icon' => 'bi-image-fill', 'bg' => 'rgba(25, 135, 84, 0.1)'],
+                                                    'New Student Orientation Program' => ['color' => '#6f42c1', 'icon' => 'bi-compass-fill', 'bg' => 'rgba(111, 66, 193, 0.1)']
                                                 ];
                                             @endphp
 
-                                            @foreach(['IDREAMS', '10C', 'LEADS', 'IMAGE'] as $seminarName)
+                                            @foreach(['New Student Orientation Program', 'IDREAMS', '10C', 'LEADS', 'IMAGE'] as $seminarName)
                                                 @if(isset($evaluations[$seminarName]))
                                                     @php 
                                                         $eval = $evaluations[$seminarName];
                                                         $brand = $branding[$seminarName] ?? ['color' => '#1f7a2d', 'icon' => 'bi-clipboard-check', 'bg' => '#f8f9fa'];
+                                                        // Use reliable unique ID
+                                                        $slug = Str::slug($seminarName);
+                                                        $headingId = "heading_" . $slug;
+                                                        $collapseId = "eval_" . $slug;
                                                     @endphp
-                                                    <div class="accordion-item border rounded-3 mb-3 overflow-hidden" 
+                                                    <div class="accordion-item border rounded-3 mb-3" 
                                                          style="--seminar-color: {{ $brand['color'] }}; --seminar-bg: {{ $brand['bg'] }}">
-                                                        <h2 class="accordion-header" id="heading_{{ $seminarName }}">
+                                                        <h2 class="accordion-header" id="{{ $headingId }}">
                                                             <button class="accordion-button collapsed px-4 py-3" type="button" 
-                                                                    data-bs-toggle="collapse" data-bs-target="#eval_{{ $seminarName }}"
-                                                                    aria-expanded="false" aria-controls="eval_{{ $seminarName }}">
+                                                                    data-bs-toggle="collapse" data-bs-target="#{{ $collapseId }}"
+                                                                    aria-expanded="false" aria-controls="{{ $collapseId }}">
                                                                 <div class="d-flex align-items-center gap-3 w-100">
                                                                     <div class="seminar-badge-icon" style="background-color: var(--seminar-color); color: white;">
                                                                         <i class="bi {{ $brand['icon'] }}"></i>
@@ -644,7 +656,8 @@
                                                                 </div>
                                                             </button>
                                                         </h2>
-                                                        <div id="eval_{{ $seminarName }}" class="accordion-collapse collapse" aria-labelledby="heading_{{ $seminarName }}">
+                                                        <div id="{{ $collapseId }}" class="accordion-collapse collapse" 
+                                                             aria-labelledby="{{ $headingId }}">
                                                             <div class="accordion-body bg-light p-4">
                                                                 @php
                                                                     $questions = [];
@@ -693,8 +706,49 @@
                                                                             'q9' => "9. Replenishing resources (Self-Care)",
                                                                             'q10' => '10. Time management: schedule priorities'
                                                                         ];
+                                                                    } elseif($seminarName === 'New Student Orientation Program') {
+                                                                        $questions = [
+                                                                            'q1' => '1. Student Status',
+                                                                            'q2' => '2. Dropping Subjects',
+                                                                            'q3' => '3. Removing Incomplete Grades',
+                                                                            'q4' => '4. GDSU meaning',
+                                                                            'q5' => '5. GCC meaning',
+                                                                            'q6' => '6. Prohibited Organizations',
+                                                                            'q7' => '7. Magna Cum Laude GWA',
+                                                                            'q8' => '8. Retention Policy',
+                                                                            'q9' => '9. Medical Certificate Issuer',
+                                                                            'q10' => '10. Student Handbook Knowledge',
+                                                                            'q11' => '11. UCGD meaning',
+                                                                            'q12' => '12. Office of Security Services',
+                                                                            'q13' => '13. Data Protection Office',
+                                                                            'q14' => '14. Consent Definition',
+                                                                            'q15' => '15. DTO meaning',
+                                                                            'q16' => '16. Mental Health Support Group',
+                                                                            'q17' => '17. Student Legal Services',
+                                                                            'q18' => '18. Not a CMU College',
+                                                                            'q19' => '19. CMU Motto',
+                                                                            'q20' => '20. CMU Hymn Phrase',
+                                                                            'q21' => '21. Anti-Hazing Law',
+                                                                            'q22' => '22. Initiation Rite',
+                                                                            'q23' => '23. Hazing Definition',
+                                                                            'q24' => '24. Hazing Participants',
+                                                                            'q25' => '25. Hazing Liability'
+                                                                        ];
                                                                     }
                                                                 @endphp
+
+
+                                                                @if($seminarName === 'New Student Orientation Program')
+                                                                     <div class="alert alert-info d-flex align-items-center mb-3">
+                                                                         <i class="bi bi-info-circle-fill me-2"></i>
+                                                                         <div>
+                                                                             <strong>Score:</strong> {{ $eval->answers['score'] ?? 'N/A' }} / 25
+                                                                             <span class="badge ms-2 {{ ($eval->answers['passed'] ?? false) ? 'bg-success' : 'bg-danger' }}">
+                                                                                 {{ ($eval->answers['passed'] ?? false) ? 'PASSED' : 'FAILED' }}
+                                                                             </span>
+                                                                         </div>
+                                                                     </div>
+                                                                @endif
 
                                                                 @if(!empty($questions))
                                                                     <div class="row g-4">
@@ -784,19 +838,17 @@
             const sidebar = document.querySelector('.custom-sidebar');
             const toggleBtn = document.getElementById('counselorSidebarToggle');
             if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function() {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
                 document.addEventListener('click', function(e) {
                     if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
+                        if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                            sidebar.classList.remove('show');
+                        }
                     }
                 });
             }
+        });
 
+        document.addEventListener('DOMContentLoaded', function() {
             // Data from backend
             const seminars = @json($seminars);
             const attendanceMatrix = @json($attendanceMatrix);
@@ -865,15 +917,18 @@
             });
 
             // Confirm Button Logic
-            document.getElementById('confirmScheduleBtn').addEventListener('click', function() {
-                const selectedSchedule = document.querySelector('input[name="schedule_id"]:checked');
-                if (selectedSchedule) {
-                    updateAttendance(currentYear, currentSeminarName, true, selectedSchedule.value);
-                    scheduleModal.hide();
-                } else {
-                    alert('Please select a schedule.');
-                }
-            });
+            const confirmBtn = document.getElementById('confirmScheduleBtn');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function() {
+                    const selectedSchedule = document.querySelector('input[name="schedule_id"]:checked');
+                    if (selectedSchedule) {
+                        updateAttendance(currentYear, currentSeminarName, true, selectedSchedule.value);
+                        scheduleModal.hide();
+                    } else {
+                        alert('Please select a schedule.');
+                    }
+                });
+            }
 
             function updateAttendance(year, seminarName, attended, scheduleId) {
                 fetch(`{{ route('counselor.guidance.update', $student) }}`, {
@@ -894,10 +949,7 @@
                     if (data.success) {
                         if (currentCheckbox) {
                             currentCheckbox.checked = attended;
-                            // Optional: Update UI to show selected schedule details if needed
-                            // For now, just the checkmark is enough as per request
                         } else {
-                             // If called directly (no schedules case), find the checkbox
                              const cb = document.querySelector(`.attendance-checkbox[data-year="${year}"][data-seminar="${seminarName}"]`);
                              if(cb) cb.checked = attended;
                         }

@@ -1,4 +1,6 @@
 import './bootstrap';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
 
 // Enhanced notification system for user actions
 document.addEventListener('DOMContentLoaded', function () {

@@ -675,6 +675,11 @@
                             <i class="bi bi-pause-circle"></i> Deactivate
                         </button>
 
+                        <button type="button" class="btn btn-sm btn-info text-white" onclick="submitBulkAction('promote')"
+                            style="white-space: nowrap;">
+                            <i class="bi bi-graph-up-arrow"></i> Promote
+                        </button>
+
                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
                             data-bs-target="#bulkDeleteModal" style="white-space: nowrap;">
                             <i class="bi bi-trash"></i> Delete
@@ -694,6 +699,11 @@
     <form id="bulkDeactivateForm" method="POST" action="{{ route('users.bulk-deactivate') }}" style="display: none;">
         @csrf
         <div id="bulkDeactivateInputs"></div>
+    </form>
+
+    <form id="bulkPromoteForm" method="POST" action="{{ route('users.bulk-promote') }}" style="display: none;">
+        @csrf
+        <div id="bulkPromoteInputs"></div>
     </form>
 
     <form id="bulkDeleteForm" method="POST" action="{{ route('users.bulk-delete') }}" style="display: none;">
@@ -860,6 +870,9 @@
                 } else if (action === 'deactivate') {
                     form = document.getElementById('bulkDeactivateForm');
                     inputsContainer = document.getElementById('bulkDeactivateInputs');
+                } else if (action === 'promote') {
+                    form = document.getElementById('bulkPromoteForm');
+                    inputsContainer = document.getElementById('bulkPromoteInputs');
                 }
 
                 if (!form || !inputsContainer) return;
@@ -1019,12 +1032,12 @@
                             // Display Results in Modal
                             if (resultsDiv) {
                                 resultsDiv.innerHTML = `
-                                                                                    <div class="alert alert-success">
-                                                                                        <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
-                                                                                        <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
-                                                                                        <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
-                                                                                    </div>
-                                                                                `;
+                                                                                        <div class="alert alert-success">
+                                                                                            <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
+                                                                                            <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
+                                                                                            <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
+                                                                                        </div>
+                                                                                    `;
                             }
 
 
