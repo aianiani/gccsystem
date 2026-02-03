@@ -1,53 +1,40 @@
 @extends('layouts.app')
 
 @section('content')
+@section('full_width', true)
     <style>
-        /* Homepage theme variables */
         :root {
-            --primary-green: #1f7a2d;
-            --primary-green-2: #13601f;
-            --accent-green: #2e7d32;
-            --light-green: #eaf5ea;
-            --accent-orange: #FFCB05;
-            --text-dark: #16321f;
-            --text-light: #6c757d;
-            --bg-light: #f6fbf6;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-
-            --forest-green: var(--primary-green);
-            --forest-green-dark: var(--primary-green-2);
-            --forest-green-light: var(--accent-green);
-            --forest-green-lighter: var(--light-green);
-            --yellow-maize: var(--accent-orange);
-            --yellow-maize-light: #fef9e7;
-            --white: #ffffff;
-            --gray-50: var(--bg-light);
-            --gray-100: #eef6ee;
-            --gray-600: var(--text-light);
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --success: #28a745;
-            --info: #17a2b8;
+            --forest-green: #1f7a2d;
+            --forest-green-dark: #13601f;
+            --forest-green-light: #2e7d32;
+            --forest-green-lighter: #e8f5e9;
+            --yellow-maize: #f4d03f;
+            --gray-50: #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-600: #6c757d;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
-            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+            --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-dark) 100%);
         }
 
-        /* Page Zoom */
-        .home-zoom {
-            zoom: 0.75;
-        }
-
-        @supports not (zoom: 1) {
-            .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
-            }
-        }
-
+        /* Prevent horizontal overflow on mobile */
+        html,
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        .d-flex {
+            width: 100%;
+            max-width: 100vw;
         }
 
         /* Sidebar Styles */
@@ -56,7 +43,7 @@
             top: 0;
             left: 0;
             bottom: 0;
-            width: 240px;
+            width: 280px;
             background: var(--forest-green);
             color: #fff;
             z-index: 1040;
@@ -67,147 +54,21 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .custom-sidebar .sidebar-logo h3 {
-            font-family: 'Outfit', sans-serif;
-            letter-spacing: 0.5px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .custom-sidebar .sidebar-logo p {
-            letter-spacing: 1px;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem !important;
-        }
-
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.25rem 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1.1rem;
-            padding: 0.9rem 1.25rem;
-            border-radius: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            margin: 0.1rem 0;
-        }
-
-        .custom-sidebar .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            transform: translateX(5px);
-        }
-
-        .custom-sidebar .sidebar-link.active {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            color: #f4d03f;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .custom-sidebar .sidebar-link.active::before {
-            content: '';
-            position: absolute;
-            left: -0.75rem;
-            top: 15%;
-            bottom: 15%;
-            width: 5px;
-            background: #f4d03f;
-            border-radius: 0 6px 6px 0;
-            box-shadow: 2px 0 15px rgba(244, 208, 63, 0.5);
-        }
-
-        .custom-sidebar .sidebar-link .bi {
-            font-size: 1.25rem;
-            transition: all 0.3s ease;
-        }
-
-        .custom-sidebar .sidebar-link.active .bi {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 5px rgba(244, 208, 63, 0.3));
-        }
-
-        .custom-sidebar .sidebar-bottom {
-            padding: 1.5rem 1rem;
-            background: rgba(0, 0, 0, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .custom-sidebar .sidebar-link.logout {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            text-align: left;
-            padding: 0.85rem 1.25rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 1.1rem;
-        }
-
-        .custom-sidebar .sidebar-link.logout:hover {
-            background: #dc3545;
-            color: #fff;
-            border-color: #dc3545;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.4);
-        }
-
         @media (max-width: 991.98px) {
             .custom-sidebar {
-                width: 200px;
-            }
-
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
-
-        @media (max-width: 767.98px) {
-            /* Off-canvas behavior on mobile */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
                 transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                flex-direction: column;
-                padding: 0;
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
             }
 
             .custom-sidebar.show {
-                transform: translateX(0);
+                transform: translateX(0) !important;
+                z-index: 1100;
+                visibility: visible;
             }
 
             .main-dashboard-content {
-                margin-left: 0;
-                padding: 1rem;
+                margin-left: 0 !important;
             }
 
-            /* Toggle button */
             #studentSidebarToggle {
                 position: fixed;
                 top: 1rem;
@@ -220,151 +81,847 @@
                 padding: 0.6rem 0.8rem;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
                 display: flex !important;
-                align-items: center;
-                justify-content: center;
             }
         }
 
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
             min-height: 100vh;
-            padding: 2rem 1.5rem;
-            margin-left: 240px;
+            margin-left: 280px;
             transition: margin-left 0.3s ease;
+            width: calc(100% - 280px);
+            overflow-x: hidden;
         }
 
-        .main-dashboard-inner {
-            max-width: 1180px;
-            margin: 0 auto;
+        @media (max-width: 991.98px) {
+            .main-dashboard-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+        }
+
+        /* Hero Header */
+        .resources-hero {
+            background: var(--hero-gradient);
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resources-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        .resources-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 300px;
+            height: 300px;
+            background: rgba(244, 208, 63, 0.1);
+            border-radius: 50%;
+            filter: blur(50px);
+        }
+
+        .resources-hero h1 {
+            color: #fff;
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .resources-hero p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.05rem;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .resources-hero .search-box {
+            position: relative;
+            max-width: 450px;
+            margin-top: 1.5rem;
+            z-index: 1;
+        }
+
+        .resources-hero .search-box input {
+            width: 100%;
+            padding: 0.9rem 1.25rem 0.9rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .resources-hero .search-box i {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-600);
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1.5rem 2rem;
+            background: #fff;
+            border-bottom: 1px solid var(--gray-100);
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .category-tab {
+            padding: 0.6rem 1.25rem;
+            border-radius: 50px;
+            background: var(--gray-50);
+            color: var(--gray-600);
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-tab:hover {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+        }
+
+        .category-tab.active {
+            background: var(--forest-green);
+            color: #fff;
+            border-color: var(--forest-green);
+        }
+
+        .category-tab .count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        .category-tab.active .count {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Resources Grid */
+        .resources-grid {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 767.98px) {
+            .resources-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+        }
+
+        /* Resource Card */
+        .resource-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--forest-green-lighter);
+        }
+
+        .resource-card .card-thumbnail {
+            height: 180px;
+            background: linear-gradient(135deg, var(--forest-green-lighter) 0%, #d4edda 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-card .card-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .resource-card .card-thumbnail .thumbnail-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--forest-green);
+            box-shadow: 0 8px 25px rgba(31, 122, 45, 0.2);
+        }
+
+        .resource-card .card-thumbnail .play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .resource-card:hover .card-thumbnail .play-overlay {
+            opacity: 1;
+        }
+
+        .resource-card .card-thumbnail .play-overlay i {
+            font-size: 3.5rem;
+            color: #fff;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+        }
+
+        .resource-card .type-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 10;
+        }
+
+        .resource-card .type-badge.video {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .resource-card .type-badge.image {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .resource-card .type-badge.file {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .resource-card .type-badge.article {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .resource-card .card-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resource-card .card-category {
+            font-size: 0.75rem;
+            color: var(--forest-green);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-card .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .resource-card .card-description {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .resource-card .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .resource-card .card-meta {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .resource-card .view-btn {
+            padding: 0.5rem 1.25rem;
+            background: var(--forest-green);
+            color: #fff;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .resource-card .view-btn:hover {
+            background: var(--forest-green-dark);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state .empty-icon {
+            width: 120px;
+            height: 120px;
+            background: var(--forest-green-lighter);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .empty-state .empty-icon i {
+            font-size: 3rem;
+            color: var(--forest-green);
+        }
+
+        .empty-state h3 {
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--gray-600);
+        }
+
+        /* Category Section Headers */
+        .category-section {
+            margin-bottom: 2rem;
+        }
+
+        .category-section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--forest-green);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .category-section-header .section-line {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--forest-green-lighter), transparent);
+        }
+
+        .category-section-header .count-badge {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* ========== MOBILE RESPONSIVE FIXES ========== */
+        @media (max-width: 767.98px) {
+
+            /* Disable zoom on mobile for proper touch experience */
+            .home-zoom {
+                zoom: 1 !important;
+                transform: none !important;
+            }
+
+            /* Hero section mobile adjustments */
+            .resources-hero {
+                padding: 4rem 1rem 1.5rem 1rem;
+            }
+
+            .resources-hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .resources-hero p {
+                font-size: 0.9rem;
+            }
+
+            .resources-hero .search-box {
+                max-width: 100%;
+            }
+
+            .resources-hero .search-box input {
+                padding: 0.75rem 1rem 0.75rem 2.75rem;
+                font-size: 0.9rem;
+            }
+
+            .resources-hero .search-box i {
+                left: 1rem;
+            }
+
+            /* Category tabs - horizontal scroll */
+            .category-tabs {
+                padding: 1rem;
+                gap: 0.5rem;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+
+            .category-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .category-tab {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            /* Category section headers */
+            .category-section-header {
+                padding: 0 1rem;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .category-section-header h2 {
+                font-size: 1.2rem;
+                width: 100%;
+            }
+
+            .category-section-header .section-line {
+                display: none;
+            }
+
+            .category-section-header .count-badge {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.6rem;
+            }
+
+            /* Resource cards */
+            .resource-card .card-thumbnail {
+                height: 150px;
+            }
+
+            .resource-card .card-content {
+                padding: 1rem;
+            }
+
+            .resource-card .card-title {
+                font-size: 1rem;
+            }
+
+            .resource-card .card-description {
+                font-size: 0.85rem;
+                -webkit-line-clamp: 2;
+            }
+
+            .resource-card .card-footer {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: stretch;
+            }
+
+            .resource-card .card-meta {
+                justify-content: center;
+            }
+
+            .resource-card .view-btn {
+                justify-content: center;
+                width: 100%;
+            }
+
+            /* Empty state */
+            .empty-state {
+                padding: 2rem 1rem;
+            }
+
+            .empty-state .empty-icon {
+                width: 80px;
+                height: 80px;
+            }
+
+            .empty-state .empty-icon i {
+                font-size: 2rem;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 375px) {
+            .resources-hero h1 {
+                font-size: 1.25rem;
+            }
+
+            .category-tab {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+
+            .resource-card .card-thumbnail {
+                height: 120px;
+            }
         }
     </style>
 
-    <div class="home-zoom">
-        <div class="d-flex">
-            <!-- Mobile Sidebar Toggle -->
-            <button id="studentSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
+    <div class="d-flex">
+        <!-- Mobile Sidebar Toggle -->
+        <button id="studentSidebarToggle" class="d-lg-none">
+            <i class="bi bi-list"></i>
+        </button>
 
-            <!-- Sidebar -->
-            <div class="custom-sidebar">
-                <div class="sidebar-logo">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="CMU Logo"
-                        style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                    <h3
-                        style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">
-                        CMU Guidance and Counseling Center</h3>
-                    <p style="margin: 0; font-size: 0.8rem; color: #fff; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">
-                        {{ auth()->user()->isCounselor() ? 'Counselor Portal' : 'Student Portal' }}</p>
-                </div>
-                <nav class="sidebar-nav">
-                    @if(auth()->user()->isCounselor())
-                        <a href="{{ route('counselor.appointments.index') }}"
-                            class="sidebar-link{{ request()->routeIs('counselor.appointments.*') ? ' active' : '' }}"><i
-                                class="bi bi-calendar-check"></i>Appointments</a>
-                        <a href="{{ route('counselor.session_notes.index') }}"
-                            class="sidebar-link{{ request()->routeIs('counselor.session_notes.*') ? ' active' : '' }}"><i
-                                class="bi bi-journal-text"></i>Session Notes</a>
-                        <a href="{{ route('counselor.assessments.index') }}"
-                            class="sidebar-link{{ request()->routeIs('counselor.assessments.*') ? ' active' : '' }}"><i
-                                class="bi bi-clipboard-data"></i>Assessments</a>
-                        <a href="{{ route('profile') }}"
-                            class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
-                                class="bi bi-person"></i>Profile</a>
-                    @else
-                        <a href="{{ route('dashboard') }}"
-                            class="sidebar-link{{ request()->routeIs('dashboard') ? ' active' : '' }}"><i
-                                class="bi bi-house-door"></i>Dashboard</a>
-                        <a href="{{ route('profile') }}"
-                            class="sidebar-link{{ request()->routeIs('profile') ? ' active' : '' }}"><i
-                                class="bi bi-person"></i>Profile</a>
-                        <a href="{{ route('appointments.index') }}"
-                            class="sidebar-link{{ request()->routeIs('appointments.*') && !request()->routeIs('appointments.completedWithNotes') ? ' active' : '' }}"><i
-                                class="bi bi-calendar-check"></i>Appointments</a>
-                        <a href="{{ route('appointments.completedWithNotes') }}"
-                            class="sidebar-link{{ request()->routeIs('appointments.completedWithNotes') ? ' active' : '' }}"><i
-                                class="bi bi-journal-text"></i>Sessions & Feedback</a>
-                        <a href="{{ route('assessments.index') }}"
-                            class="sidebar-link{{ request()->routeIs('assessments.*') ? ' active' : '' }}"><i
-                                class="bi bi-clipboard-data"></i>Assessments</a>
-                        <a href="{{ route('chat.selectCounselor') }}"
-                            class="sidebar-link{{ request()->routeIs('chat.selectCounselor') ? ' active' : '' }}"><i
-                                class="bi bi-chat-dots"></i>Chat with a Counselor</a>
+        <!-- Sidebar -->
+        @include('student.sidebar')
 
-                        <div class="sidebar-divider my-3" style="border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
-                        <div class="sidebar-resources">
-                            <div class="text-uppercase small px-3 mb-2" style="color: rgba(255,255,255,0.5); font-weight:700; font-size: 0.75rem; letter-spacing: 1px;">
-                                Resources</div>
-                            <a href="{{ route('resources') }}" class="sidebar-link active"><i class="bi bi-play-circle"></i>Orientation</a>
-                            <a href="#" class="sidebar-link"><i class="bi bi-book"></i>Library</a>
-                            <a href="#" class="sidebar-link"><i class="bi bi-gear"></i>Settings</a>
-                        </div>
-                    @endif
-                </nav>
-                <div class="sidebar-bottom w-100">
-                    <a href="{{ route('logout') }}" class="sidebar-link logout"
-                        onclick="event.preventDefault(); document.getElementById('logout-form-resources').submit();">
-                        <i class="bi bi-box-arrow-right"></i>Logout
-                    </a>
-                    <form id="logout-form-resources" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
+        <!-- Main Content -->
+        <div class="main-dashboard-content flex-grow-1">
+            <!-- Hero Header -->
+            <div class="resources-hero">
+                <h1><i class="bi bi-collection-play me-2"></i>Student Resources</h1>
+                <p>Access mental health materials, orientation videos, and guidance resources to support your journey.
+                </p>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search resources...">
                 </div>
             </div>
 
-            <!-- Main Content -->
-            <div class="main-dashboard-content flex-grow-1">
-                <div class="main-dashboard-inner">
-                    <div class="container py-5 text-center">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <div class="card shadow-sm border-0 rounded-4 p-5" style="background: white;">
-                                    <div class="mb-4">
-                                        <i class="bi bi-journal-bookmark-fill display-1 text-success opacity-25"></i>
-                                    </div>
-                                    <h1 class="mb-3 fw-bold text-dark">Resources</h1>
-                                    <p class="lead mb-4 text-muted">This feature is coming soon!</p>
-                                    <div class="p-4 rounded-3 mb-4" style="background: var(--gray-50); border: 1px dashed var(--gray-600);">
-                                        <p class="mb-0 text-dark">Guidance and counseling resources, orientation materials, and library links will be available in a future update to help you focus on your mental well-being and academic success.</p>
-                                    </div>
-                                    <div class="d-flex justify-content-center gap-3">
-                                        <a href="{{ route('dashboard') }}" class="btn btn-success rounded-pill px-4 py-2">
-                                            <i class="bi bi-house-door me-2"></i>Back to Dashboard
-                                        </a>
+            <!-- Category Tabs -->
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="all">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    All
+                    <span class="count">{{ $resources->flatten()->count() }}</span>
+                </button>
+                @foreach ($resources as $category => $items)
+                    <button class="category-tab" data-category="{{ Str::slug($category) }}">
+                        @if ($category == 'Mental Health')
+                            <i class="bi bi-heart-pulse"></i>
+                        @elseif($category == 'Orientation')
+                            <i class="bi bi-compass"></i>
+                        @elseif($category == 'Academic Support')
+                            <i class="bi bi-book"></i>
+                        @elseif($category == 'Career Guidance')
+                            <i class="bi bi-briefcase"></i>
+                        @else
+                            <i class="bi bi-folder"></i>
+                        @endif
+                        {{ $category }}
+                        <span class="count">{{ $items->count() }}</span>
+                    </button>
+                @endforeach
+            </div>
+
+            <!-- Resources Content -->
+            @forelse($resources as $category => $items)
+                <div class="category-section" data-category="{{ Str::slug($category) }}">
+                    <div class="category-section-header">
+                        <h2>
+                            @if ($category == 'Mental Health')
+                                <i class="bi bi-heart-pulse"></i>
+                            @elseif($category == 'Orientation')
+                                <i class="bi bi-compass"></i>
+                            @elseif($category == 'Academic Support')
+                                <i class="bi bi-book"></i>
+                            @elseif($category == 'Career Guidance')
+                                <i class="bi bi-briefcase"></i>
+                            @else
+                                <i class="bi bi-folder"></i>
+                            @endif
+                            {{ $category }}
+                        </h2>
+                        <div class="section-line"></div>
+                        <span class="count-badge">{{ $items->count() }} resources</span>
+                    </div>
+
+                    <div class="resources-grid">
+                        @foreach ($items as $resource)
+                            <div class="resource-card" data-title="{{ strtolower($resource->title) }}"
+                                data-description="{{ strtolower($resource->description) }}">
+                                <div class="card-thumbnail">
+                                    <span class="type-badge {{ $resource->type }}">{{ ucfirst($resource->type) }}</span>
+
+                                    @if ($resource->type == 'video')
+                                        @php
+                                            // Extract YouTube video ID for thumbnail
+                                            preg_match(
+                                                '/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/',
+                                                $resource->content,
+                                                $matches,
+                                            );
+                                            $videoId = $matches[1] ?? null;
+                                        @endphp
+                                        @if ($videoId)
+                                            <img src="https://img.youtube.com/vi/{{ $videoId }}/mqdefault.jpg" alt="{{ $resource->title }}">
+                                        @elseif($resource->file_path && str_starts_with($resource->file_type ?? '', 'video/'))
+                                            <div class="thumbnail-icon">
+                                                <i class="bi bi-film"></i>
+                                            </div>
+                                        @else
+                                            <div class="thumbnail-icon">
+                                                <i class="bi bi-play-circle"></i>
+                                            </div>
+                                        @endif
+                                        <div class="play-overlay">
+                                            <i class="bi bi-play-circle-fill"></i>
+                                        </div>
+                                    @elseif($resource->type == 'image')
+                                        @if ($resource->file_path)
+                                            <img src="{{ asset('storage/' . $resource->file_path) }}" alt="{{ $resource->title }}">
+                                        @else
+                                            <div class="thumbnail-icon">
+                                                <i class="bi bi-image"></i>
+                                            </div>
+                                        @endif
+                                    @elseif($resource->type == 'file')
+                                        <div class="thumbnail-icon">
+                                            @if (str_contains($resource->file_type ?? '', 'pdf'))
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                            @elseif(str_contains($resource->file_type ?? '', 'word') || str_contains($resource->file_name ?? '', '.doc'))
+                                                <i class="bi bi-file-earmark-word"></i>
+                                            @elseif(str_contains($resource->file_type ?? '', 'presentation') || str_contains($resource->file_name ?? '', '.ppt'))
+                                                <i class="bi bi-file-earmark-ppt"></i>
+                                            @else
+                                                <i class="bi bi-file-earmark"></i>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <div class="thumbnail-icon">
+                                            <i class="bi bi-link-45deg"></i>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="card-content">
+                                    <div class="card-category">{{ $category }}</div>
+                                    <h3 class="card-title">{{ $resource->title }}</h3>
+                                    <p class="card-description">
+                                        {{ $resource->description ?? 'No description available.' }}
+                                    </p>
+
+                                    <div class="card-footer">
+                                        <div class="card-meta">
+                                            @if ($resource->file_size)
+                                                <i class="bi bi-hdd"></i>
+                                                {{ number_format($resource->file_size / (1024 * 1024), 1) }} MB
+                                            @else
+                                                <i class="bi bi-calendar3"></i>
+                                                {{ $resource->created_at->format('M d, Y') }}
+                                            @endif
+                                        </div>
+
+                                        @if ($resource->file_path)
+                                            <a href="{{ asset('storage/' . $resource->file_path) }}" target="_blank" class="view-btn"
+                                                @if ($resource->type == 'file') download @endif>
+                                                @if ($resource->type == 'video')
+                                                    <i class="bi bi-play-fill"></i> Watch
+                                                @elseif($resource->type == 'image')
+                                                    <i class="bi bi-eye"></i> View
+                                                @else
+                                                    <i class="bi bi-download"></i> Download
+                                                @endif
+                                            </a>
+                                        @else
+                                            <a href="{{ $resource->content }}" target="_blank" class="view-btn">
+                                                @if ($resource->type == 'video')
+                                                    <i class="bi bi-play-fill"></i> Watch
+                                                @else
+                                                    <i class="bi bi-box-arrow-up-right"></i> Open
+                                                @endif
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
-            </div>
+            @empty
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="bi bi-collection"></i>
+                    </div>
+                    <h3>No Resources Available</h3>
+                    <p>Check back later for new educational materials and resources.</p>
+                </div>
+            @endforelse
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar toggle logic
-            const sidebar = document.querySelector('.custom-sidebar');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar toggle
+            const sidebar = document.getElementById('studentSidebar');
             const toggleBtn = document.getElementById('studentSidebarToggle');
-            
+            const closeBtn = document.getElementById('studentSidebarClose');
+            let isToggling = false;
+
             if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function() {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
+                toggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    isToggling = true;
+                    sidebar.classList.add('show');
+                    setTimeout(() => { isToggling = false; }, 100);
                 });
-                
-                document.addEventListener('click', function(e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
+            }
+
+            if (closeBtn && sidebar) {
+                closeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sidebar.classList.remove('show');
                 });
-                
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+            }
+
+            document.addEventListener('click', function(e) {
+                if (isToggling) return;
+                if (window.innerWidth < 992 && sidebar && sidebar.classList.contains('show')) {
+                    const clickInside = sidebar.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target));
+                    if (!clickInside) {
                         sidebar.classList.remove('show');
                     }
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && window.innerWidth < 992 && sidebar && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                }
+            });
+
+            // Category tabs filtering
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const categorySections = document.querySelectorAll('.category-section');
+
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    const category = this.dataset.category;
+
+                    // Update active tab
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Filter sections
+                    if (category === 'all') {
+                        categorySections.forEach(section => {
+                            section.style.display = 'block';
+                        });
+                    } else {
+                        categorySections.forEach(section => {
+                            if (section.dataset.category === category) {
+                                section.style.display = 'block';
+                            } else {
+                                section.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            const resourceCards = document.querySelectorAll('.resource-card');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    const query = this.value.toLowerCase().trim();
+
+                    if (query === '') {
+                        // Show all cards and sections
+                        resourceCards.forEach(card => card.style.display = 'flex');
+                        categorySections.forEach(section => section.style.display = 'block');
+                        return;
+                    }
+
+                    // Filter cards
+                    resourceCards.forEach(card => {
+                        const title = card.dataset.title || '';
+                        const description = card.dataset.description || '';
+                        if (title.includes(query) || description.includes(query)) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    // Hide empty sections
+                    categorySections.forEach(section => {
+                        const cards = section.querySelectorAll('.resource-card');
+                        let hasVisible = false;
+                        cards.forEach(card => {
+                            if (card.style.display !== 'none') hasVisible = true;
+                        });
+                        section.style.display = hasVisible ? 'block' : 'none';
+                    });
+
+                    // Reset to "All" tab during search
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    if (categoryTabs[0]) categoryTabs[0].classList.add('active');
                 });
             }
         });

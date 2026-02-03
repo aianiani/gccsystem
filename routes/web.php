@@ -87,6 +87,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('announcements/{announcement}/images/{index}', [App\Http\Controllers\AnnouncementController::class, 'deleteImage'])->name('announcements.deleteImage');
         Route::put('announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+        // Resources Management
+        Route::resource('admin/resources', App\Http\Controllers\Admin\ResourceController::class, ['as' => 'admin']);
     });
 
     // Profile Management Routes
@@ -130,6 +133,12 @@ Route::middleware('auth')->group(function () {
     // Counselor and Admin routes
     Route::middleware('role:counselor,admin')->group(function () {
         Route::get('counselor/appointments', [App\Http\Controllers\CounselorDashboardController::class, 'index'])->name('counselor.appointments.index');
+
+        // Bulk Actions
+        Route::delete('counselor/appointments/bulk/completed', [App\Http\Controllers\CounselorDashboardController::class, 'deleteAllCompleted'])->name('counselor.appointments.bulk.deleteCompleted');
+        Route::post('counselor/appointments/bulk-approve', [App\Http\Controllers\CounselorDashboardController::class, 'bulkApprove'])->name('counselor.appointments.bulkApprove');
+        Route::delete('counselor/appointments/bulk-delete', [App\Http\Controllers\CounselorDashboardController::class, 'bulkDestroy'])->name('counselor.appointments.bulkDestroy');
+
         Route::get('counselor/appointments/{id}', [App\Http\Controllers\CounselorDashboardController::class, 'show'])->name('counselor.appointments.show');
         Route::get('counselor/appointments/create', [App\Http\Controllers\AppointmentController::class, 'create'])->name('counselor.appointments.create');
         Route::get('counselor/appointments/{id}/edit', [App\Http\Controllers\AppointmentController::class, 'edit'])->name('counselor.appointments.edit');
@@ -142,8 +151,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('counselor/appointments/{id}/accept', [App\Http\Controllers\AppointmentController::class, 'accept'])->name('counselor.appointments.accept');
         Route::patch('counselor/appointments/{id}/decline', [App\Http\Controllers\AppointmentController::class, 'decline'])->name('counselor.appointments.decline');
         Route::delete('counselor/appointments/{id}', [App\Http\Controllers\AppointmentController::class, 'destroy'])->name('counselor.appointments.destroy');
-        Route::delete('counselor/appointments/bulk/completed', [App\Http\Controllers\CounselorDashboardController::class, 'deleteAllCompleted'])->name('counselor.appointments.bulk.deleteCompleted');
         Route::get('counselor/session-notes', [App\Http\Controllers\SessionNoteController::class, 'index'])->name('counselor.session_notes.index');
+
+        // Bulk Actions (Move before wildcards to avoid collision)
+        Route::delete('counselor/session-notes/bulk-delete', [App\Http\Controllers\SessionNoteController::class, 'bulkDestroy'])->name('counselor.session_notes.bulkDestroy');
+        Route::patch('counselor/session-notes/bulk-complete', [App\Http\Controllers\SessionNoteController::class, 'bulkComplete'])->name('counselor.session_notes.bulkComplete');
+
         Route::get('counselor/session-notes/{id}', [App\Http\Controllers\SessionNoteController::class, 'show'])->name('counselor.session_notes.show');
         Route::patch('counselor/session-notes/{id}/complete', [App\Http\Controllers\SessionNoteController::class, 'complete'])->name('counselor.session_notes.complete');
         Route::get('counselor/session-notes/{id}/edit', [App\Http\Controllers\SessionNoteController::class, 'edit'])->name('counselor.session_notes.edit');
@@ -152,7 +165,9 @@ Route::middleware('auth')->group(function () {
         Route::post('counselor/session-notes/{id}/create-next-appointment', [App\Http\Controllers\SessionNoteController::class, 'createNextAppointment'])->name('counselor.session_notes.create_next_appointment');
         // Assessment results for counselors
         Route::get('counselor/assessments', [App\Http\Controllers\AssessmentController::class, 'counselorIndex'])->name('counselor.assessments.index');
+        Route::delete('/counselor/assessments/bulk-delete', [App\Http\Controllers\AssessmentController::class, 'bulkDestroy'])->name('counselor.assessments.bulkDestroy');
         Route::get('/counselor/assessments/{assessment}', [App\Http\Controllers\AssessmentController::class, 'show'])->name('counselor.assessments.show');
+        Route::delete('/counselor/assessments/{assessment}', [App\Http\Controllers\AssessmentController::class, 'destroy'])->name('counselor.assessments.destroy');
     });
 
     // Notification routes - accessible to all authenticated users
@@ -176,7 +191,8 @@ Route::get('/chat', function () {
 })->name('chat');
 
 Route::get('/resources', function () {
-    return view('resources');
+    $resources = \App\Models\Resource::published()->latest()->get()->groupBy('category');
+    return view('resources', compact('resources'));
 })->name('resources');
 
 Route::middleware(['auth'])->group(function () {
@@ -201,10 +217,13 @@ Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(functi
     //     ->name('counselor.priority-cases.index');
     // Route::get('feedback', [App\Http\Controllers\Counselor\FeedbackController::class, 'index'])
 //     ->name('counselor.feedback.index');
+    Route::delete('feedback/bulk-delete', [App\Http\Controllers\SessionFeedbackController::class, 'bulkDestroy'])->name('counselor.feedback.bulkDestroy');
     Route::get('feedback', [App\Http\Controllers\SessionFeedbackController::class, 'index'])->name('counselor.feedback.index');
     Route::get('feedback/{id}', [App\Http\Controllers\SessionFeedbackController::class, 'show'])->name('counselor.feedback.show');
     Route::get('availability', [App\Http\Controllers\CounselorAvailabilityController::class, 'index'])->name('counselor.availability.index');
     Route::get('students', [App\Http\Controllers\CounselorStudentController::class, 'index'])->name('counselor.students.index');
+    Route::post('students/bulk-message', [App\Http\Controllers\CounselorStudentController::class, 'bulkMessage'])->name('counselor.students.bulkMessage');
+    Route::post('students/bulk-export', [App\Http\Controllers\CounselorStudentController::class, 'bulkExport'])->name('counselor.students.bulkExport');
     Route::get('students/{student}', [App\Http\Controllers\CounselorStudentController::class, 'show'])->name('counselor.students.show');
     Route::get('availabilities', [App\Http\Controllers\AvailabilityController::class, 'index']);
     Route::post('availabilities', [App\Http\Controllers\AvailabilityController::class, 'store']);
@@ -228,6 +247,13 @@ Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(functi
     // Reports
     Route::get('guidance/reports', [App\Http\Controllers\Counselor\GuidanceReportController::class, 'index'])->name('counselor.guidance.reports.index');
     Route::post('guidance/reports/generate', [App\Http\Controllers\Counselor\GuidanceReportController::class, 'generate'])->name('counselor.guidance.reports.generate');
+
+    // Bulk Appointment Actions
+    Route::post('appointments/bulk-approve', [App\Http\Controllers\AppointmentController::class, 'bulkApprove'])->name('counselor.appointments.bulkApprove');
+    Route::delete('appointments/bulk-destroy', [App\Http\Controllers\AppointmentController::class, 'bulkDestroy'])->name('counselor.appointments.bulkDestroy');
+    Route::delete('appointments/bulk-delete-completed', [App\Http\Controllers\AppointmentController::class, 'bulkDeleteCompleted'])->name('counselor.appointments.bulk.deleteCompleted');
+    Route::post('appointments/bulk-sms-prepare', [App\Http\Controllers\AppointmentController::class, 'prepareBulkSms'])->name('counselor.appointments.bulkSmsPrepare');
+    Route::post('appointments/bulk-reminder', [App\Http\Controllers\AppointmentController::class, 'bulkReminder'])->name('counselor.appointments.bulkReminder');
 });
 
 // TEST: Simple POST route to debug 404 issues

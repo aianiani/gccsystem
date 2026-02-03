@@ -304,115 +304,34 @@
         }
 
         /* Announcements (enhanced) */
-        #announcements .announcement-card {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
-            height: 100%;
+        #announcements {
             position: relative;
-            overflow: hidden;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            background: linear-gradient(180deg, var(--bg-light) 0%, #ffffff 100%);
         }
 
-        #announcements .announcement-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
-        }
-
-        #announcements .announcement-card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-hover);
-            border-color: rgba(0, 0, 0, 0.08);
-        }
-
-        #announcements .announcement-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--accent-green), var(--primary-green));
-            color: white;
-            box-shadow: 0 6px 16px rgba(34, 139, 34, 0.2);
-            margin-bottom: 1rem;
-        }
-
-        #announcements .announcement-title {
-            color: var(--text-dark);
-            font-weight: 700;
-            margin-bottom: .25rem;
-        }
-
-        #announcements .announcement-meta {
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            margin-bottom: .75rem;
-        }
-
-        #announcements .announcement-date {
-            display: inline-block;
-            padding: .25rem .6rem;
-            border-radius: 999px;
-            background: rgba(255, 203, 5, 0.15);
-            color: #8a6d00;
-            font-size: .8rem;
-            font-weight: 600;
-        }
-
-        #announcements .badge-new {
-            display: inline-block;
-            padding: .25rem .5rem;
-            border-radius: 999px;
-            background: var(--accent-orange);
-            color: #1a1a1a;
-            font-size: .72rem;
-            font-weight: 700;
-        }
-
-        #announcements .announcement-excerpt {
-            color: var(--text-light);
-        }
-
-        #announcements .announcement-action {
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
-            color: var(--accent-green);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        #announcements .announcement-action:hover {
-            color: var(--primary-green);
-        }
-
-        /* Modern Horizontal Announcements */
         .announcements-carousel {
             margin: 2rem 0;
+            padding: 1rem 0;
+            /* Add padding for shadow visibility */
         }
 
         .announcements-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
+            background: transparent;
+            /* Changed from white to transparent to allow card shadows */
+            border-radius: 0;
+            box-shadow: none;
+            overflow: visible;
+            /* Allow hover effects to overflow */
             position: relative;
             width: 100%;
             margin: 0 auto;
         }
 
         .announcements-track {
-            transition: transform 0.5s ease-in-out;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             display: flex;
+            gap: 0;
+            /* Slides dictate spacing */
         }
 
         .announcement-slide {
@@ -420,293 +339,428 @@
             width: 100%;
             min-width: 100%;
             position: relative;
+            padding: 0 5px;
+            /* Tiny padding to prevent clipping */
         }
 
         .announcement-card-horizontal {
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 0;
-            height: 100%;
             width: 100%;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        /* Hover effect for the whole card */
+        .announcement-card-horizontal:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
         }
 
         .announcement-content {
             display: flex;
-            align-items: center;
-            padding: 3rem;
+            align-items: stretch;
             position: relative;
             width: 100%;
-            flex-grow: 1;
+            height: 100%;
         }
 
-        .announcement-header {
+        /* Top decorative line */
+        .announcement-card-horizontal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+            z-index: 10;
+        }
+
+        .announcement-image-col {
+            position: relative;
+            min-height: 500px;
+            overflow: hidden;
+        }
+
+        .announcement-image-col img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+
+        .announcement-card-horizontal:hover .announcement-image-col img {
+            transform: scale(1.05);
+        }
+
+        /* Overlay for image to make text readable if needed, but here mainly for polish */
+        .announcement-image-col::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .announcement-text-col {
+            padding: 3.5rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            margin-right: 2rem;
-            min-width: 100px;
+            justify-content: center;
+            background: white;
+            position: relative;
         }
 
-        .announcement-icon-large {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--accent-green), var(--primary-green));
-            color: white;
-            font-size: 1.5rem;
-            box-shadow: 0 8px 25px rgba(34, 139, 34, 0.25);
-            margin-bottom: 1rem;
+        /* Decorative background pattern for text column */
+        .announcement-text-col::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at top right, var(--light-green) 0%, transparent 70%);
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         .announcement-meta {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .announcement-date {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            background: rgba(255, 203, 5, 0.15);
-            color: #8a6d00;
-            font-size: 0.85rem;
-            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            background: rgba(255, 203, 5, 0.1);
+            color: #bfa005;
+            /* Darker yellow for text */
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .announcement-date i {
+            font-size: 1rem;
         }
 
         .badge-new {
-            display: inline-block;
-            padding: 0.3rem 0.6rem;
-            border-radius: 20px;
-            background: var(--accent-orange);
-            color: #1a1a1a;
-            font-size: 0.75rem;
-            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5253);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(238, 82, 83, 0.3);
+            animation: pulse-badge 2s infinite;
         }
 
-        .announcement-body {
-            flex: 1;
-            width: 100%;
-            padding-left: 1rem;
-            min-width: 0;
+        @keyframes pulse-badge {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .announcement-title {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 2.25rem;
+            font-weight: 800;
             color: var(--text-dark);
-            margin-bottom: 1rem;
-            line-height: 1.3;
+            margin-bottom: 1.25rem;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
         }
 
         .announcement-excerpt {
-            font-size: 1.1rem;
-            color: var(--text-light);
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
+            font-size: 1.15rem;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
         }
 
         .announcement-action {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            color: var(--accent-green);
+            gap: 0.75rem;
+            color: white;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1rem;
-            padding: 0.6rem 1.2rem;
-            border: 2px solid var(--accent-green);
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            background: rgba(34, 139, 34, 0.05);
-            line-height: 1;
+            font-size: 1.05rem;
+            padding: 1rem 2rem;
+            background: var(--primary-green);
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.25);
+            align-self: flex-start;
         }
 
         .announcement-action i {
-            display: inline-flex;
-            align-items: center;
-            vertical-align: middle;
+            transition: transform 0.3s ease;
         }
 
         .announcement-action:hover {
-            background: var(--accent-green);
+            background: #1a6b1a;
+            /* Darker green */
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(34, 139, 34, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(34, 139, 34, 0.4);
         }
 
-        /* External Navigation Controls */
+        .announcement-action:hover i {
+            transform: translateX(4px);
+        }
+
+        /* Fallback / No Image / Text Only Layout specifically */
+        .announcement-card-no-image {
+            background: white;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .announcement-card-no-image .announcement-content.text-only {
+            padding: 3rem;
+            width: 100%;
+            margin: 0;
+            text-align: left;
+            flex-direction: column;
+        }
+
+        .announcement-card-no-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23228b22' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 1;
+            z-index: 0;
+            pointer-events: none;
+            mask-image: linear-gradient(to top left, black, transparent);
+            -webkit-mask-image: linear-gradient(to top left, black, transparent);
+        }
+
+        /* Mini Gallery Grid */
+        .announcement-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 1.5rem 0 2rem;
+            width: 100%;
+        }
+
+        .announcement-gallery-item {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .announcement-gallery-item:hover {
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .announcement-gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* External Navigation Controls (Polished) */
         .announcement-controls-external {
-            margin: 2rem 0;
+            margin-top: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 10;
         }
 
         .announcement-nav {
-            background: var(--primary-green);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
+            background: white;
+            color: var(--primary-green);
+            border: 2px solid rgba(34, 139, 34, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .announcement-nav:hover {
-            background: var(--accent-green);
+            background: var(--primary-green);
+            color: white;
             transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(34, 139, 34, 0.4);
-        }
-
-        .announcement-nav:active {
-            transform: scale(0.95);
-        }
-
-        .announcement-nav:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 8px 20px rgba(34, 139, 34, 0.3);
         }
 
         .announcement-counter {
-            background: rgba(34, 139, 34, 0.1);
-            color: var(--primary-green);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border: 1px solid rgba(34, 139, 34, 0.2);
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            color: var(--text-light);
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .announcement-counter span {
+            color: var(--text-dark);
         }
 
         /* Dots Indicator */
         .announcement-dots {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
         }
 
         .announcement-dots .dot {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: rgba(34, 139, 34, 0.3);
-            margin: 0 5px;
-            cursor: pointer;
+            background: #cbd5e1;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .announcement-dots .dot.active {
+            width: 30px;
+            border-radius: 20px;
             background: var(--primary-green);
-            transform: scale(1.2);
-        }
-
-        .announcement-dots .dot:hover {
-            background: var(--accent-green);
-            transform: scale(1.1);
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
-            .announcements-carousel {
-                margin: 1rem 0;
-            }
-
-            .announcements-container {
-                margin: 0;
-                max-width: 100%;
-                width: 100%;
-            }
-
-            .announcement-content {
+        @media (max-width: 991px) {
+            .announcement-card-horizontal {
+                display: flex;
                 flex-direction: column;
-                text-align: center;
-                padding: 1.5rem;
-                min-height: auto;
+                height: auto;
             }
 
-            .announcement-header {
-                margin-right: 0;
-                margin-bottom: 1.5rem;
+            .announcement-image-col {
+                height: 250px;
+                min-height: 250px;
+                order: -1;
             }
 
-            .announcement-body {
-                padding-left: 0;
+            .announcement-text-col {
+                padding: 2rem;
             }
 
             .announcement-title {
-                font-size: 1.5rem;
+                font-size: 1.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .announcement-content.text-only {
+                padding: 2rem !important;
+                flex-direction: column !important;
+                min-height: auto !important;
+            }
+
+            .announcement-content.text-only>.d-flex {
+                flex-direction: column !important;
+                gap: 1.5rem !important;
+            }
+
+            .gallery-sidebar {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                order: 2;
+                /* Move below text on mobile */
+            }
+
+            .announcement-gallery-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+                /* Fixed grid for mobile */
+                gap: 8px !important;
+                margin: 1rem 0 !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .announcement-text-col {
+                padding: 1.5rem;
+            }
+
+            .announcement-title {
+                font-size: 1.4rem;
             }
 
             .announcement-excerpt {
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .announcement-meta {
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .announcement-date,
+            .badge-new {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+
+            .announcement-action {
+                width: 100%;
+                padding: 0.8rem 1.5rem;
                 font-size: 1rem;
             }
 
             .announcement-nav {
                 width: 40px;
                 height: 40px;
-                font-size: 1rem;
-                margin: 0 0.5rem;
+                font-size: 0.9rem;
             }
 
             .announcement-controls-external {
-                margin: 1rem 0;
-                padding: 0 1rem;
+                gap: 0.75rem;
+                margin-top: 1.5rem;
             }
 
-            .announcement-counter {
-                font-size: 0.8rem;
-                padding: 0.4rem 0.8rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .announcements-container {
-                margin: 0 0.5rem;
-                max-width: calc(100% - 1rem);
-            }
-
-            .announcement-content {
-                padding: 1.5rem 1rem;
-                flex-direction: column !important;
-                align-items: flex-start !important;
-            }
-
-            .announcement-title {
-                font-size: 1.3rem;
-                text-align: left !important;
-            }
-
-            .announcement-excerpt {
-                font-size: 0.9rem;
-                text-align: left !important;
-            }
-
-            .announcement-date {
-                text-align: left !important;
-            }
-
-            .announcement-icon-large {
-                width: 50px;
-                height: 50px;
-                font-size: 1.25rem;
-                margin-bottom: 1rem;
-            }
-
-            .announcement-action {
-                font-size: 0.9rem;
-                padding: 0.6rem 1.2rem;
-                align-self: flex-start !important;
+            .announcement-gallery-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                /* Smaller grid for very small screens */
             }
         }
 
@@ -1776,7 +1830,8 @@
         </section>
 
         <!-- Announcements Section -->
-        <section id="announcements" class="py-5" style="background: var(--bg-light);">
+        <!-- Announcements Section -->
+        <section id="announcements" class="py-5">
             <div class="container-fluid px-4 px-lg-5">
                 <div class="section-header">
                     <h2 style="color: var(--primary-green);">Latest Announcements</h2>
@@ -1786,118 +1841,117 @@
 
                 <div class="announcements-carousel position-relative">
                     <div class="announcements-container overflow-hidden rounded-4">
-                        <div class="announcements-track d-flex" id="announcementsTrack">
+                        <div class="announcements-track" id="announcementsTrack">
                             @forelse($announcements as $index => $announcement)
-                                <div class="announcement-slide flex-shrink-0" style="width: 100%;">
+                                <div class="announcement-slide">
 
                                     <div class="announcement-card-horizontal">
                                         @php
                                             $homeAttachmentPath = $announcement->attachment ?? null;
                                             $homeIsImage = $homeAttachmentPath && preg_match('/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i', $homeAttachmentPath);
+                                            // Check if we have gallery images
+                                            $hasGallery = !empty($announcement->images) && is_array($announcement->images) && count($announcement->images) > 0;
                                         @endphp
 
                                         @if($homeIsImage)
                                             <!-- Layout with Featured Image (Split Image/Content) -->
                                             <div class="row g-0 h-100">
-                                                <div class="col-lg-5 col-md-12">
-                                                    <div class="h-100 position-relative" style="min-height: 550px;">
+                                                <div class="col-lg-5 announcement-image-col">
+                                                    <a href="{{ route('announcements.show', $announcement) }}"
+                                                        class="d-block h-100">
                                                         <img src="{{ asset('storage/' . $homeAttachmentPath) }}"
-                                                            alt="{{ $announcement->title }}" class="w-100 h-100"
-                                                            style="object-fit: cover; position: absolute; inset: 0;">
-                                                    </div>
+                                                            alt="{{ $announcement->title }}">
+                                                    </a>
                                                 </div>
-                                                <div class="col-lg-7 col-md-12">
-                                                    <div class="announcement-content h-100"
-                                                        style="min-height: auto; padding: 2.5rem;">
-                                                        <div class="announcement-header me-4 align-items-start">
-                                                            <div class="announcement-meta align-items-start">
-                                                                <span
-                                                                    class="announcement-date">{{ optional($announcement->created_at)->format('M d, Y') }}</span>
-                                                                @if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14)))
-                                                                    <span class="badge-new">NEW</span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                        <div class="announcement-body p-0" style="flex: 1; width: 100%;">
-                                                            <h3 class="announcement-title mb-3">{{ $announcement->title }}</h3>
-                                                            <p class="announcement-excerpt mb-4"
-                                                                style="font-size: 1.05rem; line-height: 1.7;">
-                                                                {{ \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? $announcement->body ?? ''), 600) }}
-                                                            </p>
-                                                            <a href="{{ route('announcements.show', $announcement) }}"
-                                                                class="announcement-action"
-                                                                aria-label="Read more about {{ $announcement->title }}">
-                                                                <span>Read Full Announcement</span>
-                                                                <i class="fas fa-arrow-right"></i>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @else
-                                            <!-- Standard Layout (No Image) -Redesigned for More Content -->
-                                            <div class="announcement-content"
-                                                style="display: flex; align-items: flex-start; gap: 1rem; padding: 2rem; width: 100%;">
-                                                <div style="flex-shrink: 0;">
-                                                    <div class="announcement-icon-large"
-                                                        style="width: 50px; height: 50px; font-size: 1.25rem; border-radius: 12px;">
-                                                        <i class="fas fa-bullhorn"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="announcement-body"
-                                                    style="display: flex; flex-direction: column; height: 100%; padding-left: 0; flex: 1; width: 100%;">
-                                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                                        <span class="announcement-date"
-                                                            style="font-size: 0.85rem;">{{ optional($announcement->created_at)->format('M d, Y') }}</span>
+                                                <div class="col-lg-7 announcement-text-col">
+
+                                                    <div class="announcement-meta">
+                                                        <span class="announcement-date">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                            {{ optional($announcement->created_at)->format('M d, Y') }}
+                                                        </span>
                                                         @if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14)))
                                                             <span class="badge-new">NEW</span>
                                                         @endif
                                                     </div>
-                                                    <h3 class="announcement-title"
-                                                        style="font-size: 1.75rem; margin-bottom: 1rem;">
-                                                        {{ $announcement->title }}
-                                                    </h3>
-                                                    <p class="announcement-excerpt"
-                                                        style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 1rem; color: #5a5a5a; text-align: left;">
-                                                        {{ \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? $announcement->body ?? ''), 1000) }}
+
+                                                    <h3 class="announcement-title">{{ $announcement->title }}</h3>
+
+                                                    <p class="announcement-excerpt">
+                                                        {{ \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? $announcement->body ?? ''), 250) }}
                                                     </p>
 
-                                                    @if(!empty($announcement->images) && is_array($announcement->images) && count($announcement->images) > 0)
-                                                        <!-- Display all gallery images in a grid -->
-                                                        <div
-                                                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
-                                                            @foreach($announcement->images as $image)
-                                                                <a href="{{ route('announcements.show', $announcement) }}"
-                                                                    style="display: block;">
-                                                                    <img src="{{ asset('storage/' . $image) }}"
-                                                                        alt="{{ $announcement->title }}"
-                                                                        style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.3s ease;">
-                                                                </a>
-                                                            @endforeach
-                                                        </div>
-                                                    @endif
                                                     <a href="{{ route('announcements.show', $announcement) }}"
-                                                        class="announcement-action"
-                                                        aria-label="Read more about {{ $announcement->title }}"
-                                                        style="margin-top: auto; align-self: flex-start;">
+                                                        class="announcement-action">
                                                         <span>Read Full Announcement</span>
                                                         <i class="fas fa-arrow-right"></i>
                                                     </a>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <!-- Standard Layout (No Image) - Refactored for Flexbox Alignment -->
+                                            <div class="announcement-content text-only position-relative"
+                                                style="padding: 3rem; min-height: 450px;">
+                                                <div class="d-flex w-100 gap-4 align-items-start">
+
+                                                    <!-- Main Text Content -->
+                                                    <div class="d-flex flex-column h-100" style="flex: 1; min-width: 0;">
+                                                        <div class="announcement-meta">
+                                                            <span class="announcement-date">
+                                                                <i class="far fa-calendar-alt"></i>
+                                                                {{ optional($announcement->created_at)->format('M d, Y') }}
+                                                            </span>
+                                                            @if(optional($announcement->created_at) && optional($announcement->created_at)->greaterThanOrEqualTo(now()->subDays(14)))
+                                                                <span class="badge-new">NEW</span>
+                                                            @endif
+                                                        </div>
+
+                                                        <h3 class="announcement-title">{{ $announcement->title }}</h3>
+
+                                                        <p class="announcement-excerpt mb-4">
+                                                            {{ \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? $announcement->body ?? ''), $hasGallery ? 400 : 800) }}
+                                                        </p>
+
+                                                        <a href="{{ route('announcements.show', $announcement) }}"
+                                                            class="announcement-action mt-auto">
+                                                            <span>Read Full Announcement</span>
+                                                            <i class="fas fa-arrow-right"></i>
+                                                        </a>
+                                                    </div>
+
+                                                    <!-- Optional Gallery Sidebar -->
+                                                    @if($hasGallery)
+                                                        <div class="gallery-sidebar"
+                                                            style="width: 25%; min-width: 250px; max-width: 300px; flex-shrink: 0;">
+                                                            <div class="announcement-gallery-grid">
+                                                                @foreach(array_slice($announcement->images, 0, 4) as $image)
+                                                                    <a href="{{ route('announcements.show', $announcement) }}"
+                                                                        class="announcement-gallery-item d-block">
+                                                                        <img src="{{ asset('storage/' . $image) }}" alt="Gallery Image">
+                                                                    </a>
+                                                                @endforeach
+                                                                @if(count($announcement->images) > 4)
+                                                                    <a href="{{ route('announcements.show', $announcement) }}"
+                                                                        class="announcement-gallery-item d-flex align-items-center justify-content-center bg-light text-muted fw-bold text-decoration-none">
+                                                                        +{{ count($announcement->images) - 4 }}
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         @endif
                                     </div>
                                 </div>
                             @empty
-                                <div class="announcement-slide flex-shrink-0" style="width: 100%;">
+                                <div class="announcement-slide">
                                     <div class="announcement-card-horizontal">
-                                        <div class="announcement-content">
-                                            <div class="announcement-header">
-                                                <div class="announcement-icon-large">
+                                        <div class="announcement-card-no-image h-100">
+                                            <div class="announcement-content text-only text-center align-items-center">
+                                                <div class="mb-4 text-muted display-4">
                                                     <i class="fas fa-bullhorn"></i>
                                                 </div>
-                                            </div>
-                                            <div class="announcement-body text-center">
                                                 <h3 class="announcement-title">No announcements yet</h3>
                                                 <p class="announcement-excerpt">Please check back later for updates and
                                                     center news.</p>
@@ -1911,7 +1965,7 @@
 
                     <!-- Dots Indicator -->
                     @if($announcements && count($announcements) > 1)
-                        <div class="announcement-dots text-center mt-4">
+                        <div class="announcement-dots">
                             @foreach($announcements as $index => $announcement)
                                 <span class="dot {{ $index === 0 ? 'active' : '' }}" data-slide="{{ $index }}"></span>
                             @endforeach
@@ -1919,29 +1973,29 @@
                     @endif
                 </div>
 
-                <!-- Navigation Controls - Outside the section -->
+                <!-- Navigation Controls - External -->
                 @if($announcements && count($announcements) > 1)
-                    <div class="announcement-controls-external d-flex justify-content-center align-items-center mt-4">
+                    <div class="announcement-controls-external">
                         <button type="button" class="announcement-nav announcement-prev" id="announcementPrev"
                             aria-label="Previous announcement">
-                            <i class="fas fa-chevron-left"></i>
+                            <i class="fas fa-arrow-left"></i>
                         </button>
-                        <div class="mx-4">
-                            <span class="announcement-counter">
-                                <span id="currentSlide">1</span> / <span id="totalSlides">{{ count($announcements) }}</span>
-                            </span>
+
+                        <div class="announcement-counter">
+                            <span id="currentSlide">1</span> / <span id="totalSlides">{{ count($announcements) }}</span>
                         </div>
+
                         <button type="button" class="announcement-nav announcement-next" id="announcementNext"
                             aria-label="Next announcement">
-                            <i class="fas fa-chevron-right"></i>
+                            <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 @endif
 
-                <div class="text-center mt-4">
-                    <a href="{{ route('announcements.index') }}" class="btn btn-success px-4 py-2 fw-bold"
-                        style="background: var(--primary-green); border: none; border-radius: 10px; box-shadow: 0 6px 18px rgba(34,139,34,0.18);">
-                        <i class="fas fa-list me-2"></i>View all announcements
+                <div class="text-center mt-5">
+                    <a href="{{ route('announcements.index') }}" class="btn btn-link text-decoration-none fw-bold"
+                        style="color: var(--primary-green);">
+                        View All Announcements <i class="fas fa-long-arrow-alt-right ms-2"></i>
                     </a>
                 </div>
             </div>
@@ -3100,285 +3154,113 @@
         // Event listeners
         if (nextBtn && nextBtn.addEventListener) nextBtn.addEventListener('click', nextSlide);
         if (prevBtn && prevBtn.addEventListener) prevBtn.addEventListener('click', prevSlide);
-        window.addEventListener('resize', () => {
-            // Debounce minimal
-            clearTimeout(window.__carouselResizeTimer);
-            window.__carouselResizeTimer = setTimeout(() => {
-                recalcCarouselMetrics();
-                updateCarousel();
-            }, 100);
-        });
 
-        // Auto-play functionality (optional)
-        let autoPlayInterval;
-        function startAutoPlay() {
-            stopAutoPlay();
-            autoPlayInterval = setInterval(() => {
-                nextSlide();
-            }, 5000);
-        }
 
-        function stopAutoPlay() {
-            if (autoPlayInterval) clearInterval(autoPlayInterval);
-        }
+        // Unified Announcement Carousel Logic
+        document.addEventListener('DOMContentLoaded', function () {
+            // Select elements
+            const track = document.getElementById('announcementsTrack');
+            const container = document.querySelector('.announcements-container');
+            const slides = document.querySelectorAll('.announcement-slide');
+            const nextBtn = document.getElementById('announcementNext');
+            const prevBtn = document.getElementById('announcementPrev');
+            const dots = document.querySelectorAll('.announcement-dots .dot');
+            const currentSlideEl = document.getElementById('currentSlide');
+            const totalSlidesEl = document.getElementById('totalSlides');
 
-        // Pause auto-play on hover
-        if (carousel && carousel.addEventListener) {
-            carousel.addEventListener('mouseenter', stopAutoPlay);
-            carousel.addEventListener('mouseleave', startAutoPlay);
-        }
+            // State
+            let currentIndex = 0;
+            const totalSlides = slides.length;
 
-        // Initialize carousel
-        recalcCarouselMetrics();
-        startAutoPlay();
+            if (!track || !container || totalSlides === 0) return;
 
-        // Announcements Carousel
-        let currentAnnouncementSlide = 0;
-        let announcementTrack, announcementPrevBtn, announcementNextBtn, announcementCarousel, announcementContainer, announcementSlides, announcementDotsContainer, totalAnnouncementSlides;
+            // Update Carousel Function
+            function updateCarousel() {
+                const containerWidth = container.offsetWidth || window.innerWidth; // Robust fallback
+                const slideWidth = containerWidth; // Each slide matches container
 
-        function initAnnouncementCarousel() {
-            announcementTrack = document.getElementById('announcementsTrack');
-            announcementPrevBtn = document.getElementById('announcementPrev');
-            announcementNextBtn = document.getElementById('announcementNext');
-            announcementCarousel = document.querySelector('.announcements-carousel');
-            announcementContainer = document.querySelector('.announcements-container');
-            announcementSlides = announcementTrack ? Array.from(announcementTrack.querySelectorAll('.announcement-slide')) : [];
-            announcementDotsContainer = document.querySelector('.announcement-dots');
-            totalAnnouncementSlides = announcementSlides.length;
+                // 1. Set Track Width
+                track.style.width = `${totalSlides * slideWidth}px`;
+                track.style.display = 'flex';
+                track.style.transition = 'transform 0.5s ease-in-out';
 
-            console.log('Announcement carousel initialized:', {
-                track: !!announcementTrack,
-                prevBtn: !!announcementPrevBtn,
-                nextBtn: !!announcementNextBtn,
-                slides: totalAnnouncementSlides
-            });
-        }
-
-        function updateAnnouncementCarousel() {
-            if (!announcementTrack || totalAnnouncementSlides === 0) return;
-
-            // Ensure each slide takes full width
-            const containerWidth = announcementContainer ? announcementContainer.getBoundingClientRect().width : 0;
-            const slideWidth = containerWidth; // Each slide should be full width
-
-            // Update slide widths and ensure proper containment
-            announcementSlides.forEach((slide, index) => {
-                slide.style.width = `${slideWidth}px`;
-                slide.style.minWidth = `${slideWidth}px`;
-                slide.style.flexShrink = '0';
-                slide.style.position = 'relative';
-                slide.style.overflow = 'hidden';
-
-                // On mobile, show all slides but position them correctly
-                if (window.innerWidth <= 768) {
+                // 2. Size Slides
+                slides.forEach(slide => {
+                    slide.style.width = `${slideWidth}px`;
+                    slide.style.minWidth = `${slideWidth}px`;
+                    slide.style.display = 'block';
                     slide.style.visibility = 'visible';
-                } else {
-                    // Hide all slides except current one to prevent bleeding on desktop
-                    if (index !== currentAnnouncementSlide) {
-                        slide.style.visibility = 'hidden';
-                    } else {
-                        slide.style.visibility = 'visible';
-                    }
-                }
-            });
-
-            // Update track width to accommodate all slides
-            announcementTrack.style.width = `${totalAnnouncementSlides * slideWidth}px`;
-            announcementTrack.style.display = 'flex';
-
-            // Move to current slide
-            announcementTrack.style.transform = `translateX(-${currentAnnouncementSlide * slideWidth}px)`;
-
-            console.log('Carousel update:', {
-                containerWidth,
-                slideWidth,
-                currentSlide: currentAnnouncementSlide,
-                totalSlides: totalAnnouncementSlides
-            });
-
-            // Update dots
-            if (announcementDotsContainer) {
-                Array.from(announcementDotsContainer.querySelectorAll('.dot')).forEach((dot, index) => {
-                    dot.classList.toggle('active', index === currentAnnouncementSlide);
                 });
-            }
 
-            // Update button states
-            if (announcementPrevBtn) {
-                announcementPrevBtn.disabled = currentAnnouncementSlide === 0;
-                announcementPrevBtn.style.opacity = currentAnnouncementSlide === 0 ? '0.5' : '1';
-            }
-            if (announcementNextBtn) {
-                announcementNextBtn.disabled = currentAnnouncementSlide >= totalAnnouncementSlides - 1;
-                announcementNextBtn.style.opacity = currentAnnouncementSlide >= totalAnnouncementSlides - 1 ? '0.5' : '1';
-            }
+                // 3. Move Track
+                track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
 
-            // Update counter
-            const currentSlideElement = document.getElementById('currentSlide');
-            if (currentSlideElement) {
-                currentSlideElement.textContent = currentAnnouncementSlide + 1;
-            }
-        }
+                // 4. Update UI
+                dots.forEach((dot, idx) => dot.classList.toggle('active', idx === currentIndex));
+                if (currentSlideEl) currentSlideEl.textContent = currentIndex + 1;
 
-        function nextAnnouncementSlide() {
-            console.log('nextAnnouncementSlide called', {
-                totalSlides: totalAnnouncementSlides,
-                currentSlide: currentAnnouncementSlide
-            });
-            if (totalAnnouncementSlides === 0) {
-                console.log('No slides available');
-                return;
-            }
-            currentAnnouncementSlide = (currentAnnouncementSlide + 1) % totalAnnouncementSlides;
-            console.log('New current slide:', currentAnnouncementSlide);
-            updateAnnouncementCarousel();
-        }
-
-        function prevAnnouncementSlide() {
-            if (totalAnnouncementSlides === 0) return;
-            currentAnnouncementSlide = (currentAnnouncementSlide - 1 + totalAnnouncementSlides) % totalAnnouncementSlides;
-            updateAnnouncementCarousel();
-        }
-
-        function goToAnnouncementSlide(slideIndex) {
-            currentAnnouncementSlide = Math.max(0, Math.min(slideIndex, totalAnnouncementSlides - 1));
-            updateAnnouncementCarousel();
-        }
-
-        // Event listeners for announcements
-        function attachAnnouncementEventListeners() {
-            console.log('Attaching event listeners...', {
-                nextBtn: !!announcementNextBtn,
-                prevBtn: !!announcementPrevBtn,
-                dotsContainer: !!announcementDotsContainer
-            });
-
-            try {
-                if (announcementNextBtn && announcementNextBtn.addEventListener) {
-                    announcementNextBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        console.log('Next button clicked');
-                        nextAnnouncementSlide();
-                    });
-                    console.log('Next button listener attached');
-                } else {
-                    console.log('Next button not found or not ready');
+                // 5. Update Buttons (Always enabled for cyclical, or managed here)
+                if (prevBtn) {
+                    prevBtn.style.opacity = totalSlides > 1 ? '1' : '0.5';
                 }
-
-                if (announcementPrevBtn && announcementPrevBtn.addEventListener) {
-                    announcementPrevBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        console.log('Prev button clicked');
-                        prevAnnouncementSlide();
-                    });
-                    console.log('Prev button listener attached');
-                } else {
-                    console.log('Prev button not found or not ready');
+                if (nextBtn) {
+                    nextBtn.style.opacity = totalSlides > 1 ? '1' : '0.5';
                 }
+            }
 
-                // Dot navigation
-                if (announcementDotsContainer && announcementDotsContainer.addEventListener) {
-                    announcementDotsContainer.addEventListener('click', (e) => {
-                        if (e.target.classList.contains('dot')) {
-                            const slideIndex = parseInt(e.target.dataset.slide);
-                            goToAnnouncementSlide(slideIndex);
+            // Next Slide Logic
+            function nextSlide() {
+                if (totalSlides <= 1) return;
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateCarousel();
+            }
+
+            // Prev Slide Logic
+            function prevSlide() {
+                if (totalSlides <= 1) return;
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateCarousel();
+            }
+
+            // Event Listeners
+            if (nextBtn) {
+                nextBtn.onclick = (e) => { // Direct assignment to avoid duplication
+                    e.preventDefault();
+                    nextSlide();
+                };
+            }
+
+            if (prevBtn) {
+                prevBtn.onclick = (e) => {
+                    e.preventDefault();
+                    prevSlide();
+                };
+            }
+
+            // Dot Navigation
+            const dotsContainer = document.querySelector('.announcement-dots');
+            if (dotsContainer) {
+                dotsContainer.onclick = (e) => {
+                    if (e.target.classList.contains('dot')) {
+                        const index = parseInt(e.target.dataset.slide);
+                        if (!isNaN(index)) {
+                            currentIndex = index;
+                            updateCarousel();
                         }
-                    });
-                    console.log('Dots listener attached');
-                } else {
-                    console.log('Dots container not found or not ready');
-                }
-            } catch (error) {
-                console.error('Error attaching event listeners:', error);
-            }
-        }
-
-        // Auto-play for announcements
-        let announcementAutoPlayInterval;
-        function startAnnouncementAutoPlay() {
-            stopAnnouncementAutoPlay();
-            if (totalAnnouncementSlides > 1) {
-                announcementAutoPlayInterval = setInterval(() => {
-                    nextAnnouncementSlide();
-                }, 6000); // 6 seconds per slide
-            }
-        }
-
-        function stopAnnouncementAutoPlay() {
-            if (announcementAutoPlayInterval) clearInterval(announcementAutoPlayInterval);
-        }
-
-        // Pause auto-play on hover - DISABLED since autoplay is off
-        function attachHoverListeners() {
-            // Autoplay disabled, hover listeners not needed
-            console.log('Hover listeners skipped (autoplay disabled)');
-        }
-
-        // Initialize announcements carousel
-        let carouselInitRetries = 0;
-        const maxCarouselInitRetries = 50; // Max 5 seconds of retries (50 * 100ms)
-
-        function initializeAnnouncementCarousel() {
-            console.log('Initializing announcement carousel...');
-            initAnnouncementCarousel();
-
-            // Check if the announcements section exists at all
-            const announcementsSection = document.getElementById('announcements');
-            if (!announcementsSection) {
-                console.log('Announcements section not found, skipping carousel initialization');
-                return;
+                    }
+                };
             }
 
-
-            // Only proceed if we have slides to show
-            if (totalAnnouncementSlides === 0) {
-                console.log('No announcement slides found, skipping carousel initialization');
-                return;
-            }
-
-            // Check if elements exist, if not, retry after a short delay
-            if (!announcementNextBtn || !announcementPrevBtn) {
-                if (carouselInitRetries < maxCarouselInitRetries) {
-                    carouselInitRetries++;
-                    console.log(`Navigation buttons not ready, retrying in 100ms... (attempt ${carouselInitRetries}/${maxCarouselInitRetries})`);
-                    setTimeout(initializeAnnouncementCarousel, 100);
-                } else {
-                    console.log('Navigation buttons not found after maximum retries, skipping carousel initialization');
-                }
-                return;
-            }
-
-            attachAnnouncementEventListeners();
-            attachHoverListeners();
-            updateAnnouncementCarousel();
-            // startAnnouncementAutoPlay(); // DISABLED: Autoplay removed per user request
-            console.log('Announcement carousel fully initialized (autoplay disabled)');
-        }
-
-        // Handle window resize and orientation change
-        window.addEventListener('resize', () => {
-            if (totalAnnouncementSlides > 0) {
-                updateAnnouncementCarousel();
-            }
-        });
-
-        // Handle orientation change for mobile
-        window.addEventListener('orientationchange', () => {
-            setTimeout(() => {
-                if (totalAnnouncementSlides > 0) {
-                    updateAnnouncementCarousel();
-                }
-            }, 100);
-        });
-
-        // Initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(initializeAnnouncementCarousel, 50);
+            // Resize Observer for Robustness
+            const resizeObserver = new ResizeObserver(() => {
+                window.requestAnimationFrame(updateCarousel);
             });
-        } else {
-            setTimeout(initializeAnnouncementCarousel, 50);
-        }
+            resizeObserver.observe(container);
+
+            // Initial Render
+            // Force a small delay to ensure layout is computed
+            setTimeout(updateCarousel, 50);
+        });
     </script>
 
     <!-- Auth Modals -->
@@ -5999,7 +5881,8 @@
             enhanceModalBehavior();
 
             // Initialize enhanced signup
-            initializeEnhancedSignup();
+            // - logic is already attached via event listeners
+            // initializeEnhancedSignup();
 
         });
     </script>

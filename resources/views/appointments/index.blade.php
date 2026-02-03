@@ -66,6 +66,16 @@
             .main-dashboard-content {
                 margin-left: 0 !important;
             }
+
+            .custom-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .custom-sidebar.show {
+                transform: translateX(0) !important;
+                z-index: 1100;
+                visibility: visible;
+            }
         }
 
         /* Constrain inner content and center it within the available area */
@@ -78,7 +88,7 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="studentSidebarToggle" class="d-md-none">
+            <button id="studentSidebarToggle" class="d-lg-none">
                 <i class="bi bi-list"></i>
             </button>
             <!-- Sidebar -->
@@ -368,10 +378,11 @@
                                     <i class="bi bi-graph-up"></i>
                                     {{ count($appointments) }} Total
                                 </div>
-                                <a href="{{ route('appointments.create') }}" class="btn-book-new w-100 justify-content-center">
+                                <a href="#" class="btn-book-new w-100 justify-content-center js-book-appointment-trigger">
                                     <i class="bi bi-plus-lg"></i>
                                     <span>Book Appointment</span>
                                 </a>
+
                             </div>
                         </div>
 
@@ -512,9 +523,10 @@
                                 <h3 class="fw-bold text-dark">No Appointments Yet</h3>
                                 <p class="text-muted mb-4">You haven't booked any counseling sessions yet.<br>We're here to
                                     listen whenever you're ready.</p>
-                                <a href="{{ route('appointments.create') }}" class="btn-book-new px-4 py-2">
-                                    Start Your Journey
-                                </a>
+                                    <a href="#" class="btn-book-new px-4 py-2 js-book-appointment-trigger">
+                                        Start Your Journey
+                                    </a>
+
                             </div>
                         @endif
                     </div>
@@ -522,27 +534,94 @@
             </div>
         </div>
     </div>
+
+    <!-- DASS-42 reminder modal -->
+    <div class="modal fade" id="dassReminderModal" tabindex="-1" aria-labelledby="dassReminderLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered dass-modal">
+            <div class="modal-content">
+                <style>
+                    .dass-modal .modal-content {
+                        border: none;
+                        border-radius: 20px;
+                        overflow: hidden;
+                        box-shadow: var(--shadow-lg);
+                    }
+                    .dass-modal-header {
+                        background: var(--hero-gradient);
+                        padding: 1.75rem;
+                        color: white !important;
+                    }
+                    .dass-modal-icon {
+                        width: 50px;
+                        height: 50px;
+                        background: rgba(255, 255, 255, 0.2);
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5rem;
+                        color: white;
+                    }
+                    .dass-modal-title {
+                        font-weight: 700;
+                        font-size: 1.25rem;
+                        color: white !important;
+                    }
+                    .dass-modal-body {
+                        padding: 2rem;
+                    }
+                    .dass-modal-footer {
+                        padding: 1.25rem 2rem;
+                        background: #f8f9fa;
+                        border-top: 1px solid rgba(0,0,0,0.05);
+                        display: flex;
+                        justify-content: flex-end;
+                        gap: 1rem;
+                    }
+                </style>
+                <div class="dass-modal-header position-relative">
+                    <div class="d-flex align-items-start gap-3 w-100">
+                        <div class="dass-modal-icon flex-shrink-0">
+                            <i class="bi bi-clipboard-heart"></i>
+                        </div>
+                        <div class="flex-grow-1 pt-1">
+                            <h5 class="dass-modal-title mb-1">Complete the DASS-42 Assessment</h5>
+                            <p class="mb-0 text-white-50 small">This helps counselors tailor your session</p>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="dass-modal-body">
+                    <p class="mb-3" style="font-size: 1.05rem; line-height: 1.6; color: var(--text-dark);">
+                        Prior to booking an appointment, students are required to complete the DASS-42 assessment. 
+                        This brief assessment provides counselors with essential insights to support you effectively.
+                    </p>
+                    <div class="d-flex gap-2 text-muted small align-items-start bg-light p-3 rounded-3">
+                        <i class="bi bi-info-circle-fill mt-1 flex-shrink-0 text-primary opacity-75"></i>
+                        <span>Once you finish the assessment, you’ll be able to proceed with booking your appointment immediately.</span>
+                    </div>
+                </div>
+                <div class="dass-modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Maybe Later</button>
+                    <a href="{{ route('consent.show', ['context' => 'booking']) }}" class="btn btn-success px-4 fw-semibold">
+                        Proceed to Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Sidebar toggle for mobile
         document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('studentSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function (e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        sidebar.classList.remove('show');
-                    }
+            // Gate appointment booking behind DASS-42 modal
+            const dassModalElement = document.getElementById('dassReminderModal');
+            if (dassModalElement) {
+                const dassModal = new bootstrap.Modal(dassModalElement);
+                document.querySelectorAll('.js-book-appointment-trigger').forEach(function (trigger) {
+                    trigger.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        dassModal.show();
+                    });
                 });
             }
         });

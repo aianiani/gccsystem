@@ -473,7 +473,7 @@
                                                 </td>
                                                 <td class="text-right align-top">
                                                     <form action="<?php echo e(route('counselor.seminars.schedules.destroy', $schedule)); ?>"
-                                                        method="POST" onsubmit="return confirm('Delete this schedule?');">
+                                                        method="POST" class="delete-form" data-confirm-message="Delete this schedule?">
                                                         <?php echo csrf_field(); ?>
                                                         <?php echo method_field('DELETE'); ?>
                                                         <button type="submit"

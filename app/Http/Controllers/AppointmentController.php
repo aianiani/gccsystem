@@ -6,58 +6,90 @@ use App\Models\Appointment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Notifications\AppointmentAcceptedNotification;
+use Illuminate\Support\Facades\Log;
 
 class AppointmentController extends Controller
 {
-    // Show all appointments for the authenticated student
-    public function index()
+    // Show all appointments for the authenticated student or counselor
+    public function index(Request $request)
     {
-        if (auth()->user()->role === 'counselor') {
-            // Get the latest appointment per student for this counselor
-            $appointments = \App\Models\Appointment::where('counselor_id', auth()->id())
-                ->select('appointments.*')
-                ->join(
-                    \DB::raw('(
-                        SELECT MAX(id) as id
-                        FROM appointments
-                        WHERE counselor_id = ' . auth()->id() . '
-                        GROUP BY student_id
-                    ) as latest'),
-                    'appointments.id',
-                    '=',
-                    'latest.id'
-                )
-                ->with('student')
-                ->orderBy('scheduled_at', 'desc')
-                ->get();
-            $allAppointments = $appointments;
-            return view('counselor.appointments.index', compact('appointments', 'allAppointments'));
+        $user = auth()->user();
+
+        if ($user->role === 'counselor') {
+            $query = Appointment::where('counselor_id', $user->id)->with('student');
+
+            // Search by student name or ID
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->whereHas('student', function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('student_id', 'like', '%' . $search . '%');
+                });
+            }
+
+            // Filter by status
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            // Sorting
+            $sortBy = $request->input('sort_by', 'date_desc');
+            if ($sortBy === 'date_asc') {
+                $query->orderBy('scheduled_at', 'asc');
+            } elseif ($sortBy === 'name_asc') {
+                $query->join('users', 'appointments.student_id', '=', 'users.id')
+                    ->orderBy('users.name', 'asc')
+                    ->select('appointments.*');
+            } else {
+                $query->orderBy('scheduled_at', 'desc');
+            }
+
+            // Pagination
+            $perPage = (int) $request->input('per_page', 10);
+            $perPage = in_array($perPage, [10, 20, 30, 50, 100]) ? $perPage : 10;
+
+            $appointments = $query->paginate($perPage)->appends($request->all());
+
+            // Statistics
+            $totalAppointments = Appointment::where('counselor_id', $user->id)->count();
+            $pendingAppointments = Appointment::where('counselor_id', $user->id)->where('status', 'pending')->count();
+            $completedAppointments = Appointment::where('counselor_id', $user->id)->where('status', 'completed')->count();
+
+            return view('counselor.appointments.index', compact('appointments', 'totalAppointments', 'pendingAppointments', 'completedAppointments'));
         }
+
         // Default: student view
-        $appointments = Appointment::where('student_id', auth()->id())
+        $appointments = Appointment::where('student_id', $user->id)
             ->with(['counselor', 'sessionNotes'])
             ->orderBy('scheduled_at', 'desc')
             ->get();
+
         return view('appointments.index', compact('appointments'));
     }
 
     // Show form to create a new appointment
     public function create()
     {
-        // Ensure user agreed to consent first
-        if (!auth()->user()->consent_agreed) {
+        // Ensure user agreed to consent first - use fresh() to avoid stale session data
+        $user = auth()->user();
+        if (!$user->fresh()->consent_agreed) {
             return redirect()->route('consent.show')
                 ->with('error', 'Please agree to the consent information before continuing.');
         }
 
-        // Check if user has completed DASS-42 assessment
-        $hasDass42 = \App\Models\Assessment::where('user_id', auth()->id())
-            ->where('type', 'DASS-42')
-            ->exists();
+        // Check if user has a "fresh" DASS-42 assessment (one created after their latest appointment)
+        $latestAppointment = Appointment::where('student_id', auth()->id())->latest()->first();
+        $hasDass42Query = \App\Models\Assessment::where('user_id', auth()->id())->where('type', 'DASS-42');
+
+        if ($latestAppointment) {
+            $hasDass42 = $hasDass42Query->where('created_at', '>', $latestAppointment->created_at)->exists();
+        } else {
+            $hasDass42 = $hasDass42Query->exists();
+        }
 
         if (!$hasDass42) {
             return redirect()->route('assessments.dass42')
-                ->with('error', 'Please complete the DASS-42 assessment before booking an appointment.');
+                ->with('error', 'Please complete a new DASS-42 assessment before booking an appointment.');
         }
 
         $counselors = User::where('role', 'counselor')->get();
@@ -275,8 +307,9 @@ class AppointmentController extends Controller
         if ($student) {
             $student->notify(new \App\Notifications\AppointmentCompletedNotification($appointment));
         }
-        // Redirect back after completion (no longer go to Add Session Note)
-        return redirect()->back()->with('success', 'Appointment marked as completed.');
+        // Redirect to create session note
+        return redirect()->route('counselor.session_notes.create', $appointment->id)
+            ->with('success', 'Appointment completed. Please add a session note.');
     }
 
     // Cancel an appointment
@@ -426,5 +459,130 @@ class AppointmentController extends Controller
             ->get();
 
         return view('appointments.completed-with-notes', compact('completedAppointments'));
+    }
+
+    /**
+     * Bulk approve selected appointments
+     */
+    public function bulkApprove(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:appointments,id',
+        ]);
+
+        $appointments = Appointment::whereIn('id', $request->ids)
+            ->where('counselor_id', auth()->id())
+            ->where('status', 'pending')
+            ->get();
+
+        foreach ($appointments as $appointment) {
+            /** @var \App\Models\Appointment $appointment */
+            $appointment->status = 'accepted';
+            $appointment->save();
+
+            // Notify student
+            if ($appointment->student) {
+                $appointment->student->notify(new \App\Notifications\AppointmentAcceptedNotification($appointment));
+            }
+        }
+
+        return redirect()->back()->with('success', count($appointments) . ' appointments approved successfully.');
+    }
+
+    /**
+     * Bulk delete selected appointments
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:appointments,id',
+        ]);
+
+        $count = Appointment::whereIn('id', $request->ids)
+            ->where('counselor_id', auth()->id())
+            // Allow deleting completed, declined, or cancelled
+            ->whereIn('status', ['completed', 'declined', 'cancelled'])
+            ->delete();
+
+        return redirect()->back()->with('success', $count . ' appointments deleted successfully.');
+    }
+
+    /**
+     * Prepare data for Bulk SMS (Personal/Manual sends)
+     */
+    public function prepareBulkSms(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:appointments,id',
+        ]);
+
+        $appointments = Appointment::whereIn('id', $request->ids)
+            ->where('counselor_id', auth()->id())
+            ->with('student')
+            ->get();
+
+        $data = $appointments->map(function ($appointment) {
+            $student = $appointment->student;
+            $scheduledAt = $appointment->scheduled_at->format('M d, Y \a\t g:i A');
+            $counselorName = auth()->user()->name;
+
+            // Template: Reminder: You have a counseling session with [Counselor] on [Date]. Please be on time.
+            $message = "Reminder: You have a counseling session with {$counselorName} on {$scheduledAt}. Please be on time. - GCC System";
+
+            return [
+                'id' => $appointment->id,
+                'name' => $student->name,
+                'phone' => $student->contact_number ?? '',
+                'message' => $message,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'students' => $data
+        ]);
+    }
+
+    /**
+     * Delete all completed appointments for the counselor
+     */
+    public function bulkDeleteCompleted()
+    {
+        $count = Appointment::where('counselor_id', auth()->id())
+            ->where('status', 'completed')
+            ->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => $count . ' completed appointments cleared.'
+        ]);
+    }
+
+    /**
+     * Send bulk automated reminders (In-app + Email)
+     */
+    public function bulkReminder(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:appointments,id',
+        ]);
+
+        $appointments = Appointment::whereIn('id', $request->ids)
+            ->where('counselor_id', auth()->id())
+            ->with('student')
+            ->get();
+
+        foreach ($appointments as $appointment) {
+            /** @var \App\Models\Appointment $appointment */
+            if ($appointment->student) {
+                $appointment->student->notify(new \App\Notifications\AppointmentReminderNotification($appointment));
+            }
+        }
+
+        return redirect()->back()->with('success', $appointments->count() . ' reminders sent successfully.');
     }
 }

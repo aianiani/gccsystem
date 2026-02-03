@@ -40,9 +40,13 @@ class SessionReminderNotification extends Notification
         $isStudent = $notifiable->role === 'student';
         $otherParty = $isStudent ? $appointment->counselor : $appointment->student;
 
+        // Use next_session date if available, otherwise fallback
+        $date = $this->sessionNote->next_session ? $this->sessionNote->next_session->format('F d, Y') : $appointment->scheduled_at->format('F d, Y');
+        $time = $this->sessionNote->next_session ? $this->sessionNote->next_session->format('g:i A') : $appointment->scheduled_at->format('g:i A');
+
         $message = (new MailMessage)
             ->subject('Upcoming Appointment Reminder')
-            ->view('emails.appointments.reminder', compact('user', 'appointment', 'isStudent', 'otherParty'));
+            ->view('emails.appointments.reminder', compact('user', 'appointment', 'isStudent', 'otherParty', 'date', 'time'));
 
         return $message;
     }

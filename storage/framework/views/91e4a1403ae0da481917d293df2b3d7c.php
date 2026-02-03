@@ -344,7 +344,7 @@
                 <i class="bi bi-person-plus-fill stat-icon" style="color: var(--maize-yellow);"></i>
                 <div class="stat-info">
                     <div class="value"><?php echo e($analytics['action_items']['pending_approvals']); ?></div>
-                    <div class="label">Pending Access</div>
+                    <div class="label">Pending Approvals</div>
                 </div>
             </div>
         </div>

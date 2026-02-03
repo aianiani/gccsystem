@@ -35,15 +35,10 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply the same page zoom used on the homepage */
-        .home-zoom {
-            zoom: 0.75;
-        }
-
-        @supports not (zoom: 1) {
+        @media (max-width: 768px) {
             .home-zoom {
-                transform: scale(0.75);
-                transform-origin: top center;
+                zoom: 1 !important;
+                transform: none !important;
             }
         }
 
@@ -206,7 +201,7 @@
 
             .main-dashboard-content {
                 margin-left: 0;
-                padding: 1rem;
+                padding: 1rem 0.75rem;
             }
 
             /* Toggle button */
@@ -249,7 +244,7 @@
             border-radius: 12px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--gray-100);
-            padding: 2.5rem;
+            padding: 2.5rem 1.5rem;
         }
 
         .confirmation-header {
@@ -317,13 +312,34 @@
         .info-label {
             font-weight: 600;
             color: var(--text-light);
-            width: 200px;
+            width: 150px;
             flex-shrink: 0;
         }
 
         .info-value {
             color: var(--text-dark);
             flex: 1;
+            word-break: break-all;
+        }
+
+        @media (max-width: 576px) {
+            .info-row {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .info-label {
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-confirmation {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         .action-buttons {

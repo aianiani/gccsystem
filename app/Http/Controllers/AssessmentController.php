@@ -19,16 +19,23 @@ class AssessmentController extends Controller
     }
 
     // Show dedicated DASS-42 assessment page
-    public function dass42Page()
+    public function dass42Page(Request $request)
     {
-        // Require consent first
-        if (!auth()->user() || !auth()->user()->consent_agreed) {
+        $user = auth()->user();
+
+        // Allow bypass if user just submitted consent in this session (avoids race conditions/ loops)
+        if (session('just_consented')) {
+            // Bypass check
+        } elseif (!$user || !$user->fresh()->consent_agreed) {
             return redirect()->route('consent.show')
                 ->with('error', 'Please agree to the consent information before taking the assessment.');
         }
 
+        $context = $request->query('context');
+
         return view('assessments.dass42', [
             'dass42_questions' => $this->getDass42Questions(),
+            'context' => $context,
         ]);
     }
 
@@ -61,7 +68,9 @@ class AssessmentController extends Controller
         // Extremely Severe -> very-high
         $depression_severity = $depression >= 28 ? 'Extremely Severe' : ($depression >= 21 ? 'Severe' : ($depression >= 14 ? 'Moderate' : ($depression >= 10 ? 'Mild' : 'Normal')));
         $anxiety_severity = $anxiety >= 20 ? 'Extremely Severe' : ($anxiety >= 15 ? 'Severe' : ($anxiety >= 10 ? 'Moderate' : ($anxiety >= 8 ? 'Mild' : 'Normal')));
+        $score_interpretation['stress'] = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
         $stress_severity = $stress >= 34 ? 'Extremely Severe' : ($stress >= 26 ? 'Severe' : ($stress >= 19 ? 'Moderate' : ($stress >= 15 ? 'Mild' : 'Normal')));
+
 
         // severity ranking
         $severity_rank = ['Normal' => 0, 'Mild' => 1, 'Moderate' => 2, 'Severe' => 3, 'Extremely Severe' => 4];
@@ -107,14 +116,19 @@ class AssessmentController extends Controller
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
             'type' => 'DASS-42',
-            'score' => json_encode($scorePayload),
+            'score' => $scorePayload, // Pass as array, model cast handles JSON encoding
             'risk_level' => $risk_level,
             'student_comment' => $comment,
         ]);
 
-        // After completing the assessment send user to booking (appointments.create)
-        return redirect()->route('appointments.create')
-            ->with('success', 'DASS-42 assessment completed successfully. You may now continue to booking.');
+        // Role-based redirect
+        if (auth()->user()->role === 'student' && $request->input('context') === 'booking') {
+            return redirect()->route('appointments.create')
+                ->with('success', 'DASS-42 assessment completed successfully. You may now continue to booking.');
+        }
+
+        return redirect()->route('dashboard')
+            ->with('success', 'DASS-42 assessment completed successfully.');
     }
 
     // Counselor: View all DASS-42 assessment results
@@ -131,14 +145,6 @@ class AssessmentController extends Controller
         // Filter by Assessment Type
         if ($request->filled('type')) {
             $query->where('type', $request->input('type'));
-        }
-
-        // Filter by Date Range
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->input('date_from'));
-        }
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->input('date_to'));
         }
 
         // Filter by Student Name or Email
@@ -176,7 +182,33 @@ class AssessmentController extends Controller
             });
         }
 
-        $assessments = $query->paginate(20)->withQueryString();
+        // Sorting Logic
+        $sortBy = $request->input('sort_by', 'newest');
+        switch ($sortBy) {
+            case 'oldest':
+                $query->reorder()->orderBy('created_at', 'asc');
+                break;
+            case 'name_az':
+                $query->join('users', 'assessments.user_id', '=', 'users.id')
+                    ->select('assessments.*')
+                    ->orderBy('users.name', 'asc');
+                break;
+            case 'name_za':
+                $query->join('users', 'assessments.user_id', '=', 'users.id')
+                    ->select('assessments.*')
+                    ->orderBy('users.name', 'desc');
+                break;
+            case 'newest':
+            default:
+                $query->reorder()->orderByDesc('created_at');
+                break;
+        }
+
+        // Pagination with configurable per_page
+        $perPage = (int) $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 30, 50, 100]) ? $perPage : 10;
+
+        $assessments = $query->paginate($perPage)->withQueryString();
 
         return view('counselor.assessments.index', compact('assessments'));
     }
@@ -245,15 +277,20 @@ class AssessmentController extends Controller
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
             'type' => 'GRIT Scale',
-            'score' => json_encode($scorePayload),
+            'score' => $scorePayload,
             'risk_level' => $risk_level,
             'student_comment' => $comment,
         ]);
-        return redirect()->route('assessments.index')->with([
-            'show_thank_you' => true,
-            'last_assessment_type' => 'GRIT Scale',
-            'success' => 'GRIT assessment completed successfully!'
-        ]);
+
+        if (auth()->user()->role === 'student') {
+            return redirect()->route('appointments.create')->with([
+                'show_thank_you' => true,
+                'last_assessment_type' => 'GRIT Scale',
+                'success' => 'GRIT assessment completed successfully! You may now continue to booking.'
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with('success', 'GRIT assessment completed successfully!');
     }
 
     // Handle NEO-FFI submission
@@ -332,16 +369,20 @@ class AssessmentController extends Controller
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
             'type' => 'Personality (NEO-FFI)',
-            'score' => json_encode($scorePayload),
+            'score' => $scorePayload,
             'risk_level' => 'normal',
             'student_comment' => $request->input('student_comment'),
         ]);
 
-        return redirect()->route('assessments.index')->with([
-            'show_thank_you' => true,
-            'last_assessment_type' => 'NEO-FFI',
-            'success' => 'NEO-FFI assessment completed successfully!'
-        ]);
+        if (auth()->user()->role === 'student') {
+            return redirect()->route('appointments.create')->with([
+                'show_thank_you' => true,
+                'last_assessment_type' => 'NEO-FFI',
+                'success' => 'NEO-FFI assessment completed successfully! You may now continue to booking.'
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with('success', 'NEO-FFI assessment completed successfully!');
     }
 
     // Handle Work Values Inventory submission
@@ -392,16 +433,20 @@ class AssessmentController extends Controller
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
             'type' => 'Work Values Inventory',
-            'score' => json_encode($scorePayload),
+            'score' => $scorePayload,
             'risk_level' => 'normal',
             'student_comment' => $request->input('student_comment'),
         ]);
 
-        return redirect()->route('assessments.index')->with([
-            'show_thank_you' => true,
-            'last_assessment_type' => 'Work Values Inventory',
-            'success' => 'Work Values Inventory completed successfully!'
-        ]);
+        if (auth()->user()->role === 'student') {
+            return redirect()->route('appointments.create')->with([
+                'show_thank_you' => true,
+                'last_assessment_type' => 'Work Values Inventory',
+                'success' => 'Work Values Inventory completed successfully! You may now continue to booking.'
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Work Values Inventory completed successfully!');
     }
 
     // Helper for DASS-42 questions
@@ -661,5 +706,40 @@ class AssessmentController extends Controller
 
         $pdf = Pdf::loadView('counselor.assessments.export', $viewData);
         return $pdf->download('assessment-summary-' . $assessment->id . '.pdf');
+    }
+
+    /**
+     * Delete a single assessment
+     */
+    public function destroy($id)
+    {
+        if (!auth()->user()->isCounselor()) {
+            abort(403);
+        }
+
+        $assessment = \App\Models\Assessment::findOrFail($id);
+        $assessment->delete();
+
+        return redirect()->back()->with('success', 'Assessment deleted successfully.');
+    }
+
+    /**
+     * Delete multiple assessments
+     */
+    public function bulkDestroy(Request $request)
+    {
+        if (!auth()->user()->isCounselor()) {
+            abort(403);
+        }
+
+        $ids = $request->input('ids');
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'No assessments selected for deletion.');
+        }
+
+        \App\Models\Assessment::whereIn('id', $ids)->delete();
+
+        return redirect()->back()->with('success', 'Selected assessments deleted successfully.');
     }
 }

@@ -16,6 +16,11 @@ class Assessment extends Model
         'type',
         'notes',
         'status',
+        'student_comment',
+    ];
+
+    protected $casts = [
+        'score' => 'json',
     ];
 
     // Relationship to User
@@ -23,4 +28,4 @@ class Assessment extends Model
     {
         return $this->belongsTo(User::class);
     }
-} 
+}

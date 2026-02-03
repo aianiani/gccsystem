@@ -123,154 +123,271 @@
             justify-content: center;
         }
 
-        .main-content-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
+        /* Reuse premium dashboard styles */
+        .filter-control {
+            background: #fff;
+            border: 1.5px solid var(--gray-100);
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            width: 100%;
         }
 
-        .main-content-card .card-header {
-            background: var(--forest-green-lighter);
-            color: var(--forest-green);
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--gray-100);
+        .filter-control:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 4px rgba(31, 122, 45, 0.1);
+            outline: none;
+        }
+
+        .filter-select {
+            background: #fff;
+            border: 1.5px solid var(--gray-100);
+            border-radius: 12px;
+            padding: 0.6rem 2rem 0.6rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-filter {
+            background: var(--forest-green);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.6rem 1.5rem;
             font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-filter:hover {
+            background: var(--forest-green-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(31, 122, 45, 0.2);
+        }
+
+        .btn-reset {
+            background: var(--gray-50);
+            color: var(--text-light);
+            border: 1.5px solid var(--gray-100);
+            border-radius: 12px;
+            padding: 0.6rem;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            transition: all 0.2s;
+            text-decoration: none;
         }
 
-        .main-content-card .card-body {
-            padding: 1.25rem;
+        .btn-reset:hover {
+            background: #fff;
+            color: var(--primary-green);
+            border-color: var(--primary-green);
         }
 
-        .student-card {
-            background: white;
+        /* Table Aesthetics */
+        .user-avatar {
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .student-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--forest-green-light);
-        }
-
-        .student-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
             object-fit: cover;
-            border: 2px solid var(--forest-green-light);
+            border: 2px solid var(--gray-50);
+            margin-right: 0.85rem;
         }
 
-        .btn-outline-primary,
-        .btn-outline-success,
-        .btn-outline-info,
-        .btn-outline-warning {
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.15s ease;
-            padding: 0.6rem 1rem;
-            border-width: 1px;
-            box-shadow: 0 6px 18px rgba(17, 94, 37, 0.06);
+        .user-details h6 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
         }
 
-        .btn-outline-primary {
-            border-color: var(--forest-green);
-            color: var(--forest-green);
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--forest-green);
-            border-color: var(--forest-green);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-outline-success:hover,
-        .btn-outline-info:hover,
-        .btn-outline-warning:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .filter-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: var(--gray-600);
-            background: var(--gray-50);
-            border-radius: 12px;
-            border: 2px dashed var(--gray-100);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: var(--gray-600);
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .badge-risk {
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
+        .user-details span {
             font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Bulk Actions Bar */
+        .bulk-actions-bar {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid var(--gray-100);
+            border-radius: 100px;
+            padding: 0.75rem;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 500px;
+        }
+
+        .bulk-actions-bar.active {
+            bottom: 30px;
+        }
+
+        .selected-badge {
+            background: var(--forest-green-lighter);
+            color: var(--forest-green);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .bulk-btn {
+            border: none;
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
             font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
 
-        .badge-risk.high {
-            background: #fee;
+        .bulk-btn-delete {
+            background: #fff;
+            color: var(--text-dark);
+            border: 1.5px solid var(--gray-100);
+        }
+
+        .bulk-btn-delete:hover {
+            background: var(--bg-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-close-bulk {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.25rem;
+            padding: 0 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .btn-close-bulk:hover {
             color: var(--danger);
-            border: 1px solid var(--danger);
         }
 
-        .badge-risk.moderate {
-            background: #fffbf0;
-            color: var(--warning);
-            border: 1px solid var(--warning);
+        .v-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--gray-100);
+            margin: 0 0.5rem;
         }
 
-        .badge-risk.normal {
-            background: #f0f9f0;
-            color: var(--success);
-            border: 1px solid var(--success);
+        /* Custom Checkbox */
+        .custom-checkbox {
+            position: relative;
+            width: 20px;
+            height: 20px;
         }
 
-        @media (max-width: 991.98px) {
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
+        .custom-checkbox input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
         }
 
-        @media (max-width: 767.98px) {
-            .main-dashboard-content {
-                margin-left: 0;
-            }
+        .custom-checkbox label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border: 2px solid var(--gray-100);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        /* Stats Cards CSS */
+        .custom-checkbox input:checked + label {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+        }
+
+        .custom-checkbox input:checked + label:after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .btn-action {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid var(--gray-100);
+            background: #fff;
+        }
+
+        .btn-action.view { color: var(--primary-green); }
+        .btn-action.view:hover { background: var(--light-green); border-color: var(--primary-green); }
+        .btn-action.chat:hover { background: #e7f3ff; border-color: #0d6efd; }
+
+        .pagination-wrap {
+            padding: 1.5rem;
+            background: #fff;
+            border-top: 1px solid var(--gray-50);
+        }
+
+        /* Stats Grid Styles */
+        .averages-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 0.5rem; 
+            width: 100%; 
+            margin-top: 0.25rem; 
+        }
+        .avg-item { 
+            text-align: center; 
+            background: var(--bg-light); 
+            padding: 0.4rem; 
+            border-radius: 8px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .avg-label { 
+            font-size: 0.7rem; 
+            color: var(--text-light); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            font-weight: 700;
+            line-height: 1;
+        }
+        .avg-val { 
+            font-size: 1.1rem; 
+            font-weight: 800; 
+            line-height: 1; 
+            margin-bottom: 4px;
+        }
+
+        /* Dashboard Stat Card */
         .dashboard-stat-card {
             background: #fff;
             border-radius: 16px;
             box-shadow: var(--shadow-sm);
-            padding: 1.5rem;
+            padding: 1.25rem;
             border: 1px solid var(--gray-100);
             transition: all 0.3s ease;
             height: 100%;
@@ -281,20 +398,14 @@
             overflow: hidden;
         }
 
-        .dashboard-stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--forest-green-lighter);
-        }
-
         .stat-icon {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             flex-shrink: 0;
         }
 
@@ -303,48 +414,43 @@
         .stat-icon.warning { background: #fff8e1; color: #ffc107; }
 
         .stat-content { flex-grow: 1; min-width: 0; }
-        .stat-label { font-size: 0.9rem; color: var(--text-light); font-weight: 500; margin-bottom: 0.25rem; }
-        .stat-value { font-size: 1.85rem; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
-        .stat-hint { font-size: 0.8rem; color: #9aa0ac; margin-top: 0.25rem; }
-
-        .averages-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; width: 100%; margin-top: 0.25rem; }
-        .avg-item { text-align: center; background: var(--bg-light); padding: 0.4rem; border-radius: 8px; }
-        .avg-label { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;}
-        .avg-val { font-size: 1.15rem; font-weight: 700; line-height: 1; margin-bottom: 2px;}
+        .stat-label { font-size: 0.85rem; color: var(--text-light); font-weight: 600; margin-bottom: 0.25rem; }
+        .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--text-dark); line-height: 1.2; }
+        .stat-hint { font-size: 0.75rem; color: #9aa0ac; margin-top: 0.25rem; }
     </style>
 
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
+            <button id="counselorSidebarToggle" class="d-md-none" 
+                style="position: fixed; top: 10px; left: 10px; z-index: 1050; border: none; background: var(--forest-green); color: white; padding: 5px 10px; border-radius: 5px;">
                 <i class="bi bi-list"></i>
             </button>
+            
             <!-- Sidebar -->
             @include('counselor.sidebar')
 
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
                 <div class="main-dashboard-inner">
-                    <div class="welcome-card">
+                    <!-- Header -->
+                    <div class="welcome-card mb-4" style="min-height: auto; padding: 1.5rem;">
                         <div>
-                            <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
-                            <div class="welcome-text">Students Directory</div>
-                            <div style="font-size: 0.9rem; margin-top: 0.5rem;">View and manage all student profiles</div>
+                            <div class="welcome-text" style="font-size: 1.5rem;">Students Directory</div>
+                            <div style="font-size: 0.9rem; margin-top: 0.25rem; opacity: 0.9;">
+                                View and manage all student profiles across the university.
+                            </div>
                         </div>
-                        <div class="welcome-avatar">
-                            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
-                                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <div class="d-none d-md-block" style="font-size: 2rem; opacity: 0.8;">
+                            <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
 
                     <!-- Summary Cards -->
-                    <div class="row g-3 mb-4 hero-cards">
-                        <!-- Total Students -->
+                    <div class="row g-3 mb-4">
                         <div class="col-12 col-sm-6 col-md-4">
                             <div class="dashboard-stat-card">
-                                <div class="stat-icon primary">
-                                    <i class="bi bi-people"></i>
-                                </div>
+                                <div class="stat-icon primary"><i class="bi bi-people"></i></div>
                                 <div class="stat-content">
                                     <div class="stat-label">Total Students</div>
                                     <div class="stat-value">{{ number_format($totalStudents) }}</div>
@@ -352,23 +458,17 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Year Level Stats -->
                         <div class="col-12 col-sm-6 col-md-4">
                             <div class="dashboard-stat-card ps-3 pe-3">
                                 <div class="stat-content">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <div class="stat-label mb-0">Year Level</div>
-                                        <div class="stat-icon info" style="width: 32px; height: 32px; font-size: 1rem;">
-                                            <i class="bi bi-calendar3"></i>
-                                        </div>
+                                        <div class="stat-label mb-0">Year Distribution</div>
+                                        <div class="stat-icon info" style="width: 32px; height: 32px; font-size: 1rem;"><i class="bi bi-mortarboard"></i></div>
                                     </div>
                                     <div class="averages-grid" style="grid-template-columns: repeat(4, 1fr);">
                                         @foreach([1, 2, 3, 4] as $yl)
                                             <div class="avg-item">
-                                                <div class="avg-val" style="font-size: 1.1rem; color: var(--forest-green);">
-                                                    {{ $yearStats[$yl] ?? 0 }}
-                                                </div>
+                                                <div class="avg-val" style="font-size: 1.1rem; color: var(--forest-green);">{{ $yearStats[$yl] ?? 0 }}</div>
                                                 <div class="avg-label">{{ $yl }}</div>
                                             </div>
                                         @endforeach
@@ -376,16 +476,12 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Gender Stats -->
                         <div class="col-12 col-sm-12 col-md-4">
                             <div class="dashboard-stat-card ps-3 pe-3">
                                 <div class="stat-content">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="stat-label mb-0">Sex Ratio</div>
-                                        <div class="stat-icon warning" style="width: 32px; height: 32px; font-size: 1rem;">
-                                            <i class="bi bi-gender-ambiguous"></i>
-                                        </div>
+                                        <div class="stat-icon warning" style="width: 32px; height: 32px; font-size: 1rem;"><i class="bi bi-gender-ambiguous"></i></div>
                                     </div>
                                     <div class="averages-grid">
                                         <div class="avg-item">
@@ -396,185 +492,214 @@
                                             <div class="avg-val" style="color: #d63384;">{{ $sexStats['female'] ?? 0 }}</div>
                                             <div class="avg-label">Female</div>
                                         </div>
-                                        @php
-                                            $otherCount = ($sexStats['non-binary'] ?? 0) + ($sexStats['prefer_not_to_say'] ?? 0) + ($sexStats['other'] ?? 0);
-                                        @endphp
-                                        @if($otherCount > 0)
-                                            <div class="avg-item">
-                                                <div class="avg-val" style="color: #6c757d;">{{ $otherCount }}</div>
-                                                <div class="avg-label">Other</div>
-                                            </div>
-                                        @endif
+                                        @php $otherTotal = ($sexStats['other'] ?? 0) + ($sexStats['non-binary'] ?? 0) + ($sexStats['prefer_not_to_say'] ?? 0); @endphp
+                                        <div class="avg-item">
+                                            <div class="avg-val" style="color: #6c757d;">{{ $otherTotal }}</div>
+                                            <div class="avg-label">Other</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Filter Card -->
-                    <div class="filter-card">
-                        <h5 class="mb-3" style="color: var(--forest-green); font-weight: 700;">
-                            <i class="bi bi-funnel me-2"></i>Filter Students
-                        </h5>
-                        <form method="GET" action="{{ route('counselor.students.index') }}" class="row g-3">
-                            <div class="col-md-3">
-                                <label for="search" class="form-label"
-                                    style="font-weight: 600; color: var(--text-dark);">Search</label>
-                                <input type="text" class="form-control" id="search" name="search"
-                                    value="{{ request('search') }}" placeholder="Name, Email, or Student ID">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="college" class="form-label"
-                                    style="font-weight: 600; color: var(--text-dark);">College</label>
-                                <select class="form-select" id="college" name="college">
-                                    <option value="">All Colleges</option>
-                                    @php
-                                        $allColleges = [
-                                            'College of Arts and Sciences',
-                                            'College of Veterinary Medicine',
-                                            'College of Forestry and Environmental Sciences',
-                                            'College of Business and Management',
-                                            'College of Nursing',
-                                            'College of Human Ecology',
-                                            'College of Agriculture',
-                                            'College of Information Science and Computing',
-                                            'College of Education',
-                                            'College of Engineering'
-                                        ];
-                                    @endphp
-                                    @foreach($allColleges as $college)
-                                        <option value="{{ $college }}" {{ request('college') == $college ? 'selected' : '' }}>
-                                            {{ $college }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                    <!-- Filter Bar -->
+                    <div class="main-content-card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                        <div class="card-body p-3">
+                            <form action="{{ route('counselor.students.index') }}" method="GET" class="row g-2">
+                                <div class="col-md-3">
+                                    <div class="search-box position-relative">
+                                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                        <input type="text" name="search" class="filter-control ps-5" 
+                                            placeholder="Search name, ID, or email..." value="{{ request('search') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <select name="college" class="filter-select w-100">
+                                        <option value="">All Colleges</option>
+                                        @foreach($colleges as $college)
+                                            <option value="{{ $college }}" {{ request('college') == $college ? 'selected' : '' }}>{{ $college }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select name="year_level" class="filter-select w-100">
+                                        <option value="">Year Levels</option>
+                                        @foreach($yearLevels as $yl)
+                                            <option value="{{ $yl }}" {{ request('year_level') == $yl ? 'selected' : '' }}>{{ $yl }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select name="sex" class="filter-select w-100">
+                                        <option value="">All Sexes</option>
+                                        <option value="male" {{ request('sex') == 'male' ? 'selected' : '' }}>Male</option>
+                                        <option value="female" {{ request('sex') == 'female' ? 'selected' : '' }}>Female</option>
+                                        <option value="other" {{ request('sex') == 'other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-1">
+                                    <select name="per_page" class="filter-select w-100 ps-2 pe-4">
+                                        @foreach([10, 20, 30, 50, 100] as $count)
+                                            <option value="{{ $count }}" {{ request('per_page') == $count ? 'selected' : '' }}>{{ $count }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2 d-flex gap-2">
+                                    <button type="submit" class="btn-filter flex-grow-1">
+                                        <i class="bi bi-funnel-fill me-2"></i>Filter
+                                    </button>
+                                    <a href="{{ route('counselor.students.index') }}" class="btn-reset">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 
-                            <div class="col-md-2">
-                                <label for="year_level" class="form-label"
-                                    style="font-weight: 600; color: var(--text-dark);">Year Level</label>
-                                <select class="form-select" id="year_level" name="year_level">
-                                    <option value="">All Year Levels</option>
-                                    @foreach($yearLevels as $yearLevel)
-                                        <option value="{{ $yearLevel }}" {{ request('year_level') == $yearLevel ? 'selected' : '' }}>
-                                            {{ $yearLevel }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label for="sex" class="form-label"
-                                    style="font-weight: 600; color: var(--text-dark);">Sex</label>
-                                <select class="form-select" id="sex" name="sex">
-                                    <option value="">All Sexes</option>
-                                    <option value="male" {{ request('sex') == 'male' ? 'selected' : '' }}>Male</option>
-                                    <option value="female" {{ request('sex') == 'female' ? 'selected' : '' }}>Female
-                                    </option>
-                                    <option value="non-binary" {{ request('sex') == 'non-binary' ? 'selected' : '' }}>
-                                        Non-binary</option>
-                                    <option value="prefer_not_to_say" {{ request('sex') == 'prefer_not_to_say' ? 'selected' : '' }}>Prefer not to say</option>
-                                    <option value="other" {{ request('sex') == 'other' ? 'selected' : '' }}>Other</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary w-100"
-                                    style="background: var(--forest-green); border: none;">
-                                    <i class="bi bi-funnel"></i>
+                    <!-- Bulk Actions Bar -->
+                    <div id="bulkBar" class="bulk-actions-bar shadow-lg">
+                        <div class="container-fluid d-flex align-items-center justify-content-between px-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="selected-badge"><span id="selectedCount">0</span> selected</span>
+                                <div class="v-divider"></div>
+                                <button type="button" id="bulkMessageBtn" class="bulk-btn" style="background: var(--light-green); color: var(--forest-green);">
+                                    <i class="bi bi-chat-dots-fill me-2"></i>Bulk Message
                                 </button>
-                                <a href="{{ route('counselor.students.index') }}" class="btn btn-outline-secondary w-100" title="Clear Filters">
-                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                </a>
+                                <button type="button" id="bulkExportBtn" class="bulk-btn bulk-btn-delete">
+                                    <i class="bi bi-file-earmark-pdf-fill me-2"></i>Export Selected
+                                </button>
                             </div>
-                        </form>
+                            <button type="button" id="closeBulkBar" class="btn-close-bulk">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Students List Card -->
-                    <div class="main-content-card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-people me-2"></i>Students ({{ $students->total() }})</h5>
-                        </div>
-                        <div class="card-body">
-                            @forelse($students as $student)
-                                @php
-                                    $latestAssessment = $student->assessments->first();
-                                    $riskLevel = $latestAssessment ? $latestAssessment->risk_level : 'normal';
-                                    $totalAppointments = $student->appointments()->where('counselor_id', auth()->id())->count();
-                                    $completedSessions = $student->appointments()
-                                        ->where('counselor_id', auth()->id())
-                                        ->where('status', 'completed')
-                                        ->count();
-                                @endphp
-                                <div class="student-card">
-                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <img src="{{ $student->avatar_url }}" alt="{{ $student->name }}"
-                                                class="student-avatar">
-                                            <div>
-                                                <h6 class="mb-1 fw-bold" style="color: var(--forest-green); font-size: 1.1rem;">
-                                                    {{ $student->name }}
-                                                    @if($student->student_id)
-                                                        <span class="text-muted fw-normal ms-2" style="font-size: 0.9rem;">
-                                                            {{ $student->student_id }}
-                                                        </span>
+                    <form id="bulk-action-form" method="POST" style="display: none;">
+                        @csrf
+                        <div id="bulk-ids-container"></div>
+                    </form>
+
+                    <!-- Students Table Card -->
+                    <div class="main-content-card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="ps-4 py-3" style="width: 40px;">
+                                                <div class="custom-checkbox">
+                                                    <input type="checkbox" id="selectAll">
+                                                    <label for="selectAll"></label>
+                                                </div>
+                                            </th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px;">Student Info</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px;">College & Level</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px; width: 120px;">Sessions</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px; width: 120px;">Risk Level</th>
+                                            <th class="pe-4 py-3 text-end text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px; width: 120px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($students as $student)
+                                            @php
+                                                $latestAssessment = $student->assessments->first();
+                                                $riskLevel = $latestAssessment ? ($latestAssessment->risk_level ?? 'normal') : 'none';
+                                                $totalApps = \App\Models\Appointment::where('student_id', $student->id)->where('counselor_id', auth()->id())->count();
+                                                $completedApps = \App\Models\Appointment::where('student_id', $student->id)->where('counselor_id', auth()->id())->where('status', 'completed')->count();
+                                            @endphp
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="custom-checkbox">
+                                                        <input type="checkbox" class="item-checkbox" id="check-{{ $student->id }}" value="{{ $student->id }}">
+                                                        <label for="check-{{ $student->id }}"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ $student->avatar_url }}" class="user-avatar" alt="">
+                                                        <div class="user-details">
+                                                            <h6>{{ $student->name }}</h6>
+                                                            <span>{{ $student->student_id ?? 'No ID' }} • {{ $student->email }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex flex-column">
+                                                        <span class="fw-bold text-dark" style="font-size: 0.85rem;">{{ $student->college ?? 'No College' }}</span>
+                                                        <span class="text-muted small">{{ $student->year_level ?? 'Unspecified' }} Level</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="text-center px-2 py-1 bg-light rounded" title="Total Sessions">
+                                                            <div class="fw-bold text-dark lh-1">{{ $totalApps }}</div>
+                                                            <div class="text-muted" style="font-size: 0.6rem;">TOTAL</div>
+                                                        </div>
+                                                        <div class="text-center px-2 py-1 rounded" style="background: var(--light-green);" title="Completed Sessions">
+                                                            <div class="fw-bold text-success lh-1">{{ $completedApps }}</div>
+                                                            <div class="text-muted" style="font-size: 0.6rem;">DONE</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @if($riskLevel == 'high')
+                                                        <span class="badge-risk high">High Risk</span>
+                                                    @elseif($riskLevel == 'moderate')
+                                                        <span class="badge-risk moderate">Moderate</span>
+                                                    @elseif($riskLevel == 'normal' || $riskLevel == 'low')
+                                                        <span class="badge-risk normal">{{ ucfirst($riskLevel) }}</span>
+                                                    @else
+                                                        <span class="badge-risk text-muted bg-light border-0">No Data</span>
                                                     @endif
-                                                </h6>
-                                                <div class="d-flex align-items-center text-muted small">
-                                                    <i class="bi bi-envelope me-2"></i>{{ $student->email }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-4 flex-wrap">
-                                            <div class="d-flex gap-4 me-3">
-                                                <div class="text-center">
-                                                    <div class="fw-bold" style="color: var(--forest-green); font-size: 1.1rem;">
-                                                        {{ $totalAppointments }}
+                                                </td>
+                                                <td class="pe-4 text-end">
+                                                    <div class="actions-cell justify-content-end">
+                                                        <a href="{{ route('counselor.students.show', $student->id) }}" 
+                                                            class="btn-action view" title="View Profile">
+                                                            <i class="bi bi-person-badge-fill"></i>
+                                                        </a>
+                                                        <a href="{{ route('chat.index', $student->id) }}" 
+                                                            class="btn-action chat" style="color: #0d6efd;" title="Chat">
+                                                            <i class="bi bi-chat-dots-fill"></i>
+                                                        </a>
                                                     </div>
-                                                    <small class="text-muted" style="font-size: 0.8rem;">Sessions</small>
-                                                </div>
-                                                <div class="text-center">
-                                                    <div class="fw-bold" style="color: var(--forest-green); font-size: 1.1rem;">
-                                                        {{ $completedSessions }}
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="text-center py-5">
+                                                    <div class="empty-state">
+                                                        <i class="bi bi-people"></i>
+                                                        <h5 class="mb-2 fw-bold">No Students Found</h5>
+                                                        <p class="mb-0 text-muted">Try adjusting your filters or search terms.</p>
                                                     </div>
-                                                    <small class="text-muted" style="font-size: 0.8rem;">Completed</small>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex gap-2">
-                                                <a href="{{ route('counselor.students.show', $student->id) }}"
-                                                    class="btn btn-outline-success btn-sm px-3">
-                                                    <i class="bi bi-eye me-1"></i>View Profile
-                                                </a>
-                                                <a href="{{ route('chat.index', $student->id) }}"
-                                                    class="btn btn-outline-success btn-sm px-3">
-                                                    <i class="bi bi-chat-dots me-1"></i>Chat
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="empty-state">
-                                    <i class="bi bi-people"></i>
-                                    <h5 class="mb-2">No Students Found</h5>
-                                    <p class="mb-0">Try adjusting your filters or check back later.</p>
-                                </div>
-                            @endforelse
-
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                            
                             <!-- Pagination -->
-                            @if($students->hasPages())
-                                <div class="d-flex justify-content-center mt-4">
-                                    {{ $students->links('vendor.pagination.bootstrap-5') }}
-                                </div>
-                            @endif
+                            <div class="pagination-wrap">
+                                {{ $students->links('vendor.pagination.premium') }}
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
                 </div>
             </div>
         </div>
 
     </div>
     <script>
-        // Sidebar toggle for mobile
         document.addEventListener('DOMContentLoaded', function () {
+            // Sidebar toggle logic
             const sidebar = document.querySelector('.custom-sidebar');
             const toggleBtn = document.getElementById('counselorSidebarToggle');
             if (toggleBtn && sidebar) {
@@ -589,10 +714,102 @@
                         if (!clickInside) sidebar.classList.remove('show');
                     }
                 });
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        sidebar.classList.remove('show');
+            }
+
+            // Bulk actions logic
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            const bulkBar = document.getElementById('bulkBar');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const closeBulkBar = document.getElementById('closeBulkBar');
+
+            function updateBulkBar() {
+                const checked = document.querySelectorAll('.item-checkbox:checked');
+                selectedCountSpan.textContent = checked.length;
+                if (checked.length > 0) {
+                    bulkBar.classList.add('active');
+                } else {
+                    bulkBar.classList.remove('active');
+                    if (selectAll) selectAll.checked = false;
+                }
+            }
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateBulkBar();
+                });
+            }
+
+            checkboxes.forEach(cb => cb.addEventListener('change', updateBulkBar));
+
+            if (closeBulkBar) {
+                closeBulkBar.addEventListener('click', () => {
+                    checkboxes.forEach(cb => cb.checked = false);
+                    if (selectAll) selectAll.checked = false;
+                    updateBulkBar();
+                });
+            }
+
+            // Bulk Message Event
+            const bulkMessageBtn = document.getElementById('bulkMessageBtn');
+            const bulkExportBtn = document.getElementById('bulkExportBtn');
+            const bulkActionForm = document.getElementById('bulk-action-form');
+            const bulkIdsContainer = document.getElementById('bulk-ids-container');
+
+            if (bulkMessageBtn) {
+                bulkMessageBtn.addEventListener('click', async () => {
+                    const ids = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+                    if (ids.length === 0) return;
+
+                    const { value: text } = await Swal.fire({
+                        title: 'Send Bulk Message',
+                        input: 'textarea',
+                        inputLabel: `Sending message to ${ids.length} students`,
+                        inputPlaceholder: 'Type your message here...',
+                        inputAttributes: {
+                            'aria-label': 'Type your message here'
+                        },
+                        showCancelButton: true,
+                        confirmButtonText: 'Send Message',
+                        confirmButtonColor: '#1f7a2d',
+                    });
+
+                    if (text) {
+                        bulkActionForm.action = "{{ route('counselor.students.bulkMessage') }}";
+                        bulkIdsContainer.innerHTML = '';
+                        ids.forEach(id => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'ids[]';
+                            input.value = id;
+                            bulkIdsContainer.appendChild(input);
+                        });
+                        const msgInput = document.createElement('input');
+                        msgInput.type = 'hidden';
+                        msgInput.name = 'message';
+                        msgInput.value = text;
+                        bulkIdsContainer.appendChild(msgInput);
+                        bulkActionForm.submit();
                     }
+                });
+            }
+
+            if (bulkExportBtn) {
+                bulkExportBtn.addEventListener('click', () => {
+                    const ids = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+                    if (ids.length === 0) return;
+
+                    bulkActionForm.action = "{{ route('counselor.students.bulkExport') }}";
+                    bulkIdsContainer.innerHTML = '';
+                    ids.forEach(id => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = id;
+                        bulkIdsContainer.appendChild(input);
+                    });
+                    bulkActionForm.submit();
                 });
             }
         });

@@ -45,11 +45,17 @@ class CounselorStudentController extends Controller
             });
         }
 
+        // Standardized per_page
+        $perPage = (int) $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 30, 50, 100]) ? $perPage : 10;
+
         $students = $query->with([
             'assessments' => function ($q) {
                 $q->latest()->take(1);
             }
-        ])->orderBy('name')->paginate(15);
+        ])->orderBy('name')
+            ->paginate($perPage)
+            ->appends($request->except('page'));
 
         // Get unique values for filter dropdowns
         $colleges = User::where('role', 'student')
@@ -130,6 +136,77 @@ class CounselorStudentController extends Controller
         }
 
         return view('counselor.students.show', compact('student', 'assessments', 'appointments', 'attendanceMatrix'));
+    }
+
+    /**
+     * Send a bulk message to selected students
+     */
+    public function bulkMessage(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:users,id',
+            'message' => 'required|string|max:1000',
+        ]);
+
+        $students = User::whereIn('id', $request->ids)->where('role', 'student')->get();
+        $senderId = auth()->id();
+
+        foreach ($students as $student) {
+            \App\Models\Message::create([
+                'sender_id' => $senderId,
+                'recipient_id' => $student->id,
+                'content' => $request->message,
+                'is_read' => false,
+            ]);
+        }
+
+        return redirect()->back()->with('success', count($students) . ' messages sent successfully.');
+    }
+
+    /**
+     * Export selected students to CSV
+     */
+    public function bulkExport(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:users,id',
+        ]);
+
+        $students = User::whereIn('id', $request->ids)
+            ->where('role', 'student')
+            ->orderBy('name')
+            ->get();
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="students_export_' . now()->format('Ymd_His') . '.csv"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
+        ];
+
+        $callback = function () use ($students) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Student ID', 'Name', 'Email', 'College', 'Course', 'Year Level', 'Sex', 'Join Date']);
+
+            foreach ($students as $student) {
+                fputcsv($file, [
+                    $student->student_id,
+                    $student->name,
+                    $student->email,
+                    $student->college,
+                    $student->course,
+                    $student->year_level,
+                    $student->sex,
+                    $student->created_at->format('Y-m-d')
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
 

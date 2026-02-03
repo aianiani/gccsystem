@@ -239,11 +239,13 @@
             justify-content: center;
         }
 
-        .star-btn:hover {
-            color: var(--yellow-maize);
-            transform: scale(1.15) rotate(10deg);
-            background: rgba(244, 208, 63, 0.2);
-            border-color: var(--yellow-maize);
+        @media (hover: hover) {
+            .star-btn:hover {
+                color: var(--yellow-maize);
+                transform: scale(1.15) rotate(10deg);
+                background: rgba(244, 208, 63, 0.2);
+                border-color: var(--yellow-maize);
+            }
         }
 
         .star-btn.active {
@@ -459,6 +461,33 @@
             padding: 0 !important;
             margin: 0 !important;
         }
+
+        @media (max-width: 767.98px) {
+            /* Keep global zoom as per user request, but optimize touch targets */
+
+            .star-btn {
+                width: 75px;
+                height: 75px;
+                font-size: 3rem;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Disable hover transform on mobile to prevent click calc issues */
+            .star-btn:hover {
+                transform: none !important;
+            }
+
+            .star-btn.active {
+                transform: none !important;
+            }
+
+            .rating-stars {
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin: 1.5rem 0;
+            }
+        }
     </style>
 
     <div class="d-flex">
@@ -637,14 +666,15 @@ unset($__errorArgs, $__bag); ?>
                 </div>
             </div>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const starButtons = document.querySelectorAll('.star-btn');
-                    const ratingInput = document.getElementById('rating');
-                    let selectedRating = 0;
-
+            <script>             document.addEventListener('DOMContentLoaded', function () {
+                    const starButtons = document.querySelectorAll('.star-btn'); const ratingInput = document.getElementById('rating'); let selectedRating = 0;
                     starButtons.forEach(button => {
-                        button.addEventListener('click', function () {
+                        function handleRating(e) {
+                            // Prevent double firing on touch devices that emit both touch and click
+                            if (e.type === 'touchstart') {
+                                e.preventDefault();
+                            }
+
                             const rating = parseInt(this.getAttribute('data-rating'));
                             selectedRating = rating;
                             ratingInput.value = rating;
@@ -659,10 +689,26 @@ unset($__errorArgs, $__bag); ?>
                                     star.innerHTML = '<i class="bi bi-star"></i>';
                                 }
                             });
-                        });
 
-                        // Hover effects
+                            // Hide validation error if it exists
+                            // The error is after the hidden input which is after .rating-stars
+                            // Structure: .rating-stars -> input#rating -> .text-danger
+                            const container = document.querySelector('.form-group .rating-stars').parentNode;
+                            const errorMsg = container.querySelector('.text-danger');
+                            if (errorMsg) {
+                                errorMsg.style.display = 'none';
+                            }
+                        }
+
+                        button.addEventListener('click', handleRating);
+                        button.addEventListener('touchstart', handleRating, { passive: false });
+
+                        // Hover effects (only for mouse)
                         button.addEventListener('mouseenter', function () {
+                            // Simple check for touch capability might not be enough, but good heuristic
+                            // A better way is to see if we recently had a touch event, but this is fine for now
+                            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+
                             const rating = parseInt(this.getAttribute('data-rating'));
                             starButtons.forEach((star, index) => {
                                 if (index < rating) {
@@ -672,6 +718,8 @@ unset($__errorArgs, $__bag); ?>
                         });
 
                         button.addEventListener('mouseleave', function () {
+                            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+
                             starButtons.forEach((star, index) => {
                                 if (index < selectedRating) {
                                     star.innerHTML = '<i class="bi bi-star-fill"></i>';

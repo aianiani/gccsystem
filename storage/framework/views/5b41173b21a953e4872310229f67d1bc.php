@@ -171,27 +171,9 @@
             box-shadow: 0 10px 20px rgba(220, 53, 69, 0.4);
         }
 
-        @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
 
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
 
         @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
-
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
-
-        @media (max-width: 767.98px) {
 
             /* Off-canvas behavior on mobile */
             .custom-sidebar {
@@ -257,7 +239,9 @@
         }
 
         .page-header {
-            background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
+            background: var(--hero-gradient);
+            background-color: var(--primary-green);
+            /* Fallback */
             color: white;
             border-radius: 16px;
             padding: 1.5rem 1.5rem;
@@ -267,14 +251,15 @@
         }
 
         .page-header h1 {
+            color: white !important;
             font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
         .page-header p {
+            color: rgba(255, 255, 255, 0.9) !important;
             font-size: 0.95rem;
-            opacity: 0.9;
             margin-bottom: 0;
         }
 
@@ -498,7 +483,7 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="studentSidebarToggle" class="d-md-none">
+            <button id="studentSidebarToggle" class="d-lg-none">
                 <i class="bi bi-list"></i>
             </button>
             <!-- Sidebar -->
@@ -520,89 +505,57 @@
                         <div class="container">
 
                             <?php if($counselors->count() > 0): ?>
-                                <div class="inbox-list">
+
+                                <div class="counselor-grid">
                                     <?php $__currentLoopData = $counselors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $counselor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <a href="<?php echo e(route('chat.index', $counselor->id)); ?>" class="inbox-item">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="position-relative">
+                                        <div class="counselor-card">
+                                            <div class="counselor-header">
+                                                <div class="status-indicator" title="Online"></div>
+                                                <div class="counselor-avatar">
                                                     <?php if($counselor->avatar): ?>
-                                                        <img src="<?php echo e($counselor->avatar_url); ?>" alt="Avatar" class="rounded-circle"
-                                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                                        <img src="<?php echo e($counselor->avatar_url); ?>" alt="Avatar"
+                                                            class="w-100 h-100 rounded-circle" style="object-fit: cover;">
                                                     <?php else: ?>
-                                                        <div class="rounded-circle d-flex align-items-center justify-content-center bg-success text-white"
-                                                            style="width: 50px; height: 50px; font-weight: bold; font-size: 1.2rem;">
-                                                            <?php echo e(strtoupper(substr($counselor->name ?? 'C', 0, 1))); ?>
+                                                        <?php echo e(strtoupper(substr($counselor->name ?? 'C', 0, 1))); ?>
+
+                                                    <?php endif; ?>
+                                                </div>
+                                                <h3 class="counselor-name"><?php echo e($counselor->name); ?></h3>
+                                                <p class="counselor-role">Guidance Counselor</p>
+                                            </div>
+                                            <div class="counselor-body">
+                                                <div class="counselor-info">
+                                                    <i class="bi bi-envelope"></i>
+                                                    <span class="text-truncate d-block"
+                                                        style="max-width: 200px;"><?php echo e($counselor->email); ?></span>
+                                                </div>
+
+                                                <div class="counselor-stats">
+                                                    <div class="stat-item">
+                                                        <div class="stat-number">
+                                                            <?php echo e($counselor->program ?? 'N/A'); ?>
 
                                                         </div>
-                                                    <?php endif; ?>
-                                                    <div class="status-indicator"></div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <h6 class="mb-0 font-weight-bold text-dark"><?php echo e($counselor->name); ?></h6>
-                                                        <?php if($counselor->last_message): ?>
-                                                            <small class="text-muted" style="font-size: 0.75rem;">
-                                                                <?php echo e($counselor->last_message->created_at->diffForHumans(null, true, true)); ?>
-
-                                                            </small>
-                                                        <?php endif; ?>
+                                                        <div class="stat-label">Assigned Program</div>
                                                     </div>
-                                                    <p class="mb-0 text-muted small text-truncate" style="max-width: 250px;">
-                                                        <?php if($counselor->last_message): ?>
-                                                            <?php if($counselor->last_message->sender_id === auth()->id()): ?>
-                                                                <span class="fw-bold text-dark">You:</span>
-                                                            <?php endif; ?>
-                                                            <?php echo e($counselor->last_message->content ?: ($counselor->last_message->image ? 'Sent an image' : '')); ?>
-
-                                                        <?php else: ?>
-                                                            <?php echo e($counselor->email); ?>
-
-                                                        <?php endif; ?>
-                                                    </p>
+                                                    <div class="stat-item">
+                                                        <div class="stat-number">
+                                                            <i class="bi bi-check-circle-fill text-success"
+                                                                style="font-size: 1.25rem;"></i>
+                                                        </div>
+                                                        <div class="stat-label">Status</div>
+                                                    </div>
                                                 </div>
-                                                <i class="bi bi-chevron-right text-muted"></i>
+
+                                                <a href="<?php echo e(route('chat.index', $counselor->id)); ?>" class="chat-btn">
+                                                    <i class="bi bi-chat-text-fill"></i> Chat Now
+                                                </a>
                                             </div>
-                                        </a>
+                                        </div>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
 
-                                <style>
-                                    .inbox-list {
-                                        background: white;
-                                        border-radius: 12px;
-                                        overflow: hidden;
-                                        box-shadow: var(--shadow-sm);
-                                        border: 1px solid var(--gray-100);
-                                    }
 
-                                    .inbox-item {
-                                        display: block;
-                                        padding: 1rem 1.5rem;
-                                        border-bottom: 1px solid var(--gray-100);
-                                        transition: background-color 0.2s;
-                                        text-decoration: none;
-                                    }
-
-                                    .inbox-item:last-child {
-                                        border-bottom: none;
-                                    }
-
-                                    .inbox-item:hover {
-                                        background-color: var(--gray-50);
-                                        text-decoration: none;
-                                    }
-
-                                    .status-indicator {
-                                        position: absolute;
-                                        bottom: 0;
-                                        right: 0;
-                                        width: 12px;
-                                        height: 12px;
-                                        border-radius: 50%;
-                                        background: #28a745;
-                                        border: 2px solid white;
-                                    }
-                                </style>
                             <?php else: ?>
                                 <div class="empty-state">
                                     <i class="bi bi-people"></i>
@@ -617,30 +570,6 @@
             </div>
         </div>
     </div>
-    <script>
-        // Sidebar toggle for mobile
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('studentSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function (e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        sidebar.classList.remove('show');
-                    }
-                });
-            }
-        });
-    </script>
+
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/chat_select_counselor.blade.php ENDPATH**/ ?>

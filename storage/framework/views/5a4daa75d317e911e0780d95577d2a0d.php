@@ -189,17 +189,9 @@
             }
         }
 
+
+
         @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
-
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
-
-        @media (max-width: 767.98px) {
 
             /* Off-canvas behavior on mobile */
             .custom-sidebar {
@@ -268,64 +260,14 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="studentSidebarToggle" class="d-md-none">
+            <button id="studentSidebarToggle" class="d-lg-none">
                 <i class="bi bi-list"></i>
             </button>
             <!-- Sidebar -->
             <?php if(auth()->check() && auth()->user()->isCounselor()): ?>
                 <?php echo $__env->make('counselor.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
             <?php else: ?>
-                <div class="custom-sidebar">
-                    <div class="sidebar-logo">
-                        <img src="<?php echo e(asset('images/logo.jpg')); ?>" alt="CMU Logo"
-                            style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                        <h3
-                            style="margin: 0.5rem 0 0.25rem 0; font-size: 1.1rem; font-weight: 700; color: #f4d03f; line-height: 1.3;">
-                            CMU Guidance and Counseling Center</h3>
-                        <p
-                            style="margin: 0; font-size: 0.8rem; color: #fff; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">
-                            Student Portal</p>
-                    </div>
-                    <nav class="sidebar-nav">
-                        <a href="<?php echo e(route('dashboard')); ?>"
-                            class="sidebar-link<?php echo e(request()->routeIs('dashboard') ? ' active' : ''); ?>"><i
-                                class="bi bi-house-door"></i>Dashboard</a>
-                        <a href="<?php echo e(route('profile')); ?>"
-                            class="sidebar-link<?php echo e(request()->routeIs('profile') ? ' active' : ''); ?>"><i
-                                class="bi bi-person"></i>Profile</a>
-                        <a href="<?php echo e(route('appointments.index')); ?>"
-                            class="sidebar-link<?php echo e(request()->routeIs('appointments.*') && !request()->routeIs('appointments.completedWithNotes') ? ' active' : ''); ?>"><i
-                                class="bi bi-calendar-check"></i>Appointments</a>
-                        <a href="<?php echo e(route('appointments.completedWithNotes')); ?>"
-                            class="sidebar-link<?php echo e(request()->routeIs('appointments.completedWithNotes') ? ' active' : ''); ?>"><i
-                                class="bi bi-journal-text"></i>Sessions & Feedback</a>
-                        <a href="<?php echo e(route('assessments.index')); ?>"
-                            class="sidebar-link<?php echo e(request()->routeIs('assessments.*') ? ' active' : ''); ?>"><i
-                                class="bi bi-clipboard-data"></i>Assessments</a>
-                        <a href="<?php echo e(route('chat.selectCounselor')); ?>"
-                            class="sidebar-link<?php echo e(request()->routeIs('chat.selectCounselor') ? ' active' : ''); ?>"><i
-                                class="bi bi-chat-dots"></i>Chat with a Counselor</a>
-
-                        <div class="sidebar-divider my-3" style="border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
-                        <div class="sidebar-resources">
-                            <div class="text-uppercase small px-3 mb-2"
-                                style="color: rgba(255,255,255,0.5); font-weight:700; font-size: 0.75rem; letter-spacing: 1px;">
-                                Resources</div>
-                            <a href="#" class="sidebar-link"><i class="bi bi-play-circle"></i>Orientation</a>
-                            <a href="#" class="sidebar-link"><i class="bi bi-book"></i>Library</a>
-                            <a href="#" class="sidebar-link"><i class="bi bi-gear"></i>Settings</a>
-                        </div>
-                    </nav>
-                    <div class="sidebar-bottom w-100">
-                        <a href="<?php echo e(route('logout')); ?>" class="sidebar-link logout"
-                            onclick="event.preventDefault(); document.getElementById('logout-form-chat').submit();">
-                            <i class="bi bi-box-arrow-right"></i>Logout
-                        </a>
-                        <form id="logout-form-chat" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
-                            <?php echo csrf_field(); ?>
-                        </form>
-                    </div>
-                </div>
+                <?php echo $__env->make('student.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
             <?php endif; ?>
 
             <!-- Main Content -->
@@ -477,7 +419,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="d-flex align-items-end">
+                                                    <div class="d-flex align-items-center flex-nowrap">
                                                         <div class="chat-input-group flex-grow-1">
                                                             <button type="button" class="btn-attach"
                                                                 onclick="document.getElementById('image-input').click()"
@@ -488,7 +430,8 @@
                                                                 class="chat-input" placeholder="Type a message..."
                                                                 autocomplete="off">
                                                         </div>
-                                                        <button type="submit" class="btn-send" id="send-button">
+                                                        <button type="submit" class="btn-send flex-shrink-0"
+                                                            id="send-button">
                                                             <i class="bi bi-send-fill"></i>
                                                         </button>
                                                     </div>
@@ -525,8 +468,12 @@
             }
 
             .inbox-sidebar {
-                display: none;
+                display: none !important;
                 /* simple mobile chat: show conversation only if active */
+            }
+
+            .chat-input-wrapper {
+                padding: 0.75rem 0.5rem !important;
             }
 
             .chat-main {
@@ -576,6 +523,7 @@
         .inbox-item.active {
             background-color: var(--light-green);
             border-left-color: var(--primary-green);
+            background: linear-gradient(90deg, rgba(31, 122, 45, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
         }
 
         .avatar-container {
@@ -653,25 +601,29 @@
         }
 
         .message-bubble {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 18px;
+            max-width: 75%;
+            padding: 12px 18px;
+            border-radius: 20px;
             position: relative;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             font-size: 0.95rem;
             line-height: 1.5;
+            word-wrap: break-word;
         }
 
         .message-wrapper.own .message-bubble {
-            background: var(--primary-green);
+            background: linear-gradient(135deg, var(--primary-green-2) 0%, var(--primary-green) 100%);
             color: white;
             border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 10px rgba(31, 122, 45, 0.2);
         }
 
         .message-wrapper.other .message-bubble {
             background: white;
             color: var(--text-dark);
             border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.02);
         }
 
         .message-time {
@@ -692,8 +644,10 @@
         /* Input Area */
         .chat-input-wrapper {
             background: white;
-            padding: 1.25rem;
+            padding: 1rem 1.5rem;
             border-top: 1px solid var(--gray-100);
+            position: relative;
+            z-index: 20;
         }
 
         .chat-input-group {
@@ -709,7 +663,8 @@
         .chat-input-group:focus-within {
             background: white;
             border-color: var(--primary-green);
-            box-shadow: 0 0 0 4px rgba(31, 122, 45, 0.1);
+            box-shadow: 0 4px 12px rgba(31, 122, 45, 0.1);
+            transform: translateY(-1px);
         }
 
         .chat-input {
@@ -849,9 +804,10 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                    .then(response => {
+                    .then(async response => {
                         if (!response.ok) {
-                            throw new Error('Network response was not ok');
+                            const text = await response.text();
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}\n${text.substring(0, 100)}...`);
                         }
                         return response.json();
                     })
@@ -950,8 +906,8 @@
                 }
                 if (message.image) {
                     messageContent += `<div class="message-image mt-2">
-                                                    <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
-                                                </div>`;
+                                                                <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
+                                                            </div>`;
                 }
 
                 // Avatar for other user
@@ -961,13 +917,13 @@
                 }
 
                 wrapperDiv.innerHTML = `
-                                                ${avatarHtml}
-                                                <div class="message-bubble">
-                                                    ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
-                                                    ${messageContent}
-                                                    <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                                </div>
-                                            `;
+                                                            ${avatarHtml}
+                                                            <div class="message-bubble">
+                                                                ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
+                                                                ${messageContent}
+                                                                <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                            </div>
+                                                        `;
 
                 messagesContainer.insertBefore(wrapperDiv, scrollAnchor);
             }
@@ -1030,31 +986,6 @@
                         } else {
                             alert('Please drop an image file.');
                         }
-                    }
-                });
-            }
-        });
-    </script>
-    <script>
-        // Sidebar toggle for mobile
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('studentSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function (e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        sidebar.classList.remove('show');
                     }
                 });
             }

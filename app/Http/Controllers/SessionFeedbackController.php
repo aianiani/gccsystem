@@ -105,19 +105,55 @@ class SessionFeedbackController extends Controller
     }
 
     // List all feedback for the counselor
-    public function index()
+    public function index(Request $request)
     {
         if (auth()->user()->role !== 'counselor') {
             return redirect()->back()->with('error', 'Access denied.');
         }
 
-        $feedbacks = SessionFeedback::whereHas('appointment', function ($query) {
+        $query = SessionFeedback::whereHas('appointment', function ($query) {
             $query->where('counselor_id', auth()->id());
-        })
-            ->with(['appointment.student'])
-            ->latest()
-            ->paginate(10); // Paginate for better UI
+        })->with(['appointment.student']);
+
+        // Filter by student name
+        if ($request->filled('student')) {
+            $query->whereHas('appointment.student', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->student . '%');
+            });
+        }
+
+        // Filter by rating
+        if ($request->filled('rating')) {
+            $query->where('rating', $request->rating);
+        }
+
+        // Standardized per_page
+        $perPage = (int) $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 30, 50, 100]) ? $perPage : 10;
+
+        $feedbacks = $query->latest()
+            ->paginate($perPage)
+            ->appends($request->except('page'));
 
         return view('counselor.feedback.index', compact('feedbacks'));
+    }
+
+    // Bulk Delete Feedback
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:session_feedback,id'
+        ]);
+
+        $ids = $request->ids;
+
+        // Ensure counselor only deletes feedback for THEIR appointments
+        SessionFeedback::whereIn('id', $ids)
+            ->whereHas('appointment', function ($q) {
+                $q->where('counselor_id', auth()->id());
+            })->delete();
+
+        return redirect()->back()->with('success', count($ids) . ' feedback entries deleted successfully.');
     }
 }

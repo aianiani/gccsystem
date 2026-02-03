@@ -44,15 +44,42 @@
             }
 
             .announcement-header-bg {
-                padding: 1.5rem 1rem !important;
+                padding: 2rem 1.25rem !important;
+                border-radius: 12px !important;
+                text-align: center;
+            }
+
+            .announcement-header-bg .d-flex {
+                justify-content: center !important;
+                flex-direction: column;
+            }
+
+            .announcement-header-bg .d-flex.align-items-center.mb-2 {
+                justify-content: center !important;
+                margin-bottom: 1rem !important;
             }
 
             .announcement-content-card {
-                padding: 1.5rem 1rem !important;
+                padding: 1.5rem 1.25rem !important;
             }
 
             .announcement-title {
                 font-size: 1.5rem !important;
+                line-height: 1.3;
+            }
+
+            .announcement-meta {
+                justify-content: center;
+            }
+
+            .attachment-compact-mobile {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem !important;
+            }
+
+            .attachment-compact-mobile .btn {
+                width: 100%;
             }
         }
 
@@ -120,14 +147,14 @@
                                     </div>
                                     <div class="text-muted small mb-2">Click the image to open in a new tab.</div>
                                 @else
-                                    <div class="p-3 p-lg-4 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-3"
+                                    <div class="p-3 p-lg-4 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-3 attachment-compact-mobile"
                                         style="background: #f8faf9; border: 1px solid rgba(0,0,0,0.06);">
                                         <div class="d-flex align-items-center gap-3">
                                             <div class="d-inline-flex align-items-center justify-content-center"
-                                                style="width:44px;height:44px;border-radius:12px;background: linear-gradient(135deg, #2e7d32, #228B22); color:#fff;">
+                                                style="width:44px;height:44px;border-radius:12px;background: linear-gradient(135deg, #2e7d32, #228B22); color:#fff; flex-shrink: 0;">
                                                 <i class="fas fa-paperclip"></i>
                                             </div>
-                                            <div>
+                                            <div class="text-start">
                                                 <div class="fw-semibold">Attachment</div>
                                                 <div class="text-muted small">Click to view or download</div>
                                             </div>

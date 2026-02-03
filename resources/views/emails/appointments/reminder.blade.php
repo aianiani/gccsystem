@@ -8,9 +8,9 @@
 
 <div class="info-box">
     <p><strong>{{ $isStudent ? 'Counselor' : 'Student' }}:</strong> {{ $otherParty->name }}</p>
-    <p><strong>Date:</strong> {{ $appointment->scheduled_at->format('F d, Y') }}</p>
-    <p><strong>Time:</strong> {{ $appointment->scheduled_at->format('g:i A') }}</p>
-    <p><strong>Type:</strong> {{ ucfirst($appointment->type) }}</p>
+    <p><strong>Date:</strong> {{ $date }}</p>
+    <p><strong>Time:</strong> {{ $time }}</p>
+    <p><strong>Type:</strong> {{ ucfirst($appointment->appointment_type) }}</p>
     <p><strong>Reference Number:</strong> {{ $appointment->reference_number }}</p>
 </div>
 

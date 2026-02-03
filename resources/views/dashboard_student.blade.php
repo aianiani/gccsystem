@@ -92,6 +92,16 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+
+            .custom-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .custom-sidebar.show {
+                transform: translateX(0) !important;
+                z-index: 1100;
+                visibility: visible;
+            }
         }
 
         /* Apply the same page zoom used on the homepage */
@@ -195,31 +205,27 @@
             }
         }
 
-        /* Hero Section - The "Showstopper" */
+        /* Hero Section - Premium Design */
         .welcome-card {
-            background: var(--hero-gradient);
+            background: linear-gradient(135deg, #1f7a2d 0%, #145a1f 50%, #0a3d10 100%);
             position: relative;
-            border-radius: 24px;
-            box-shadow: var(--shadow-lg);
-            padding: 2.5rem 3rem;
-            margin-bottom: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(31, 122, 45, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            padding: 0;
+            margin-bottom: 2rem;
             color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Abstract Background Pattern for Hero */
+        /* Decorative Elements */
         .welcome-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            top: -100px;
+            right: -100px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(244, 208, 63, 0.15) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
         }
@@ -227,26 +233,29 @@
         .welcome-card::after {
             content: '';
             position: absolute;
-            bottom: -30%;
-            left: -10%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255, 203, 5, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+            bottom: -80px;
+            left: -80px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
         }
 
-        .welcome-card-content {
+        .welcome-card-inner {
+            display: flex;
+            align-items: stretch;
             position: relative;
             z-index: 2;
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            width: 100%;
         }
 
-        .welcome-avatar-wrapper {
-            position: relative;
+        /* Left Section - User Info */
+        .welcome-user-section {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         .welcome-avatar {
@@ -254,10 +263,9 @@
             height: 100px;
             border-radius: 50%;
             padding: 4px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
         }
 
         .welcome-avatar img {
@@ -265,71 +273,207 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
-        .welcome-text h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
-            color: #ffffff;
-            /* Explicitly white for better contrast */
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        .welcome-info {
+            flex: 1;
         }
 
         .welcome-date {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.8);
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.35rem 0.9rem;
+            border-radius: 50px;
             margin-bottom: 0.75rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .welcome-date i {
+            font-size: 0.85rem;
+        }
+
+        .welcome-greeting {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            color: #fff;
+            line-height: 1.3;
         }
 
         .welcome-subtitle {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 300;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 400;
         }
 
-        /* Seminar Badges with Glassmorphism */
-        .seminar-badges-container {
+        /* Right Section - Seminar Badges */
+        .welcome-badges-section {
             background: rgba(0, 0, 0, 0.15);
-            border-radius: 20px;
-            padding: 1.25rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            min-width: 320px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 420px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .badges-header {
+            margin-bottom: 1rem;
+        }
+
+        .badges-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .seminar-badges-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
         }
 
         .seminar-badge {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            padding: 0.6rem 1rem;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
-            transition: all 0.3s ease;
+            gap: 0.5rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: default;
+            border: 1px solid transparent;
+        }
+
+        .seminar-badge.locked {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .seminar-badge.locked i {
+            opacity: 0.5;
         }
 
         .seminar-badge.completed {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
             color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
         }
 
-        .seminar-badge.completed i {
-            color: var(--accent-orange);
-            filter: drop-shadow(0 0 5px rgba(255, 203, 5, 0.6));
+        /* NSOP - Purple */
+        .seminar-badge.completed.nsop {
+            background: rgba(111, 66, 193, 0.9);
+            border-color: rgba(111, 66, 193, 0.5);
+        }
+
+        .seminar-badge.completed.nsop i {
+            color: #d8b4fe;
+        }
+
+        /* IDREAMS - Cyan */
+        .seminar-badge.completed.idreams {
+            background: rgba(13, 202, 240, 0.9);
+            border-color: rgba(13, 202, 240, 0.5);
+        }
+
+        .seminar-badge.completed.idreams i {
+            color: #fff;
+        }
+
+        /* 10C - Yellow/Gold */
+        .seminar-badge.completed.ten-c {
+            background: rgba(255, 203, 5, 0.95);
+            border-color: rgba(255, 203, 5, 0.5);
+        }
+
+        .seminar-badge.completed.ten-c i {
+            color: #1a1a1a;
+        }
+
+        .seminar-badge.completed.ten-c span {
+            color: #1a1a1a;
+        }
+
+        /* LEADS - Blue */
+        .seminar-badge.completed.leads {
+            background: rgba(13, 110, 253, 0.9);
+            border-color: rgba(13, 110, 253, 0.5);
+        }
+
+        .seminar-badge.completed.leads i {
+            color: #bfdbfe;
+        }
+
+        /* IMAGE - Green */
+        .seminar-badge.completed.image {
+            background: rgba(25, 135, 84, 0.9);
+            border-color: rgba(25, 135, 84, 0.5);
+        }
+
+        .seminar-badge.completed.image i {
+            color: #a7f3d0;
+        }
+
+        .seminar-badge:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .welcome-card-inner {
+                flex-direction: column;
+            }
+
+            .welcome-badges-section {
+                min-width: unset;
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .welcome-user-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .welcome-user-section {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.25rem;
+                gap: 1rem;
+            }
+
+            .welcome-avatar {
+                width: 70px;
+                height: 70px;
+            }
+
+            .welcome-greeting {
+                font-size: 1.25rem;
+            }
+
+            .welcome-badges-section {
+                padding: 1.25rem;
+            }
+
+            .seminar-badges-grid {
+                justify-content: center;
+            }
+
+            .seminar-badge {
+                padding: 0.4rem 0.7rem;
+                font-size: 0.75rem;
+            }
         }
 
         /* Stats Cards Redesign */
@@ -470,63 +614,12 @@
             box-shadow: 0 8px 25px rgba(255, 203, 5, 0.5);
             background: linear-gradient(135deg, #f4b400 0%, #FFCB05 100%);
         }
-
-        /* Responsive */
-        @media (max-width: 991px) {
-            .welcome-card {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                padding: 2rem;
-                gap: 2rem;
-            }
-
-            .welcome-card-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .seminar-badges-container {
-                width: 100%;
-                min-width: unset;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .welcome-card {
-                padding: 1.25rem 1rem !important;
-                border-radius: 16px;
-                gap: 1.25rem !important;
-            }
-
-            .welcome-avatar {
-                width: 70px;
-                height: 70px;
-            }
-
-            .welcome-text h1 {
-                font-size: 1.35rem;
-                margin-bottom: 0.25rem;
-            }
-
-            .welcome-date {
-                font-size: 0.85rem;
-                padding: 0.2rem 0.6rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .seminar-badge {
-                min-width: 70px !important;
-                padding: 0.4rem 0.6rem !important;
-                font-size: 0.75rem !important;
-            }
-        }
     </style>
 
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="studentSidebarToggle" class="d-md-none">
+            <button id="studentSidebarToggle" class="d-lg-none">
                 <i class="bi bi-list"></i>
             </button>
 
@@ -538,37 +631,38 @@
                 <div class="main-dashboard-inner">
 
                     <!-- Premium Hero Section -->
-                    <div class="welcome-card position-relative overflow-hidden">
-                        <!-- Hero Content... -->
-                        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100 gap-3 gap-md-4 position-relative"
-                            style="z-index: 2;">
-                            <div class="d-flex flex-column flex-md-row align-items-center gap-3 gap-md-4">
-                                <div class="welcome-avatar flex-shrink-0">
-                                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
-                                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3);">
+                    <div class="welcome-card">
+                        <div class="welcome-card-inner">
+                            <!-- User Info Section -->
+                            <div class="welcome-user-section">
+                                <div class="welcome-avatar">
+                                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}">
                                 </div>
-                                <div>
-                                    <div class="welcome-date mb-1 opacity-75"><i
-                                            class="bi bi-calendar-event me-2"></i>{{ now()->format('F j, Y') }}</div>
-                                    <div class="welcome-text mb-2">Welcome back,
+                                <div class="welcome-info">
+                                    <div class="welcome-date">
+                                        <i class="bi bi-calendar3"></i>
+                                        {{ now()->format('F j, Y') }}
+                                    </div>
+                                    <div class="welcome-greeting">Welcome back,
                                         {{ auth()->user()->first_name ?? auth()->user()->name }}!
                                     </div>
-                                    <div style="font-size: 0.95rem; opacity: 0.9;">Always stay updated in your student
-                                        portal</div>
+                                    <div class="welcome-subtitle">Always stay updated in your student portal</div>
                                 </div>
                             </div>
-                            <!-- Seminar Badges... -->
-                            <div class="d-flex flex-column align-items-end">
-                                <div class="text-white-50 text-uppercase fw-bold mb-2"
-                                    style="font-size: 0.7rem; letter-spacing: 0.5px;">Seminar Progress</div>
-                                <div class="d-flex flex-wrap gap-2 justify-content-end">
+
+                            <!-- Seminar Badges Section -->
+                            <div class="welcome-badges-section">
+                                <div class="badges-header">
+                                    <span class="badges-title">Seminar Progress</span>
+                                </div>
+                                <div class="seminar-badges-grid">
                                     @php
                                         $badges = [
-                                            'New Student Orientation Program' => ['color' => 'bg-secondary bg-opacity-25 text-white border-secondary', 'icon' => 'bi-compass-fill', 'year' => 1, 'label' => 'NSOP'],
-                                            'IDREAMS' => ['color' => 'bg-info bg-opacity-25 text-white border-info', 'icon' => 'bi-clouds-fill', 'year' => 1],
-                                            '10C' => ['color' => 'bg-warning bg-opacity-25 text-white border-warning', 'icon' => 'bi-lightbulb-fill', 'year' => 2],
-                                            'LEADS' => ['color' => 'bg-primary bg-opacity-25 text-white border-primary', 'icon' => 'bi-people-fill', 'year' => 3],
-                                            'IMAGE' => ['color' => 'bg-success bg-opacity-25 text-white border-success', 'icon' => 'bi-person-badge-fill', 'year' => 4],
+                                            'New Student Orientation Program' => ['icon' => 'bi-compass-fill', 'year' => 1, 'label' => 'NSOP', 'class' => 'nsop'],
+                                            'IDREAMS' => ['icon' => 'bi-clouds-fill', 'year' => 1, 'class' => 'idreams'],
+                                            '10C' => ['icon' => 'bi-lightbulb-fill', 'year' => 2, 'class' => 'ten-c'],
+                                            'LEADS' => ['icon' => 'bi-people-fill', 'year' => 3, 'class' => 'leads'],
+                                            'IMAGE' => ['icon' => 'bi-person-badge-fill', 'year' => 4, 'class' => 'image'],
                                         ];
                                     @endphp
 
@@ -577,18 +671,14 @@
                                             $attendance = $attendanceMatrix[$style['year']][$seminarName] ?? null;
                                             $isCompleted = $attendance && ($attendance['status'] ?? '') === 'completed';
                                         @endphp
-                                        <div class="d-flex align-items-center justify-content-center gap-2 px-3 py-2 rounded-3 border transition-all text-center
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {{ $isCompleted ? $style['color'] . ' shadow-sm' : 'border-white-10 text-white-50' }}"
-                                            style="background: {{ $isCompleted ? '' : 'rgba(255, 255, 255, 0.05)' }};
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                border-color: {{ $isCompleted ? '' : 'rgba(255, 255, 255, 0.1)' }};
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                backdrop-filter: blur(4px); min-width: 100px;">
+                                        <div
+                                            class="seminar-badge {{ $isCompleted ? 'completed ' . $style['class'] : 'locked' }}">
                                             @if($isCompleted)
                                                 <i class="bi {{ $style['icon'] }}"></i>
-                                                <span class="fw-bold small">{{ $style['label'] ?? $seminarName }}</span>
                                             @else
-                                                <i class="bi bi-lock-fill opacity-50"></i>
-                                                <span class="small opacity-75">{{ $style['label'] ?? $seminarName }}</span>
+                                                <i class="bi bi-lock-fill"></i>
                                             @endif
+                                            <span>{{ $style['label'] ?? $seminarName }}</span>
                                         </div>
                                     @endforeach
                                 </div>
@@ -1026,6 +1116,7 @@
                             <a href="#" class="btn-action-premium js-book-appointment-trigger text-decoration-none">
                                 Book Now
                             </a>
+
                         </div>
                     </div>
 
@@ -1208,22 +1299,26 @@
                                     <h5 class="dass-modal-title mb-1">Complete the DASS-42 Assessment</h5>
                                     <p class="mb-0 text-white-50 small">This helps counselors tailor your session</p>
                                 </div>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
                         </div>
                         <div class="dass-modal-body">
                             <p class="mb-3" style="font-size: 1.05rem; line-height: 1.6; color: var(--text-dark);">
-                                Prior to booking an appointment, students are required to complete the DASS-42 assessment. 
-                                This brief assessment provides counselors with essential insights to support you effectively.
+                                Prior to booking an appointment, students are required to complete the DASS-42 assessment.
+                                This brief assessment provides counselors with essential insights to support you
+                                effectively.
                             </p>
                             <div class="d-flex gap-2 text-muted small align-items-start bg-light p-3 rounded-3">
                                 <i class="bi bi-info-circle-fill mt-1 flex-shrink-0 text-primary opacity-75"></i>
-                                <span>Once you finish the assessment, you’ll be able to proceed with booking your appointment immediately.</span>
+                                <span>Once you finish the assessment, you’ll be able to proceed with booking your
+                                    appointment immediately.</span>
                             </div>
                         </div>
                         <div class="dass-modal-footer">
                             <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Maybe Later</button>
-                            <a href="{{ route('consent.show') }}" class="btn btn-success px-4 fw-semibold">
+                            <a href="{{ route('consent.show', ['context' => 'booking']) }}"
+                                class="btn btn-success px-4 fw-semibold">
                                 Proceed to Assessment
                             </a>
                         </div>
@@ -1238,34 +1333,7 @@
                     tooltipTriggerList.forEach(function (tooltipTriggerEl) {
                         new bootstrap.Tooltip(tooltipTriggerEl);
                     });
-                    // Sidebar toggle for mobile
-                    const sidebar = document.querySelector('.custom-sidebar');
-                    const toggleBtn = document.getElementById('studentSidebarToggle');
-                    const closeBtn = document.getElementById('studentSidebarClose');
 
-                    if (toggleBtn && sidebar) {
-                        toggleBtn.addEventListener('click', function () {
-                            sidebar.classList.toggle('show');
-                        });
-
-                        if (closeBtn) {
-                            closeBtn.addEventListener('click', function () {
-                                sidebar.classList.remove('show');
-                            });
-                        }
-
-                        document.addEventListener('click', function (e) {
-                            if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                                if (!clickInside) sidebar.classList.remove('show');
-                            }
-                        });
-                        document.addEventListener('keydown', function (e) {
-                            if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                sidebar.classList.remove('show');
-                            }
-                        });
-                    }
 
                     // Gate appointment booking behind DASS-42 modal
                     const dassModalElement = document.getElementById('dassReminderModal');

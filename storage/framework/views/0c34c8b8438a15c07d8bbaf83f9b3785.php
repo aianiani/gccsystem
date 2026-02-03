@@ -176,20 +176,35 @@
         }
 
         @media (max-width: 768px) {
+            .consent-page {
+                padding: 1.5rem 1rem;
+            }
+
             .consent-header-title {
                 font-size: 1.5rem;
             }
 
             .consent-container {
-                padding: 1.5rem;
+                padding: 1.25rem;
+                border-radius: 12px;
+            }
+
+            .consent-content {
+                padding: 1rem;
+            }
+
+            .consent-checkbox {
+                padding: 1rem;
             }
 
             .consent-actions {
                 flex-direction: column;
+                gap: 0.75rem;
             }
 
             .btn-consent {
                 width: 100%;
+                padding: 0.8rem 1.5rem;
             }
         }
     </style>
@@ -227,6 +242,10 @@
 
                     <form method="POST" action="<?php echo e(route('consent.store')); ?>" id="consentForm">
                         <?php echo csrf_field(); ?>
+                        <?php if(isset($context)): ?>
+                            <input type="hidden" name="context" value="<?php echo e($context); ?>">
+                        <?php endif; ?>
+
 
                         <div class="consent-content">
                             <h3>CONSENT</h3>
@@ -280,9 +299,22 @@ unset($__errorArgs, $__bag); ?>
         document.addEventListener('DOMContentLoaded', function () {
             const checkbox = document.getElementById('consent_agreed');
             const submitBtn = document.getElementById('submitBtn');
+            const consentForm = document.getElementById('consentForm');
+            let isSubmitting = false;
 
             checkbox.addEventListener('change', function () {
                 submitBtn.disabled = !this.checked;
+            });
+
+            // Prevent double submission
+            consentForm.addEventListener('submit', function (e) {
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return false;
+                }
+                isSubmitting = true;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing...';
             });
         });
     </script>

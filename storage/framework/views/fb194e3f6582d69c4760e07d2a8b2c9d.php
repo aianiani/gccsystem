@@ -42,6 +42,11 @@
                 zoom: 1 !important;
                 transform: none !important;
             }
+
+            .main-dashboard-content {
+                margin-left: 0 !important;
+                padding: 3rem 0.75rem 1rem 0.75rem !important;
+            }
         }
 
         body,
@@ -283,8 +288,9 @@
         .dass42-options-row>div {
             flex: 1 1 calc(25% - 0.5rem);
             /* 4 columns on desktop */
-            min-width: 200px;
-            /* Stack on mobile */
+            min-width: 140px;
+            /* Reduced from 200px to allow better fitting */
+            /* Stack on mobile handled via grid classes */
         }
 
         .dass42-option-check {
@@ -294,17 +300,24 @@
             transition: background 0.2s;
             display: flex;
             align-items: center;
-            min-height: 60px;
+            min-height: 50px;
+            /* Reduced from 60px */
             /* Single consistent height */
-            margin-bottom: 0.3rem;
+            margin-bottom: 0px;
+            border: 1px solid transparent;
         }
 
-        /*
-                    .dass42-option-check[data-value="0"] { min-height: 42px; font-size: 0.94rem; padding: 0.45rem 0.6rem; }
-                    .dass42-option-check[data-value="1"] { min-height: 50px; font-size: 0.96rem; padding: 0.5rem 0.65rem; }
-                    .dass42-option-check[data-value="2"] { min-height: 58px; font-size: 0.99rem; padding: 0.55rem 0.7rem; }
-                    .dass42-option-check[data-value="3"] { min-height: 66px; font-size: 1.02rem; padding: 0.6rem 0.75rem; }
-                    */
+        @media (max-width: 576px) {
+            .dass42-option-check {
+                min-height: auto;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .dass42-option-check label {
+                font-size: 0.9rem !important;
+            }
+        }
+
         .dass42-option-check {
             transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, min-height 0.18s ease, padding 0.18s ease;
         }
@@ -362,11 +375,12 @@
         .dass42-sticky-header {
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 1045;
+            /* Higher than sidebar toggle if needed, but below modals */
             background: #f8f9fa;
-            padding: 0.9rem 1rem 0.5rem 1rem;
+            padding: 1rem;
             border-radius: 18px 18px 0 0;
-            box-shadow: 0 2px 8px rgba(44, 80, 22, 0.04);
+            box-shadow: 0 4px 12px rgba(44, 80, 22, 0.08);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -601,6 +615,10 @@
                         <!-- DASS-42 Assessment Form -->
                         <form method="POST" action="<?php echo e(route('assessments.dass42.submit')); ?>" class="dass42-form">
                             <?php echo csrf_field(); ?>
+                            <?php if(isset($context)): ?>
+                                <input type="hidden" name="context" value="<?php echo e($context); ?>">
+                            <?php endif; ?>
+
                             <div class="dass42-sticky-header">
                                 <h3 style="margin:0;">DASS-42 Assessment</h3>
                                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;">
@@ -762,6 +780,37 @@
             // Show summary before submit
             submitBtn.onclick = function (e) {
                 e.preventDefault();
+
+                // Check if ALL questions are answered
+                let unansweredIdx = -1;
+                for (let i = 0; i < totalQuestions; i++) {
+                    const checked = document.querySelector('input[name="answers[' + i + ']"]:checked');
+                    if (!checked) {
+                        unansweredIdx = i;
+                        break;
+                    }
+                }
+
+                if (unansweredIdx !== -1) {
+                    currentQuestion = unansweredIdx;
+                    showDass42Question(unansweredIdx);
+                    const qEl = questions[unansweredIdx];
+                    qEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    qEl.classList.add('border-danger');
+                    setTimeout(() => qEl.classList.remove('border-danger'), 1500);
+
+                    // Show a quick alert to the user
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Unfinished Assessment',
+                            text: 'Please answer all questions before submitting. We have highlighted the first missing answer for you.',
+                            confirmButtonColor: '#1f7a2d'
+                        });
+                    }
+                    return;
+                }
+
                 // Fill summary
                 document.querySelectorAll('.dass42-summary-answer').forEach(span => {
                     const idx = span.getAttribute('data-summary');
@@ -774,9 +823,11 @@
                         span.className = 'badge bg-danger dass42-summary-answer';
                     }
                 });
+
                 summaryDiv.style.display = '';
                 questionWrapper.style.display = 'none';
                 prevBtn.style.display = nextBtn.style.display = submitBtn.style.display = 'none';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
             var dass42EditBtn = document.getElementById('dass42-edit');
@@ -794,8 +845,15 @@
             var summarySubmitBtn = document.querySelector('#dass42-summary .btn-success');
             if (summarySubmitBtn) {
                 summarySubmitBtn.onclick = function (e) {
-                    // Allow form to submit (don't prevent default)
-                    return true;
+                    e.preventDefault(); // Stop natural submit to handle UI change properly
+                    const btn = this;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting Assessment...';
+
+                    // Small timeout ensures the UI update is visible before browser busy
+                    setTimeout(() => {
+                        btn.closest('form').submit();
+                    }, 100);
                 };
             }
 

@@ -176,7 +176,7 @@
             }
         }
 
-        @media (max-width: 767.98px) {
+        @media (max-width: 991.98px) {
             .custom-sidebar {
                 transform: translateX(-100%);
                 width: 240px;
@@ -386,7 +386,7 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="studentSidebarToggle" class="d-md-none">
+            <button id="studentSidebarToggle" class="d-lg-none">
                 <i class="bi bi-list"></i>
             </button>
             <!-- Sidebar -->
@@ -626,28 +626,6 @@
             document.getElementById('assessment-cards').style.display = 'flex';
         }
 
-        // Sidebar toggle for mobile
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('studentSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function (e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        sidebar.classList.remove('show');
-                    }
-                });
-            }
-        });
+
     </script>
 @endsection

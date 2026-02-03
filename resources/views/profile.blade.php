@@ -18,6 +18,16 @@
             .main-dashboard-content {
                 margin-left: 0 !important;
             }
+
+            .custom-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .custom-sidebar.show {
+                transform: translateX(0) !important;
+                z-index: 1100;
+                visibility: visible;
+            }
         }
 
         /* Premium Design Variables */
@@ -508,7 +518,7 @@
             <div class="home-zoom">
                 <div class="d-flex">
                     <!-- Mobile Sidebar Toggle -->
-                    <button id="studentSidebarToggle" class="d-md-none">
+                    <button id="studentSidebarToggle" class="d-lg-none">
                         <i class="bi bi-list"></i>
                     </button>
                     <!-- Sidebar -->
@@ -1037,30 +1047,6 @@
                         @if(!auth()->user()->isAdmin())
                                 </div>
                             </div>
-                            <script>
-                                // Sidebar toggle for mobile
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    const sidebar = document.querySelector('.custom-sidebar');
-                                    const toggleBtn = document.getElementById('studentSidebarToggle');
-                                    if (toggleBtn && sidebar) {
-                                        toggleBtn.addEventListener('click', function () {
-                                            if (window.innerWidth < 768) {
-                                                sidebar.classList.toggle('show');
-                                            }
-                                        });
-                                        document.addEventListener('click', function (e) {
-                                            if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                                const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                                                if (!clickInside) sidebar.classList.remove('show');
-                                            }
-                                        });
-                                        document.addEventListener('keydown', function (e) {
-                                            if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                                sidebar.classList.remove('show');
-                                            }
-                                        });
-                                    }
-                                });
-                            </script>
+
                         @endif
 @endsection

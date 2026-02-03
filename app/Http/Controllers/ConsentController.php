@@ -10,10 +10,11 @@ class ConsentController extends Controller
     /**
      * Show the consent page
      */
-    public function show()
+    public function show(Request $request)
     {
         // Always show the consent page so user can review or (re)confirm.
-        return view('consent');
+        $context = $request->query('context');
+        return view('consent', compact('context'));
     }
 
     /**
@@ -24,14 +25,24 @@ class ConsentController extends Controller
         $request->validate([
             'consent_agreed' => 'required|accepted',
         ]);
-        // Update user consent
-        auth()->user()->update([
-            'consent_agreed' => true,
-            'consent_agreed_at' => now(),
-        ]);
+        // Update user consent explicitly to ensure it's persisted before redirect
+        $user = auth()->user();
+        $user->consent_agreed = true;
+        $user->consent_agreed_at = now();
+        $user->save();
+
+        // Refresh the user instance to ensure the session and model are in sync
+        $user->refresh();
 
         // After agreeing to consent, the user should complete the DASS-42 assessment
-        return redirect()->route('assessments.dass42')
-            ->with('success', 'Consent agreement recorded. Please complete the DASS-42 assessment.');
+        $routeParams = [];
+        if ($request->has('context')) {
+            $routeParams['context'] = $request->input('context');
+        }
+
+        return redirect()->route('assessments.dass42', $routeParams)
+            ->with('success', 'Consent agreement recorded. Please complete the DASS-42 assessment.')
+            ->with('just_consented', true);
     }
+
 }

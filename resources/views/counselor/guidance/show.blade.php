@@ -638,7 +638,7 @@
                                                          style="--seminar-color: {{ $brand['color'] }}; --seminar-bg: {{ $brand['bg'] }}">
                                                         <h2 class="accordion-header" id="{{ $headingId }}">
                                                             <button class="accordion-button collapsed px-4 py-3" type="button" 
-                                                                    data-bs-toggle="collapse" data-bs-target="#{{ $collapseId }}"
+                                                                    onclick="toggleAccordion('{{ $collapseId }}')"
                                                                     aria-expanded="false" aria-controls="{{ $collapseId }}">
                                                                 <div class="d-flex align-items-center gap-3 w-100">
                                                                     <div class="seminar-badge-icon" style="background-color: var(--seminar-color); color: white;">
@@ -656,7 +656,7 @@
                                                                 </div>
                                                             </button>
                                                         </h2>
-                                                        <div id="{{ $collapseId }}" class="accordion-collapse collapse" 
+                                                        <div id="{{ $collapseId }}" class="d-none" 
                                                              aria-labelledby="{{ $headingId }}">
                                                             <div class="accordion-body bg-light p-4">
                                                                 @php
@@ -833,6 +833,20 @@
     </div>
 
     <script>
+        // Manual accordion toggle (Vanilla JS) to completely bypass Bootstrap conflicts
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.classList.contains('d-none')) {
+                    el.classList.remove('d-none');
+                    el.classList.add('d-block');
+                } else {
+                    el.classList.remove('d-block');
+                    el.classList.add('d-none');
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Sidebar toggle for mobile
             const sidebar = document.querySelector('.custom-sidebar');

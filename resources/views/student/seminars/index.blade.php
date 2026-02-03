@@ -143,6 +143,34 @@
             .main-dashboard-content {
                 padding: 1rem 0.75rem !important;
             }
+
+            /* Mobile sidebar toggle button */
+            #studentSidebarToggle {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1100;
+                background: var(--forest-green);
+                color: #fff;
+                border: none;
+                border-radius: 10px;
+                padding: 0.6rem 0.8rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.4rem;
+            }
+
+            /* Mobile sidebar off-canvas behavior */
+            .custom-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .custom-sidebar.show {
+                transform: translateX(0);
+            }
         }
 
         .btn-evaluate {
@@ -280,4 +308,43 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('studentSidebar');
+            const toggleBtn = document.getElementById('studentSidebarToggle');
+            const closeBtn = document.getElementById('studentSidebarClose');
+
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    sidebar.classList.add('show');
+                });
+            }
+
+            if (closeBtn && sidebar) {
+                closeBtn.addEventListener('click', function () {
+                    sidebar.classList.remove('show');
+                });
+            }
+
+            // Close when clicking outside sidebar on mobile
+            document.addEventListener('click', function (e) {
+                if (window.innerWidth < 768 && sidebar && sidebar.classList.contains('show')) {
+                    const clickInside = sidebar.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target));
+                    if (!clickInside) {
+                        sidebar.classList.remove('show');
+                    }
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && window.innerWidth < 768 && sidebar && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        });
+    </script>
 @endsection

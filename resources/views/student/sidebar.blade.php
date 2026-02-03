@@ -37,9 +37,9 @@
             <div class="text-uppercase small px-3 mb-2"
                 style="color: rgba(255,255,255,0.5); font-weight:700; font-size: 0.75rem; letter-spacing: 1px;">
                 Resources</div>
-            <a href="#" class="sidebar-link"><i class="bi bi-info-circle-fill"></i>Orientation</a>
-            <a href="#" class="sidebar-link"><i class="bi bi-book"></i>Library</a>
-            <a href="#" class="sidebar-link"><i class="bi bi-gear"></i>Settings</a>
+            <a href="{{ route('resources') }}"
+                class="sidebar-link{{ request()->routeIs('resources') ? ' active' : '' }}"><i
+                    class="bi bi-collection-play"></i>Resources</a>
         </div>
     </nav>
     <div class="sidebar-bottom w-100">
@@ -52,3 +52,46 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sidebar = document.getElementById('studentSidebar');
+        const toggleBtn = document.getElementById('studentSidebarToggle');
+        const closeBtn = document.getElementById('studentSidebarClose');
+        let isToggling = false;
+
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                isToggling = true;
+                sidebar.classList.add('show');
+                setTimeout(() => { isToggling = false; }, 100);
+            });
+        }
+
+        if (closeBtn && sidebar) {
+            closeBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                sidebar.classList.remove('show');
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            if (isToggling) return;
+            if (window.innerWidth < 992 && sidebar && sidebar.classList.contains('show')) {
+                const clickInside = sidebar.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target));
+                if (!clickInside) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && window.innerWidth < 992 && sidebar && sidebar.classList.contains('show')) {
+                sidebar.classList.remove('show');
+            }
+        });
+    });
+</script>

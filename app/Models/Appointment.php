@@ -23,6 +23,7 @@ class Appointment extends Model
         'nature_of_problem_other',
         'appointment_type',
         'referral_reason',
+        'referrer_name',
         'reference_number',
     ];
 

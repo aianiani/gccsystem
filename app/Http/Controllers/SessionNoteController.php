@@ -152,7 +152,11 @@ class SessionNoteController extends Controller
                 break;
         }
 
-        $sessionNotes = $query->paginate(10)->appends($request->except('page'));
+        // Get paginated results with configurable per_page
+        $perPage = (int) $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 30, 50, 100]) ? $perPage : 10;
+
+        $sessionNotes = $query->paginate($perPage)->appends($request->except('page'));
 
         return view('counselor.session_notes.index', compact('sessionNotes'));
     }
@@ -281,5 +285,34 @@ class SessionNoteController extends Controller
             'session_status' => \App\Models\SessionNote::STATUS_SCHEDULED,
         ]);
         return redirect()->back()->with('success', 'Next appointment and session created successfully!');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:session_notes,id'
+        ]);
+
+        $deleted = \App\Models\SessionNote::where('counselor_id', auth()->id())
+            ->whereIn('id', $request->ids)
+            ->delete();
+
+        return redirect()->back()->with('success', "$deleted session note(s) deleted successfully.");
+    }
+
+    public function bulkComplete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:session_notes,id'
+        ]);
+
+        $updated = \App\Models\SessionNote::where('counselor_id', auth()->id())
+            ->whereIn('id', $request->ids)
+            ->where('session_status', '!=', 'completed')
+            ->update(['session_status' => \App\Models\SessionNote::STATUS_COMPLETED]);
+
+        return redirect()->back()->with('success', "$updated session note(s) marked as completed.");
     }
 }

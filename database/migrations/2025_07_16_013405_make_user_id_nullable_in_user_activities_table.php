@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -58,6 +57,9 @@ return new class extends Migration
             Schema::drop('user_activities');
             Schema::rename('user_activities_temp', 'user_activities');
         } else {
+            // Delete records with NULL user_id before making it NOT NULL to avoid SQL error
+            \DB::table('user_activities')->whereNull('user_id')->delete();
+
             Schema::table('user_activities', function (Blueprint $table) {
                 $table->unsignedBigInteger('user_id')->nullable(false)->change();
             });

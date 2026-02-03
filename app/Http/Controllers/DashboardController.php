@@ -136,6 +136,7 @@ class DashboardController extends Controller
                 }
 
                 return view('dashboard_student', compact('user', 'recentActivities', 'studentStats', 'recentAnnouncements', 'upcomingAppointments', 'recentMessages', 'attendanceMatrix'));
+
             default:
                 return view('dashboard', compact('user', 'recentActivities', 'stats', 'recentAnnouncements'));
         }
@@ -262,7 +263,7 @@ class DashboardController extends Controller
 
         // 10. Action Items Summary
         $actionItems = [
-            'pending_approvals' => User::where('registration_status', 'pending')->where('is_active', true)->count(),
+            'pending_approvals' => User::where('registration_status', 'pending')->count(),
             'pending_appointments' => \App\Models\Appointment::where('status', 'pending')
                 ->whereHas('student', function ($q) {
                     $q->where('is_active', true);

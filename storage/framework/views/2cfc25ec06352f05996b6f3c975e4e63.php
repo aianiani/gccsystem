@@ -641,7 +641,7 @@
                                                          style="--seminar-color: <?php echo e($brand['color']); ?>; --seminar-bg: <?php echo e($brand['bg']); ?>">
                                                         <h2 class="accordion-header" id="<?php echo e($headingId); ?>">
                                                             <button class="accordion-button collapsed px-4 py-3" type="button" 
-                                                                    data-bs-toggle="collapse" data-bs-target="#<?php echo e($collapseId); ?>"
+                                                                    onclick="toggleAccordion('<?php echo e($collapseId); ?>')"
                                                                     aria-expanded="false" aria-controls="<?php echo e($collapseId); ?>">
                                                                 <div class="d-flex align-items-center gap-3 w-100">
                                                                     <div class="seminar-badge-icon" style="background-color: var(--seminar-color); color: white;">
@@ -659,7 +659,7 @@
                                                                 </div>
                                                             </button>
                                                         </h2>
-                                                        <div id="<?php echo e($collapseId); ?>" class="accordion-collapse collapse" 
+                                                        <div id="<?php echo e($collapseId); ?>" class="d-none" 
                                                              aria-labelledby="<?php echo e($headingId); ?>">
                                                             <div class="accordion-body bg-light p-4">
                                                                 <?php
@@ -837,6 +837,20 @@
     </div>
 
     <script>
+        // Manual accordion toggle (Vanilla JS) to completely bypass Bootstrap conflicts
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.classList.contains('d-none')) {
+                    el.classList.remove('d-none');
+                    el.classList.add('d-block');
+                } else {
+                    el.classList.remove('d-block');
+                    el.classList.add('d-none');
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Sidebar toggle for mobile
             const sidebar = document.querySelector('.custom-sidebar');

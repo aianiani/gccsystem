@@ -335,7 +335,9 @@
                 </div>
                 <div class="text-end">
                   <div class="badge rounded-pill" style="background-color: <?php echo e($getWviColor($sum)); ?>; font-size: 0.6rem;">
-                    <?php echo e($getWviLabel($sum)); ?></div>
+                    <?php echo e($getWviLabel($sum)); ?>
+
+                  </div>
                 </div>
               </div>
             </div>
@@ -400,6 +402,17 @@
         </div>
 
         <div class="col-12">
+          <div class="card shadow-sm p-3 mb-3">
+            <h6 class="fw-bold"><i class="bi bi-chat-left-text me-2"></i>Student Comment</h6>
+            <div class="p-3 bg-light rounded border">
+              <?php if($assessment->student_comment): ?>
+                <p class="mb-0 small"><?php echo e($assessment->student_comment); ?></p>
+              <?php else: ?>
+                <p class="mb-0 small text-muted italic">No comment provided by student.</p>
+              <?php endif; ?>
+            </div>
+          </div>
+
           <div class="card shadow-sm p-3">
             <h6 class="fw-bold">Case Management Notes</h6>
             <form method="POST" action="<?php echo e(route('counselor.assessments.saveNotes', $assessment->id)); ?>">

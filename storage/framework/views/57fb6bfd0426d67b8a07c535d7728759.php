@@ -29,6 +29,37 @@
             }
         }
 
+        /* Mobile Responsive Fixes */
+        @media (max-width: 768px) {
+            .home-zoom {
+                zoom: 1 !important;
+                transform: none !important;
+            }
+
+            .main-dashboard-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+
+            .welcome-card, .page-header-card {
+                flex-direction: column;
+                padding: 1.5rem !important;
+                text-align: center;
+            }
+
+            .welcome-card .welcome-avatar {
+                margin: 1rem auto 0;
+            }
+
+            .page-header-card .btn-lg {
+                width: 100%;
+            }
+
+            .welcome-card .welcome-text, .page-header-card h1 {
+                font-size: 1.5rem !important;
+            }
+        }
+
 
 
         <?php if(auth()->check() && auth()->user()->isAdmin()): ?>

@@ -623,6 +623,9 @@
                             <a href="<?php echo e(route('admin.hero-images.index')); ?>"
                                 class="sidebar-link<?php echo e(request()->routeIs('admin.hero-images.*') ? ' active' : ''); ?>"><i
                                     class="bi bi-images"></i>Hero Images</a>
+                            <a href="<?php echo e(route('admin.resources.index')); ?>"
+                                class="sidebar-link<?php echo e(request()->routeIs('admin.resources.*') ? ' active' : ''); ?>"><i
+                                    class="bi bi-collection-play"></i>Resources</a>
 
                             <div class="sidebar-divider"></div>
 
@@ -937,7 +940,7 @@
     </script>
     <!-- Removed problematic external script -->
     <!-- Bootstrap Bundle with Popper -->
-    <script src="<?php echo e(asset('vendor/bootstrap/js/bootstrap.bundle.min.js')); ?>"></script>
+    <!-- Bootstrap Bundle with Popper is handled by Vite -->
 </body>
 
 </html><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/layouts/app.blade.php ENDPATH**/ ?>

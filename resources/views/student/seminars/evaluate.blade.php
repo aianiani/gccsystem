@@ -722,329 +722,329 @@
 
                                         <input type="hidden" name="rating" value="5">
                                     @elseif($seminar->name === 'New Student Orientation Program')
-                                            <div class="mb-5">
-                                                <h4 class="fw-bold seminar-section-title">Post-Test</h4>
-                                                <div class="alert alert-info mb-4">
-                                                    <i class="bi bi-info-circle me-2"></i>
-                                                    <strong>Note:</strong> You are required to get a score of at least 14 points. If you FAIL TO PASS there will be no issuance of certificate. You are allowed to submit this post-test only ONCE.
-                                                </div>
-
-                                                @php
-                                                    $orientation_questions = [
-                                                        'q1' => [
-                                                            'label' => '1. A student who is registered for formal academic credits but he/she is not carrying a regular load in a given semester as prescribed in the curriculum for which he/she is registered.',
-                                                            'options' => ['Shiftee Student', 'Irregular Student', 'Transferee Student', 'Regular Student']
-                                                        ],
-                                                        'q2' => [
-                                                            'label' => '2. What grade does a student get when he/she drops a subject after the midterm examination but his class standing is above the passing mark?',
-                                                            'options' => ['A grade of 5', 'A grade of 3', 'A grade of W', 'None of the above']
-                                                        ],
-                                                        'q3' => [
-                                                            'label' => '3. The following situations are the reasons why a student is given a grade of INC except one?',
-                                                            'options' => [
-                                                                'The student was unable to take the final examination because of failure to present an examination permit.',
-                                                                'The student was not able to complete the requirements for the course during the semester/midyear.',
-                                                                'The student was not able to get a score of 50% or higher in the removal examination.',
-                                                                'There is no grade in either lecture or laboratory class for subjects with combined lecture laboratory grade.'
-                                                            ]
-                                                        ],
-                                                        'q4' => [
-                                                            'label' => '4. The service units under the Office of Student Affairs are the following except one.',
-                                                            'options' => ['Student Organization and Activities', 'Student Discipline and Grievance', 'Guidance and Counseling Center', 'Student Housing and Residential Services', 'Student Assistantship Program', 'Gender and Development Service Unit']
-                                                        ],
-                                                        'q5' => [
-                                                            'label' => '5. This unit coordinates the conduct of the new students orientation program, career orientation seminar, learning session according to the needs of the students, counseling services, and psychological testing.',
-                                                            'options' => ['Student Organization and Activities', 'Student Discipline and Grievance', 'Guidance and Counseling Center', 'Student Housing and Residential Services', 'Student Assistantship Program']
-                                                        ],
-                                                        'q6' => [
-                                                            'label' => '6. The first year students are encouraged to get involve in extracurricular activities by joining student groups or organizations except for this category.',
-                                                            'options' => ['Athletic and sports club', 'Class or departmental organizations', 'Religious and cultural groups', 'Fraternities and Sororities']
-                                                        ],
-                                                        'q7' => [
-                                                            'label' => '7. What is the required General Weighed Average (GWA) to be able to qualify as a university scholar for the 2nd or succeeding semesters?',
-                                                            'options' => ['1.0000-1.2500', '1.0000-1.4500', '1.2501-1.4500', '1.4501-1.7500']
-                                                        ],
-                                                        'q8' => [
-                                                            'label' => '8. The following are the requirements for the CHED Full Merit Scholarship Grant except one?',
-                                                            'options' => ['GWA of 2.5 or better', 'Grade slip or checklist from the previous semester', 'Barangay clearance', 'Income tax return, tax exemption or certificate of indigency from DSWD']
-                                                        ],
-                                                        'q9' => [
-                                                            'label' => '9. This unit provides best possible facilities and technology in the deliverance of the basic acceptable, high quality health care service for the care, relief, and cure of ailments as well as prevention and control of diseases that may injure every constituent of CMU community.',
-                                                            'options' => ['University Food and Lodging Services Unit', 'Disaster Risk Reduction and Management Office', 'Security Services Unit', 'University Hospital']
-                                                        ],
-                                                        'q10' => [
-                                                            'label' => '10. What are services that can be availed from our University Hospital?',
-                                                            'options' => ['24/7 Emergency Room Service', 'Outpatient Consultation', 'Pharmacy Services', 'In-patient Monitoring and Care', 'Dental Services', 'All of the above']
-                                                        ],
-                                                        'q11' => [
-                                                            'label' => '11. This office monitors and evaluates the implementation of policies, programs and services geared towards gender equality and women empowerment in the university.',
-                                                            'options' => ['Legal Office', 'University Center for Gender and Development', 'Vice President for Administration', 'Human Resource Management Office', 'Guidance and Counseling Center']
-                                                        ],
-                                                        'q12' => [
-                                                            'label' => '12. The following are the services offered by our Security Services Unit except one.',
-                                                            'options' => [
-                                                                'Facilitates the licensing and renewal of firearms in the university',
-                                                                'Protect the university personnel, students, properties and projects and enforce all university policies, rules and regulations.',
-                                                                'Conducts spot investigations on reported cases of misbehavior or illegal activities.',
-                                                                'Coordinate with local law enforcement agencies whenever necessary for the maintenance of peace and order'
-                                                            ]
-                                                        ],
-                                                        'q13' => [
-                                                            'label' => '13. The following are the goals of RA10173 except one:',
-                                                            'options' => [
-                                                                'Protects the privacy of individuals while ensuring free flow of information to promote innovation and growth',
-                                                                'Mandates to administer and implement the Data Privacy Act, and to monitor and ensure compliance',
-                                                                'Regulates the collection, recording, organization, storage, modification, retrieval, consultation, blocking',
-                                                                'Ensure that personal information and communications systems in the government and in the private sector are secured and protected'
-                                                            ]
-                                                        ],
-                                                        'q14' => [
-                                                            'label' => '14. This refers to any freely given, specific, informed indication of will, whereby the data subject agrees to the collection and processing of his or her personal, sensitive personal, or privileged information.',
-                                                            'options' => ['Data Processing', 'Data Information', 'Consent', 'Will']
-                                                        ],
-                                                        'q15' => [
-                                                            'label' => '15. Where can we seek for assistance concerning issues or problems with our institutional email?',
-                                                            'options' => ['Data Transformation Office', 'Data Privacy Office', 'Security Services Unit', 'Public Information and Relations Office']
-                                                        ],
-                                                        'q16' => [
-                                                            'label' => '16. The official name of the socio-cultural troupe of the university.',
-                                                            'options' => ['Kalimulan', 'Sidlak', 'Lamdag', 'Bidlisiw']
-                                                        ],
-                                                        'q17' => [
-                                                            'label' => '17. The following are the objectives of the Legal Office except one.',
-                                                            'options' => [
-                                                                'To present a procedure on providing assistance in the formulation and interpretation of laws, rules and regulations',
-                                                                'To provide a procedure on handling or assisting in the investigation of administrative cases',
-                                                                'To provide procedure on drafting, reviewing and notarizing contracts, MOAs / MOUs, and deeds',
-                                                                'To represent the students who are pursuing legal cases'
-                                                            ]
-                                                        ],
-                                                        'q18' => [
-                                                            'label' => '18. Central Mindanao University is the center of excellence in the following programs except one.',
-                                                            'options' => ['Agriculture', 'Biology', 'Forestry', 'Environmental Science', 'Veterinary Medicine']
-                                                        ],
-                                                        'q19' => [
-                                                            'label' => '19. Fill-in the missing words of this line from the CMU Hymn, "We shall strive to work with ___ and ___."',
-                                                            'options' => ['bulwark - fatherland', 'mind - true heart', 'alma matter - beloved', 'sons - daughters all', 'honor - boundless fame']
-                                                        ],
-                                                        'q20' => [
-                                                            'label' => '20. "We shall become the ___ of our ___." What are these missing words of the said sentence from the CMU Hymn?',
-                                                            'options' => ['honor - boundless fame', 'mind - true heart', 'alma matter - beloved', 'bulwark - fatherland', 'sons - daughters all']
-                                                        ],
-                                                        'q21' => [
-                                                            'label' => '21. An act regulating hazing and other forms of initiation rites in fraternities and sororities, and other organizations and providing penalties therefor.',
-                                                            'options' => ['R.A. No. 10121', 'R.A. No. 11053', 'R.A. No. 8049', 'None of the Above']
-                                                        ],
-                                                        'q22' => [
-                                                            'label' => '22. It is the "pre-requisite for admission into membership in a fraternity, sorority or organization".',
-                                                            'options' => ['Initiation rite', 'Acceptance', 'Dare', 'Hazing', 'Violence']
-                                                        ],
-                                                        'q23' => [
-                                                            'label' => '23. This action refers to ceremonies, practices, rituals, or other acts, whether formal or informal, that a person must perform perform or take part in order to be accepted into a fraternity, sorority, or organization as a full-fledged member.',
-                                                            'options' => ['Initiation', 'Hazing', 'Rite of Passage', 'Acceptance']
-                                                        ],
-                                                        'q24' => [
-                                                            'label' => '24. The following shall not be considered as hazing, except...',
-                                                            'options' => [
-                                                                'Similar procedures and practices approved by the respective heads of other uniformed learning institutions as to their prospective members.',
-                                                                'Any customary athletic event or other similar contests or competitions, subject to prior submission of a medical clearance or certificate.',
-                                                                'Any activity or conduct that furthers a legal and legitimate objectives, subject also to prior submission of a medical clearance or certificate.',
-                                                                'None of the above',
-                                                                'All of the above'
-                                                            ]
-                                                        ],
-                                                        'q25' => [
-                                                            'label' => '25. The following are roles of educational institution with regards to the regulation of school-based institution rites, except...',
-                                                            'options' => [
-                                                                'Promulgation of guidelines by appropriate school authorities for the approval or denial of applications to conduct initiation rites.',
-                                                                'Exercise reasonable supervision in loco parentis over the conduct of its students.',
-                                                                'Schools shall implement an information dissemination campaign at the start of every semester or trimester.',
-                                                                'To facilitate an orientation program relating to membership in a fraternity, sorority, or organization.',
-                                                                'All of the above',
-                                                                'None of the above',
-                                                                'Only choices A, B, and C'
-                                                            ]
-                                                        ],
-                                                    ];
-                                                @endphp
-
-                                                @foreach($orientation_questions as $key => $data)
-                                                    <div class="mb-4">
-                                                        <label class="form-label fw-bold">{{ $data['label'] }} <span class="text-danger">*</span></label>
-                                                        <div class="row g-2">
-                                                            @foreach($data['options'] as $option)
-                                                                <div class="col-12">
-                                                                    <div class="form-check p-2 border rounded hover-bg-light transition-all">
-                                                                        <input class="form-check-input ms-0 me-2" type="radio"
-                                                                            name="answers[{{ $key }}]"
-                                                                            id="{{ $key }}_{{ Str::slug(substr($option, 0, 20)) }}" value="{{ $option }}"
-                                                                            required>
-                                                                        <label class="form-check-label w-100 cursor-pointer"
-                                                                            for="{{ $key }}_{{ Str::slug(substr($option, 0, 20)) }}">
-                                                                            {{ $option }}
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                @endforeach
+                                        <div class="mb-5">
+                                            <h4 class="fw-bold seminar-section-title">Post-Test</h4>
+                                            <div class="alert alert-info mb-4">
+                                                <i class="bi bi-info-circle me-2"></i>
+                                                <strong>Note:</strong> You are required to get a score of at least 14 points. If you FAIL TO PASS there will be no issuance of certificate. You are allowed to submit this post-test only ONCE.
                                             </div>
 
-                                            <div class="mb-5">
-                                                <h4 class="fw-bold seminar-section-title">Program Evaluation</h4>
-                                                @php
-                                                    $criteria = [
-                                                        'c1' => '1. I have gained information that are useful for my development.',
-                                                        'c2' => '2. The program had helped me learn new techniques that can be useful in my academic adjustment.',
-                                                        'c3' => '3. Through the program, my confidence to enhance my learning for my development improvement was strengthened.',
-                                                        'c4' => '4. The speakers have presented the discussion themes with mastery and facilitative attitude.',
-                                                        'c5' => '5. The program logistics (registration, facilities, etc.) were provided and attended.'
-                                                    ];
-                                                @endphp
+                                            @php
+                                                $orientation_questions = [
+                                                    'q1' => [
+                                                        'label' => '1. A student who is registered for formal academic credits but he/she is not carrying a regular load in a given semester as prescribed in the curriculum for which he/she is registered.',
+                                                        'options' => ['Shiftee Student', 'Irregular Student', 'Transferee Student', 'Regular Student']
+                                                    ],
+                                                    'q2' => [
+                                                        'label' => '2. What grade does a student get when he/she drops a subject after the midterm examination but his class standing is above the passing mark?',
+                                                        'options' => ['A grade of 5', 'A grade of 3', 'A grade of W', 'None of the above']
+                                                    ],
+                                                    'q3' => [
+                                                        'label' => '3. The following situations are the reasons why a student is given a grade of INC except one?',
+                                                        'options' => [
+                                                            'The student was unable to take the final examination because of failure to present an examination permit.',
+                                                            'The student was not able to complete the requirements for the course during the semester/midyear.',
+                                                            'The student was not able to get a score of 50% or higher in the removal examination.',
+                                                            'There is no grade in either lecture or laboratory class for subjects with combined lecture laboratory grade.'
+                                                        ]
+                                                    ],
+                                                    'q4' => [
+                                                        'label' => '4. The service units under the Office of Student Affairs are the following except one.',
+                                                        'options' => ['Student Organization and Activities', 'Student Discipline and Grievance', 'Guidance and Counseling Center', 'Student Housing and Residential Services', 'Student Assistantship Program', 'Gender and Development Service Unit']
+                                                    ],
+                                                    'q5' => [
+                                                        'label' => '5. This unit coordinates the conduct of the new students orientation program, career orientation seminar, learning session according to the needs of the students, counseling services, and psychological testing.',
+                                                        'options' => ['Student Organization and Activities', 'Student Discipline and Grievance', 'Guidance and Counseling Center', 'Student Housing and Residential Services', 'Student Assistantship Program']
+                                                    ],
+                                                    'q6' => [
+                                                        'label' => '6. The first year students are encouraged to get involve in extracurricular activities by joining student groups or organizations except for this category.',
+                                                        'options' => ['Athletic and sports club', 'Class or departmental organizations', 'Religious and cultural groups', 'Fraternities and Sororities']
+                                                    ],
+                                                    'q7' => [
+                                                        'label' => '7. What is the required General Weighed Average (GWA) to be able to qualify as a university scholar for the 2nd or succeeding semesters?',
+                                                        'options' => ['1.0000-1.2500', '1.0000-1.4500', '1.2501-1.4500', '1.4501-1.7500']
+                                                    ],
+                                                    'q8' => [
+                                                        'label' => '8. The following are the requirements for the CHED Full Merit Scholarship Grant except one?',
+                                                        'options' => ['GWA of 2.5 or better', 'Grade slip or checklist from the previous semester', 'Barangay clearance', 'Income tax return, tax exemption or certificate of indigency from DSWD']
+                                                    ],
+                                                    'q9' => [
+                                                        'label' => '9. This unit provides best possible facilities and technology in the deliverance of the basic acceptable, high quality health care service for the care, relief, and cure of ailments as well as prevention and control of diseases that may injure every constituent of CMU community.',
+                                                        'options' => ['University Food and Lodging Services Unit', 'Disaster Risk Reduction and Management Office', 'Security Services Unit', 'University Hospital']
+                                                    ],
+                                                    'q10' => [
+                                                        'label' => '10. What are services that can be availed from our University Hospital?',
+                                                        'options' => ['24/7 Emergency Room Service', 'Outpatient Consultation', 'Pharmacy Services', 'In-patient Monitoring and Care', 'Dental Services', 'All of the above']
+                                                    ],
+                                                    'q11' => [
+                                                        'label' => '11. This office monitors and evaluates the implementation of policies, programs and services geared towards gender equality and women empowerment in the university.',
+                                                        'options' => ['Legal Office', 'University Center for Gender and Development', 'Vice President for Administration', 'Human Resource Management Office', 'Guidance and Counseling Center']
+                                                    ],
+                                                    'q12' => [
+                                                        'label' => '12. The following are the services offered by our Security Services Unit except one.',
+                                                        'options' => [
+                                                            'Facilitates the licensing and renewal of firearms in the university',
+                                                            'Protect the university personnel, students, properties and projects and enforce all university policies, rules and regulations.',
+                                                            'Conducts spot investigations on reported cases of misbehavior or illegal activities.',
+                                                            'Coordinate with local law enforcement agencies whenever necessary for the maintenance of peace and order'
+                                                        ]
+                                                    ],
+                                                    'q13' => [
+                                                        'label' => '13. The following are the goals of RA10173 except one:',
+                                                        'options' => [
+                                                            'Protects the privacy of individuals while ensuring free flow of information to promote innovation and growth',
+                                                            'Mandates to administer and implement the Data Privacy Act, and to monitor and ensure compliance',
+                                                            'Regulates the collection, recording, organization, storage, modification, retrieval, consultation, blocking',
+                                                            'Ensure that personal information and communications systems in the government and in the private sector are secured and protected'
+                                                        ]
+                                                    ],
+                                                    'q14' => [
+                                                        'label' => '14. This refers to any freely given, specific, informed indication of will, whereby the data subject agrees to the collection and processing of his or her personal, sensitive personal, or privileged information.',
+                                                        'options' => ['Data Processing', 'Data Information', 'Consent', 'Will']
+                                                    ],
+                                                    'q15' => [
+                                                        'label' => '15. Where can we seek for assistance concerning issues or problems with our institutional email?',
+                                                        'options' => ['Data Transformation Office', 'Data Privacy Office', 'Security Services Unit', 'Public Information and Relations Office']
+                                                    ],
+                                                    'q16' => [
+                                                        'label' => '16. The official name of the socio-cultural troupe of the university.',
+                                                        'options' => ['Kalimulan', 'Sidlak', 'Lamdag', 'Bidlisiw']
+                                                    ],
+                                                    'q17' => [
+                                                        'label' => '17. The following are the objectives of the Legal Office except one.',
+                                                        'options' => [
+                                                            'To present a procedure on providing assistance in the formulation and interpretation of laws, rules and regulations',
+                                                            'To provide a procedure on handling or assisting in the investigation of administrative cases',
+                                                            'To provide procedure on drafting, reviewing and notarizing contracts, MOAs / MOUs, and deeds',
+                                                            'To represent the students who are pursuing legal cases'
+                                                        ]
+                                                    ],
+                                                    'q18' => [
+                                                        'label' => '18. Central Mindanao University is the center of excellence in the following programs except one.',
+                                                        'options' => ['Agriculture', 'Biology', 'Forestry', 'Environmental Science', 'Veterinary Medicine']
+                                                    ],
+                                                    'q19' => [
+                                                        'label' => '19. Fill-in the missing words of this line from the CMU Hymn, "We shall strive to work with ___ and ___."',
+                                                        'options' => ['bulwark - fatherland', 'mind - true heart', 'alma matter - beloved', 'sons - daughters all', 'honor - boundless fame']
+                                                    ],
+                                                    'q20' => [
+                                                        'label' => '20. "We shall become the ___ of our ___." What are these missing words of the said sentence from the CMU Hymn?',
+                                                        'options' => ['honor - boundless fame', 'mind - true heart', 'alma matter - beloved', 'bulwark - fatherland', 'sons - daughters all']
+                                                    ],
+                                                    'q21' => [
+                                                        'label' => '21. An act regulating hazing and other forms of initiation rites in fraternities and sororities, and other organizations and providing penalties therefor.',
+                                                        'options' => ['R.A. No. 10121', 'R.A. No. 11053', 'R.A. No. 8049', 'None of the Above']
+                                                    ],
+                                                    'q22' => [
+                                                        'label' => '22. It is the "pre-requisite for admission into membership in a fraternity, sorority or organization".',
+                                                        'options' => ['Initiation rite', 'Acceptance', 'Dare', 'Hazing', 'Violence']
+                                                    ],
+                                                    'q23' => [
+                                                        'label' => '23. This action refers to ceremonies, practices, rituals, or other acts, whether formal or informal, that a person must perform perform or take part in order to be accepted into a fraternity, sorority, or organization as a full-fledged member.',
+                                                        'options' => ['Initiation', 'Hazing', 'Rite of Passage', 'Acceptance']
+                                                    ],
+                                                    'q24' => [
+                                                        'label' => '24. The following shall not be considered as hazing, except...',
+                                                        'options' => [
+                                                            'Similar procedures and practices approved by the respective heads of other uniformed learning institutions as to their prospective members.',
+                                                            'Any customary athletic event or other similar contests or competitions, subject to prior submission of a medical clearance or certificate.',
+                                                            'Any activity or conduct that furthers a legal and legitimate objectives, subject also to prior submission of a medical clearance or certificate.',
+                                                            'None of the above',
+                                                            'All of the above'
+                                                        ]
+                                                    ],
+                                                    'q25' => [
+                                                        'label' => '25. The following are roles of educational institution with regards to the regulation of school-based institution rites, except...',
+                                                        'options' => [
+                                                            'Promulgation of guidelines by appropriate school authorities for the approval or denial of applications to conduct initiation rites.',
+                                                            'Exercise reasonable supervision in loco parentis over the conduct of its students.',
+                                                            'Schools shall implement an information dissemination campaign at the start of every semester or trimester.',
+                                                            'To facilitate an orientation program relating to membership in a fraternity, sorority, or organization.',
+                                                            'All of the above',
+                                                            'None of the above',
+                                                            'Only choices A, B, and C'
+                                                        ]
+                                                    ],
+                                                ];
+                                            @endphp
 
-                                                <div class="bg-light p-3 rounded mb-4 d-flex justify-content-between flex-wrap gap-2 small fw-bold">
-                                                    <span>5 - Excellent</span>
-                                                    <span>4 - Very Good</span>
-                                                    <span>3 - Good</span>
-                                                    <span>2 - Satisfactory</span>
-                                                    <span>1 - Needs Improvement</span>
-                                                </div>
-
-                                                @foreach($criteria as $key => $label)
-                                                    <div class="mb-4 pb-3 border-bottom border-light">
-                                                        <label class="form-label fw-bold d-block mb-3">{{ $label }} <span class="text-danger">*</span></label>
-                                                        <div class="d-flex justify-content-between align-items-center" style="max-width: 800px; margin: 0 auto;">
-                                                            @for($i = 5; $i >= 1; $i--)
-                                                                <div class="form-check form-check-inline text-center mx-0">
-                                                                    <input class="form-check-input d-block mx-auto mb-1" type="radio"
-                                                                        name="answers[{{ $key }}]" id="{{ $key }}_{{ $i }}" value="{{ $i }}" required>
-                                                                    <label class="form-check-label small fw-bold" for="{{ $key }}_{{ $i }}">
-                                                                        {{ $i }}
-                                                                        <div style="font-size: 0.65rem; font-weight: normal; margin-top: 2px;">
-                                                                            @if($i == 5) Excellent
-                                                                            @elseif($i == 4) Very Good
-                                                                            @elseif($i == 3) Good
-                                                                            @elseif($i == 2) Satisfactory
-                                                                            @elseif($i == 1) Needs Imp.
-                                                                            @endif
-                                                                        </div>
+                                            @foreach($orientation_questions as $key => $data)
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-bold">{{ $data['label'] }} <span class="text-danger">*</span></label>
+                                                    <div class="row g-2">
+                                                        @foreach($data['options'] as $option)
+                                                            <div class="col-12">
+                                                                <div class="form-check p-2 border rounded hover-bg-light transition-all">
+                                                                    <input class="form-check-input ms-0 me-2" type="radio"
+                                                                        name="answers[{{ $key }}]"
+                                                                        id="{{ $key }}_{{ Str::slug(substr($option, 0, 20)) }}" value="{{ $option }}"
+                                                                        required>
+                                                                    <label class="form-check-label w-100 cursor-pointer"
+                                                                        for="{{ $key }}_{{ Str::slug(substr($option, 0, 20)) }}">
+                                                                        {{ $option }}
                                                                     </label>
                                                                 </div>
-                                                            @endfor
-                                                        </div>
+                                                            </div>
+                                                        @endforeach
                                                     </div>
-                                                @endforeach
+                                                </div>
+                                            @endforeach
+                                        </div>
+
+                                        <div class="mb-5">
+                                            <h4 class="fw-bold seminar-section-title">Program Evaluation</h4>
+                                            @php
+                                                $criteria = [
+                                                    'c1' => '1. I have gained information that are useful for my development.',
+                                                    'c2' => '2. The program had helped me learn new techniques that can be useful in my academic adjustment.',
+                                                    'c3' => '3. Through the program, my confidence to enhance my learning for my development improvement was strengthened.',
+                                                    'c4' => '4. The speakers have presented the discussion themes with mastery and facilitative attitude.',
+                                                    'c5' => '5. The program logistics (registration, facilities, etc.) were provided and attended.'
+                                                ];
+                                            @endphp
+
+                                            <div class="bg-light p-3 rounded mb-4 d-flex justify-content-between flex-wrap gap-2 small fw-bold">
+                                                <span>5 - Excellent</span>
+                                                <span>4 - Very Good</span>
+                                                <span>3 - Good</span>
+                                                <span>2 - Satisfactory</span>
+                                                <span>1 - Needs Improvement</span>
                                             </div>
 
-                                            <div class="mb-5">
-                                                <h4 class="fw-bold seminar-section-title">Citizen's Charter (CC)</h4>
-                                                <div class="alert alert-light border mb-4">
-                                                    <small>The Citizen's Charter is an official document that reflects the services of a government agency/office including its requirement requirements, fees, and processing times among others.</small>
+                                            @foreach($criteria as $key => $label)
+                                                <div class="mb-4 pb-3 border-bottom border-light">
+                                                    <label class="form-label fw-bold d-block mb-3">{{ $label }} <span class="text-danger">*</span></label>
+                                                    <div class="d-flex justify-content-between align-items-center" style="max-width: 800px; margin: 0 auto;">
+                                                        @for($i = 5; $i >= 1; $i--)
+                                                            <div class="form-check form-check-inline text-center mx-0">
+                                                                <input class="form-check-input d-block mx-auto mb-1" type="radio"
+                                                                    name="answers[{{ $key }}]" id="{{ $key }}_{{ $i }}" value="{{ $i }}" required>
+                                                                <label class="form-check-label small fw-bold" for="{{ $key }}_{{ $i }}">
+                                                                    {{ $i }}
+                                                                    <div style="font-size: 0.65rem; font-weight: normal; margin-top: 2px;">
+                                                                        @if($i == 5) Excellent
+                                                                        @elseif($i == 4) Very Good
+                                                                        @elseif($i == 3) Good
+                                                                        @elseif($i == 2) Satisfactory
+                                                                        @elseif($i == 1) Needs Imp.
+                                                                        @endif
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                        @endfor
+                                                    </div>
                                                 </div>
+                                            @endforeach
+                                        </div>
 
-                                                <dir class="ps-0 mb-4">
-                                                    <label class="form-label fw-bold">CC1. Which of the following best describes your awareness of a CC? <span class="text-danger">*</span></label>
-                                                    @foreach([
-                                                            '1' => "1. I know what a CC and I saw this office's CC.",
-                                                            '2' => "2. I know what a CC is but I did not see this office's CC.",
-                                                            '3' => "3. I learned of the CC only when I saw this office's CC.",
-                                                            '4' => "4. I do not know what a CC is and I did not see one in this office."
-                                                        ] as $val => $text)
+                                        <div class="mb-5">
+                                            <h4 class="fw-bold seminar-section-title">Citizen's Charter (CC)</h4>
+                                            <div class="alert alert-light border mb-4">
+                                                <small>The Citizen's Charter is an official document that reflects the services of a government agency/office including its requirement requirements, fees, and processing times among others.</small>
+                                            </div>
+
+                                            <dir class="ps-0 mb-4">
+                                                <label class="form-label fw-bold">CC1. Which of the following best describes your awareness of a CC? <span class="text-danger">*</span></label>
+                                                @foreach([
+                                                        '1' => "1. I know what a CC and I saw this office's CC.",
+                                                        '2' => "2. I know what a CC is but I did not see this office's CC.",
+                                                        '3' => "3. I learned of the CC only when I saw this office's CC.",
+                                                        '4' => "4. I do not know what a CC is and I did not see one in this office."
+                                                    ] as $val => $text)
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="radio" name="answers[cc1]" id="cc1_{{ $val }}" value="{{ $val }}" required>
                                                                     <label class="form-check-label" for="cc1_{{ $val }}">{{ $text }}</label>
                                                                 </div>
-                                                    @endforeach
-                                                </dir>
+                                                @endforeach
+                                            </dir>
 
-                                                <dir class="ps-0 mb-4">
-                                                    <label class="form-label fw-bold">CC2. If aware of CC (answered 1-3 in CC1), would you say that the CC of this office was...? <span class="text-danger">*</span></label>
-                                                    @foreach([
-                                                            '1' => "1. Easy to see",
-                                                            '2' => "2. Somewhat easy to see",
-                                                            '3' => "3. Difficult to see",
-                                                            '4' => "4. Not visible at all",
-                                                            '5' => "5. N/A"
-                                                        ] as $val => $text)
+                                            <dir class="ps-0 mb-4">
+                                                <label class="form-label fw-bold">CC2. If aware of CC (answered 1-3 in CC1), would you say that the CC of this office was...? <span class="text-danger">*</span></label>
+                                                @foreach([
+                                                        '1' => "1. Easy to see",
+                                                        '2' => "2. Somewhat easy to see",
+                                                        '3' => "3. Difficult to see",
+                                                        '4' => "4. Not visible at all",
+                                                        '5' => "5. N/A"
+                                                    ] as $val => $text)
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="radio" name="answers[cc2]" id="cc2_{{ $val }}" value="{{ $val }}" required>
                                                                     <label class="form-check-label" for="cc2_{{ $val }}">{{ $text }}</label>
                                                                 </div>
-                                                    @endforeach
-                                                </dir>
+                                                @endforeach
+                                            </dir>
 
-                                                <dir class="ps-0 mb-4">
-                                                    <label class="form-label fw-bold">CC3. If aware of CC (answered 1-3 in CC1) how much did the CC help you in your transaction? <span class="text-danger">*</span></label>
-                                                    @foreach([
-                                                            '1' => "1. Helped very much",
-                                                            '2' => "2. Somewhat helped",
-                                                            '3' => "3. Did not help",
-                                                            '4' => "4. N/A"
-                                                        ] as $val => $text)
+                                            <dir class="ps-0 mb-4">
+                                                <label class="form-label fw-bold">CC3. If aware of CC (answered 1-3 in CC1) how much did the CC help you in your transaction? <span class="text-danger">*</span></label>
+                                                @foreach([
+                                                        '1' => "1. Helped very much",
+                                                        '2' => "2. Somewhat helped",
+                                                        '3' => "3. Did not help",
+                                                        '4' => "4. N/A"
+                                                    ] as $val => $text)
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="radio" name="answers[cc3]" id="cc3_{{ $val }}" value="{{ $val }}" required>
                                                                     <label class="form-check-label" for="cc3_{{ $val }}">{{ $text }}</label>
                                                                 </div>
-                                                    @endforeach
-                                                </dir>
-                                            </div>
+                                                @endforeach
+                                            </dir>
+                                        </div>
 
-                                            <div class="mb-5">
-                                                <h4 class="fw-bold seminar-section-title">Service Quality Dimensions (SQD)</h4>
-                                                @php
-                                                    $sqd_items = [
-                                                        'sqd0' => 'SQD0. I am satisfied with the services that I availed.',
-                                                        'sqd1' => 'SQD1. I spent a reasonable amount of time for my transaction.',
-                                                        'sqd2' => "SQD2. The office followed the transaction's requirements and steps based on the information provided.",
-                                                        'sqd3' => 'SQD3. The steps (including payment) I needed to do for my transaction were easy and simple.',
-                                                        'sqd4' => 'SQD4. I easily found information about my transaction from the office or its website.',
-                                                        'sqd5' => 'SQD5. I paid a reasonable amount of fees for my transaction. (If service was free, mark the \'N/A\' box)',
-                                                        'sqd6' => 'SQD6. I feel the office was fair to everyone, or "walang palakasan", during my transaction.',
-                                                        'sqd7' => 'SQD7. I was treated courteously by the staff, and (if asked for help) the staff was helpful.',
-                                                        'sqd8' => 'SQD8. I got what I needed from the government office, or (if denied) denial of request was sufficiently explained to me.'
-                                                    ];
-                                                @endphp
+                                        <div class="mb-5">
+                                            <h4 class="fw-bold seminar-section-title">Service Quality Dimensions (SQD)</h4>
+                                            @php
+                                                $sqd_items = [
+                                                    'sqd0' => 'SQD0. I am satisfied with the services that I availed.',
+                                                    'sqd1' => 'SQD1. I spent a reasonable amount of time for my transaction.',
+                                                    'sqd2' => "SQD2. The office followed the transaction's requirements and steps based on the information provided.",
+                                                    'sqd3' => 'SQD3. The steps (including payment) I needed to do for my transaction were easy and simple.',
+                                                    'sqd4' => 'SQD4. I easily found information about my transaction from the office or its website.',
+                                                    'sqd5' => 'SQD5. I paid a reasonable amount of fees for my transaction. (If service was free, mark the \'N/A\' box)',
+                                                    'sqd6' => 'SQD6. I feel the office was fair to everyone, or "walang palakasan", during my transaction.',
+                                                    'sqd7' => 'SQD7. I was treated courteously by the staff, and (if asked for help) the staff was helpful.',
+                                                    'sqd8' => 'SQD8. I got what I needed from the government office, or (if denied) denial of request was sufficiently explained to me.'
+                                                ];
+                                            @endphp
 
-                                                 <div class="table-responsive">
-                                                    <table class="table table-borderless">
-                                                        <thead>
-                                                            <tr class="text-center small">
-                                                                <th style="width: 40%"></th>
-                                                                <th>Strongly Disagree</th>
-                                                                <th>Disagree</th>
-                                                                <th>Neither Agree nor Disagree</th>
-                                                                <th>Agree</th>
-                                                                <th>Strongly Agree</th>
-                                                                <th>N/A</th>
+                                             <div class="table-responsive">
+                                                <table class="table table-borderless">
+                                                    <thead>
+                                                        <tr class="text-center small">
+                                                            <th style="width: 40%"></th>
+                                                            <th>Strongly Disagree</th>
+                                                            <th>Disagree</th>
+                                                            <th>Neither Agree nor Disagree</th>
+                                                            <th>Agree</th>
+                                                            <th>Strongly Agree</th>
+                                                            <th>N/A</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($sqd_items as $key => $label)
+                                                            <tr class="border-bottom">
+                                                                <td class="fw-bold small py-3">{{ $label }} <span class="text-danger">*</span></td>
+                                                                @foreach(['Strongly Disagree', 'Disagree', 'Neither agree nor Disagree', 'Agree', 'Strongly Agree', 'N/A'] as $opt)
+                                                                    <td class="text-center py-3">
+                                                                        <div class="form-check d-flex justify-content-center">
+                                                                            <input class="form-check-input" type="radio" name="answers[{{ $key }}]" value="{{ $opt }}" required>
+                                                                        </div>
+                                                                    </td>
+                                                                @endforeach
                                                             </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach($sqd_items as $key => $label)
-                                                                <tr class="border-bottom">
-                                                                    <td class="fw-bold small py-3">{{ $label }} <span class="text-danger">*</span></td>
-                                                                    @foreach(['Strongly Disagree', 'Disagree', 'Neither agree nor Disagree', 'Agree', 'Strongly Agree', 'N/A'] as $opt)
-                                                                        <td class="text-center py-3">
-                                                                            <div class="form-check d-flex justify-content-center">
-                                                                                <input class="form-check-input" type="radio" name="answers[{{ $key }}]" value="{{ $opt }}" required>
-                                                                            </div>
-                                                                        </td>
-                                                                    @endforeach
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
                                             </div>
+                                        </div>
 
-                                            <div class="mb-4">
-                                                <h4 class="fw-bold seminar-section-title">COMMENTS AND SUGGESTIONS</h4>
-                                                <label for="comments" class="form-label fw-bold small text-muted">Kindly share any other feedback you have *</label>
-                                                <textarea class="form-control bg-light" id="comments" name="comments" rows="4" required placeholder="Type your comments and suggestions here..."></textarea>
-                                            </div>
+                                        <div class="mb-4">
+                                            <h4 class="fw-bold seminar-section-title">COMMENTS AND SUGGESTIONS</h4>
+                                            <label for="comments" class="form-label fw-bold small text-muted">Kindly share any other feedback you have *</label>
+                                            <textarea class="form-control bg-light" id="comments" name="comments" rows="4" required placeholder="Type your comments and suggestions here..."></textarea>
+                                        </div>
 
-                                            <input type="hidden" name="rating" value="5">
-                                        @else
+                                        <input type="hidden" name="rating" value="5">
+                                    @else
                                                 <label class="form-label d-block mb-3 fw-bold fs-5 text-dark">How would you rate
                                                     this seminar?</label>
                                                 <div class="star-rating justify-content-center">

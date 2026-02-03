@@ -64,8 +64,10 @@ class CounselorDashboardController extends Controller
                 break;
         }
 
-        // Get paginated results
-        $appointments = $query->paginate(10)->appends($request->except('page'));
+        // Get paginated results with configurable per_page
+        $perPage = (int) $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 30, 50, 100]) ? $perPage : 10;
+        $appointments = $query->paginate($perPage)->appends($request->except('page'));
 
         // Add session numbers to each appointment
         foreach ($appointments as $appointment) {
@@ -214,5 +216,50 @@ class CounselorDashboardController extends Controller
                 'message' => 'Failed to delete completed appointments. Please try again.'
             ], 500);
         }
+    }
+
+    // Bulk delete selected appointments
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'No appointments selected for deletion.');
+        }
+
+        // Only delete appointments belonging to the current counselor
+        $deletedCount = Appointment::where('counselor_id', auth()->id())
+            ->whereIn('id', $ids)
+            ->delete();
+
+        return redirect()->back()->with('success', "Successfully deleted {$deletedCount} appointment(s).");
+    }
+
+    // Bulk approve selected appointments
+    public function bulkApprove(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'No appointments selected for approval.');
+        }
+
+        // Only approve appointments belonging to the current counselor and are pending
+        $updatedCount = Appointment::where('counselor_id', auth()->id())
+            ->whereIn('id', $ids)
+            ->whereIn('status', ['pending', 'rescheduled_pending'])
+            ->update(['status' => 'accepted']);
+
+        // Send notifications (Optional: can be queued to avoid timeout on large batches)
+        // For simplicity, we'll skip individual notifications for bulk action or implement a job later.
+        // If critical, we can iterate and notify:
+        /*
+        $appointments = Appointment::whereIn('id', $ids)->get();
+        foreach($appointments as $app) {
+             if ($app->student) $app->student->notify(new AppointmentAcceptedNotification($app));
+        }
+        */
+
+        return redirect()->back()->with('success', "Successfully approved {$updatedCount} appointment(s).");
     }
 }

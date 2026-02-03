@@ -2,12 +2,10 @@
 
 @section('content')
     <style>
-        /* Homepage theme variables (mapped into existing dashboard vars) */
+        /* Homepage theme variables */
         :root {
             --primary-green: #1f7a2d;
-            /* Homepage forest green */
             --primary-green-2: #13601f;
-            /* darker stop */
             --accent-green: #2e7d32;
             --light-green: #eaf5ea;
             --accent-orange: #FFCB05;
@@ -16,7 +14,6 @@
             --bg-light: #f6fbf6;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 
-            /* Map dashboard-specific names to homepage palette for compatibility */
             --forest-green: var(--primary-green);
             --forest-green-dark: var(--primary-green-2);
             --forest-green-light: var(--accent-green);
@@ -37,7 +34,7 @@
             --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
         }
 
-        /* Apply page zoom consistent with appointments pages */
+        /* Apply page zoom - CRITICAL */
         .home-zoom {
             zoom: 0.75;
         }
@@ -45,15 +42,13 @@
         @supports not (zoom: 1) {
             .home-zoom {
                 transform: scale(0.75);
-                transform-origin: top center;
+                transform-origin: top left;
             }
         }
 
-        body,
-        .profile-card,
-        .stats-card,
-        .main-content-card {
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
         }
 
         .custom-sidebar {
@@ -75,485 +70,691 @@
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
             min-height: 100vh;
-            padding: 1rem 1.5rem;
+            padding: 1.5rem 2rem;
             margin-left: 240px;
             transition: margin-left 0.2s;
         }
 
         .main-dashboard-inner {
-            max-width: 100%;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 1rem;
         }
 
-        .welcome-card {
-            background: var(--hero-gradient);
-            border-radius: 16px;
-            box-shadow: var(--shadow-lg);
-            padding: 1.5rem 1.5rem;
+        @media (max-width: 991.98px) {
+            .main-dashboard-content { margin-left: 200px; }
+        }
+
+        @media (max-width: 767.98px) {
+            .main-dashboard-content { margin-left: 0; padding: 1rem; }
+        }
+
+        /* Page Header */
+        .page-header {
             margin-bottom: 1.5rem;
-            color: #fff;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 0;
+            background: var(--hero-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.04);
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 1rem;
-            min-height: 100px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .welcome-card .welcome-text {
-            font-size: 1.75rem;
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 0.25rem;
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
         }
 
-        .welcome-card .welcome-date {
-            font-size: 0.95rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .welcome-card .welcome-avatar {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.primary { background: var(--light-green); color: var(--primary-green); }
+        .stat-icon.success { background: #e8f5e9; color: #1b5e20; }
+        .stat-icon.warning { background: #fff8e1; color: #f57f17; }
+
+        .stat-info h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .stat-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: #fff;
+            padding: 1.25rem;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            align-items: end;
+        }
+
+        .filter-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .filter-input-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-control {
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            height: 38px;
+            width: 100%;
+            background: #fff;
+        }
+
+        .btn-filter-submit {
+            background: var(--primary-green);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            height: 38px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .btn-filter-submit:hover {
+            background: var(--primary-green-2);
+            color: #fff;
+        }
+
+        .btn-reset-filter {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            height: 38px;
+            width: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-reset-filter:hover {
+            background: #e2e8f0;
+            color: var(--text-dark);
+        }
+
+        /* Content Card & Table */
+        .content-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+
+        .premium-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .premium-table thead th {
+            background: #f8fafc;
+            padding: 0.9rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            border-bottom: 2px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .premium-table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .premium-table tbody tr:hover {
+            background: #fcfcfd;
+        }
+
+        /* User Info Cell */
+        .user-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .user-details h6 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .user-details span {
+            font-size: 0.8rem;
+            color: #64748b;
+            display: block;
+        }
+
+        /* Badges */
+        .session-badge {
+            background: var(--light-green);
+            color: var(--primary-green);
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 1px solid var(--forest-green-lighter);
+            white-space: nowrap;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
         }
 
-        .main-content-card {
-            background: white;
-            border-radius: 18px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid rgba(31, 122, 45, 0.1);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-            transition: box-shadow 0.3s ease;
-        }
-
-        .main-content-card:hover {
-            box-shadow: var(--shadow-lg);
-        }
-
-        .main-content-card .card-header {
-            background: linear-gradient(135deg, var(--forest-green-lighter) 0%, rgba(234, 245, 234, 0.5) 100%);
-            color: var(--forest-green);
-            padding: 1.25rem 1.5rem;
-            border-bottom: 2px solid rgba(31, 122, 45, 0.15);
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
             font-weight: 700;
-            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .status-scheduled { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; }
+        .status-completed { background: #ecfdf5; color: #047857; border: 1px solid #6ee7b7; }
+        .status-missed { background: #fffbeb; color: #b45309; border: 1px solid #fcd34d; }
+        .status-expired { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        /* Attendance Select */
+        .attendance-select {
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            background: #fff;
+            min-width: 120px;
+        }
+
+        /* Actions */
+        .actions-cell {
+            display: flex;
+            gap: 0.4rem;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            color: #64748b;
+            transition: all 0.2s;
+            background: transparent;
+            border: none;
         }
 
-        .main-content-card .card-body {
-            padding: 1.75rem;
+        .btn-action:hover {
+            background: #f1f5f9;
         }
 
-        .table {
-            margin-bottom: 0;
-        }
+        .btn-action.view:hover { color: #0284c7; background: #e0f2fe; }
+        .btn-action.timeline:hover { color: #6d28d9; background: #f5f3ff; }
+        .btn-action.edit:hover { color: #f59e0b; background: #fffbeb; }
+        .btn-action.complete:hover { color: #059669; background: #d1fae5; }
 
-        .table thead th {
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--forest-green);
-            background-color: rgba(234, 245, 234, 0.5) !important;
-            border-bottom: 2px solid var(--forest-green-lighter);
-            padding: 0.9rem 0.75rem;
-        }
-
-        .table tbody tr {
-            transition: all 0.2s ease;
-        }
-
-        .table tbody tr:hover {
-            background-color: rgba(234, 245, 234, 0.3);
-            transform: translateX(2px);
-        }
-
-        .btn-outline-primary,
-        .btn-outline-success,
-        .btn-outline-info,
-        .btn-outline-warning {
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.15s ease;
-            padding: 0.6rem 1rem;
-            border-width: 1px;
-            box-shadow: 0 6px 18px rgba(17, 94, 37, 0.06);
-        }
-
-        .btn-outline-primary {
-            border-color: var(--forest-green);
-            color: var(--forest-green);
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--forest-green);
-            border-color: var(--forest-green);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-outline-success:hover,
-        .btn-outline-info:hover,
-        .btn-outline-warning:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        @media (max-width: 991.98px) {
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
-
-        @media (max-width: 767.98px) {
-            .main-dashboard-content {
-                margin-left: 0;
-            }
+        /* Pagination */
+        .pagination-wrap {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #f1f5f9;
         }
     </style>
 
     <div class="home-zoom">
         <div class="d-flex">
-            <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
             <!-- Sidebar -->
             @include('counselor.sidebar')
 
-            <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
                 <div class="main-dashboard-inner">
-                    <div class="welcome-card">
+                    
+                    @php
+                        // Assuming $sessionNotes is available from controller
+                        $totalNotes = $sessionNotes->total();
+                        $completedNotes = \App\Models\SessionNote::where('counselor_id', auth()->id())->where('session_status', 'completed')->count();
+                        $missedNotes = \App\Models\SessionNote::where('counselor_id', auth()->id())->where('session_status', 'missed')->count();
+                    @endphp
+
+                    <!-- Page Header -->
+                    <div class="page-header d-flex justify-content-between align-items-center">
                         <div>
-                            <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
-                            <div class="welcome-text">Session Notes</div>
-                            <div style="font-size: 0.9rem; margin-top: 0.5rem;">Manage and review all your session notes
-                            </div>
+                            <h1 class="page-title">Session Notes</h1>
+                            <p class="text-muted mb-0 mt-1">Detailed tracking of student guidance sessions</p>
                         </div>
-                        <div class="welcome-avatar">
-                            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
-                                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                        </div>
+                        <a href="{{ route('counselor.appointments.index') }}" class="btn btn-outline-success btn-sm d-flex align-items-center gap-2">
+                             <i class="bi bi-calendar-check-fill"></i> Appointments List
+                        </a>
                     </div>
 
+                    <!-- Alert Messages -->
                     @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
+                        <div class="alert alert-success border-0 shadow-sm rounded-3 mb-3 py-2">
+                            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                        </div>
                     @endif
 
-                    <div class="main-content-card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Session Notes</h5>
-                            <a href="{{ route('counselor.appointments.index') }}" class="btn btn-outline-success btn-sm">
-                                <i class="bi bi-calendar-event me-1"></i>Go to Appointments
-                            </a>
-                        </div>
-                        <div class="card-body">
-                            <!-- Enhanced Filters -->
-                            <form method="GET" class="mb-3">
-                                <!-- Row 1: Primary Filters -->
-                                <div class="row g-2 mb-2">
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold text-muted">Search Student</label>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text bg-white border-end-0"><i
-                                                    class="bi bi-search"></i></span>
-                                            <input type="text" name="student" class="form-control border-start-0 ps-0"
-                                                placeholder="Student name" value="{{ request('student') }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small fw-bold text-muted">Status</label>
-                                        <select name="status" class="form-select form-select-sm">
-                                            <option value="">All Status</option>
-                                            <option value="scheduled"
-                                                {{ request('status') == 'scheduled' ? 'selected' : '' }}>Scheduled
-                                            </option>
-                                            <option value="completed"
-                                                {{ request('status') == 'completed' ? 'selected' : '' }}>Completed
-                                            </option>
-                                            <option value="missed" {{ request('status') == 'missed' ? 'selected' : '' }}>
-                                                Missed</option>
-                                            <option value="expired"
-                                                {{ request('status') == 'expired' ? 'selected' : '' }}>Expired
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small fw-bold text-muted">Attendance</label>
-                                        <select name="attendance" class="form-select form-select-sm">
-                                            <option value="">All</option>
-                                            <option value="attended"
-                                                {{ request('attendance') == 'attended' ? 'selected' : '' }}>Attended
-                                            </option>
-                                            <option value="missed"
-                                                {{ request('attendance') == 'missed' ? 'selected' : '' }}>Missed
-                                            </option>
-                                            <option value="unknown"
-                                                {{ request('attendance') == 'unknown' ? 'selected' : '' }}>Unknown
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small fw-bold text-muted">Time Period</label>
-                                        <select name="filter" class="form-select form-select-sm">
-                                            <option value="">All Time</option>
-                                            <option value="upcoming"
-                                                {{ request('filter') == 'upcoming' ? 'selected' : '' }}>Upcoming
-                                            </option>
-                                            <option value="past" {{ request('filter') == 'past' ? 'selected' : '' }}>
-                                                Past</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small fw-bold text-muted">Sort By</label>
-                                        <select name="sort" class="form-select form-select-sm">
-                                            <option value="date_desc"
-                                                {{ request('sort') == 'date_desc' ? 'selected' : '' }}>Date: Newest
-                                            </option>
-                                            <option value="date_asc"
-                                                {{ request('sort') == 'date_asc' ? 'selected' : '' }}>Date: Oldest
-                                            </option>
-                                            <option value="student_asc"
-                                                {{ request('sort') == 'student_asc' ? 'selected' : '' }}>Student: A-Z
-                                            </option>
-                                            <option value="student_desc"
-                                                {{ request('sort') == 'student_desc' ? 'selected' : '' }}>Student: Z-A
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Row 2: Date Range and Actions -->
-                                <div class="row g-2 align-items-end">
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold text-muted">Date From</label>
-                                        <input type="date" name="date_from" class="form-control form-control-sm"
-                                            value="{{ request('date_from') }}">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold text-muted">Date To</label>
-                                        <input type="date" name="date_to" class="form-control form-control-sm"
-                                            value="{{ request('date_to') }}">
-                                    </div>
-                                    <div class="col-md-4 d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
-                                            <i class="bi bi-funnel me-1"></i>Apply
-                                        </button>
-                                        @if(request()->hasAny(['student', 'status', 'attendance', 'filter', 'sort', 'date_from', 'date_to']))
-                                            <a href="{{ route('counselor.session_notes.index') }}"
-                                                class="btn btn-outline-secondary btn-sm flex-grow-1">
-                                                <i class="bi bi-x-circle me-1"></i>Clear
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </form>
-                            <div class="table-responsive">
-                                @php
-                                    $grouped = $sessionNotes->groupBy('appointment_id');
-                                @endphp
-                                @forelse($grouped as $appointmentId => $notes)
-                                    @php $appointment = $notes->first()->appointment; @endphp
-                                    <div class="mb-4">
-                                        <div class="d-flex align-items-center gap-3 mb-2">
-                                            <img src="{{ $appointment->student->avatar_url }}" alt="Avatar"
-                                                class="rounded-circle border border-2 flex-shrink-0"
-                                                style="width: 40px; height: 40px; object-fit: cover; border-color: var(--forest-green);">
-                                            <div>
-                                                <span class="fw-semibold"
-                                                    style="color: var(--forest-green);">{{ $appointment->student->name }}</span>
-                                                <span
-                                                    class="text-muted ms-2">({{ $appointment->scheduled_at->format('F j, Y') }})</span>
-                                            </div>
-                                        </div>
-                                        <table class="table table-hover align-middle mb-0">
-                                            <thead class="table-light">
-                                                <tr class="align-middle text-center">
-                                                    <th>Session #</th>
-                                                    <th>Status</th>
-                                                    <th>Attendance</th>
-                                                    <th>Date</th>
-                                                    <th>Time</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($notes as $note)
-                                                    <tr class="align-middle text-center">
-                                                        <td><span class="badge bg-primary px-3 py-2"
-                                                                style="font-size: 0.9rem;">{{ $note->session_number ?? '-' }}</span>
-                                                        </td>
-                                                        <td>
-                                                            @php
-                                                                $status = $note->session_status;
-                                                                $statusMap = [
-                                                                    'scheduled' => ['label' => 'Scheduled', 'class' => 'bg-info text-dark', 'icon' => 'calendar-event'],
-                                                                    'completed' => ['label' => 'Completed', 'class' => 'bg-success', 'icon' => 'check-circle'],
-                                                                    'missed' => ['label' => 'Missed', 'class' => 'bg-warning text-dark', 'icon' => 'clock'],
-                                                                    'expired' => ['label' => 'Expired', 'class' => 'bg-danger', 'icon' => 'exclamation-triangle'],
-                                                                ];
-                                                            @endphp
-                                                            @if(isset($statusMap[$status]))
-                                                                <span
-                                                                    class="badge {{ $statusMap[$status]['class'] }} d-inline-flex align-items-center gap-1 px-3 py-2"
-                                                                    style="font-size: 0.85rem;">
-                                                                    <i class="bi bi-{{ $statusMap[$status]['icon'] }}"></i>
-                                                                    {{ $statusMap[$status]['label'] }}
-                                                                </span>
-                                                            @else
-                                                                <span class="badge bg-secondary">N/A</span>
-                                                            @endif
-                                                        </td>
-                                                        <td>
-                                                            <form action="{{ route('counselor.session_notes.update', $note->id) }}"
-                                                                method="POST"
-                                                                class="d-flex align-items-center gap-2 justify-content-center mb-0">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <select name="attendance" class="form-select form-select-sm w-auto"
-                                                                    onchange="this.form.submit()" style="min-width: 120px;">
-                                                                    <option value="unknown" {{ $note->attendance === 'unknown' ? 'selected' : '' }}>Unknown</option>
-                                                                    <option value="attended" {{ $note->attendance === 'attended' ? 'selected' : '' }}>Attended</option>
-                                                                    <option value="missed" {{ $note->attendance === 'missed' ? 'selected' : '' }}>Missed</option>
-                                                                </select>
-                                                                @if($note->attendance === 'missed')
-                                                                    <button type="button" class="btn btn-outline-danger btn-sm"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#absenceReasonModal{{ $note->id }}">
-                                                                        <i class="bi bi-exclamation-triangle"></i> Reason
-                                                                    </button>
-                                                                @endif
-                                                            </form>
-                                                            @if($note->attendance === 'missed')
-                                                                <!-- Absence Reason Modal -->
-                                                                <div class="modal fade" id="absenceReasonModal{{ $note->id }}"
-                                                                    tabindex="-1"
-                                                                    aria-labelledby="absenceReasonModalLabel{{ $note->id }}"
-                                                                    aria-hidden="true">
-                                                                    <div class="modal-dialog">
-                                                                        <div class="modal-content">
-                                                                            <form
-                                                                                action="{{ route('counselor.session_notes.update', $note->id) }}"
-                                                                                method="POST">
-                                                                                @csrf
-                                                                                @method('PATCH')
-                                                                                <div class="modal-header">
-                                                                                    <h5 class="modal-title"
-                                                                                        id="absenceReasonModalLabel{{ $note->id }}">
-                                                                                        Absence Reason</h5>
-                                                                                    <button type="button" class="btn-close"
-                                                                                        data-bs-dismiss="modal"
-                                                                                        aria-label="Close"></button>
-                                                                                </div>
-                                                                                <div class="modal-body">
-                                                                                    <textarea name="absence_reason" class="form-control"
-                                                                                        rows="3"
-                                                                                        placeholder="Enter reason for absence...">{{ $note->absence_reason }}</textarea>
-                                                                                </div>
-                                                                                <div class="modal-footer">
-                                                                                    <button type="button" class="btn btn-secondary"
-                                                                                        data-bs-dismiss="modal">Cancel</button>
-                                                                                    <button type="submit" class="btn btn-danger">Save
-                                                                                        Reason</button>
-                                                                                </div>
-                                                                            </form>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            @endif
-                                                        </td>
-                                                        <td class="text-nowrap" style="font-weight: 500;">
-                                                            {{ $note->appointment->scheduled_at->format('F j, Y') }}</td>
-                                                        <td class="text-nowrap">
-                                                            {{ $note->appointment->scheduled_at->format('g:i A') }} &ndash;
-                                                            {{ $note->appointment->scheduled_at->copy()->addMinutes(30)->format('g:i A') }}
-                                                        </td>
-                                                        <td>
-                                                            <div class="d-flex flex-wrap justify-content-center gap-2">
-                                                                <a href="{{ route('counselor.session_notes.show', $note->id) }}"
-                                                                    class="btn btn-outline-primary btn-sm" title="View"><i
-                                                                        class="bi bi-eye"></i></a>
-                                                                <a href="{{ route('counselor.session_notes.timeline', $note->appointment->student->id) }}"
-                                                                    class="btn btn-outline-secondary btn-sm" title="Timeline"><i
-                                                                        class="bi bi-clock-history"></i></a>
-                                                                @if($note->session_status !== 'completed')
-                                                                    <a href="{{ route('counselor.session_notes.edit', $note->id) }}"
-                                                                        class="btn btn-warning btn-sm" title="Edit"><i
-                                                                            class="bi bi-pencil"></i></a>
-                                                                    <form
-                                                                        action="{{ route('counselor.session_notes.complete', $note->id) }}"
-                                                                        method="POST" style="display:inline;">
-                                                                        @csrf
-                                                                        @method('PATCH')
-                                                                        <button type="submit" class="btn btn-success btn-sm"
-                                                                            title="Mark Completed"><i
-                                                                                class="bi bi-check-circle"></i></button>
-                                                                    </form>
-                                                                @endif
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @empty
-                                    <div class="text-center text-muted py-5">
-                                        <div class="d-flex flex-column align-items-center justify-content-center gap-2">
-                                            <i class="bi bi-journal-x"
-                                                style="font-size: 2.5rem; color: var(--forest-green);"></i>
-                                            <div class="mt-2">No session notes found.</div>
-                                        </div>
-                                    </div>
-                                @endforelse
+                    <!-- Stats Row -->
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon primary">
+                                <i class="bi bi-journal-text"></i>
                             </div>
-
-                            <!-- Pagination -->
-                            @if($sessionNotes->hasPages())
-                                <div class="d-flex justify-content-center mt-4">
-                                    {{ $sessionNotes->links('vendor.pagination.bootstrap-5') }}
-                                </div>
-                            @endif
+                            <div class="stat-info">
+                                <h3>{{ number_format($totalNotes) }}</h3>
+                                <p>Total Notes</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon success">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>{{ number_format($completedNotes) }}</h3>
+                                <p>Sessions Completed</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon warning">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>{{ number_format($missedNotes) }}</h3>
+                                <p>Sessions Missed</p>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Filter Bar -->
+                    <div class="filter-bar">
+                        <form method="GET" action="{{ route('counselor.session_notes.index') }}">
+                            <div class="filter-row">
+                                <div class="filter-input-group" style="grid-column: span 2;">
+                                    <label>Search Student</label>
+                                    <input type="text" name="student" class="filter-control" placeholder="Name or email..." value="{{ request('student') }}">
+                                </div>
+
+                                <div class="filter-input-group">
+                                    <label>Status</label>
+                                    <select name="status" class="filter-control">
+                                        <option value="">All Statuses</option>
+                                        <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                        <option value="missed" {{ request('status') == 'missed' ? 'selected' : '' }}>Missed</option>
+                                        <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Expired</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-input-group">
+                                    <label>Time</label>
+                                    <select name="filter" class="filter-control">
+                                        <option value="">All Time</option>
+                                        <option value="upcoming" {{ request('filter') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                                        <option value="past" {{ request('filter') == 'past' ? 'selected' : '' }}>Past Sessions</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-input-group">
+                                    <label>Sort By</label>
+                                    <select name="sort" class="filter-control">
+                                        <option value="date_desc" {{ request('sort') == 'date_desc' ? 'selected' : '' }}>Newest First</option>
+                                        <option value="date_asc" {{ request('sort') == 'date_asc' ? 'selected' : '' }}>Oldest First</option>
+                                        <option value="student_asc" {{ request('sort') == 'student_asc' ? 'selected' : '' }}>Name A-Z</option>
+                                    </select>
+                                    <select name="per_page" class="filter-control" style="min-width: 100px;">
+                                        <option value="10" {{ request('per_page') == '10' ? 'selected' : '' }}>10 Per Page</option>
+                                        <option value="20" {{ request('per_page') == '20' ? 'selected' : '' }}>20 Per Page</option>
+                                        <option value="30" {{ request('per_page') == '30' ? 'selected' : '' }}>30 Per Page</option>
+                                        <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50 Per Page</option>
+                                        <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100 Per Page</option>
+                                    </select>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn-filter-submit px-4 flex-grow-1">
+                                        <i class="bi bi-funnel-fill"></i> Filter
+                                    </button>
+                                    <a href="{{ route('counselor.session_notes.index') }}" class="btn-reset-filter" title="Reset">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Content Card -->
+                    <div class="content-card">
+                        <!-- Bulk Overlay -->
+                        <div class="bulk-bar" id="bulkBar">
+                            <span class="count"><span id="selectedCount">0</span> selected</span>
+                            <div class="vr bg-white opacity-25" style="height: 20px;"></div>
+                            <button type="button" id="bulkCompleteBtn" class="btn-bulk approve">
+                                <i class="bi bi-check-circle"></i> Mark Completed
+                            </button>
+                            <button type="button" id="bulkDeleteBtn" class="btn-bulk delete">
+                                <i class="bi bi-trash3"></i> Delete Selected
+                            </button>
+                            <button type="button" class="btn-close btn-close-white ms-auto" id="closeBulkBar" style="font-size: 0.6rem;"></button>
+                        </div>
+
+                        <form id="bulk-delete-form" action="{{ route('counselor.session_notes.bulkDestroy') }}" method="POST" class="d-none">
+                            @csrf @method('DELETE')
+                        </form>
+                        <form id="bulk-complete-form" action="{{ route('counselor.session_notes.bulkComplete') }}" method="POST" class="d-none">
+                            @csrf @method('PATCH')
+                        </form>
+
+                        @if($sessionNotes->count() > 0)
+                        <div class="table-responsive">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;">
+                                            <input class="form-check-input" type="checkbox" id="selectAll">
+                                        </th>
+                                        <th>Student</th>
+                                        <th style="width: 120px;">Session</th>
+                                        <th style="width: 150px;">Status</th>
+                                        <th style="width: 150px;">Date & Time</th>
+                                        <th style="width: 180px;">Attendance</th>
+                                        <th class="text-end" style="width: 180px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($sessionNotes as $note)
+                                    <tr>
+                                        <td>
+                                            <input class="form-check-input item-checkbox" type="checkbox" value="{{ $note->id }}">
+                                        </td>
+                                        <td>
+                                            <div class="user-info-cell">
+                                                <img src="{{ $note->appointment->student->avatar_url }}" class="user-avatar" alt="">
+                                                <div class="user-details">
+                                                    <h6>{{ $note->appointment->student->name }}</h6>
+                                                    <span>{{ $note->appointment->student->student_id ?? '-' }} • {{ $note->appointment->student->college ?? '' }}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="session-badge">Session #{{ $note->session_number ?? '-' }}</span>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $status = $note->session_status;
+                                                $statusClasses = [
+                                                    'scheduled' => 'status-scheduled',
+                                                    'completed' => 'status-completed',
+                                                    'missed' => 'status-missed',
+                                                    'expired' => 'status-expired'
+                                                ];
+                                            @endphp
+                                            <span class="status-badge {{ $statusClasses[$status] ?? 'status-scheduled' }}">
+                                                {{ ucfirst($status) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-semibold">{{ $note->appointment->scheduled_at->format('M d, Y') }}</span>
+                                                <span class="text-muted small">{{ $note->appointment->scheduled_at->format('g:i A') }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <form action="{{ route('counselor.session_notes.update', $note->id) }}" method="POST" class="d-flex align-items-center gap-2">
+                                                @csrf @method('PATCH')
+                                                <select name="attendance" class="attendance-select" onchange="this.form.submit()">
+                                                    <option value="unknown" {{ $note->attendance === 'unknown' ? 'selected' : '' }}>Unknown</option>
+                                                    <option value="attended" {{ $note->attendance === 'attended' ? 'selected' : '' }}>Attended</option>
+                                                    <option value="missed" {{ $note->attendance === 'missed' ? 'selected' : '' }}>Missed</option>
+                                                </select>
+                                                @if($note->attendance === 'missed')
+                                                    <button type="button" class="btn btn-sm btn-outline-danger p-1" data-bs-toggle="modal" data-bs-target="#reasonModal{{ $note->id }}" title="See Reason">
+                                                        <i class="bi bi-info-circle"></i>
+                                                    </button>
+                                                @endif
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <div class="actions-cell">
+                                                <a href="{{ route('counselor.session_notes.show', $note->id) }}" class="btn-action view" title="View Details">
+                                                    <i class="bi bi-eye-fill"></i>
+                                                </a>
+                                                <a href="{{ route('counselor.session_notes.timeline', $note->appointment->student->id) }}" class="btn-action timeline" title="Session History">
+                                                    <i class="bi bi-clock-history"></i>
+                                                </a>
+                                                
+                                                @if($note->session_status !== 'completed')
+                                                <a href="{{ route('counselor.session_notes.edit', $note->id) }}" class="btn-action edit" title="Edit Note">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <form action="{{ route('counselor.session_notes.complete', $note->id) }}" method="POST" class="d-inline">
+                                                    @csrf @method('PATCH')
+                                                    <button type="submit" class="btn-action complete" title="Mark Completed">
+                                                        <i class="bi bi-check-circle-fill"></i>
+                                                    </button>
+                                                </form>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    @if($note->attendance === 'missed')
+                                    <!-- Reason Modal -->
+                                    <div class="modal fade" id="reasonModal{{ $note->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                                                <div class="modal-header border-0 pb-0">
+                                                    <h5 class="modal-title fw-bold">Absence Reason</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="{{ route('counselor.session_notes.update', $note->id) }}" method="POST">
+                                                    @csrf @method('PATCH')
+                                                    <div class="modal-body">
+                                                        <p class="text-muted small mb-3">Please provide or update the reason why the student missed the session.</p>
+                                                        <textarea name="absence_reason" class="form-control border-opacity-10" rows="4" placeholder="Enter reason here..." style="border-radius: 12px;">{{ $note->absence_reason }}</textarea>
+                                                    </div>
+                                                    <div class="modal-footer border-0 pt-0">
+                                                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary px-4" style="background: var(--primary-green); border: none; border-radius: 10px;">Save Reason</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="pagination-wrap">
+                            {{ $sessionNotes->links('vendor.pagination.premium') }}
+                        </div>
+                        @else
+                        <div class="empty-state text-center py-5">
+                            <i class="bi bi-journal-x fs-1 text-muted opacity-25"></i>
+                            <h5 class="mt-3 fw-bold">No session notes found</h5>
+                            <p class="text-muted">New notes will appear when appointments are scheduled.</p>
+                        </div>
+                        @endif
+                    </div>
+
                 </div>
             </div>
-
         </div>
-        <script>
-            // Sidebar toggle for mobile
-            document.addEventListener('DOMContentLoaded', function () {
-                const sidebar = document.querySelector('.custom-sidebar');
-                const toggleBtn = document.getElementById('counselorSidebarToggle');
-                if (toggleBtn && sidebar) {
-                    toggleBtn.addEventListener('click', function () {
-                        if (window.innerWidth < 768) {
-                            sidebar.classList.toggle('show');
-                        }
-                    });
-                    document.addEventListener('click', function (e) {
-                        if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                            const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                            if (!clickInside) sidebar.classList.remove('show');
-                        }
-                    });
-                    document.addEventListener('keydown', function (e) {
-                        if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                            sidebar.classList.remove('show');
-                        }
-                    });
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            const bulkBar = document.getElementById('bulkBar');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+            const bulkCompleteBtn = document.getElementById('bulkCompleteBtn');
+            const bulkDeleteForm = document.getElementById('bulk-delete-form');
+            const bulkCompleteForm = document.getElementById('bulk-complete-form');
+            const closeBulkBar = document.getElementById('closeBulkBar');
+
+            function updateBulkBar() {
+                const checked = document.querySelectorAll('.item-checkbox:checked');
+                selectedCountSpan.textContent = checked.length;
+                if (checked.length > 0) {
+                    bulkBar.classList.add('active');
+                } else {
+                    bulkBar.classList.remove('active');
+                    if (selectAll) selectAll.checked = false;
                 }
-            });
-        </script>
+            }
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateBulkBar();
+                });
+            }
+
+            checkboxes.forEach(cb => cb.addEventListener('change', updateBulkBar));
+
+            if (closeBulkBar) {
+                closeBulkBar.addEventListener('click', () => {
+                    checkboxes.forEach(cb => cb.checked = false);
+                    if (selectAll) selectAll.checked = false;
+                    updateBulkBar();
+                });
+            }
+
+            if (bulkDeleteBtn) {
+                bulkDeleteBtn.addEventListener('click', () => {
+                    const ids = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+                    if (ids.length === 0) return;
+
+                    Swal.fire({
+                        title: 'Delete Selected?',
+                        text: `You are about to delete ${ids.length} session note(s). This cannot be undone.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        confirmButtonText: 'Yes, Delete'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            bulkDeleteForm.innerHTML = '@csrf @method("DELETE")';
+                            ids.forEach(id => {
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'ids[]';
+                                input.value = id;
+                                bulkDeleteForm.appendChild(input);
+                            });
+                            bulkDeleteForm.submit();
+                        }
+                    });
+                });
+            }
+
+            if (bulkCompleteBtn) {
+                bulkCompleteBtn.addEventListener('click', () => {
+                    const ids = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+                    if (ids.length === 0) return;
+
+                    Swal.fire({
+                        title: 'Mark as Completed?',
+                        text: `You are about to mark ${ids.length} session(s) as completed.`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#1f7a2d',
+                        confirmButtonText: 'Yes, Complete'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            bulkCompleteForm.innerHTML = '@csrf @method("PATCH")';
+                            ids.forEach(id => {
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'ids[]';
+                                input.value = id;
+                                bulkCompleteForm.appendChild(input);
+                            });
+                            bulkCompleteForm.submit();
+                        }
+                    });
+                });
+            }
+        });
+    </script>
 @endsection
