@@ -308,7 +308,12 @@ class AuthController extends Controller
      */
     public function verify(Request $request, $id, $hash)
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
+
+        if (!$user) {
+            return redirect()->route('home')
+                ->with('error', 'User account not found or has been deleted.');
+        }
 
         if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
             return redirect()->route('home')

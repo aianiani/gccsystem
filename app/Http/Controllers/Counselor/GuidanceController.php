@@ -119,13 +119,21 @@ class GuidanceController extends Controller
             }
         }
 
+        $perPage = $request->input('per_page', 15);
         $students = $query->with(['seminarAttendances', 'seminarEvaluations.seminar'])
-            ->paginate(15)
+            ->paginate($perPage)
             ->withQueryString();
 
         $allSeminars = \App\Models\Seminar::all();
+        $selectedIds = session('guidance_selected_ids', []);
 
-        return view('counselor.guidance.index', compact('students', 'allSeminars'));
+        return view('counselor.guidance.index', compact('students', 'allSeminars', 'perPage', 'selectedIds'));
+    }
+
+    public function clearSelection()
+    {
+        session()->forget(['guidance_selected_ids', 'guidance_target_seminar', 'guidance_target_year']);
+        return redirect()->back()->with('success', 'Selection cleared.');
     }
 
     public function show(User $student)

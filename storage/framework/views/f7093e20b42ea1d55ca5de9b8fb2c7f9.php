@@ -523,12 +523,24 @@
                                     </select>
                                 </div>
 
+                                <!-- Per Page -->
+                                <div class="col-6 col-md-auto">
+                                    <select name="per_page" class="form-select-custom w-100" onchange="this.form.submit()">
+                                        <option value="15" <?php echo e($perPage == 15 ? 'selected' : ''); ?>>15 per page</option>
+                                        <option value="30" <?php echo e($perPage == 30 ? 'selected' : ''); ?>>30 per page</option>
+                                        <option value="50" <?php echo e($perPage == 50 ? 'selected' : ''); ?>>50 per page</option>
+                                        <option value="100" <?php echo e($perPage == 100 ? 'selected' : ''); ?>>100 per page</option>
+                                    </select>
+                                </div>
+
                                 <!-- Search -->
                                 <div class="col-12 col-md flex-grow-1">
                                     <div class="d-flex w-100">
-                                        <input type="text" name="search" placeholder="Search..."
+                                        <input type="text" name="search" placeholder="Search name or ID..."
                                             value="<?php echo e(request('search')); ?>" class="form-control-custom rounded-end-0 w-100">
-                                        <button type="submit" class="btn-primary-custom rounded-start-0">Search</button>
+                                        <button type="submit" class="btn-primary-custom rounded-start-0">
+                                            <i class="bi bi-search"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </form>
@@ -577,7 +589,7 @@
                                                 <td>
                                                     <input type="checkbox" name="student_ids[]" value="<?php echo e($student->id); ?>"
                                                         class="student-checkbox form-check-input"
-                                                        style="transform: scale(1.2); cursor: pointer;">
+                                                        style="transform: scale(1.2); cursor: pointer;" <?php echo e(in_array($student->id, $selectedIds) ? 'checked' : ''); ?>>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex align-items-center gap-3">
@@ -586,7 +598,9 @@
                                                         <div>
                                                             <div class="font-bold text-gray-800"><?php echo e($student->name); ?></div>
                                                             <div class="text-sm text-gray-500">
-                                                                <?php echo e($student->student_id ?? 'N/A'); ?></div>
+                                                                <?php echo e($student->student_id ?? 'N/A'); ?>
+
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -696,20 +710,35 @@
                                 <span class="fw-bold text-success"><span id="selectedCount">0</span> selected</span>
                                 <div class="d-flex gap-2 align-items-center">
                                     <select name="seminar_name" class="form-select-custom form-select-sm" required
-                                        style="min-width: 150px;">
+                                        style="min-width: 150px;" id="bulkSeminarSelect">
                                         <option value="">Select Seminar...</option>
-                                        <option value="New Student Orientation Program">New Student Orientation Program</option>
-                                        <option value="IDREAMS">IDREAMS</option>
-                                        <option value="10C">10C</option>
-                                        <option value="LEADS">LEADS</option>
-                                        <option value="IMAGE">IMAGE</option>
+                                        <?php $__currentLoopData = $allSeminars; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($sem->name); ?>" <?php echo e((session('guidance_target_seminar') == $sem->name || request('seminar_name') == $sem->name) ? 'selected' : ''); ?>>
+                                                <?php echo e($sem->name); ?>
+
+                                            </option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
-                                    <input type="hidden" name="attended" value="1">
-                                    <input type="hidden" name="year_level" value="<?php echo e(request('year_level', 1)); ?>">
-                                    <!-- Default to 1 if not set, or handle in controller? Controller expects year_level. Ideally we pass each student's year level but bulk update implies uniform action. Let's use request or JS. Actually, update logic needs year_level. I'll rely on the user to filter by Year Level first OR I'll update the controller to fetch year from student model if not provided. For now, let's keep it simple: required filter. -->
-                                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">
-                                        <i class="bi bi-unlock-fill me-1"></i> Unlock Evaluations
-                                    </button>
+                                    <input type="hidden" name="status" id="bulkStatusInput" value="unlocked">
+                                    <input type="hidden" name="year_level" id="bulkYearLevel"
+                                        value="<?php echo e(session('guidance_target_year', request('year_level', 1))); ?>">
+
+                                    <div class="d-flex gap-2">
+                                        <button type="button" onclick="submitBulk('unlocked')"
+                                            class="btn btn-outline-success rounded-pill px-3 fw-bold btn-sm">
+                                            <i class="bi bi-unlock-fill me-1"></i> Unlock Evaluations
+                                        </button>
+                                        <button type="button" onclick="submitBulk('completed')"
+                                            class="btn btn-success rounded-pill px-3 fw-bold btn-sm">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Mark as Attended
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="ms-3 border-start ps-3 d-flex align-items-center">
+                                    <a href="<?php echo e(route('counselor.guidance.clear_selection')); ?>"
+                                        class="btn btn-sm btn-link text-danger p-0 fw-bold" style="text-decoration: none;">
+                                        <i class="bi bi-trash3-fill me-1"></i> Clear All Selection
+                                    </a>
                                 </div>
                                 <button type="button" id="cancelSelection" class="btn btn-link text-muted p-0 ms-2"
                                     style="text-decoration: none;">
@@ -718,8 +747,8 @@
                             </div>
                         </form>
 
-                        <div class="p-4 border-t border-gray-100">
-                            <?php echo e($students->links()); ?>
+                        <div class="pagination-wrap p-4">
+                            <?php echo e($students->links('vendor.pagination.premium')); ?>
 
                         </div>
                     </div>
@@ -745,7 +774,8 @@
                             <label class="form-label fw-bold small text-uppercase">Seminar</label>
                             <select name="seminar_name" class="form-select-custom w-100" required>
                                 <option value="">Select Seminar...</option>
-                                <option value="New Student Orientation Program">New Student Orientation Program (Year 1)</option>
+                                <option value="New Student Orientation Program">New Student Orientation Program (Year 1)
+                                </option>
                                 <option value="IDREAMS">IDREAMS (Year 1)</option>
                                 <option value="10C">10C (Year 2)</option>
                                 <option value="LEADS">LEADS (Year 3)</option>
@@ -766,7 +796,8 @@
                             <label class="form-label fw-bold small text-uppercase">CSV File</label>
                             <input type="file" name="csv_file" class="form-control" accept=".csv,.txt" required>
                             <div class="form-text mt-2"><i class="bi bi-info-circle me-1"></i>Must have
-                                <strong>student_id</strong> column.</div>
+                                <strong>student_id</strong> column.
+                            </div>
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-success fw-bold py-2">Upload and Process</button>
@@ -799,47 +830,90 @@
 
             // Bulk Selection Logic
             const selectAll = document.getElementById('selectAllCheckbox');
-            const checkboxes = document.querySelectorAll('.student-checkbox');
-            const toolbar = document.getElementById('bulkToolbar');
-            const countSpan = document.getElementById('selectedCount');
-            const cancelBtn = document.getElementById('cancelSelection');
+            const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+            const bulkToolbar = document.getElementById('bulkToolbar');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const cancelSelection = document.getElementById('cancelSelection');
 
-            function updateToolbar() {
-                const checked = document.querySelectorAll('.student-checkbox:checked');
-                countSpan.textContent = checked.length;
-                if (checked.length > 0) {
-                    toolbar.classList.add('show');
-                } else {
-                    toolbar.classList.remove('show');
+            const initialSelectedIds = <?php echo json_encode($selectedIds, 15, 512) ?>;
+                const currentSelectedIds = new Set(initialSelectedIds.map(id => String(id)));
+
+                function updateBulkToolbar() {
+                    // Sync current page checkboxes with the Set
+                    studentCheckboxes.forEach(cb => {
+                        if (cb.checked) {
+                            currentSelectedIds.add(String(cb.value));
+                        } else {
+                            currentSelectedIds.delete(String(cb.value));
+                        }
+                    });
+
+                    const displayCount = currentSelectedIds.size;
+
+                    if (displayCount > 0) {
+                        bulkToolbar.classList.add('show');
+                        selectedCountSpan.textContent = displayCount;
+                    } else {
+                        bulkToolbar.classList.remove('show');
+                    }
                 }
 
-                // Update Select All State
-                if (checked.length === checkboxes.length && checkboxes.length > 0) {
-                    selectAll.checked = true;
-                    selectAll.indeterminate = false;
-                } else if (checked.length > 0) {
-                    selectAll.checked = false;
-                    selectAll.indeterminate = true;
-                } else {
-                    selectAll.checked = false;
-                    selectAll.indeterminate = false;
+                // Sync on load (for session-based ones visible on current page)
+                updateBulkToolbar();
+
+                if (selectAll) {
+                    selectAll.addEventListener('change', function () {
+                        studentCheckboxes.forEach(cb => {
+                            cb.checked = selectAll.checked;
+                        });
+                        updateBulkToolbar();
+                    });
                 }
-            }
 
-            selectAll.addEventListener('change', function () {
-                checkboxes.forEach(cb => cb.checked = this.checked);
-                updateToolbar();
-            });
+                studentCheckboxes.forEach(cb => {
+                    cb.addEventListener('change', updateBulkToolbar);
+                });
 
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', updateToolbar);
-            });
+                if (cancelSelection) {
+                    cancelSelection.addEventListener('click', function () {
+                        studentCheckboxes.forEach(cb => cb.checked = false);
+                        if (selectAll) selectAll.checked = false;
+                        updateBulkToolbar();
+                    });
+                }
 
-            cancelBtn.addEventListener('click', function () {
-                checkboxes.forEach(cb => cb.checked = false);
-                updateToolbar();
+                window.submitBulk = function (status) {
+                    const seminarSelect = document.getElementById('bulkSeminarSelect');
+                    if (!seminarSelect.value) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Select Seminar',
+                            text: 'Please choose which seminar you are marking attendance for.'
+                        });
+                        return;
+                    }
+
+                    document.getElementById('bulkStatusInput').value = status;
+
+                    const title = status === 'completed' ? 'Mark as Attended?' : 'Unlock Evaluations?';
+                    const text = status === 'completed' 
+                        ? `This will mark all selected students as COMPLETED for ${seminarSelect.value}.`
+                        : `This will allow selected students to EVALUATE ${seminarSelect.value}.`;
+
+                    Swal.fire({
+                        title: title,
+                        text: text,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#1f7a2d',
+                        confirmButtonText: 'Yes, Proceed'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('bulkActionForm').submit();
+                        }
+                    });
+                };
             });
-        });
-    </script>
+        </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/counselor/guidance/index.blade.php ENDPATH**/ ?>

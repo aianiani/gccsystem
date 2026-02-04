@@ -379,6 +379,51 @@
             margin-right: 10px;
             transform: scale(1.2);
         }
+
+        /* Locked Card Styling */
+        .assessment-card.locked {
+            filter: grayscale(1);
+            opacity: 0.8;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .assessment-card.locked .assessment-btn {
+            background-color: #6c757d !important;
+            cursor: not-allowed;
+        }
+
+        .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            border-radius: 16px;
+        }
+
+        .lock-icon-big {
+            font-size: 3.5rem;
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .locked-notice {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #d32f2f;
+            font-weight: 700;
+            z-index: 6;
+            padding: 0 10px;
+        }
     </style>
 
     <div class="home-zoom">
@@ -394,50 +439,80 @@
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1" id="mainContent">
                 <div class="container py-1">
-                    <div class="assessment-header">Student Assessments</div>
-                    <div class="assessment-subtitle">
-                        Select the assessment corresponding to your year level.
+                    <div id="assessment-page-header">
+                        <div class="assessment-header">Student Assessments</div>
+                        <div class="assessment-subtitle">
+                            Select the assessment corresponding to your year level.
+                        </div>
                     </div>
 
                     <!-- Card Selection Grid -->
                     <div class="assessment-cards-row" id="assessment-cards">
+                        <?php
+                            $userYear = (int) auth()->user()->year_level;
+                        ?>
 
                         <!-- 1st Year: GRIT -->
-                        <div class="assessment-card">
+                        <div class="assessment-card <?php echo e($userYear !== 1 ? 'locked' : ''); ?>">
+                            <?php if($userYear !== 1): ?>
+                                <div class="lock-overlay"><i class="bi bi-lock-fill lock-icon-big"></i></div>
+                                <div class="locked-notice">Available for 1st Year Students only</div>
+                            <?php endif; ?>
                             <span class="year-badge badge-1st">1st Year</span>
                             <div class="assessment-icon"><i class="bi bi-lightning-charge"></i></div>
                             <div class="assessment-title">GRIT Scale</div>
                             <div class="assessment-desc">Measure your passion and perseverance for long-term goals.</div>
-                            <button class="assessment-btn" onclick="openAssessment('grit')">START GRIT TEST</button>
+                            <button class="assessment-btn" <?php echo e($userYear !== 1 ? 'disabled' : ''); ?>
+
+                                onclick="openAssessment('grit')"><?php echo e($userYear !== 1 ? 'LOCKED' : 'START GRIT TEST'); ?></button>
                         </div>
 
                         <!-- 2nd Year: DASS-42 -->
-                        <!-- Redirects to dedicated page -->
-                        <div class="assessment-card">
+                        <div class="assessment-card <?php echo e($userYear !== 2 ? 'locked' : ''); ?>">
+                            <?php if($userYear !== 2): ?>
+                                <div class="lock-overlay"><i class="bi bi-lock-fill lock-icon-big"></i></div>
+                                <div class="locked-notice">Available for 2nd Year Students only</div>
+                            <?php endif; ?>
                             <span class="year-badge badge-2nd">2nd Year</span>
                             <div class="assessment-icon"><i class="bi bi-activity"></i></div>
                             <div class="assessment-title">DASS-42</div>
                             <div class="assessment-desc">Depression, Anxiety, and Stress Scale assessment.</div>
-                            <a href="<?php echo e(route('assessments.dass42')); ?>"
-                                class="assessment-btn text-decoration-none text-center">START DASS-42</a>
+                            <?php if($userYear === 2): ?>
+                                <a href="<?php echo e(route('assessments.dass42')); ?>"
+                                    class="assessment-btn text-decoration-none text-center">START DASS-42</a>
+                            <?php else: ?>
+                                <button class="assessment-btn" disabled>LOCKED</button>
+                            <?php endif; ?>
                         </div>
 
                         <!-- 3rd Year: NEO -->
-                        <div class="assessment-card">
+                        <div class="assessment-card <?php echo e($userYear !== 3 ? 'locked' : ''); ?>">
+                            <?php if($userYear !== 3): ?>
+                                <div class="lock-overlay"><i class="bi bi-lock-fill lock-icon-big"></i></div>
+                                <div class="locked-notice">Available for 3rd Year Students only</div>
+                            <?php endif; ?>
                             <span class="year-badge badge-3rd">3rd Year</span>
                             <div class="assessment-icon"><i class="bi bi-person-lines-fill"></i></div>
                             <div class="assessment-title">NEO Personality</div>
                             <div class="assessment-desc">Understand your personality traits (Big Five).</div>
-                            <button class="assessment-btn" onclick="openAssessment('neo')">START NEO TEST</button>
+                            <button class="assessment-btn" <?php echo e($userYear !== 3 ? 'disabled' : ''); ?>
+
+                                onclick="openAssessment('neo')"><?php echo e($userYear !== 3 ? 'LOCKED' : 'START NEO TEST'); ?></button>
                         </div>
 
                         <!-- 4th Year: WVI -->
-                        <div class="assessment-card">
+                        <div class="assessment-card <?php echo e($userYear !== 4 ? 'locked' : ''); ?>">
+                            <?php if($userYear !== 4): ?>
+                                <div class="lock-overlay"><i class="bi bi-lock-fill lock-icon-big"></i></div>
+                                <div class="locked-notice">Available for 4th Year Students only</div>
+                            <?php endif; ?>
                             <span class="year-badge badge-4th">4th Year</span>
                             <div class="assessment-icon"><i class="bi bi-briefcase"></i></div>
                             <div class="assessment-title">Work Values</div>
                             <div class="assessment-desc">Identify what matters most to you in your career.</div>
-                            <button class="assessment-btn" onclick="openAssessment('wvi')">START WVI TEST</button>
+                            <button class="assessment-btn" <?php echo e($userYear !== 4 ? 'disabled' : ''); ?>
+
+                                onclick="openAssessment('wvi')"><?php echo e($userYear !== 4 ? 'LOCKED' : 'START WVI TEST'); ?></button>
                         </div>
 
                     </div>
@@ -612,20 +687,110 @@
 
     <script>
         function openAssessment(type) {
-            document.getElementById('assessment-cards').style.display = 'none';
-            // Hide all forms first
-            document.querySelectorAll('.assessment-form-container').forEach(el => el.style.display = 'none');
-            // Show selected form
-            document.getElementById(type + '-form-container').style.display = 'block';
-            window.scrollTo(0, 0);
+            const assessmentInfo = {
+                'grit': {
+                    title: 'GRIT Scale',
+                    time: '2-3 minutes',
+                    icon: 'bi-lightning-charge'
+                },
+                'neo': {
+                    title: 'NEO Personality Inventory',
+                    time: '10-15 minutes',
+                    icon: 'bi-person-lines-fill'
+                },
+                'wvi': {
+                    title: 'Work Values Inventory',
+                    time: '5-8 minutes',
+                    icon: 'bi-briefcase'
+                }
+            };
+
+            const info = assessmentInfo[type];
+
+            Swal.fire({
+                title: 'Start ' + info.title + '?',
+                html: `
+                                <div class="mb-3">
+                                    <i class="bi ${info.icon}" style="font-size: 3rem; color: #2d9a36;"></i>
+                                </div>
+                                <p>You are about to start the <strong>${info.title}</strong>.</p>
+                                <p class="text-muted"><i class="bi bi-clock-history mr-1"></i> Estimated time: <strong>${info.time}</strong></p>
+                            `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2d9a36',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Start Now',
+                cancelButtonText: 'Not Yet',
+                backdrop: `rgba(31, 122, 45, 0.1)`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: info.title + ' has started. Good luck!',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        document.getElementById('assessment-page-header').style.display = 'none';
+                        document.getElementById('assessment-cards').style.display = 'none';
+                        // Hide all forms first
+                        document.querySelectorAll('.assessment-form-container').forEach(el => el.style.display = 'none');
+                        // Show selected form
+                        document.getElementById(type + '-form-container').style.display = 'block';
+                        window.scrollTo(0, 0);
+                    });
+                }
+            });
         }
+
+        // Intercept DASS-42 link
+        document.addEventListener('DOMContentLoaded', function () {
+            const dassBtn = document.querySelector('a[href*="assessments.dass42"]');
+            if (dassBtn) {
+                const originalUrl = dassBtn.href;
+                dassBtn.addEventListener('click', function (e) {
+                    if (this.classList.contains('disabled')) return;
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Start DASS-42 Assessment?',
+                        html: `
+                                        <div class="mb-3">
+                                            <i class="bi bi-activity" style="font-size: 3rem; color: #2d9a36;"></i>
+                                        </div>
+                                        <p>You are about to start the <strong>DASS-42</strong> (Depression, Anxiety, and Stress Scale).</p>
+                                        <p class="text-muted"><i class="bi bi-clock-history mr-1"></i> Estimated time: <strong>5-10 minutes</strong></p>
+                                    `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2d9a36',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, Start Now',
+                        cancelButtonText: 'Not Yet',
+                        backdrop: `rgba(31, 122, 45, 0.1)`
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'DASS-42 Assessment has started. Good luck!',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = originalUrl;
+                            });
+                        }
+                    });
+                });
+            }
+        });
 
         function closeAssessment() {
             document.querySelectorAll('.assessment-form-container').forEach(el => el.style.display = 'none');
+            document.getElementById('assessment-page-header').style.display = 'block';
             document.getElementById('assessment-cards').style.display = 'flex';
         }
-
-
     </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/assessments.blade.php ENDPATH**/ ?>

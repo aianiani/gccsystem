@@ -405,6 +405,10 @@
                                             class="btn btn-outline-primary btn-action">
                                             <i class="bi bi-chat-dots"></i> Chat
                                         </a>
+                                        <a href="{{ route('appointments.downloadPdf', $appointment->id) }}"
+                                            class="btn btn-outline-danger btn-action" target="_blank">
+                                            <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                                        </a>
 
                                         <!-- Session Note Button -->
                                         @if($appointment->status === 'accepted' || $appointment->status === 'completed')

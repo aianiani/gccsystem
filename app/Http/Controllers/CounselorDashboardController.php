@@ -71,8 +71,9 @@ class CounselorDashboardController extends Controller
 
         // Add session numbers to each appointment
         foreach ($appointments as $appointment) {
-            // Count previous completed or accepted appointments with the same student
-            $sessionNumber = Appointment::where('counselor_id', auth()->id())
+            // Count previous appointments with the same student (regardless of status)
+            // to ensure sequential numbering even if some were declined/cancelled.
+            $sessionNumber = Appointment::where('counselor_id', $appointment->counselor_id)
                 ->where('student_id', $appointment->student_id)
                 ->where(function ($q) use ($appointment) {
                     $q->where('scheduled_at', '<', $appointment->scheduled_at)
@@ -81,7 +82,6 @@ class CounselorDashboardController extends Controller
                                 ->where('id', '<=', $appointment->id);
                         });
                 })
-                ->whereIn('status', ['completed', 'accepted', 'pending', 'rescheduled_pending'])
                 ->count();
             $appointment->session_number = $sessionNumber;
         }
@@ -116,7 +116,7 @@ class CounselorDashboardController extends Controller
             $appointment = Appointment::where('counselor_id', auth()->id())->with('student')->findOrFail($id);
         }
 
-        // Calculate session number for this appointment
+        // Calculate session number for this appointment (regardless of status)
         $sessionNumber = Appointment::where('counselor_id', $appointment->counselor_id)
             ->where('student_id', $appointment->student_id)
             ->where(function ($q) use ($appointment) {
@@ -126,7 +126,6 @@ class CounselorDashboardController extends Controller
                             ->where('id', '<=', $appointment->id);
                     });
             })
-            ->whereIn('status', ['completed', 'accepted', 'pending', 'rescheduled_pending'])
             ->count();
         $appointment->session_number = $sessionNumber;
 
@@ -197,26 +196,6 @@ class CounselorDashboardController extends Controller
         return response()->json(['success' => true, 'is_available' => $user->is_available]);
     }
 
-    // Delete all completed appointments for the authenticated counselor
-    public function deleteAllCompleted()
-    {
-        try {
-            $deletedCount = Appointment::where('counselor_id', auth()->id())
-                ->where('status', 'completed')
-                ->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully deleted {$deletedCount} completed appointment(s).",
-                'deleted_count' => $deletedCount
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete completed appointments. Please try again.'
-            ], 500);
-        }
-    }
 
     // Bulk delete selected appointments
     public function bulkDestroy(Request $request)

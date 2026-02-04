@@ -1,0 +1,40 @@
+515: @if(auth()->user()->isAdmin())
+517: @else
+526: @if(auth()->user()->isCounselor())
+562: @else
+564: @endif
+569: @endif
+570: @if(session('success'))
+576: @endif
+577: @if(session('error'))
+583: @endif
+599: @if(isset($attendanceMatrix) && $user->role === 'student')
+614: @if($isAttended)
+621: @endif
+624: @endif
+631: @if($user->role === 'student')
+635: @if($user->student_id)
+641: @endif
+643: @if($user->course)
+649: @endif
+651: @if($user->college)
+657: @endif
+659: @endif
+664: @if($user->contact_number)
+669: @endif
+671: @if($user->address)
+677: @endif
+728: @if($user->registration_status === 'approved')
+730: @elseif($user->registration_status === 'pending')
+732: @elseif($user->registration_status === 'rejected')
+734: @else
+736: @endif
+763: @if(isset($attendanceMatrix) && $user->role === 'student')
+802: @if($isAttended)
+804: @else
+806: @endif
+811: @endif
+908: @if($user->role === 'student')
+989: @endif
+1051: @if(!auth()->user()->isAdmin())
+1055: @endif

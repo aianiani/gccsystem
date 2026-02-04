@@ -319,7 +319,7 @@ class RegistrationApprovalController extends Controller
     public function verifyEnrollment(Request $request)
     {
         $request->validate([
-            'enrollment_file' => 'required|file|mimes:xlsx,xls,csv|max:5120' // Max 5MB
+            'enrollment_file' => 'required|file|mimes:xlsx,xls,csv,txt|max:5120' // Max 5MB
         ]);
 
         try {

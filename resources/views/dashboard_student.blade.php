@@ -127,10 +127,9 @@
             color: var(--text-dark);
         }
 
-        /* DASS reminder modal styles */
         .dass-modal .modal-content {
             border: none;
-            border-radius: 24px;
+            border-radius: 16px;
             box-shadow: var(--shadow-lg);
             overflow: hidden;
         }
@@ -139,27 +138,25 @@
             background: var(--hero-gradient);
             color: #fff;
             border: none;
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 1.5rem;
             display: flex;
             align-items: center;
             gap: 1rem;
         }
 
         .dass-modal-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 1.25rem;
         }
 
         .dass-modal-body {
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .dass-modal-checklist li {
@@ -178,20 +175,65 @@
         }
 
         .dass-modal-title {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            line-height: 1.3;
+            line-height: 1.2;
+            margin-bottom: 0.1rem;
         }
 
         .dass-modal-footer {
-            padding: 1.5rem 2rem;
+            padding: 1rem 1.5rem;
             background: #f9fafb;
             border-top: 1px solid rgba(0, 0, 0, 0.05);
             display: flex;
             justify-content: flex-end;
-            gap: 1rem;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
+            gap: 0.75rem;
+        }
+
+        .btn-dass-later {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-dass-later:hover {
+            background: #f8fafc;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
+
+        .btn-dass-primary {
+            background: var(--forest-green);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(31, 122, 45, 0.2);
+            transition: all 0.2s;
+        }
+
+        .btn-dass-primary:hover {
+            background: var(--forest-green-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(31, 122, 45, 0.3);
+            color: white;
+        }
+
+        .dass-info-box {
+            display: flex;
+            gap: 0.75rem;
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            color: #475569;
         }
 
         /* Sidebar and Main Content base layout handled in app.blade.php */
@@ -1304,21 +1346,18 @@
                             </div>
                         </div>
                         <div class="dass-modal-body">
-                            <p class="mb-3" style="font-size: 1.05rem; line-height: 1.6; color: var(--text-dark);">
-                                Prior to booking an appointment, students are required to complete the DASS-42 assessment.
-                                This brief assessment provides counselors with essential insights to support you
-                                effectively.
+                            <p class="mb-3" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-dark);">
+                                Prior to booking, students are required to complete the DASS-42 assessment to help
+                                counselors support you effectively.
                             </p>
-                            <div class="d-flex gap-2 text-muted small align-items-start bg-light p-3 rounded-3">
-                                <i class="bi bi-info-circle-fill mt-1 flex-shrink-0 text-primary opacity-75"></i>
-                                <span>Once you finish the assessment, you’ll be able to proceed with booking your
-                                    appointment immediately.</span>
+                            <div class="dass-info-box">
+                                <i class="bi bi-info-circle-fill mt-0.5 text-primary opacity-75"></i>
+                                <span>Once finished, you can proceed with booking your appointment immediately.</span>
                             </div>
                         </div>
                         <div class="dass-modal-footer">
-                            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Maybe Later</button>
-                            <a href="{{ route('consent.show', ['context' => 'booking']) }}"
-                                class="btn btn-success px-4 fw-semibold">
+                            <button type="button" class="btn-dass-later" data-bs-dismiss="modal">Maybe Later</button>
+                            <a href="{{ route('consent.show', ['context' => 'booking']) }}" class="btn-dass-primary">
                                 Proceed to Assessment
                             </a>
                         </div>

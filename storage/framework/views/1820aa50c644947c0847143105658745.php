@@ -2,20 +2,22 @@
 
 <?php $__env->startSection('content'); ?>
     <style>
+        /* Premium Theme Variables */
         :root {
-            --forest-green: #1f7a2d;
-            --forest-green-light: #4a7c59;
-            --forest-green-lighter: #e8f5e8;
-            --yellow-maize: #f4d03f;
-            --gray-50: #f8f9fa;
-            --gray-100: #dee2e6;
-            --gray-600: #6c757d;
+            --primary-green: #1f7a2d;
+            --primary-green-2: #13601f;
+            --accent-green: #2e7d32;
+            --light-green: #eaf5ea;
+            --accent-orange: #FFCB05;
+            --text-dark: #16321f;
+            --text-light: #6c757d;
+            --bg-light: #f6fbf6;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
-            --hero-gradient: linear-gradient(135deg, var(--forest-green) 0%, #13601f 100%);
+            --hero-gradient: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-2) 100%);
+            --forest-green: var(--primary-green);
         }
 
-        /* Apply the same page zoom used on the homepage */
         .home-zoom {
             zoom: 0.75;
         }
@@ -27,279 +29,362 @@
             }
         }
 
-        .main-content-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
+        /* Page Header */
+        .page-header {
             margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-
-        .main-content-card .card-header {
-            background: var(--forest-green-lighter);
-            color: var(--forest-green);
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--gray-100);
-            font-weight: 600;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-        }
-
-        .main-content-card .card-body {
-            padding: 1.25rem;
-        }
-
-        .page-header-card {
-            background: var(--hero-gradient);
-            border-radius: 16px;
-            box-shadow: var(--shadow-md);
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .page-header-card h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin: 0;
-            color: #fff;
-        }
-
-        .page-header-card p {
-            margin: 0.5rem 0 0 0;
-            opacity: 0.9;
-            font-size: 0.95rem;
-        }
-
-        .table {
-            margin-bottom: 0;
-        }
-
-        .table thead th {
-            background: var(--gray-50);
-            color: var(--forest-green);
-            font-weight: 600;
-            border-bottom: 2px solid var(--gray-100);
-            padding: 1rem;
-        }
-
-        .table tbody td {
-            padding: 1rem;
-            vertical-align: middle;
-        }
-
-        .table tbody tr:hover {
-            background: var(--forest-green-lighter);
-        }
-
-        .action-btn {
-            transition: all 0.2s ease;
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: var(--gray-600);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .filter-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-100);
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .filter-row {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
             align-items: end;
         }
 
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 0;
+            background: var(--hero-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .filter-group label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--forest-green);
-            margin-bottom: 0.5rem;
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.primary {
+            background: var(--light-green);
+            color: var(--primary-green);
+        }
+
+        .stat-icon.info {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .stat-icon.warning {
+            background: #fffbeb;
+            color: #b45309;
+        }
+
+        .stat-info h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .stat-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Filter styling relative to premium theme */
+        .filter-bar {
+            background: #fff;
+            padding: 1rem 1.25rem;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
             display: block;
         }
 
-        .filter-group .form-control,
-        .filter-group .form-select {
-            border: 1px solid var(--gray-100);
+        .filter-input,
+        .filter-select {
             border-radius: 8px;
-            padding: 0.625rem 0.875rem;
-            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            width: 100%;
+            height: 38px;
         }
 
-        .filter-group .form-control:focus,
-        .filter-group .form-select:focus {
-            border-color: var(--forest-green);
-            box-shadow: 0 0 0 0.2rem rgba(31, 122, 45, 0.1);
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: var(--primary-green);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(31, 122, 45, 0.1);
         }
 
-        .search-input-group {
-            position: relative;
+        /* Premium Table */
+        .content-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            overflow: hidden;
         }
 
-        .search-input-group .form-control {
-            padding-left: 2.5rem;
+        .premium-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .search-input-group i {
-            position: absolute;
-            left: 0.875rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-600);
-            z-index: 1;
+        .premium-table thead th {
+            background: #f8fafc;
+            padding: 0.9rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            border-bottom: 2px solid #e2e8f0;
+            text-align: left;
         }
 
-        .bulk-selected-count {
-            font-weight: bold;
-            color: var(--forest-green);
-            background: var(--forest-green-lighter);
-            padding: 5px 12px;
-            border-radius: 20px;
+        .premium-table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
         }
 
-        /* Improved Checkbox Visibility */
-        .form-check-input {
-            border: 2px solid var(--gray-600);
+        .premium-table tbody tr:hover {
+            background: #fcfcfd;
+        }
+
+        /* User Cell */
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .user-info h6 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .user-info span {
+            font-size: 0.8rem;
+            color: #64748b;
+            display: block;
+        }
+
+        .user-me-badge {
+            font-size: 0.7rem;
+            color: var(--primary-green);
+            background: var(--light-green);
+            padding: 1px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(31, 122, 45, 0.2);
+            margin-left: 6px;
+        }
+
+        /* Badges */
+        .premium-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .badge-role-admin {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .badge-role-student {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge-role-counselor {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .badge-status-active {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .badge-status-inactive {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* Actions */
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
             cursor: pointer;
         }
 
+        .btn-action:hover {
+            background: #f1f5f9;
+            color: var(--text-dark);
+        }
+
+        .btn-action.edit:hover {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .btn-action.delete:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        /* Checkbox */
+        .form-check-input {
+            width: 1.1em;
+            height: 1.1em;
+            cursor: pointer;
+            border: 2px solid #cbd5e1;
+            border-radius: 4px;
+        }
+
         .form-check-input:checked {
-            background-color: var(--forest-green);
-            border-color: var(--forest-green);
-        }
-
-        .filter-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-filter {
-            background: var(--forest-green);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 0.625rem 1.25rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .btn-filter:hover {
-            background: #13601f;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-reset {
-            background: var(--gray-50);
-            color: var(--forest-green);
-            border: 1px solid var(--gray-100);
-            border-radius: 8px;
-            padding: 0.625rem 1.25rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .btn-reset:hover {
-            background: var(--gray-100);
-            border-color: var(--forest-green);
-        }
-
-        @media (max-width: 768px) {
-            .filter-row {
-                flex-direction: column;
-            }
-
-            .filter-group {
-                width: 100%;
-            }
-
-            .filter-actions {
-                width: 100%;
-            }
-
-            .filter-actions .btn {
-                flex: 1;
-            }
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
         }
     </style>
 
     <div class="main-dashboard-inner home-zoom">
-        <div class="page-header-card">
+        <!-- Header -->
+        <div class="page-header">
             <div>
-                <h1><i class="bi bi-people me-2"></i>Users Management</h1>
-                <p>Manage system users and their roles</p>
+                <h1 class="page-title">Users Management</h1>
+                <p class="text-muted mb-0 mt-1">Manage, monitor, and administrate system users</p>
             </div>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal"
+                <button type="button" class="btn btn-outline-danger btn-sm fw-semibold shadow-sm" data-bs-toggle="modal"
                     data-bs-target="#importDeleteModal">
-                    <i class="bi bi-person-x me-2"></i>Import List to Delete
+                    <i class="bi bi-person-x me-2"></i>Import to Delete
                 </button>
-                <a href="<?php echo e(route('users.export', request()->all())); ?>" class="btn btn-success btn-lg">
-                    <i class="bi bi-file-earmark-arrow-down me-2"></i>Export to Excel
+                <a href="<?php echo e(route('users.export', request()->all())); ?>"
+                    class="btn btn-success btn-sm fw-semibold shadow-sm text-white"
+                    style="background: var(--primary-green); border: none;">
+                    <i class="bi bi-file-earmark-excel me-2"></i>Export
                 </a>
-                <a href="<?php echo e(route('users.create')); ?>" class="btn btn-light btn-lg">
-                    <i class="bi bi-person-plus me-2"></i>Add New User
+                <a href="<?php echo e(route('users.create')); ?>" class="btn btn-dark btn-sm fw-semibold shadow-sm">
+                    <i class="bi bi-plus-lg me-2"></i>New User
                 </a>
             </div>
         </div>
 
-        <!-- Search and Filter Section -->
-        <div class="filter-card">
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><?php echo e(number_format($users->total())); ?></h3>
+                    <p>Total Users</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon success" style="background: #f0fdf4; color: #15803d;">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><?php echo e(number_format($users->where('is_active', true)->count())); ?></h3>
+                    <p>Active Account</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><?php echo e($users->where('role', 'admin')->count()); ?></h3>
+                    <p>Administrators</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="filter-bar">
             <form method="GET" action="<?php echo e(route('users.index')); ?>" id="filterForm">
                 <input type="hidden" name="sort" value="<?php echo e(request('sort', 'created_at')); ?>">
                 <input type="hidden" name="direction" value="<?php echo e(request('direction', 'desc')); ?>">
                 <input type="hidden" name="per_page" value="<?php echo e(request('per_page', 15)); ?>">
 
-                <div class="row g-2 align-items-end mb-2">
+                <div class="row g-3">
                     <!-- Search -->
                     <div class="col-md-4">
-                        <label for="search" class="form-label text-success fw-semibold small text-uppercase mb-1">
-                            <i class="bi bi-search me-1"></i>Search
-                        </label>
-                        <input type="text" class="form-control" id="search" name="search"
-                            placeholder="Name, email, or ID..." value="<?php echo e(request('search')); ?>">
+                        <label class="filter-label"><i class="bi bi-search me-1"></i> Search</label>
+                        <input type="text" class="filter-input" name="search" placeholder="Name, email, or ID..."
+                            value="<?php echo e(request('search')); ?>">
                     </div>
 
-                    <!-- College -->
-                    <div class="col-md-3">
-                        <label for="college" class="form-label text-success fw-semibold small text-uppercase mb-1">
-                            <i class="bi bi-building me-1"></i>College
-                        </label>
-                        <select class="form-select" id="college" name="college" onchange="this.form.submit()">
+                    <!-- Filters -->
+                    <div class="col-md-2">
+                        <label class="filter-label">College</label>
+                        <select class="filter-select" name="college" onchange="this.form.submit()">
                             <option value="">All Colleges</option>
                             <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <option value="<?php echo e($college); ?>" <?php echo e(request('college') == $college ? 'selected' : ''); ?>>
@@ -309,51 +394,20 @@
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
-
-                    <!-- Course -->
-                    <div class="col-md-3">
-                        <label for="course" class="form-label text-success fw-semibold small text-uppercase mb-1">
-                            <i class="bi bi-book me-1"></i>Course
-                        </label>
-                        <select class="form-select" id="course" name="course" onchange="this.form.submit()">
+                    <div class="col-md-2">
+                        <label class="filter-label">Course</label>
+                        <select class="filter-select" name="course" onchange="this.form.submit()">
                             <option value="">All Courses</option>
                             <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($course); ?>" <?php echo e(request('course') == $course ? 'selected' : ''); ?>>
-                                    <?php echo e($course); ?>
+                                <option value="<?php echo e($course); ?>" <?php echo e(request('course') == $course ? 'selected' : ''); ?>><?php echo e($course); ?>
 
                                 </option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
-
-                    <!-- Year Level -->
                     <div class="col-md-2">
-                        <label for="year_level" class="form-label text-success fw-semibold small text-uppercase mb-1">
-                            <i class="bi bi-calendar3 me-1"></i>Year
-                        </label>
-                        <select class="form-select" id="year_level" name="year_level" onchange="this.form.submit()">
-                            <option value="">All Years</option>
-                            <option value="1st Year" <?php echo e(request('year_level') === '1st Year' ? 'selected' : ''); ?>>1st Year
-                            </option>
-                            <option value="2nd Year" <?php echo e(request('year_level') === '2nd Year' ? 'selected' : ''); ?>>2nd Year
-                            </option>
-                            <option value="3rd Year" <?php echo e(request('year_level') === '3rd Year' ? 'selected' : ''); ?>>3rd Year
-                            </option>
-                            <option value="4th Year" <?php echo e(request('year_level') === '4th Year' ? 'selected' : ''); ?>>4th Year
-                            </option>
-                            <option value="Graduated" <?php echo e(request('year_level') === 'Graduated' ? 'selected' : ''); ?>>Graduated
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row g-2 align-items-end">
-                    <!-- Role -->
-                    <div class="col-md-2">
-                        <label for="role" class="form-label text-success fw-semibold small text-uppercase mb-1">
-                            <i class="bi bi-person-badge me-1"></i>Role
-                        </label>
-                        <select class="form-select" id="role" name="role" onchange="this.form.submit()">
+                        <label class="filter-label">Role</label>
+                        <select class="filter-select" name="role" onchange="this.form.submit()">
                             <option value="">All Roles</option>
                             <option value="admin" <?php echo e(request('role') === 'admin' ? 'selected' : ''); ?>>Admin</option>
                             <option value="student" <?php echo e(request('role') === 'student' ? 'selected' : ''); ?>>Student</option>
@@ -361,29 +415,9 @@
                             </option>
                         </select>
                     </div>
-
-                    <!-- Sex (Gender) -->
                     <div class="col-md-2">
-                        <label for="sex" class="form-label text-success fw-semibold small text-uppercase mb-1">
-                            <i class="bi bi-gender-ambiguous me-1"></i>Sex
-                        </label>
-                        <select class="form-select" id="sex" name="sex" onchange="this.form.submit()">
-                            <option value="">All</option>
-                            <?php $__currentLoopData = $sexes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sex): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($sex); ?>" <?php echo e(request('sex') == $sex ? 'selected' : ''); ?>>
-                                    <?php echo e(ucfirst($sex)); ?>
-
-                                </option>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </select>
-                    </div>
-
-                    <!-- Status -->
-                    <div class="col-md-2">
-                        <label for="status" class="form-label text-success fw-semibold small text-uppercase mb-1">
-                            <i class="bi bi-toggle-on me-1"></i>Status
-                        </label>
-                        <select class="form-select" id="status" name="status" onchange="this.form.submit()">
+                        <label class="filter-label">Status</label>
+                        <select class="filter-select" name="status" onchange="this.form.submit()">
                             <option value="">All Status</option>
                             <option value="active" <?php echo e(request('status') === 'active' ? 'selected' : ''); ?>>Active</option>
                             <option value="inactive" <?php echo e(request('status') === 'inactive' ? 'selected' : ''); ?>>Inactive
@@ -391,216 +425,179 @@
                         </select>
                     </div>
 
-                    <!-- Date From -->
-                    <div class="col-md-3">
-                        <label for="date_from" class="form-label text-success fw-semibold small text-uppercase mb-1">
-                            <i class="bi bi-calendar-event me-1"></i>From Date
-                        </label>
-                        <input type="date" class="form-control" id="date_from" name="date_from"
-                            value="<?php echo e(request('date_from')); ?>" onchange="this.form.submit()">
+                    <!-- Collapsible Advanced Filters -->
+                    <div class="col-12 mt-2">
+                        <button type="button" class="btn btn-link text-decoration-none small fw-bold text-success p-0"
+                            id="advancedFiltersToggle" onclick="toggleAdvancedFilters()"
+                            aria-expanded="<?php echo e(request()->anyFilled(['year_level', 'sex', 'date_from', 'date_to']) ? 'true' : 'false'); ?>"
+                            aria-controls="advancedFilters">
+                            <i class="bi bi-sliders me-1"></i> More Filters (Year, Sex, Dates)
+                        </button>
+                        <?php if(request()->anyFilled(['year_level', 'sex', 'date_from', 'date_to'])): ?>
+                            <span class="badge bg-success ms-2" style="font-size: 0.65rem;">Active Filters</span>
+                        <?php endif; ?>
                     </div>
 
-                    <!-- Date To -->
-                    <div class="col-md-3">
-                        <label for="date_to" class="form-label text-success fw-semibold small text-uppercase mb-1">
-                            <i class="bi bi-calendar-event me-1"></i>To Date
-                        </label>
-                        <div class="input-group">
-                            <input type="date" class="form-control" id="date_to" name="date_to"
-                                value="<?php echo e(request('date_to')); ?>" onchange="this.form.submit()">
-                            <?php if(request()->anyFilled(['search', 'college', 'course', 'year_level', 'role', 'sex', 'status', 'date_from', 'date_to'])): ?>
-                                <a href="<?php echo e(route('users.index')); ?>" class="btn btn-outline-danger" title="Clear Filters">
-                                    <i class="bi bi-x-lg"></i>
-                                </a>
-                            <?php endif; ?>
+                    <script>
+                        function toggleAdvancedFilters() {
+                            const target = document.getElementById('advancedFilters');
+                            const btn = document.getElementById('advancedFiltersToggle');
+                                                                                                   if (target) {
+                                    if (target.classList.contains('d-none')) {
+                                        target.classList.remove('d-none');
+                                        if(btn) btn.setAttribute('aria-expanded', 'true');
+                                    } else {
+                                        target.classList.add('d-none');
+                                        if(btn) btn.setAttribute('aria-expanded', 'false');
+                                    }
+                                }
+                            }
+                        </script>
+
+                        <div class="col-12">
+                            <div class="<?php echo e(request()->anyFilled(['year_level', 'sex', 'date_from', 'date_to']) ? '' : 'd-none'); ?>"
+                                id="advancedFilters">
+                                <div class="row g-3 pt-2">
+                                <div class="col-md-2">
+                                    <label class="filter-label">Year Level</label>
+                                    <select class="filter-select" name="year_level" onchange="this.form.submit()">
+                                        <option value="">All Years</option>
+                                        <option value="1st Year" <?php echo e(request('year_level') === '1st Year' ? 'selected' : ''); ?>>1st
+                                            Year</option>
+                                        <option value="2nd Year" <?php echo e(request('year_level') === '2nd Year' ? 'selected' : ''); ?>>2nd
+                                            Year</option>
+                                        <option value="3rd Year" <?php echo e(request('year_level') === '3rd Year' ? 'selected' : ''); ?>>3rd
+                                            Year</option>
+                                        <option value="4th Year" <?php echo e(request('year_level') === '4th Year' ? 'selected' : ''); ?>>4th
+                                            Year</option>
+                                        <option value="Graduated" <?php echo e(request('year_level') === 'Graduated' ? 'selected' : ''); ?>>
+                                            Graduated</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="filter-label">Sex</label>
+                                    <select class="filter-select" name="sex" onchange="this.form.submit()">
+                                        <option value="">All</option>
+                                        <?php $__currentLoopData = $sexes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sex): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($sex); ?>" <?php echo e(request('sex') == $sex ? 'selected' : ''); ?>>
+                                                <?php echo e(ucfirst($sex)); ?>
+
+                                            </option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="filter-label">From Date</label>
+                                    <input type="date" class="filter-input" name="date_from" value="<?php echo e(request('date_from')); ?>"
+                                        onchange="this.form.submit()">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="filter-label">To Date</label>
+                                    <input type="date" class="filter-input" name="date_to" value="<?php echo e(request('date_to')); ?>"
+                                        onchange="this.form.submit()">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <?php if(request()->anyFilled(['search', 'college', 'course', 'year_level', 'role', 'sex', 'status', 'date_from', 'date_to'])): ?>
+                                        <a href="<?php echo e(route('users.index')); ?>" class="btn btn-outline-danger w-100"
+                                            style="height: 38px;">
+                                            <i class="bi bi-x-lg me-1"></i> Clear All
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-        </div>
-
-        <div class="main-content-card">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-people me-2"></i>All Users</h5>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary"><?php echo e($users->total()); ?> total users</span>
-                    <?php if(request()->hasAny(['search', 'role', 'status', 'registration_status'])): ?>
-                        <span class="badge bg-info"><?php echo e($users->count()); ?> filtered</span>
-                    <?php endif; ?>
-                    <span class="badge bg-success"><?php echo e($users->where('is_active', true)->count()); ?> active</span>
-                </div>
+                </form>
             </div>
-            <div class="card-body p-0">
+
+            <!-- Content Card -->
+            <div class="content-card">
                 <?php if($users->count() > 0): ?>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+                        <table class="premium-table">
+                            <thead>
                                 <tr>
                                     <th class="ps-4" style="width: 40px;">
                                         <input type="checkbox" class="form-check-input" id="selectAll">
                                     </th>
-                                    <th class="ps-4">
+                                    <th>
                                         <a href="?<?php echo e(http_build_query(array_merge(request()->except(['sort', 'direction']), ['sort' => 'name', 'direction' => request('sort') === 'name' && request('direction') === 'asc' ? 'desc' : 'asc']))); ?>"
-                                            class="text-decoration-none text-dark d-flex align-items-center gap-1 <?php echo e(request('sort') === 'name' ? 'fw-bold text-success' : ''); ?>">
-                                            User
-                                            <?php if(request('sort') === 'name'): ?>
-                                                <i class="bi bi-chevron-<?php echo e(request('direction') === 'asc' ? 'up' : 'down'); ?>"></i>
-                                            <?php else: ?>
-                                                <i class="bi bi-chevron-expand text-muted opacity-50"
-                                                    style="font-size: 0.7rem;"></i>
-                                            <?php endif; ?>
+                                            class="text-decoration-none text-secondary d-flex align-items-center gap-1">
+                                            USER
                                         </a>
                                     </th>
                                     <th>
                                         <a href="?<?php echo e(http_build_query(array_merge(request()->except(['sort', 'direction']), ['sort' => 'email', 'direction' => request('sort') === 'email' && request('direction') === 'asc' ? 'desc' : 'asc']))); ?>"
-                                            class="text-decoration-none text-dark d-flex align-items-center gap-1 <?php echo e(request('sort') === 'email' ? 'fw-bold text-success' : ''); ?>">
-                                            Email
-                                            <?php if(request('sort') === 'email'): ?>
-                                                <i class="bi bi-chevron-<?php echo e(request('direction') === 'asc' ? 'up' : 'down'); ?>"></i>
-                                            <?php else: ?>
-                                                <i class="bi bi-chevron-expand text-muted opacity-50"
-                                                    style="font-size: 0.7rem;"></i>
-                                            <?php endif; ?>
+                                            class="text-decoration-none text-secondary d-flex align-items-center gap-1">
+                                            EMAIL
                                         </a>
                                     </th>
-                                    <th>
-                                        <a href="?<?php echo e(http_build_query(array_merge(request()->except(['sort', 'direction']), ['sort' => 'role', 'direction' => request('sort') === 'role' && request('direction') === 'asc' ? 'desc' : 'asc']))); ?>"
-                                            class="text-decoration-none text-dark d-flex align-items-center gap-1 <?php echo e(request('sort') === 'role' ? 'fw-bold text-success' : ''); ?>">
-                                            Role
-                                            <?php if(request('sort') === 'role'): ?>
-                                                <i class="bi bi-chevron-<?php echo e(request('direction') === 'asc' ? 'up' : 'down'); ?>"></i>
-                                            <?php else: ?>
-                                                <i class="bi bi-chevron-expand text-muted opacity-50"
-                                                    style="font-size: 0.7rem;"></i>
-                                            <?php endif; ?>
-                                        </a>
-                                    </th>
-                                    <th>
-                                        <a href="?<?php echo e(http_build_query(array_merge(request()->except(['sort', 'direction']), ['sort' => 'is_active', 'direction' => request('sort') === 'is_active' && request('direction') === 'asc' ? 'desc' : 'asc']))); ?>"
-                                            class="text-decoration-none text-dark d-flex align-items-center gap-1 <?php echo e(request('sort') === 'is_active' ? 'fw-bold text-success' : ''); ?>">
-                                            Status
-                                            <?php if(request('sort') === 'is_active'): ?>
-                                                <i class="bi bi-chevron-<?php echo e(request('direction') === 'asc' ? 'up' : 'down'); ?>"></i>
-                                            <?php else: ?>
-                                                <i class="bi bi-chevron-expand text-muted opacity-50"
-                                                    style="font-size: 0.7rem;"></i>
-                                            <?php endif; ?>
-                                        </a>
-                                    </th>
-                                    <th>
-                                        <a href="?<?php echo e(http_build_query(array_merge(request()->except(['sort', 'direction']), ['sort' => 'created_at', 'direction' => request('sort') === 'created_at' && request('direction') === 'asc' ? 'desc' : 'asc']))); ?>"
-                                            class="text-decoration-none text-dark d-flex align-items-center gap-1 <?php echo e(request('sort') === 'created_at' || !request('sort') ? 'fw-bold text-success' : ''); ?>">
-                                            Joined
-                                            <?php if(request('sort') === 'created_at' || !request('sort')): ?>
-                                                <i
-                                                    class="bi bi-chevron-<?php echo e(request('direction', 'desc') === 'asc' ? 'up' : 'down'); ?>"></i>
-                                            <?php else: ?>
-                                                <i class="bi bi-chevron-expand text-muted opacity-50"
-                                                    style="font-size: 0.7rem;"></i>
-                                            <?php endif; ?>
-                                        </a>
-                                    </th>
-                                    <th class="text-end pe-4">Actions</th>
+                                    <th>ROLE</th>
+                                    <th>STATUS</th>
+                                    <th>JOINED</th>
+                                    <th class="text-end pe-4">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <tr data-user-id="<?php echo e($user->id); ?>">
+                                    <tr>
                                         <td class="ps-4">
-                                            <input type="checkbox" class="form-check-input user-checkbox" value="<?php echo e($user->id); ?>"
-                                                data-user-name="<?php echo e($user->name); ?>" <?php echo e($user->id === auth()->id() ? 'disabled title="Cannot select yourself"' : ''); ?>>
-                                        </td>
-                                        <td class="ps-4">
-                                            <div class="d-flex align-items-center">
-                                                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle me-3 shadow"
-                                                    style="width: 45px; height: 45px;">
-                                                    <img src="<?php echo e($user->avatar_url); ?>" alt="Avatar" class="rounded-circle"
-                                                        width="36" height="36">
-                                                </div>
-                                                <div>
-                                                    <div class="fw-semibold"><?php echo e($user->name); ?></div>
-                                                    <?php if($user->id === auth()->id()): ?>
-                                                        <small class="text-primary fw-medium">
-                                                            <i class="bi bi-star-fill me-1"></i>You
-                                                        </small>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
+                                            <input type="checkbox" class="form-check-input user-checkbox" value="<?php echo e($user->id); ?>" <?php echo e($user->id === auth()->id() ? 'disabled' : ''); ?>>
                                         </td>
                                         <td>
-                                            <div class="d-flex align-items-center">
-                                                <i class="bi bi-envelope text-muted me-2"></i>
-                                                <?php echo e($user->email); ?>
+                                            <div class="user-cell">
+                                                <img src="<?php echo e($user->avatar_url); ?>" alt="Avatar" class="user-avatar">
+                                                <div class="user-info">
+                                                    <h6>
+                                                        <?php echo e($user->name); ?>
 
+                                                        <?php if($user->id === auth()->id()): ?>
+                                                            <span class="user-me-badge">You</span>
+                                                        <?php endif; ?>
+                                                    </h6>
+                                                    <span><?php echo e($user->student_id ?? ucfirst($user->role)); ?></span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td>
-                                            <?php
-                                                $badgeColor = match ($user->role) {
-                                                    'admin' => 'danger',
-                                                    'student' => 'primary',
-                                                    'counselor' => 'success',
-                                                    default => 'secondary'
-                                                };
-                                                $icon = match ($user->role) {
-                                                    'admin' => 'shield-fill',
-                                                    'student' => 'person',
-                                                    'counselor' => 'person-badge',
-                                                    default => 'person'
-                                                };
-                                            ?>
-                                            <span class="badge bg-<?php echo e($badgeColor); ?> fs-6 px-3 py-2">
-                                                <i class="bi bi-<?php echo e($icon); ?> me-1"></i>
+                                            <div class="text-muted small"><?php echo e($user->email); ?></div>
+                                        </td>
+                                        <td>
+                                            <span class="premium-badge badge-role-<?php echo e($user->role); ?>">
+                                                <?php if($user->role == 'admin'): ?> <i class="bi bi-shield-fill"></i>
+                                                <?php elseif($user->role == 'student'): ?> <i class="bi bi-person"></i>
+                                                <?php else: ?> <i class="bi bi-person-badge"></i> <?php endif; ?>
                                                 <?php echo e(ucfirst($user->role)); ?>
 
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-<?php echo e($user->isActive() ? 'success' : 'danger'); ?> fs-6 px-3 py-2"
-                                                data-bs-toggle="tooltip"
-                                                title="<?php echo e($user->isActive() ? 'User can log in and access the system' : 'User account is deactivated'); ?>">
-                                                <i class="bi bi-<?php echo e($user->isActive() ? 'check-circle' : 'x-circle'); ?> me-1"></i>
+                                            <span class="premium-badge badge-status-<?php echo e($user->isActive() ? 'active' : 'inactive'); ?>">
+                                                <i class="bi bi-circle-fill" style="font-size: 6px;"></i>
                                                 <?php echo e($user->isActive() ? 'Active' : 'Inactive'); ?>
 
                                             </span>
                                         </td>
-                                        <td class="align-middle" style="min-width: 150px;">
-                                            <div class="d-flex align-items-center gap-2 flex-nowrap">
-                                                <i class="bi bi-calendar text-muted" style="font-size: 1.1rem;"></i>
-                                                <span style="white-space: nowrap;"><?php echo e($user->created_at->format('M d, Y')); ?></span>
-                                            </div>
+                                        <td>
+                                            <span class="text-muted small fw-medium"><?php echo e($user->created_at->format('M d, Y')); ?></span>
                                         </td>
-                                        <td class="text-end pe-2 align-middle">
-                                            <div class="d-flex align-items-center justify-content-end gap-1 flex-nowrap">
-                                                <a href="<?php echo e(route('users.show', $user)); ?>"
-                                                    class="btn btn-outline-primary btn-sm p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center action-btn"
-                                                    data-bs-toggle="tooltip" title="View">
+                                        <td class="text-end pe-4">
+                                            <div class="d-flex justify-content-end gap-1">
+                                                <a href="<?php echo e(route('users.show', $user)); ?>" class="btn-action" data-bs-toggle="tooltip"
+                                                    title="View Profile">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                <a href="<?php echo e(route('users.edit', $user)); ?>"
-                                                    class="btn btn-outline-warning btn-sm p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center action-btn"
-                                                    data-bs-toggle="tooltip" title="Edit">
+                                                <a href="<?php echo e(route('users.edit', $user)); ?>" class="btn-action edit"
+                                                    data-bs-toggle="tooltip" title="Edit User">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                                 <?php if($user->id !== auth()->id()): ?>
-                                                    <form action="<?php echo e(route('users.toggle-status', $user)); ?>" method="POST"
-                                                        class="d-inline">
-                                                        <?php echo csrf_field(); ?>
-                                                        <?php echo method_field('PATCH'); ?>
-                                                        <button type="submit"
-                                                            class="btn btn-outline-<?php echo e($user->isActive() ? 'warning' : 'success'); ?> btn-sm p-1 rounded-circle shadow-sm btn-toggle-status d-flex align-items-center justify-content-center action-btn"
-                                                            data-bs-toggle="tooltip"
+                                                    <form action="<?php echo e(route('users.toggle-status', $user)); ?>" method="POST" class="d-inline">
+                                                        <?php echo csrf_field(); ?> <?php echo method_field('PATCH'); ?>
+                                                        <button type="submit" class="btn-action" data-bs-toggle="tooltip"
                                                             title="<?php echo e($user->isActive() ? 'Deactivate' : 'Activate'); ?>">
-                                                            <i class="bi bi-<?php echo e($user->isActive() ? 'pause' : 'play'); ?>"></i>
-                                                        </button>
-                                                    </form>
-                                                    <form action="<?php echo e(route('users.destroy', $user)); ?>" method="POST" class="d-inline">
-                                                        <?php echo csrf_field(); ?>
-                                                        <?php echo method_field('DELETE'); ?>
-                                                        <button type="submit"
-                                                            class="btn btn-outline-danger btn-sm p-1 rounded-circle shadow-sm btn-delete-user d-flex align-items-center justify-content-center action-btn"
-                                                            data-bs-toggle="tooltip" title="Delete">
-                                                            <i class="bi bi-trash"></i>
+                                                            <i
+                                                                class="bi bi-<?php echo e($user->isActive() ? 'toggle-on text-success' : 'toggle-off text-muted'); ?> fs-5"></i>
                                                         </button>
                                                     </form>
                                                 <?php endif; ?>
@@ -612,25 +609,23 @@
                         </table>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center py-3 px-3 border-top">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="text-muted small">
-                                Showing <strong><?php echo e($users->firstItem() ?? 0); ?></strong> to
-                                <strong><?php echo e($users->lastItem() ?? 0); ?></strong> of <strong><?php echo e($users->total()); ?></strong> users
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <label class="text-muted small mb-0">Per page:</label>
-                                <select class="form-select form-select-sm" style="width: auto;"
-                                    onchange="changePerPage(this.value)">
-                                    <option value="15" <?php echo e(request('per_page', 15) == 15 ? 'selected' : ''); ?>>15</option>
-                                    <option value="30" <?php echo e(request('per_page') == 30 ? 'selected' : ''); ?>>30</option>
-                                    <option value="50" <?php echo e(request('per_page') == 50 ? 'selected' : ''); ?>>50</option>
-                                    <option value="100" <?php echo e(request('per_page') == 100 ? 'selected' : ''); ?>>100</option>
-                                </select>
-                            </div>
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                        <div class="text-muted small">
+                            Showing <strong><?php echo e($users->firstItem() ?? 0); ?></strong> - <strong><?php echo e($users->lastItem() ?? 0); ?></strong>
+                            of <strong><?php echo e($users->total()); ?></strong>
                         </div>
-                        <div>
-                            <?php echo e($users->links('vendor.pagination.bootstrap-5')); ?>
+                        <div class="d-flex align-items-center gap-3">
+                            <select class="form-select form-select-sm" style="width: auto; border-radius: 6px;"
+                                onchange="changePerPage(this.value)">
+                                <option value="15" <?php echo e(request('per_page', 15) == 15 ? 'selected' : ''); ?>>15 / page</option>
+                                <option value="30" <?php echo e(request('per_page') == 30 ? 'selected' : ''); ?>>30 / page</option>
+                                <option value="50" <?php echo e(request('per_page') == 50 ? 'selected' : ''); ?>>50 / page</option>
+                                <option value="100" <?php echo e(request('per_page') == 100 ? 'selected' : ''); ?>>100 / page</option>
+                                <option value="500" <?php echo e(request('per_page') == 500 ? 'selected' : ''); ?>>500 / page</option>
+                                <option value="1000" <?php echo e(request('per_page') == 1000 ? 'selected' : ''); ?>>1000 / page</option>
+                            </select>
+                            <?php echo e($users->links('vendor.pagination.premium-simple')); ?>
 
                         </div>
                     </div>
@@ -639,443 +634,524 @@
                         function changePerPage(perPage) {
                             const url = new URL(window.location.href);
                             url.searchParams.set('per_page', perPage);
-                            url.searchParams.delete('page'); // Reset to page 1
+                            url.searchParams.delete('page');
                             window.location.href = url.toString();
                         }
                     </script>
+
                 <?php else: ?>
-                    <div class="empty-state">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-4"
-                            style="width: 100px; height: 100px;">
-                            <i class="bi bi-people fs-1 text-muted"></i>
+                    <div class="empty-state py-5 text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-people text-muted opacity-25" style="font-size: 4rem;"></i>
                         </div>
-                        <h5 class="fw-semibold mb-3">No users found</h5>
-                        <p class="text-muted mb-4">Get started by adding your first user to the system.</p>
-                        <a href="<?php echo e(route('users.create')); ?>" class="btn btn-primary btn-lg">
-                            <i class="bi bi-person-plus me-2"></i>Add First User
+                        <h5 class="fw-bold text-secondary">No users found</h5>
+                        <p class="text-muted mb-4">Try adjusting your filters or search terms.</p>
+                        <a href="<?php echo e(route('users.index')); ?>" class="btn btn-outline-secondary btn-sm">
+                            Clear Filters
                         </a>
                     </div>
                 <?php endif; ?>
             </div>
         </div>
-    </div>
 
-    <!-- Bulk Action Bar (sticky) -->
-    <div id="bulkActionBar" class="position-fixed bottom-0 start-50 translate-middle-x mb-4 shadow-lg"
-        style="display: none; z-index: 1050; width: 95%; max-width: 900px;">
-        <div class="card border-success">
-            <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-center flex-wrap gap-4">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="fw-bold text-success"><span id="selectedCount">0</span> selected</span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">
-                            <i class="bi bi-x"></i> Clear
-                        </button>
-                    </div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button type="button" class="btn btn-sm btn-success" onclick="submitBulkAction('activate')"
-                            style="white-space: nowrap;">
-                            <i class="bi bi-check-circle"></i> Activate
-                        </button>
-                        <button type="button" class="btn btn-sm btn-warning" onclick="submitBulkAction('deactivate')"
-                            style="white-space: nowrap;">
-                            <i class="bi bi-pause-circle"></i> Deactivate
-                        </button>
-
-                        <button type="button" class="btn btn-sm btn-info text-white" onclick="submitBulkAction('promote')"
-                            style="white-space: nowrap;">
-                            <i class="bi bi-graph-up-arrow"></i> Promote
-                        </button>
-
-                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                            data-bs-target="#bulkDeleteModal" style="white-space: nowrap;">
-                            <i class="bi bi-trash"></i> Delete
-                        </button>
-                    </div>
+        <!-- Bulk Action Bar (sticky) -->
+        <!-- Bulk Action Bar (sticky) -->
+        <div id="bulkActionBar" class="position-fixed bottom-0 start-50 translate-middle-x mb-4"
+            style="display: none; z-index: 1050;">
+            <div
+                class="d-flex align-items-center gap-3 bg-dark text-white p-2 px-3 rounded-pill shadow-lg border border-secondary bg-opacity-90 backdrop-blur">
+                <!-- Selection Count -->
+                <div class="d-flex align-items-center border-end border-secondary pe-3 me-1">
+                    <span class="fw-bold me-2 text-warning"><span id="selectedCount">0</span></span>
+                    <span class="text-white-50 small me-2 d-none d-sm-inline">Selected</span>
+                    <button type="button" class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none"
+                        onclick="clearSelection()" title="Clear Selection">
+                        <i class="bi bi-x-circle-fill hover-white transition-colors"></i>
+                    </button>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Hidden Forms for Bulk Actions -->
-    <form id="bulkActivateForm" method="POST" action="<?php echo e(route('users.bulk-activate')); ?>" style="display: none;">
-        <?php echo csrf_field(); ?>
-        <div id="bulkActivateInputs"></div>
-    </form>
+                <!-- Actions -->
+                <div class="d-flex gap-2">
+                    <button type="button"
+                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-success"
+                        onclick="submitBulkAction('activate')" title="Activate Users" style="width: 32px; height: 32px;">
+                        <i class="bi bi-check-lg fs-6"></i>
+                    </button>
 
-    <form id="bulkDeactivateForm" method="POST" action="<?php echo e(route('users.bulk-deactivate')); ?>" style="display: none;">
-        <?php echo csrf_field(); ?>
-        <div id="bulkDeactivateInputs"></div>
-    </form>
+                    <button type="button"
+                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-warning"
+                        onclick="submitBulkAction('deactivate')" title="Deactivate Users" style="width: 32px; height: 32px;">
+                        <i class="bi bi-pause-fill fs-6"></i>
+                    </button>
 
-    <form id="bulkPromoteForm" method="POST" action="<?php echo e(route('users.bulk-promote')); ?>" style="display: none;">
-        <?php echo csrf_field(); ?>
-        <div id="bulkPromoteInputs"></div>
-    </form>
+                    <button type="button"
+                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-info"
+                        onclick="submitBulkAction('promote')" title="Promote Users" style="width: 32px; height: 32px;">
+                        <i class="bi bi-graph-up-arrow fs-6"></i>
+                    </button>
 
-    <form id="bulkDeleteForm" method="POST" action="<?php echo e(route('users.bulk-delete')); ?>" style="display: none;">
-        <?php echo csrf_field(); ?>
-        <div id="bulkDeleteInputs"></div>
-    </form>
+                    <div class="vr bg-secondary opacity-50 mx-1"></div>
 
-
-
-    <!-- Bulk Delete Confirmation Modal -->
-    <div class="modal fade" id="bulkDeleteModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Bulk Delete</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to permanently delete <strong><span id="deleteCount">0</span> user(s)</strong>?
-                    </p>
-                    <p class="text-danger mb-0"><i class="bi bi-exclamation-circle me-1"></i>This action cannot be undone!
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()">
-                        <i class="bi bi-trash me-1"></i>Delete Users
+                    <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 py-1 d-flex align-items-center gap-2"
+                        data-bs-toggle="modal" data-bs-target="#bulkDeleteModal">
+                        <i class="bi bi-trash3-fill"></i> <span class="small fw-semibold d-none d-sm-inline">Delete</span>
                     </button>
                 </div>
             </div>
         </div>
-    </div>
 
-
-
-    <!-- Import Match Modal -->
-    <div class="modal fade" id="importDeleteModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-file-earmark-person me-2"></i>Match Users from File</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>Upload your student list</strong> (Excel or CSV). Matched users will be automatically
-                        selected in the list below so you can perform bulk actions on them.
-                    </div>
-
-                    <form id="importDeleteForm" enctype="multipart/form-data">
-                        <?php echo csrf_field(); ?>
-                        <div class="mb-3">
-                            <label for="import_file" class="form-label">Upload Student List (Excel/CSV)</label>
-                            <input type="file" class="form-control" id="import_file" name="import_file"
-                                accept=".xlsx,.xls,.csv" required>
-                            <div class="form-text">
-                                File must contain a <strong>Student ID</strong> column. You may also include
-                                <strong>Name</strong> and <strong>Email</strong> columns to help you identify users.
-                            </div>
-                        </div>
-                    </form>
-                    <div id="importError" class="alert alert-danger d-none mt-2"></div>
-
-                    <!-- Results Area -->
-                    <div id="verificationResults" class="mt-3"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="verifyImport(this)">
-                        <i class="bi bi-search me-1"></i>Process File
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    <script>
-        // Bulk Actions JavaScript
-        // Clear Import Selection Function
-        function clearVerifiedImport() {
-            sessionStorage.removeItem('verified_import_user_ids');
-            window.location.reload();
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            let selectedUsers = [];
-            const selectAll = document.getElementById('selectAll');
-            const userCheckboxes = document.querySelectorAll('.user-checkbox');
-
-
-            // Apply verified import IDs from previous session
-            // REMOVED: Selections now clear on page reload
-            // Kept in sessionStorage only for verifyImport function to access on same page
-
-            // Select All functionality
-            if (selectAll) {
-                selectAll.addEventListener('change', function () {
-                    const checkboxes = document.querySelectorAll('.user-checkbox:not(:disabled)');
-                    checkboxes.forEach(cb => {
-                        cb.checked = this.checked;
-                    });
-                    updateSelection();
-                });
+        <style>
+            .backdrop-blur {
+                backdrop-filter: blur(8px);
             }
 
-            // Individual checkbox handling
-            userCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function () {
-                    updateSelection();
-                    // Update select all state
-                    const allCheckboxes = document.querySelectorAll('.user-checkbox:not(:disabled)');
-                    const checkedCheckboxes = document.querySelectorAll('.user-checkbox:checked:not(:disabled)');
-                    if (selectAll) {
-                        selectAll.checked = allCheckboxes.length === checkedCheckboxes.length && allCheckboxes.length > 0;
+            .hover-white:hover {
+                color: #fff !important;
+            }
+
+            .hover-success:hover {
+                background-color: #198754;
+                border-color: #198754;
+                color: white;
+            }
+
+            .hover-warning:hover {
+                background-color: #ffc107;
+                border-color: #ffc107;
+                color: black;
+            }
+
+            .hover-info:hover {
+                background-color: #0dcaf0;
+                border-color: #0dcaf0;
+                color: black;
+            }
+        </style>
+
+        <!-- Hidden Forms for Bulk Actions -->
+        <form id="bulkActivateForm" method="POST" action="<?php echo e(route('users.bulk-activate')); ?>" style="display: none;">
+            <?php echo csrf_field(); ?>
+            <div id="bulkActivateInputs"></div>
+        </form>
+
+        <form id="bulkDeactivateForm" method="POST" action="<?php echo e(route('users.bulk-deactivate')); ?>" style="display: none;">
+            <?php echo csrf_field(); ?>
+            <div id="bulkDeactivateInputs"></div>
+        </form>
+
+        <form id="bulkPromoteForm" method="POST" action="<?php echo e(route('users.bulk-promote')); ?>" style="display: none;">
+            <?php echo csrf_field(); ?>
+            <div id="bulkPromoteInputs"></div>
+        </form>
+
+        <form id="bulkDeleteForm" method="POST" action="<?php echo e(route('users.bulk-delete')); ?>" style="display: none;">
+            <?php echo csrf_field(); ?>
+            <div id="bulkDeleteInputs"></div>
+        </form>
+
+
+
+        <!-- Bulk Delete Confirmation Modal -->
+        <div class="modal fade" id="bulkDeleteModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Bulk Delete</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to permanently delete <strong><span id="deleteCount">0</span> user(s)</strong>?
+                        </p>
+                        <p class="text-danger mb-0"><i class="bi bi-exclamation-circle me-1"></i>This action cannot be undone!
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()">
+                            <i class="bi bi-trash me-1"></i>Delete Users
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Import Match Modal -->
+        <div class="modal fade" id="importDeleteModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-file-earmark-person me-2"></i>Match Users from File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Upload your student list</strong> (Excel or CSV). Matched users will be automatically
+                            selected in the list below so you can perform bulk actions on them.
+                        </div>
+
+                        <form id="importDeleteForm" enctype="multipart/form-data">
+                            <?php echo csrf_field(); ?>
+                            <div class="mb-3">
+                                <label for="import_file" class="form-label">Upload Student List (Excel/CSV)</label>
+                                <input type="file" class="form-control" id="import_file" name="import_file"
+                                    accept=".xlsx,.xls,.csv" required>
+                                <div class="form-text">
+                                    File must contain a <strong>Student ID</strong> column. You may also include
+                                    <strong>Name</strong> and <strong>Email</strong> columns to help you identify users.
+                                </div>
+                            </div>
+                        </form>
+                        <div id="importError" class="alert alert-danger d-none mt-2"></div>
+
+                        <!-- Results Area -->
+                        <div id="verificationResults" class="mt-3"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="verifyImport(this)">
+                            <i class="bi bi-search me-1"></i>Process File
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Bulk Action Bar (sticky) -->
+        <div id="bulkActionBar" class="position-fixed bottom-0 start-50 translate-middle-x mb-4"
+            style="display: none; z-index: 1050;">
+            <div
+                class="d-flex align-items-center gap-3 bg-dark text-white p-2 px-3 rounded-pill shadow-lg border border-secondary bg-opacity-90 backdrop-blur">
+                <!-- Selection Count -->
+                <div class="d-flex align-items-center border-end border-secondary pe-3 me-1">
+                    <span class="fw-bold me-2 text-warning"><span id="selectedCount">0</span></span>
+                    <span class="text-white-50 small me-2 d-none d-sm-inline">Selected</span>
+                    <button type="button" class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none"
+                        onclick="clearSelection()" title="Clear Selection">
+                        <i class="bi bi-x-circle-fill hover-white transition-colors"></i>
+                    </button>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2">
+                    <button type="button"
+                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-success"
+                        onclick="submitBulkAction('activate')" title="Activate Users" style="width: 32px; height: 32px;">
+                        <i class="bi bi-check-lg fs-6"></i>
+                    </button>
+
+                    <button type="button"
+                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-warning"
+                        onclick="submitBulkAction('deactivate')" title="Deactivate Users" style="width: 32px; height: 32px;">
+                        <i class="bi bi-pause-fill fs-6"></i>
+                    </button>
+
+                    <button type="button"
+                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-info"
+                        onclick="submitBulkAction('promote')" title="Promote Users" style="width: 32px; height: 32px;">
+                        <i class="bi bi-graph-up-arrow fs-6"></i>
+                    </button>
+
+                    <div class="vr bg-secondary opacity-50 mx-1"></div>
+
+                    <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 py-1 d-flex align-items-center gap-2"
+                        data-bs-toggle="modal" data-bs-target="#bulkDeleteModal">
+                        <i class="bi bi-trash3-fill"></i> <span class="small fw-semibold d-none d-sm-inline">Delete</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .backdrop-blur {
+                backdrop-filter: blur(8px);
+            }
+
+            .hover-white:hover {
+                color: #fff !important;
+            }
+
+            .hover-success:hover {
+                background-color: #198754;
+                border-color: #198754;
+                color: white;
+            }
+
+            .hover-warning:hover {
+                background-color: #ffc107;
+                border-color: #ffc107;
+                color: black;
+            }
+
+            .hover-info:hover {
+                background-color: #0dcaf0;
+                border-color: #0dcaf0;
+                color: black;
+            }
+        </style>
+
+        <!-- Hidden Forms for Bulk Actions -->
+        <form id="bulkActivateForm" method="POST" action="<?php echo e(route('users.bulk-activate')); ?>" style="display: none;">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('PATCH'); ?>
+            <div id="bulkActivateInputs"></div>
+        </form>
+
+        <form id="bulkDeactivateForm" method="POST" action="<?php echo e(route('users.bulk-deactivate')); ?>" style="display: none;">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('PATCH'); ?>
+            <div id="bulkDeactivateInputs"></div>
+        </form>
+
+        <form id="bulkPromoteForm" method="POST" action="<?php echo e(route('users.bulk-promote')); ?>" style="display: none;">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('PATCH'); ?>
+            <div id="bulkPromoteInputs"></div>
+        </form>
+
+        <form id="bulkDeleteForm" method="POST" action="<?php echo e(route('users.bulk-delete')); ?>" style="display: none;">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('DELETE'); ?>
+            <div id="bulkDeleteInputs"></div>
+        </form>
+
+        <!-- Bulk Delete Confirmation Modal -->
+        <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Bulk Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <span id="deleteCount" class="fw-bold"></span> selected users?
+                        This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            console.log('Users Page Scripts Loading...');
+
+            // Global selection manager
+            window.SelectionManager = {
+                storageKey: 'selected_user_ids',
+                selectedIds: new Set(),
+                init: function () {
+                    this.load();
+                    this.sync();
+                    this.update();
+                    this.bind();
+                },
+                load: function () {
+                    try {
+                        let saved = sessionStorage.getItem(this.storageKey);
+                        if (saved) {
+                            let arr = JSON.parse(saved);
+                            this.selectedIds = new Set(arr.map(String));
+                        }
+                    } catch (e) { console.error('Storage Load Error', e); }
+                },
+                save: function () {
+                    try {
+                        sessionStorage.setItem(this.storageKey, JSON.stringify(Array.from(this.selectedIds)));
+                    } catch (e) { console.error('Storage Save Error', e); }
+                },
+                sync: function () {
+                    document.querySelectorAll('.user-checkbox').forEach(cb => {
+                        cb.checked = this.selectedIds.has(cb.value);
+                    });
+                    let all = document.getElementById('selectAll');
+                    if (all) {
+                        let pageCbs = document.querySelectorAll('.user-checkbox:not(:disabled)');
+                        all.checked = pageCbs.length > 0 && Array.from(pageCbs).every(c => c.checked);
                     }
-                });
-            });
-
-            // Make functions globally available for inline onclick handlers
-            window.updateSelection = function () {
-                selectedUsers = [];
-                document.querySelectorAll('.user-checkbox:checked:not(:disabled)').forEach(cb => {
-                    selectedUsers.push(cb.value);
-                });
-
-                const count = selectedUsers.length;
-                const countElements = ['selectedCount', 'deleteCount'];
-
-                countElements.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.textContent = count;
-                });
-
-                // Show/hide bulk action bar
-                const actionBar = document.getElementById('bulkActionBar');
-                if (actionBar) {
-                    if (count > 0) {
-                        actionBar.style.display = 'block';
-                    } else {
-                        actionBar.style.display = 'none';
+                },
+                update: function () {
+                    let count = this.selectedIds.size;
+                    ['selectedCount', 'deleteCount'].forEach(id => {
+                        let el = document.getElementById(id);
+                        if (el) el.textContent = count;
+                    });
+                    let bar = document.getElementById('bulkActionBar');
+                    if (bar) bar.style.display = count > 0 ? 'block' : 'none';
+                },
+                add: function (id) { this.selectedIds.add(String(id)); this.save(); this.update(); },
+                remove: function (id) { this.selectedIds.delete(String(id)); this.save(); this.update(); },
+                addAll: function (ids) { ids.forEach(id => this.selectedIds.add(String(id))); this.save(); this.sync(); this.update(); },
+                clear: function () { this.selectedIds.clear(); this.save(); this.sync(); this.update(); },
+                bind: function () {
+                    document.addEventListener('change', (e) => {
+                        if (e.target.classList.contains('user-checkbox')) {
+                            if (e.target.checked) this.add(e.target.value);
+                            else this.remove(e.target.value);
+                            this.sync();
+                        }
+                    });
+                    let all = document.getElementById('selectAll');
+                    if (all) {
+                        all.addEventListener('change', (e) => {
+                            document.querySelectorAll('.user-checkbox:not(:disabled)').forEach(cb => {
+                                cb.checked = e.target.checked;
+                                if (e.target.checked) this.selectedIds.add(cb.value);
+                                else this.selectedIds.delete(cb.value);
+                            });
+                            this.save(); this.update();
+                        });
                     }
                 }
             };
 
-            window.clearSelection = function () {
-                document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = false);
-                if (selectAll) selectAll.checked = false;
-                updateSelection();
-            };
+            window.clearSelection = function () { window.SelectionManager.clear(); };
 
             window.submitBulkAction = function (action) {
-                if (selectedUsers.length === 0) {
-                    alert('Please select at least one user');
+                let ids = Array.from(window.SelectionManager.selectedIds);
+                if (ids.length === 0) {
+                    Swal.fire('Error', 'Please select at least one user', 'error');
                     return;
                 }
-
-                let form, inputsContainer;
-                if (action === 'activate') {
-                    form = document.getElementById('bulkActivateForm');
-                    inputsContainer = document.getElementById('bulkActivateInputs');
-                } else if (action === 'deactivate') {
-                    form = document.getElementById('bulkDeactivateForm');
-                    inputsContainer = document.getElementById('bulkDeactivateInputs');
-                } else if (action === 'promote') {
-                    form = document.getElementById('bulkPromoteForm');
-                    inputsContainer = document.getElementById('bulkPromoteInputs');
+                let formId, inputContainerId;
+                switch (action) {
+                    case 'activate': formId = 'bulkActivateForm'; inputContainerId = 'bulkActivateInputs'; break;
+                    case 'deactivate': formId = 'bulkDeactivateForm'; inputContainerId = 'bulkDeactivateInputs'; break;
+                    case 'promote': formId = 'bulkPromoteForm'; inputContainerId = 'bulkPromoteInputs'; break;
                 }
-
-                if (!form || !inputsContainer) return;
-
-                // Clear and add hidden inputs
-                inputsContainer.innerHTML = '';
-                selectedUsers.forEach(userId => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'user_ids[]';
-                    input.value = userId;
-                    inputsContainer.appendChild(input);
-                });
-                form.submit();
+                let form = document.getElementById(formId);
+                let container = document.getElementById(inputContainerId);
+                if (form && container) {
+                    container.innerHTML = '';
+                    ids.forEach(id => {
+                        let input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'user_ids[]';
+                        input.value = id;
+                        container.appendChild(input);
+                    });
+                    form.submit();
+                }
             };
 
             window.confirmBulkDelete = function () {
-                if (selectedUsers.length === 0) {
-                    alert('Please select at least one user');
+                let ids = Array.from(window.SelectionManager.selectedIds);
+                if (ids.length === 0) {
+                    Swal.fire('Error', 'Please select at least one user', 'error');
                     return;
                 }
-                const form = document.getElementById('bulkDeleteForm');
-                const inputsContainer = document.getElementById('bulkDeleteInputs');
-
-                if (!form || !inputsContainer) return;
-
-                inputsContainer.innerHTML = '';
-                selectedUsers.forEach(userId => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'user_ids[]';
-                    input.value = userId;
-                    inputsContainer.appendChild(input);
-                });
-                form.submit();
+                let form = document.getElementById('bulkDeleteForm');
+                let container = document.getElementById('bulkDeleteInputs');
+                if (form && container) {
+                    container.innerHTML = '';
+                    ids.forEach(id => {
+                        let input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'user_ids[]';
+                        input.value = id;
+                        container.appendChild(input);
+                    });
+                    form.submit();
+                }
             };
-        });
 
+            window.verifyImport = function (btn) {
+                console.log('Button clicked:', btn);
+                // alert('DEBUG: verifyImport function called successfully.');
 
+                let form = document.getElementById('importDeleteForm');
+                let fileInput = document.getElementById('import_file');
+                let results = document.getElementById('verificationResults');
+                let errDiv = document.getElementById('importError');
 
-
-
-        // --- IMPORT MATCH FUNCTIONALITY ---
-        window.verifyImport = function (btn) {
-            console.log('verifyImport function called'); // Debug log
-
-            try {
-                const form = document.getElementById('importDeleteForm');
-                const errorDiv = document.getElementById('importError');
-                const fileInput = document.getElementById('import_file');
-                const resultsDiv = document.getElementById('verificationResults');
-
-                // Validate elements exist
-                if (!form) {
-                    console.error('Form not found');
-                    alert('Form not found. Please refresh the page and try again.');
+                if (!form || !fileInput) {
+                    alert('Error: Form or File Input not found in the page.');
                     return;
                 }
 
-                if (!btn) {
-                    console.error('Button reference lost');
+                if (!fileInput.files.length) {
+                    alert('Please select a file first.');
+                    fileInput.focus();
                     return;
                 }
 
-                // Clear previous state
-                if (errorDiv) {
-                    errorDiv.classList.add('d-none');
-                    errorDiv.textContent = '';
-                }
-                if (resultsDiv) resultsDiv.innerHTML = '';
-
-                // Reset valid/invalid classes on input
-                if (fileInput) {
-                    fileInput.classList.remove('is-invalid');
-                }
-
-                // Basic Validation
-                if (!fileInput || !fileInput.files.length) {
-                    if (fileInput) fileInput.classList.add('is-invalid');
-                    if (errorDiv) {
-                        errorDiv.textContent = 'Please select a file first.';
-                        errorDiv.classList.remove('d-none');
-                    }
-                    return;
-                }
-
-                // Loading State
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+                let originalHtml = btn.innerHTML;
                 btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
 
-                const formData = new FormData(form);
-
-                // Safely get CSRF token
-                const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-                if (!csrfTokenMeta) {
-                    throw new Error('CSRF token not found. Please refresh the page.');
-                }
-                const csrfToken = csrfTokenMeta.getAttribute('content');
+                let formData = new FormData(form);
+                let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
                 fetch('<?php echo e(route("users.verify-import-delete")); ?>', {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': csrfToken
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json'
                     }
                 })
-                    .then(response => {
+                    .then(async response => {
+                        const contentType = response.headers.get("content-type");
                         if (!response.ok) {
-                            return response.text().then(text => {
-                                try {
-                                    const json = JSON.parse(text);
-                                    throw new Error(json.message || 'Server returned error ' + response.status);
-                                } catch (e) {
-                                    throw new Error('Server returned error ' + response.status);
+                            // Start by trying to parse JSON error (e.g. valid 422 validation error)
+                            try {
+                                const errorData = await response.json();
+                                if (errorData.message) {
+                                    throw new Error(errorData.message);
                                 }
-                            });
+                            } catch (ignore) { }
+
+                            // If not JSON, try text
+                            const text = await response.text();
+                            let errorMsg = 'Server Error: ' + response.status;
+                            if (text) {
+                                let match = text.match(/<title>(.*?)<\/title>/i);
+                                if (match) errorMsg += ' - ' + match[1];
+                                else errorMsg += ' - ' + text.substring(0, 100);
+                            }
+                            throw new Error(errorMsg);
                         }
-                        return response.json();
+                        if (contentType && contentType.indexOf("application/json") !== -1) {
+                            return response.json();
+                        } else {
+                            // Got success status but not JSON?
+                            const text = await response.text();
+                            throw new Error("Expected JSON but got: " + text.substring(0, 100));
+                        }
                     })
                     .then(data => {
                         if (data.success) {
-                            // Store matched IDs in sessionStorage for cross-page selection
                             if (data.matched_ids && data.matched_ids.length > 0) {
-                                sessionStorage.setItem('verified_import_user_ids', JSON.stringify(data.matched_ids));
-
-                                // Auto-select matched users on current page
-                                let visibleMatches = 0;
-                                data.matched_ids.forEach(id => {
-                                    const checkbox = document.querySelector(`input.user-checkbox[value="${id}"]`);
-                                    if (checkbox) {
-                                        if (!checkbox.checked) {
-                                            checkbox.checked = true;
-                                            visibleMatches++;
-                                        }
-                                        // Visual highlight
-                                        const row = checkbox.closest('tr');
-                                        if (row) {
-                                            row.classList.remove('table-success');
-                                            void row.offsetWidth;
-                                            row.classList.add('table-success');
-                                            setTimeout(() => row.classList.remove('table-success'), 3000);
-                                        }
-                                    }
-                                });
-
-                                // Notify about users on other pages
-                                const hiddenMatches = data.matched_ids.length - visibleMatches;
-                                if (hiddenMatches > 0) {
-                                    console.log(`${hiddenMatches} matched user(s) are on other pages and will be auto-selected when you navigate to those pages.`);
-                                }
-
-                                // Trigger update of bulk action bar
-                                updateSelection();
+                                window.SelectionManager.addAll(data.matched_ids);
+                                results.innerHTML = '<div class="alert alert-success mt-3"><h6>Success!</h6><p>Matched <strong>' + data.count + '</strong> users.</p></div>';
+                            } else {
+                                results.innerHTML = '<div class="alert alert-warning mt-3"><h6>No matches found.</h6></div>';
                             }
-
-                            // Display Results in Modal
-                            if (resultsDiv) {
-                                resultsDiv.innerHTML = `
-                                                                                        <div class="alert alert-success">
-                                                                                            <h6><i class="bi bi-check-circle me-2"></i>Matching Complete</h6>
-                                                                                            <p class="mb-2"><strong>${data.count}</strong> students matched out of <strong>${data.total_in_file}</strong> records in your file.</p>
-                                                                                            <p class="mb-0 small">Matched users currently visible on this page have been selected.</p>
-                                                                                        </div>
-                                                                                    `;
-                            }
-
-
-
                         } else {
-                            throw new Error(data.message || 'Verification failed.');
+                            alert('Error: ' + (data.message || 'Verification failed.'));
                         }
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        errorDiv.textContent = error.message || 'An error occurred. Please check console.';
-                        errorDiv.classList.remove('d-none');
+                    .catch(e => {
+                        console.error('Fetch Error:', e);
+                        // Clean up the error message for display
+                        let msg = e.message.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                        alert('System Error: ' + msg);
                     })
                     .finally(() => {
-                        // Always reset button state
-                        btn.innerHTML = originalText;
                         btn.disabled = false;
+                        btn.innerHTML = originalHtml;
                     });
+            };
 
-            } catch (e) {
-                console.error("Synchronous Error:", e);
-                if (btn) {
-                    btn.innerHTML = '<i class="bi bi-search me-1"></i>Process File';
-                    btn.disabled = false;
-                }
-                if (document.getElementById('importError')) {
-                    document.getElementById('importError').textContent = e.message;
-                    document.getElementById('importError').classList.remove('d-none');
-                }
-            }
-        };
-    </script>
+            document.addEventListener('DOMContentLoaded', () => {
+                window.SelectionManager.init();
+            });
+        </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/users/index.blade.php ENDPATH**/ ?>

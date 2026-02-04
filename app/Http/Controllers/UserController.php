@@ -7,6 +7,7 @@ use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -678,7 +679,7 @@ class UserController extends Controller
     public function verifyImportDelete(Request $request)
     {
         $request->validate([
-            'import_file' => 'required|file|mimes:xlsx,xls,csv|max:5120' // Max 5MB
+            'import_file' => 'required|file|mimes:xlsx,xls,csv,txt|max:5120' // Max 5MB
         ]);
 
         try {
@@ -687,8 +688,8 @@ class UserController extends Controller
 
             // Parse file based on extension
             if (in_array($extension, ['xlsx', 'xls'])) {
-                $data = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
-                $sheet = $data->getActiveSheet();
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
+                $sheet = $spreadsheet->getActiveSheet();
                 $rows = $sheet->toArray();
             } else { // csv
                 $rows = [];
@@ -721,78 +722,81 @@ class UserController extends Controller
             }
 
             // Extract file data (skip header row)
-            $fileData = [];
+            $searchStudentIds = [];
+            $searchNames = [];
+            $searchEmails = [];
+            $recordsCount = 0;
+
             for ($i = 1; $i < count($rows); $i++) {
                 $row = $rows[$i];
-                $fileData[] = [
-                    'student_id' => $studentIdCol !== null && isset($row[$studentIdCol]) ? trim($row[$studentIdCol]) : null,
-                    'name' => $nameCol !== null && isset($row[$nameCol]) ? trim($row[$nameCol]) : null,
-                    'email' => $emailCol !== null && isset($row[$emailCol]) ? trim($row[$emailCol]) : null,
-                ];
-            }
+                if (empty(array_filter($row)))
+                    continue; // Skip empty rows
 
-            // Get all students to match against
-            // Optimization: In a real large-scale app, we might query only relevant subsets, 
-            // but for typical school usage load all students (id, name, email, student_id) is okay.
-            $students = User::where('role', 'student')->get(['id', 'name', 'email', 'student_id']);
+                $recordsCount++;
 
-            $matchedIds = [];
-            $matchDetails = [];
-
-            foreach ($fileData as $fileRow) {
-                foreach ($students as $student) {
-                    $matchScore = 0;
-                    $matchReasons = [];
-
-                    // Student ID match (highest priority)
-                    if (!empty($fileRow['student_id']) && $student->student_id == $fileRow['student_id']) {
-                        $matchScore = 100;
-                        $matchReasons[] = 'Student ID';
-                    }
-
-                    // Name match (case-insensitive, partial)
-                    if (!empty($fileRow['name']) && !empty($student->name)) {
-                        $fName = strtolower($fileRow['name']);
-                        $sName = strtolower($student->name);
-                        if ($fName == $sName || strpos($fName, $sName) !== false || strpos($sName, $fName) !== false) {
-                            $matchScore = max($matchScore, 70);
-                            $matchReasons[] = 'Name';
-                        }
-                    }
-
-                    // Email match
-                    if (!empty($fileRow['email']) && strtolower($student->email) == strtolower($fileRow['email'])) {
-                        $matchScore = max($matchScore, 90);
-                        $matchReasons[] = 'Email';
-                    }
-
-                    // Consider it a match if score >= 70
-                    if ($matchScore >= 70) {
-                        if (!in_array($student->id, $matchedIds)) {
-                            $matchedIds[] = $student->id;
-                            $matchDetails[] = [
-                                'id' => $student->id,
-                                'name' => $student->name,
-                                'student_id' => $student->student_id,
-                                'email' => $student->email,
-                                'score' => $matchScore,
-                                'reasons' => implode(' + ', $matchReasons)
-                            ];
-                        }
-                        break; // Stop checking this file row against other students (1-to-1 assumption for row)
-                    }
+                if ($studentIdCol !== null && isset($row[$studentIdCol])) {
+                    $val = trim($row[$studentIdCol]);
+                    if ($val !== '')
+                        $searchStudentIds[] = $val;
+                }
+                if ($nameCol !== null && isset($row[$nameCol])) {
+                    $val = trim($row[$nameCol]);
+                    if ($val !== '')
+                        $searchNames[] = strtolower($val);
+                }
+                if ($emailCol !== null && isset($row[$emailCol])) {
+                    $val = trim($row[$emailCol]);
+                    if ($val !== '')
+                        $searchEmails[] = strtolower($val);
                 }
             }
+
+            // Efficient Database Matching
+            $query = User::where('role', 'student');
+
+            // Only match approved users (exclude pending/rejected)
+            $query->where(function ($q) {
+                $q->where('registration_status', 'approved')
+                    ->orWhereNull('registration_status');
+            });
+            $query->where(function ($q) use ($searchStudentIds, $searchNames, $searchEmails) {
+                if (!empty($searchStudentIds)) {
+                    $q->orWhereIn('student_id', $searchStudentIds);
+                }
+                if (!empty($searchEmails)) {
+                    $q->orWhereIn('email', $searchEmails);
+                }
+                if (!empty($searchNames)) {
+                    // For names, we'll do exact case-insensitive matches via whereIn for performance
+                    // but we need to ensure the DB names are also compared correctly.
+                    // Lowercasing in the DB might be slow, so we rely on default case-insensitivity
+                    // or use a raw query if necessary.
+                    $q->orWhereIn(\DB::raw('LOWER(name)'), $searchNames);
+                }
+            });
+
+            $matchedUsers = $query->get(['id', 'name', 'email', 'student_id']);
+
+            $matchedIds = $matchedUsers->pluck('id')->toArray();
+            $matchDetails = $matchedUsers->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'student_id' => $user->student_id,
+                    'email' => $user->email,
+                ];
+            });
 
             return response()->json([
                 'success' => true,
                 'matched_ids' => $matchedIds,
                 'match_details' => $matchDetails,
-                'total_in_file' => count($fileData),
+                'total_in_file' => $recordsCount,
                 'count' => count($matchedIds)
             ]);
 
         } catch (\Exception $e) {
+            \Log::error('Import Match Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error processing file: ' . $e->getMessage()

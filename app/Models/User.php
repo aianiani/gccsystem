@@ -233,6 +233,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the latest assessment for the user
+     */
+    public function latestAssessment()
+    {
+        return $this->hasOne(\App\Models\Assessment::class)->latestOfMany();
+    }
+
+    /**
      * Get messages sent by this user
      */
     public function sentMessages()

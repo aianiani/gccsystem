@@ -417,6 +417,55 @@
         .stat-label { font-size: 0.85rem; color: var(--text-light); font-weight: 600; margin-bottom: 0.25rem; }
         .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--text-dark); line-height: 1.2; }
         .stat-hint { font-size: 0.75rem; color: #9aa0ac; margin-top: 0.25rem; }
+
+        /* Risk Level Badges */
+        .badge-risk {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .badge-risk.very-high {
+            background-color: #7f1d1d; /* text-red-900 */
+            color: #fef2f2;
+            border: 1px solid #991b1b;
+        }
+
+        .badge-risk.high {
+            background-color: #fee2e2; /* text-red-100 */
+            color: #b91c1c; /* text-red-700 */
+            border: 1px solid #fecaca;
+        }
+
+        .badge-risk.moderate {
+            background-color: #fff7ed; /* text-orange-50 */
+            color: #c2410c; /* text-orange-700 */
+            border: 1px solid #ffedd5;
+        }
+
+        .badge-risk.low-moderate {
+            background-color: #fefce8; /* text-yellow-50 */
+            color: #a16207; /* text-yellow-700 */
+            border: 1px solid #fef9c3;
+        }
+
+        .badge-risk.normal, .badge-risk.low {
+            background-color: #f0fdf4; /* text-green-50 */
+            color: #15803d; /* text-green-700 */
+            border: 1px solid #dcfce7;
+        }
+
+        .badge-risk.none {
+            background-color: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
     </style>
 
     <div class="home-zoom">
@@ -602,9 +651,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $__empty_1 = true; $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $student): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <?php $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $student): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <?php
-                                                $latestAssessment = $student->assessments->first();
+                                                $latestAssessment = $student->latestAssessment;
                                                 $riskLevel = $latestAssessment ? ($latestAssessment->risk_level ?? 'normal') : 'none';
                                                 $totalApps = \App\Models\Appointment::where('student_id', $student->id)->where('counselor_id', auth()->id())->count();
                                                 $completedApps = \App\Models\Appointment::where('student_id', $student->id)->where('counselor_id', auth()->id())->where('status', 'completed')->count();
@@ -644,14 +693,18 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <?php if($riskLevel == 'high'): ?>
+                                                    <?php if($riskLevel == 'very-high'): ?>
+                                                        <span class="badge-risk very-high">Very High Risk</span>
+                                                    <?php elseif($riskLevel == 'high'): ?>
                                                         <span class="badge-risk high">High Risk</span>
                                                     <?php elseif($riskLevel == 'moderate'): ?>
                                                         <span class="badge-risk moderate">Moderate</span>
+                                                    <?php elseif($riskLevel == 'low-moderate'): ?>
+                                                        <span class="badge-risk low-moderate">Low-Moderate</span>
                                                     <?php elseif($riskLevel == 'normal' || $riskLevel == 'low'): ?>
                                                         <span class="badge-risk normal"><?php echo e(ucfirst($riskLevel)); ?></span>
                                                     <?php else: ?>
-                                                        <span class="badge-risk text-muted bg-light border-0">No Data</span>
+                                                        <span class="badge-risk none">No Data</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="pe-4 text-end">
@@ -667,7 +720,8 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php if($students->isEmpty()): ?>
                                             <tr>
                                                 <td colspan="6" class="text-center py-5">
                                                     <div class="empty-state">

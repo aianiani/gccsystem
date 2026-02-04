@@ -695,11 +695,6 @@
                                 <i class="bi bi-arrow-counterclockwise"></i>
                             </a>
 
-                            <?php if($completedAppointments > 0): ?>
-                                <button type="button" id="deleteAllCompletedBtn" class="btn-clear-completed">
-                                    <i class="bi bi-trash3"></i> Clear Completed
-                                </button>
-                            <?php endif; ?>
                         </div>
                     </form>
 
@@ -997,38 +992,6 @@
                 });
             }
 
-            // Clear All Completed
-            const deleteAllCompletedBtn = document.getElementById('deleteAllCompletedBtn');
-            if (deleteAllCompletedBtn) {
-                deleteAllCompletedBtn.addEventListener('click', () => {
-                    Swal.fire({
-                        title: 'Clear All Completed?',
-                        text: "This will permanently delete all completed appointments!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#dc3545',
-                        confirmButtonText: 'Yes, delete all'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch('<?php echo e(route("counselor.appointments.bulk.deleteCompleted")); ?>', {
-                                method: 'DELETE',
-                                headers: {
-                                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
-                                    'Content-Type': 'application/json'
-                                }
-                            })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        Swal.fire('Deleted!', data.message, 'success').then(() => location.reload());
-                                    } else {
-                                        Swal.fire('Error', 'Something went wrong.', 'error');
-                                    }
-                                });
-                        }
-                    });
-                });
-            }
             // Bulk SMS Functionality
             const bulkSmsBtn = document.getElementById('bulkSmsBtn');
             const smsQueueModalElement = document.getElementById('smsQueueModal');
@@ -1090,18 +1053,18 @@
                     const smsHref = `sms:${student.phone}?body=${encodedMsg}`;
 
                     card.innerHTML = `
-                                <div class="card-body p-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h6 class="fw-bold mb-0">${student.name}</h6>
-                                        <span class="badge bg-white text-muted border py-1 px-2" style="font-size: 0.7rem;">${student.phone || 'No Number'}</span>
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold mb-0">${student.name}</h6>
+                                            <span class="badge bg-white text-muted border py-1 px-2" style="font-size: 0.7rem;">${student.phone || 'No Number'}</span>
+                                        </div>
+                                        <p class="small text-muted mb-3 italic" style="font-size: 0.8rem; line-height: 1.4;">"${student.message}"</p>
+                                        <a href="${smsHref}" class="btn btn-success btn-sm w-100 fw-bold sms-send-trigger" 
+                                           onclick="markAsSent(${student.id})">
+                                            <i class="bi bi-chat-dots-fill me-1"></i> Send via Messaging App
+                                        </a>
                                     </div>
-                                    <p class="small text-muted mb-3 italic" style="font-size: 0.8rem; line-height: 1.4;">"${student.message}"</p>
-                                    <a href="${smsHref}" class="btn btn-success btn-sm w-100 fw-bold sms-send-trigger" 
-                                       onclick="markAsSent(${student.id})">
-                                        <i class="bi bi-chat-dots-fill me-1"></i> Send via Messaging App
-                                    </a>
-                                </div>
-                            `;
+                                `;
                     list.appendChild(card);
                 });
             }

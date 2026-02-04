@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Announcement;
 use App\Models\SeminarAttendance;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ActivitiesExport;
 
 class DashboardController extends Controller
 {
@@ -520,10 +522,114 @@ class DashboardController extends Controller
     /**
      * Show activity logs (admin only)
      */
-    public function activities()
+    public function activities(Request $request)
     {
-        $activities = UserActivity::with('user')->latest()->paginate(15);
+        $query = UserActivity::with('user');
 
-        return view('activities', compact('activities'));
+        // Search Filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                    ->orWhere('ip_address', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Action Filter
+        if ($request->filled('action')) {
+            $query->where('action', $request->action);
+        }
+
+        // Role Filter
+        if ($request->filled('role')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('role', $request->role);
+            });
+        }
+
+        // Date Range Filter
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // Sorting
+        $sortDirection = $request->get('direction', 'desc');
+        $query->orderBy('created_at', $sortDirection);
+
+        // Pagination
+        $perPage = $request->get('per_page', 15);
+        $activities = $query->paginate($perPage)->withQueryString();
+
+        // Distinct actions for filter dropdown
+        $actions = UserActivity::distinct()->pluck('action');
+
+        // Stats for the premium UI
+        $stats = [
+            'total' => UserActivity::count(),
+            'today' => UserActivity::whereDate('created_at', today())->count(),
+            'logins_today' => UserActivity::where('action', 'login')->whereDate('created_at', today())->count(),
+            'security_events' => UserActivity::whereIn('action', ['delete_user', 'update_role', 'bulk_delete_user'])->count(),
+        ];
+
+        return view('activities', compact('activities', 'actions', 'stats'));
+    }
+
+    /**
+     * Bulk delete activity logs
+     */
+    public function bulkDeleteActivities(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:user_activities,id',
+        ]);
+
+        $count = UserActivity::whereIn('id', $request->ids)->delete();
+
+        // Log this action as well
+        UserActivity::log(auth()->id(), 'bulk_delete_activities', "Bulk deleted {$count} activity logs.");
+
+        return redirect()->back()->with('success', "Successfully deleted {$count} activity log(s).");
+    }
+
+    /**
+     * Export activities
+     */
+    public function exportActivities(Request $request)
+    {
+        $query = UserActivity::with('user');
+
+        // Apply same filters
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                    ->orWhere('ip_address', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('action')) {
+            $query->where('action', $request->action);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $query->orderBy('created_at', 'desc');
+
+        return Excel::download(new ActivitiesExport($query), 'activity_logs_' . now()->format('Y-m-d_His') . '.xlsx');
     }
 }

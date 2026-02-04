@@ -47,6 +47,7 @@ Route::post('/email/verify/resend', [AuthController::class, 'resend'])->name('ve
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
+    Route::get('appointments/{id}/download-pdf', [App\Http\Controllers\AppointmentController::class, 'downloadPdf'])->name('appointments.downloadPdf');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // (Announcements index/show are public above)
@@ -64,6 +65,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/users/bulk-role-change', [UserController::class, 'bulkRoleChange'])->name('users.bulk-role-change');
         Route::post('/users/verify-import-delete', [UserController::class, 'verifyImportDelete'])->name('users.verify-import-delete');
         Route::get('/activities', [DashboardController::class, 'activities'])->name('activities');
+        Route::post('/activities/bulk-delete', [DashboardController::class, 'bulkDeleteActivities'])->name('activities.bulk-delete');
+        Route::get('/activities-export', [DashboardController::class, 'exportActivities'])->name('activities.export');
 
 
         // Registration Approval Routes
@@ -104,7 +107,6 @@ Route::middleware('auth')->group(function () {
         Route::get('appointments/create', [App\Http\Controllers\AppointmentController::class, 'create'])->name('appointments.create');
         Route::post('appointments', [App\Http\Controllers\AppointmentController::class, 'store'])->name('appointments.store');
         Route::get('appointments/{id}/confirmation', [App\Http\Controllers\AppointmentController::class, 'confirmation'])->name('appointments.confirmation');
-        Route::get('appointments/{id}/download-pdf', [App\Http\Controllers\AppointmentController::class, 'downloadPdf'])->name('appointments.downloadPdf');
         Route::get('/appointments/available-slots/{counselor}', [App\Http\Controllers\AppointmentController::class, 'availableSlots'])->name('appointments.availableSlots');
         // Accept/Decline rescheduled appointment
         Route::patch('appointments/{id}/accept-reschedule', [App\Http\Controllers\AppointmentController::class, 'acceptReschedule'])->name('appointments.acceptReschedule');
@@ -135,9 +137,8 @@ Route::middleware('auth')->group(function () {
         Route::get('counselor/appointments', [App\Http\Controllers\CounselorDashboardController::class, 'index'])->name('counselor.appointments.index');
 
         // Bulk Actions
-        Route::delete('counselor/appointments/bulk/completed', [App\Http\Controllers\CounselorDashboardController::class, 'deleteAllCompleted'])->name('counselor.appointments.bulk.deleteCompleted');
         Route::post('counselor/appointments/bulk-approve', [App\Http\Controllers\CounselorDashboardController::class, 'bulkApprove'])->name('counselor.appointments.bulkApprove');
-        Route::delete('counselor/appointments/bulk-delete', [App\Http\Controllers\CounselorDashboardController::class, 'bulkDestroy'])->name('counselor.appointments.bulkDestroy');
+        Route::delete('counselor/appointments/bulk-destroy', [App\Http\Controllers\CounselorDashboardController::class, 'bulkDestroy'])->name('counselor.appointments.bulkDestroy');
 
         Route::get('counselor/appointments/{id}', [App\Http\Controllers\CounselorDashboardController::class, 'show'])->name('counselor.appointments.show');
         Route::get('counselor/appointments/create', [App\Http\Controllers\AppointmentController::class, 'create'])->name('counselor.appointments.create');
@@ -238,6 +239,7 @@ Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(functi
     Route::get('guidance/{student}', [App\Http\Controllers\Counselor\GuidanceController::class, 'show'])->name('counselor.guidance.show');
     Route::post('guidance/{student}/update', [App\Http\Controllers\Counselor\GuidanceController::class, 'update'])->name('counselor.guidance.update');
     Route::post('guidance/{student}/profile', [App\Http\Controllers\Counselor\GuidanceController::class, 'updateProfile'])->name('counselor.guidance.update_profile');
+    Route::get('guidance/selection/clear', [App\Http\Controllers\Counselor\GuidanceController::class, 'clearSelection'])->name('counselor.guidance.clear_selection');
 
     // Seminar Management Routes
     Route::resource('seminars', App\Http\Controllers\Counselor\SeminarController::class)->names('counselor.seminars');

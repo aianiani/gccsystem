@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Appointment Confirmation - <?php echo e($appointment->reference_number); ?></title>
+    <title>Appointment Summary - <?php echo e($appointment->reference_number); ?></title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -107,7 +107,10 @@
 
         </div>
         <div style="text-align: center; color: #666;">
-            <strong>Appointment Confirmation</strong><br>
+            <strong>Appointment Summary</strong><br>
+            <?php if(isset($appointment->session_number)): ?>
+                Session #<?php echo e($appointment->session_number); ?><br>
+            <?php endif; ?>
             Generated on: <?php echo e(now()->format('F d, Y h:i A')); ?>
 
         </div>

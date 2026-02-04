@@ -88,7 +88,7 @@ class AppointmentController extends Controller
         }
 
         if (!$hasDass42) {
-            return redirect()->route('assessments.dass42')
+            return redirect()->route('assessments.dass42', ['context' => 'booking'])
                 ->with('error', 'Please complete a new DASS-42 assessment before booking an appointment.');
         }
 
@@ -127,12 +127,12 @@ class AppointmentController extends Controller
     {
         $appointment = Appointment::with(['student', 'counselor'])->findOrFail($id);
 
-        // Ensure the appointment belongs to the authenticated student
-        if ($appointment->student_id !== auth()->id()) {
+        // Ensure the appointment belongs to the authenticated student, counselor, or is an admin
+        if ($appointment->student_id !== auth()->id() && $appointment->counselor_id !== auth()->id() && !auth()->user()->isAdmin()) {
             abort(403);
         }
 
-        // Check if DASS-42 assessment exists (but don't pass scores to student)
+        // Check if DASS-42 assessment exists (but don't pass scores to student if they are the one viewing)
         $hasDass42 = \App\Models\Assessment::where('user_id', $appointment->student_id)
             ->where('type', 'DASS-42')
             ->exists();
@@ -145,6 +145,19 @@ class AppointmentController extends Controller
                 ->latest()
                 ->first(['id', 'created_at', 'type']); // Only get date, not scores
         }
+
+        // Calculate session number for this appointment
+        $sessionNumber = Appointment::where('counselor_id', $appointment->counselor_id)
+            ->where('student_id', $appointment->student_id)
+            ->where(function ($q) use ($appointment) {
+                $q->where('scheduled_at', '<', $appointment->scheduled_at)
+                    ->orWhere(function ($q2) use ($appointment) {
+                        $q2->where('scheduled_at', '=', $appointment->scheduled_at)
+                            ->where('id', '<=', $appointment->id);
+                    });
+            })
+            ->count();
+        $appointment->session_number = $sessionNumber;
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('appointments.confirmation-pdf', compact('appointment', 'dass42Assessment'));
         return $pdf->download('appointment-confirmation-' . $appointment->reference_number . '.pdf');

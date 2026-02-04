@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Appointment Confirmation - {{ $appointment->reference_number }}</title>
+    <title>Appointment Summary - {{ $appointment->reference_number }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -106,7 +106,10 @@
             Appointment Reference Number: {{ $appointment->reference_number }}
         </div>
         <div style="text-align: center; color: #666;">
-            <strong>Appointment Confirmation</strong><br>
+            <strong>Appointment Summary</strong><br>
+            @if(isset($appointment->session_number))
+                Session #{{ $appointment->session_number }}<br>
+            @endif
             Generated on: {{ now()->format('F d, Y h:i A') }}
         </div>
     </div>

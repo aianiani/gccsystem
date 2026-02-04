@@ -33,6 +33,13 @@ class AssessmentController extends Controller
 
         $context = $request->query('context');
 
+        // Year level check for DASS-42 (2nd Year)
+        // Allow bypass if context is 'booking'
+        if ($context !== 'booking' && (int) $user->year_level !== 2) {
+            return redirect()->route('assessments.index')
+                ->with('error', 'The DASS-42 assessment is only available for 2nd Year students.');
+        }
+
         return view('assessments.dass42', [
             'dass42_questions' => $this->getDass42Questions(),
             'context' => $context,
@@ -42,6 +49,11 @@ class AssessmentController extends Controller
     // Handle DASS-42 form submission
     public function submitDass42(Request $request)
     {
+        $context = $request->input('context');
+        if ($context !== 'booking' && (int) auth()->user()->year_level !== 2) {
+            return redirect()->route('assessments.index')->with('error', 'Unauthorized assessment attempt.');
+        }
+
         $request->validate([
             'answers' => 'required|array|size:42',
             'answers.*' => 'required|in:0,1,2,3',
@@ -216,6 +228,10 @@ class AssessmentController extends Controller
     // Handle GRIT Scale submission
     public function submitGrit(Request $request)
     {
+        if ((int) auth()->user()->year_level !== 1) {
+            return redirect()->route('assessments.index')->with('error', 'Unauthorized assessment attempt.');
+        }
+
         $questions = $this->getGritQuestions();
         $request->validate([
             'grit_answers' => 'required|array|size:' . count($questions),
@@ -283,10 +299,8 @@ class AssessmentController extends Controller
         ]);
 
         if (auth()->user()->role === 'student') {
-            return redirect()->route('appointments.create')->with([
-                'show_thank_you' => true,
-                'last_assessment_type' => 'GRIT Scale',
-                'success' => 'GRIT assessment completed successfully! You may now continue to booking.'
+            return redirect()->route('assessments.index')->with([
+                'success' => 'GRIT Scale completed successfully!'
             ]);
         }
 
@@ -296,6 +310,10 @@ class AssessmentController extends Controller
     // Handle NEO-FFI submission
     public function submitNeo(Request $request)
     {
+        if ((int) auth()->user()->year_level !== 3) {
+            return redirect()->route('assessments.index')->with('error', 'Unauthorized assessment attempt.');
+        }
+
         $questions = $this->getNeoQuestions();
         $request->validate([
             'neo_answers' => 'required|array|size:' . count($questions),
@@ -375,10 +393,8 @@ class AssessmentController extends Controller
         ]);
 
         if (auth()->user()->role === 'student') {
-            return redirect()->route('appointments.create')->with([
-                'show_thank_you' => true,
-                'last_assessment_type' => 'NEO-FFI',
-                'success' => 'NEO-FFI assessment completed successfully! You may now continue to booking.'
+            return redirect()->route('assessments.index')->with([
+                'success' => 'NEO-FFI assessment completed successfully!'
             ]);
         }
 
@@ -388,6 +404,10 @@ class AssessmentController extends Controller
     // Handle Work Values Inventory submission
     public function submitWvi(Request $request)
     {
+        if ((int) auth()->user()->year_level !== 4) {
+            return redirect()->route('assessments.index')->with('error', 'Unauthorized assessment attempt.');
+        }
+
         $questions = $this->getWviQuestions();
         $request->validate([
             'wvi_answers' => 'required|array|size:' . count($questions),
@@ -439,10 +459,8 @@ class AssessmentController extends Controller
         ]);
 
         if (auth()->user()->role === 'student') {
-            return redirect()->route('appointments.create')->with([
-                'show_thank_you' => true,
-                'last_assessment_type' => 'Work Values Inventory',
-                'success' => 'Work Values Inventory completed successfully! You may now continue to booking.'
+            return redirect()->route('assessments.index')->with([
+                'success' => 'Work Values Inventory completed successfully!'
             ]);
         }
 

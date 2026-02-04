@@ -271,12 +271,12 @@
                         </div>
 
                         <div class="consent-actions">
+                            <button type="submit" class="btn-consent btn-consent-primary" id="submitBtn" disabled>
+                                Continue to Assessment
+                            </button>
                             <button type="button" class="btn-consent btn-consent-secondary"
                                 onclick="window.location.href='{{ route('dashboard') }}'">
                                 Cancel
-                            </button>
-                            <button type="submit" class="btn-consent btn-consent-primary" id="submitBtn" disabled>
-                                Continue to Assessment
                             </button>
                         </div>
                     </form>
