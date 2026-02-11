@@ -42,13 +42,13 @@ class BulkAttendanceController extends Controller
     {
         $request->validate([
             'seminar_name' => 'required|exists:seminars,name',
-            'year_level' => 'required|integer|min:1|max:4',
+            'year_level' => 'nullable|integer|min:1|max:6',
             'student_ids' => 'nullable|array',
             'student_ids.*' => 'exists:users,id',
         ]);
 
         $seminar = Seminar::where('name', $request->seminar_name)->firstOrFail();
-        $status = $request->input('status', 'unlocked');
+        $status = $request->input('status', 'unlocked'); // Default to unlocked if not specified, but UI should specify.
 
         // Merge manual selections with session-based selections
         $manualIds = $request->input('student_ids', []);
@@ -60,10 +60,37 @@ class BulkAttendanceController extends Controller
         }
 
         foreach ($allIds as $studentId) {
+            $student = User::find($studentId);
+            if (!$student)
+                continue;
+
+            // Map seminars to their target curriculum year
+            $seminarYearMap = [
+                'New Student Orientation Program' => 1,
+                'IDREAMS' => 1,
+                '10C' => 2,
+                'LEADS' => 3,
+                'IMAGE' => 4,
+            ];
+
+            // Use mapped year if available, otherwise fallback to student's year level or request
+            $targetYearLevel = $seminarYearMap[$request->seminar_name] ?? ($student->year_level ?? ($request->year_level ?: 1));
+
+            // Extract integer from year level if needed (though map values are ints)
+            $targetYearLevel = (int) filter_var($targetYearLevel, FILTER_SANITIZE_NUMBER_INT);
+
+            // Safety check: if extraction failed or result is 0/empty, fallback to 1 or log error
+            if ($targetYearLevel < 1 || $targetYearLevel > 6) {
+                // Try to fallback to request or just default to 1 if we really can't determine it. 
+                // But for now let's just default to 1 to prevent crash, or maybe skip?
+                // Let's fallback to 1 as safe default if data is messy
+                $targetYearLevel = 1;
+            }
+
             $attendance = SeminarAttendance::where([
                 'user_id' => $studentId,
                 'seminar_name' => $request->seminar_name,
-                'year_level' => $request->year_level,
+                'year_level' => $targetYearLevel,
             ])->first();
 
             if (!$attendance || $attendance->status !== 'completed') {
@@ -72,17 +99,14 @@ class BulkAttendanceController extends Controller
                 $attendance = SeminarAttendance::updateOrCreate([
                     'user_id' => $studentId,
                     'seminar_name' => $request->seminar_name,
-                    'year_level' => $request->year_level,
+                    'year_level' => $targetYearLevel,
                 ], [
                     'attended_at' => now(),
                     'status' => $statusToApply,
                 ]);
 
                 if ($statusToApply === 'unlocked') {
-                    $student = User::find($studentId);
-                    if ($student) {
-                        $student->notify(new \App\Notifications\SeminarUnlocked($request->seminar_name));
-                    }
+                    $student->notify(new \App\Notifications\SeminarUnlocked($request->seminar_name));
                 }
             }
         }
@@ -90,10 +114,13 @@ class BulkAttendanceController extends Controller
         // Clear session after bulk action
         session()->forget(['guidance_selected_ids', 'guidance_target_seminar', 'guidance_target_year']);
 
-        return redirect()->route('counselor.guidance.index', [
-            'year_level' => $request->year_level,
-            'seminar_name' => $request->seminar_name,
-        ])->with('success', 'Bulk attendance marked successfully for ' . count($allIds) . ' students.');
+        $redirectParams = ['seminar_name' => $request->seminar_name];
+        if ($request->filled('year_level')) {
+            $redirectParams['year_level'] = $request->year_level;
+        }
+
+        return redirect()->route('counselor.guidance.index', $redirectParams)
+            ->with('success', 'Bulk attendance marked successfully for ' . count($allIds) . ' students.');
     }
 
     public function import(Request $request)

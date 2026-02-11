@@ -310,12 +310,12 @@
             transition: all 0.2s;
         }
 
-        .custom-checkbox input:checked + label {
+        .custom-checkbox input:checked+label {
             background: var(--primary-green);
             border-color: var(--primary-green);
         }
 
-        .custom-checkbox input:checked + label:after {
+        .custom-checkbox input:checked+label:after {
             content: '';
             position: absolute;
             left: 6px;
@@ -340,9 +340,19 @@
             background: #fff;
         }
 
-        .btn-action.view { color: var(--primary-green); }
-        .btn-action.view:hover { background: var(--light-green); border-color: var(--primary-green); }
-        .btn-action.chat:hover { background: #e7f3ff; border-color: #0d6efd; }
+        .btn-action.view {
+            color: var(--primary-green);
+        }
+
+        .btn-action.view:hover {
+            background: var(--light-green);
+            border-color: var(--primary-green);
+        }
+
+        .btn-action.chat:hover {
+            background: #e7f3ff;
+            border-color: #0d6efd;
+        }
 
         .pagination-wrap {
             padding: 1.5rem;
@@ -351,34 +361,37 @@
         }
 
         /* Stats Grid Styles */
-        .averages-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 0.5rem; 
-            width: 100%; 
-            margin-top: 0.25rem; 
+        .averages-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 0.25rem;
         }
-        .avg-item { 
-            text-align: center; 
-            background: var(--bg-light); 
-            padding: 0.4rem; 
-            border-radius: 8px; 
+
+        .avg-item {
+            text-align: center;
+            background: var(--bg-light);
+            padding: 0.4rem;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-        .avg-label { 
-            font-size: 0.7rem; 
-            color: var(--text-light); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
+
+        .avg-label {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             font-weight: 700;
             line-height: 1;
         }
-        .avg-val { 
-            font-size: 1.1rem; 
-            font-weight: 800; 
-            line-height: 1; 
+
+        .avg-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            line-height: 1;
             margin-bottom: 4px;
         }
 
@@ -409,14 +422,45 @@
             flex-shrink: 0;
         }
 
-        .stat-icon.primary { background: var(--light-green); color: var(--forest-green); }
-        .stat-icon.info { background: #e0f7fa; color: #00acc1; }
-        .stat-icon.warning { background: #fff8e1; color: #ffc107; }
+        .stat-icon.primary {
+            background: var(--light-green);
+            color: var(--forest-green);
+        }
 
-        .stat-content { flex-grow: 1; min-width: 0; }
-        .stat-label { font-size: 0.85rem; color: var(--text-light); font-weight: 600; margin-bottom: 0.25rem; }
-        .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--text-dark); line-height: 1.2; }
-        .stat-hint { font-size: 0.75rem; color: #9aa0ac; margin-top: 0.25rem; }
+        .stat-icon.info {
+            background: #e0f7fa;
+            color: #00acc1;
+        }
+
+        .stat-icon.warning {
+            background: #fff8e1;
+            color: #ffc107;
+        }
+
+        .stat-content {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .stat-hint {
+            font-size: 0.75rem;
+            color: #9aa0ac;
+            margin-top: 0.25rem;
+        }
 
         /* Risk Level Badges */
         .badge-risk {
@@ -432,32 +476,42 @@
         }
 
         .badge-risk.very-high {
-            background-color: #7f1d1d; /* text-red-900 */
+            background-color: #7f1d1d;
+            /* text-red-900 */
             color: #fef2f2;
             border: 1px solid #991b1b;
         }
 
         .badge-risk.high {
-            background-color: #fee2e2; /* text-red-100 */
-            color: #b91c1c; /* text-red-700 */
+            background-color: #fee2e2;
+            /* text-red-100 */
+            color: #b91c1c;
+            /* text-red-700 */
             border: 1px solid #fecaca;
         }
 
         .badge-risk.moderate {
-            background-color: #fff7ed; /* text-orange-50 */
-            color: #c2410c; /* text-orange-700 */
+            background-color: #fff7ed;
+            /* text-orange-50 */
+            color: #c2410c;
+            /* text-orange-700 */
             border: 1px solid #ffedd5;
         }
 
         .badge-risk.low-moderate {
-            background-color: #fefce8; /* text-yellow-50 */
-            color: #a16207; /* text-yellow-700 */
+            background-color: #fefce8;
+            /* text-yellow-50 */
+            color: #a16207;
+            /* text-yellow-700 */
             border: 1px solid #fef9c3;
         }
 
-        .badge-risk.normal, .badge-risk.low {
-            background-color: #f0fdf4; /* text-green-50 */
-            color: #15803d; /* text-green-700 */
+        .badge-risk.normal,
+        .badge-risk.low {
+            background-color: #f0fdf4;
+            /* text-green-50 */
+            color: #15803d;
+            /* text-green-700 */
             border: 1px solid #dcfce7;
         }
 
@@ -471,11 +525,11 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none" 
+            <button id="counselorSidebarToggle" class="d-md-none"
                 style="position: fixed; top: 10px; left: 10px; z-index: 1050; border: none; background: var(--forest-green); color: white; padding: 5px 10px; border-radius: 5px;">
                 <i class="bi bi-list"></i>
             </button>
-            
+
             <!-- Sidebar -->
             <?php echo $__env->make('counselor.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
@@ -512,12 +566,14 @@
                                 <div class="stat-content">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="stat-label mb-0">Year Distribution</div>
-                                        <div class="stat-icon info" style="width: 32px; height: 32px; font-size: 1rem;"><i class="bi bi-mortarboard"></i></div>
+                                        <div class="stat-icon info" style="width: 32px; height: 32px; font-size: 1rem;"><i
+                                                class="bi bi-mortarboard"></i></div>
                                     </div>
                                     <div class="averages-grid" style="grid-template-columns: repeat(4, 1fr);">
                                         <?php $__currentLoopData = [1, 2, 3, 4]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $yl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <div class="avg-item">
-                                                <div class="avg-val" style="font-size: 1.1rem; color: var(--forest-green);"><?php echo e($yearStats[$yl] ?? 0); ?></div>
+                                                <div class="avg-val" style="font-size: 1.1rem; color: var(--forest-green);">
+                                                    <?php echo e($yearStats[$yl] ?? 0); ?></div>
                                                 <div class="avg-label"><?php echo e($yl); ?></div>
                                             </div>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -530,7 +586,8 @@
                                 <div class="stat-content">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="stat-label mb-0">Sex Ratio</div>
-                                        <div class="stat-icon warning" style="width: 32px; height: 32px; font-size: 1rem;"><i class="bi bi-gender-ambiguous"></i></div>
+                                        <div class="stat-icon warning" style="width: 32px; height: 32px; font-size: 1rem;">
+                                            <i class="bi bi-gender-ambiguous"></i></div>
                                     </div>
                                     <div class="averages-grid">
                                         <div class="avg-item">
@@ -538,7 +595,9 @@
                                             <div class="avg-label">Male</div>
                                         </div>
                                         <div class="avg-item">
-                                            <div class="avg-val" style="color: #d63384;"><?php echo e($sexStats['female'] ?? 0); ?></div>
+                                            <div class="avg-val" style="color: #d63384;"><?php echo e($sexStats['female'] ?? 0); ?>
+
+                                            </div>
                                             <div class="avg-label">Female</div>
                                         </div>
                                         <?php $otherTotal = ($sexStats['other'] ?? 0) + ($sexStats['non-binary'] ?? 0) + ($sexStats['prefer_not_to_say'] ?? 0); ?>
@@ -558,8 +617,9 @@
                             <form action="<?php echo e(route('counselor.students.index')); ?>" method="GET" class="row g-2">
                                 <div class="col-md-3">
                                     <div class="search-box position-relative">
-                                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                                        <input type="text" name="search" class="filter-control ps-5" 
+                                        <i
+                                            class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                        <input type="text" name="search" class="filter-control ps-5"
                                             placeholder="Search name, ID, or email..." value="<?php echo e(request('search')); ?>">
                                     </div>
                                 </div>
@@ -567,7 +627,8 @@
                                     <select name="college" class="filter-select w-100">
                                         <option value="">All Colleges</option>
                                         <?php $__currentLoopData = $colleges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $college): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($college); ?>" <?php echo e(request('college') == $college ? 'selected' : ''); ?>><?php echo e($college); ?></option>
+                                            <option value="<?php echo e($college); ?>" <?php echo e(request('college') == $college ? 'selected' : ''); ?>>
+                                                <?php echo e($college); ?></option>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                 </div>
@@ -575,7 +636,8 @@
                                     <select name="year_level" class="filter-select w-100">
                                         <option value="">Year Levels</option>
                                         <?php $__currentLoopData = $yearLevels; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $yl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($yl); ?>" <?php echo e(request('year_level') == $yl ? 'selected' : ''); ?>><?php echo e($yl); ?></option>
+                                            <option value="<?php echo e($yl); ?>" <?php echo e(request('year_level') == $yl ? 'selected' : ''); ?>>
+                                                <?php echo e($yl); ?></option>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                 </div>
@@ -583,14 +645,16 @@
                                     <select name="sex" class="filter-select w-100">
                                         <option value="">All Sexes</option>
                                         <option value="male" <?php echo e(request('sex') == 'male' ? 'selected' : ''); ?>>Male</option>
-                                        <option value="female" <?php echo e(request('sex') == 'female' ? 'selected' : ''); ?>>Female</option>
+                                        <option value="female" <?php echo e(request('sex') == 'female' ? 'selected' : ''); ?>>Female
+                                        </option>
                                         <option value="other" <?php echo e(request('sex') == 'other' ? 'selected' : ''); ?>>Other</option>
                                     </select>
                                 </div>
                                 <div class="col-md-1">
                                     <select name="per_page" class="filter-select w-100 ps-2 pe-4">
                                         <?php $__currentLoopData = [10, 20, 30, 50, 100]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $count): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($count); ?>" <?php echo e(request('per_page') == $count ? 'selected' : ''); ?>><?php echo e($count); ?></option>
+                                            <option value="<?php echo e($count); ?>" <?php echo e(request('per_page') == $count ? 'selected' : ''); ?>>
+                                                <?php echo e($count); ?></option>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                 </div>
@@ -612,7 +676,8 @@
                             <div class="d-flex align-items-center gap-3">
                                 <span class="selected-badge"><span id="selectedCount">0</span> selected</span>
                                 <div class="v-divider"></div>
-                                <button type="button" id="bulkMessageBtn" class="bulk-btn" style="background: var(--light-green); color: var(--forest-green);">
+                                <button type="button" id="bulkMessageBtn" class="bulk-btn"
+                                    style="background: var(--light-green); color: var(--forest-green);">
                                     <i class="bi bi-chat-dots-fill me-2"></i>Bulk Message
                                 </button>
                                 <button type="button" id="bulkExportBtn" class="bulk-btn bulk-btn-delete">
@@ -643,11 +708,16 @@
                                                     <label for="selectAll"></label>
                                                 </div>
                                             </th>
-                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px;">Student Info</th>
-                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px;">College & Level</th>
-                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px; width: 120px;">Sessions</th>
-                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px; width: 120px;">Risk Level</th>
-                                            <th class="pe-4 py-3 text-end text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px; width: 120px;">Actions</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px;">Student Info</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px;">College & Level</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px; width: 120px;">Sessions</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px; width: 120px;">Risk Level</th>
+                                            <th class="pe-4 py-3 text-end text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px; width: 120px;">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -661,7 +731,8 @@
                                             <tr>
                                                 <td class="ps-4">
                                                     <div class="custom-checkbox">
-                                                        <input type="checkbox" class="item-checkbox" id="check-<?php echo e($student->id); ?>" value="<?php echo e($student->id); ?>">
+                                                        <input type="checkbox" class="item-checkbox"
+                                                            id="check-<?php echo e($student->id); ?>" value="<?php echo e($student->id); ?>">
                                                         <label for="check-<?php echo e($student->id); ?>"></label>
                                                     </div>
                                                 </td>
@@ -670,23 +741,30 @@
                                                         <img src="<?php echo e($student->avatar_url); ?>" class="user-avatar" alt="">
                                                         <div class="user-details">
                                                             <h6><?php echo e($student->name); ?></h6>
-                                                            <span><?php echo e($student->student_id ?? 'No ID'); ?> • <?php echo e($student->email); ?></span>
+                                                            <span><?php echo e($student->student_id ?? 'No ID'); ?> •
+                                                                <?php echo e($student->email); ?></span>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex flex-column">
-                                                        <span class="fw-bold text-dark" style="font-size: 0.85rem;"><?php echo e($student->college ?? 'No College'); ?></span>
-                                                        <span class="text-muted small"><?php echo e($student->year_level ?? 'Unspecified'); ?> Level</span>
+                                                        <span class="fw-bold text-dark"
+                                                            style="font-size: 0.85rem;"><?php echo e($student->college ?? 'No College'); ?></span>
+                                                        <span
+                                                            class="text-muted small"><?php echo e($student->year_level ?? 'Unspecified'); ?>
+
+                                                            Level</span>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <div class="text-center px-2 py-1 bg-light rounded" title="Total Sessions">
+                                                        <div class="text-center px-2 py-1 bg-light rounded"
+                                                            title="Total Sessions">
                                                             <div class="fw-bold text-dark lh-1"><?php echo e($totalApps); ?></div>
                                                             <div class="text-muted" style="font-size: 0.6rem;">TOTAL</div>
                                                         </div>
-                                                        <div class="text-center px-2 py-1 rounded" style="background: var(--light-green);" title="Completed Sessions">
+                                                        <div class="text-center px-2 py-1 rounded"
+                                                            style="background: var(--light-green);" title="Completed Sessions">
                                                             <div class="fw-bold text-success lh-1"><?php echo e($completedApps); ?></div>
                                                             <div class="text-muted" style="font-size: 0.6rem;">DONE</div>
                                                         </div>
@@ -709,11 +787,11 @@
                                                 </td>
                                                 <td class="pe-4 text-end">
                                                     <div class="actions-cell justify-content-end">
-                                                        <a href="<?php echo e(route('counselor.students.show', $student->id)); ?>" 
+                                                        <a href="<?php echo e(route('counselor.students.show', $student->id)); ?>"
                                                             class="btn-action view" title="View Profile">
                                                             <i class="bi bi-person-badge-fill"></i>
                                                         </a>
-                                                        <a href="<?php echo e(route('chat.index', $student->id)); ?>" 
+                                                        <a href="<?php echo e(route('chat.index', $student->id)); ?>"
                                                             class="btn-action chat" style="color: #0d6efd;" title="Chat">
                                                             <i class="bi bi-chat-dots-fill"></i>
                                                         </a>
@@ -727,7 +805,8 @@
                                                     <div class="empty-state">
                                                         <i class="bi bi-people"></i>
                                                         <h5 class="mb-2 fw-bold">No Students Found</h5>
-                                                        <p class="mb-0 text-muted">Try adjusting your filters or search terms.</p>
+                                                        <p class="mb-0 text-muted">Try adjusting your filters or search terms.
+                                                        </p>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -735,7 +814,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            
+
                             <!-- Pagination -->
                             <div class="pagination-wrap">
                                 <?php echo e($students->links('vendor.pagination.premium')); ?>
@@ -747,9 +826,9 @@
             </div>
         </div>
     </div>
-                </div>
-            </div>
-        </div>
+    </div>
+    </div>
+    </div>
 
     </div>
     <script>

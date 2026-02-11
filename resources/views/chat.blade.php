@@ -733,24 +733,117 @@
             padding: 8px;
             background: var(--gray-50);
         }
+
+        /* Premium Lightbox Modal */
+        #imageModal .modal-content {
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        #imageModal .modal-dialog {
+            max-width: 90vw;
+            margin: 1.75rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 3.5rem);
+        }
+
+        #imageModal .image-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background-color: transparent;
+            line-height: 0;
+            /* Remove bottom space */
+        }
+
+        #imageModal img {
+            max-height: 85vh;
+            max-width: 100%;
+            width: auto;
+            border-radius: 16px;
+            display: block;
+        }
+
+        #imageModal .close-btn-floating {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1060;
+            font-size: 1.2rem;
+        }
+
+        #imageModal .close-btn-floating:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(90deg) scale(1.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        #imageModal .download-btn-floating {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            padding: 10px 24px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 500;
+            text-decoration: none;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1060;
+            opacity: 0;
+            font-size: 0.95rem;
+        }
+
+        #imageModal .image-container:hover .download-btn-floating {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #imageModal .download-btn-floating:hover {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a1a;
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
     </style>
 
-    <!-- Image Modal -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+    <!-- Premium Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="Full size image" class="img-fluid">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <a id="downloadImage" href="" download class="btn btn-primary">
-                        <i class="fas fa-download me-2"></i>Download
-                    </a>
+                <div class="modal-body text-center p-0">
+                    <div class="image-container">
+                        <button type="button" class="close-btn-floating" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        <img id="modalImage" src="" alt="Full size image">
+                        <a id="downloadImage" href="" download class="download-btn-floating">
+                            <i class="bi bi-download"></i> Download
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -840,10 +933,10 @@
                         return;
                     }
 
-                    // Validate file size (2MB limit)
-                    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+                    // Validate file size (10MB limit)
+                    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
                     if (file.size > maxSize) {
-                        alert('Image size must be less than 2MB.');
+                        alert('Image size must be less than 10MB.');
                         imageInput.value = '';
                         return;
                     }
@@ -906,8 +999,8 @@
                 }
                 if (message.image) {
                     messageContent += `<div class="message-image mt-2">
-                                                                <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
-                                                            </div>`;
+                                                                            <img src="/storage/${message.image}" alt="Message image" class="img-fluid rounded shadow-sm" style="max-width: 250px; max-height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('/storage/${message.image}')">
+                                                                        </div>`;
                 }
 
                 // Avatar for other user
@@ -917,13 +1010,13 @@
                 }
 
                 wrapperDiv.innerHTML = `
-                                                            ${avatarHtml}
-                                                            <div class="message-bubble">
-                                                                ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
-                                                                ${messageContent}
-                                                                <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                                            </div>
-                                                        `;
+                                                                        ${avatarHtml}
+                                                                        <div class="message-bubble">
+                                                                            ${!isSelf ? `<div class="message-sender">${message.sender_name}</div>` : ''}
+                                                                            ${messageContent}
+                                                                            <span class="message-time">${message.created_at || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                                        </div>
+                                                                    `;
 
                 messagesContainer.insertBefore(wrapperDiv, scrollAnchor);
             }

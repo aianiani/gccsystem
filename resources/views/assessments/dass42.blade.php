@@ -752,6 +752,23 @@
             }
             radios.forEach(r => r.addEventListener('change', updateProgress));
 
+            // Auto-advance functionality
+            radios.forEach(r => {
+                r.addEventListener('change', function() {
+                   // Extract question index from input name "answers[idx]"
+                   const match = this.name.match(/\[(\d+)\]/);
+                   const questionIdx = match ? parseInt(match[1]) : -1;
+                   
+                   setTimeout(() => {
+                       // Only advance if the answered question is the current one
+                       // This prevents skipping if user rapidly changes answer on same question
+                       if (questionIdx === currentQuestion && currentQuestion < totalQuestions - 1) {
+                           showDass42Question(++currentQuestion);
+                       }
+                   }, 300);
+                });
+            });
+
             // Make the entire option bar clickable and update visual selection
             function refreshSelectedStates() {
                 document.querySelectorAll('.dass42-option-check').forEach(opt => {

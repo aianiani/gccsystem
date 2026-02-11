@@ -143,7 +143,7 @@
                         <i class="bi bi-person-badge me-2"></i>
                         Registration Details
                     </h1>
-                    <p class="mb-0">Review and process student registration</p>
+                    <p class="mb-0">Review and process user registration</p>
                 </div>
                 <a href="{{ route('admin.registration-approvals.index') }}" class="btn btn-light">
                     <i class="bi bi-arrow-left me-2"></i>
@@ -179,7 +179,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             <i class="bi bi-person me-2"></i>
-                            Student Information
+                            User Information
                         </h5>
                         <span class="status-badge status-{{ $user->registration_status }}">
                             {{ ucfirst($user->registration_status) }}
@@ -208,6 +208,10 @@
                     <div class="row">
                         <!-- Left Column -->
                         <div class="col-md-6">
+                            <div class="info-row">
+                                <span class="info-label">Role:</span>
+                                <span class="badge bg-secondary">{{ ucfirst($user->role) }}</span>
+                            </div>
                             <div class="info-row">
                                 <span class="info-label">Full Name:</span>
                                 <span class="info-value fw-bold">{{ $user->name ?? 'N/A' }}</span>

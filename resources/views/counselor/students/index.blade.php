@@ -310,12 +310,12 @@
             transition: all 0.2s;
         }
 
-        .custom-checkbox input:checked + label {
+        .custom-checkbox input:checked+label {
             background: var(--primary-green);
             border-color: var(--primary-green);
         }
 
-        .custom-checkbox input:checked + label:after {
+        .custom-checkbox input:checked+label:after {
             content: '';
             position: absolute;
             left: 6px;
@@ -340,9 +340,19 @@
             background: #fff;
         }
 
-        .btn-action.view { color: var(--primary-green); }
-        .btn-action.view:hover { background: var(--light-green); border-color: var(--primary-green); }
-        .btn-action.chat:hover { background: #e7f3ff; border-color: #0d6efd; }
+        .btn-action.view {
+            color: var(--primary-green);
+        }
+
+        .btn-action.view:hover {
+            background: var(--light-green);
+            border-color: var(--primary-green);
+        }
+
+        .btn-action.chat:hover {
+            background: #e7f3ff;
+            border-color: #0d6efd;
+        }
 
         .pagination-wrap {
             padding: 1.5rem;
@@ -351,34 +361,37 @@
         }
 
         /* Stats Grid Styles */
-        .averages-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 0.5rem; 
-            width: 100%; 
-            margin-top: 0.25rem; 
+        .averages-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 0.25rem;
         }
-        .avg-item { 
-            text-align: center; 
-            background: var(--bg-light); 
-            padding: 0.4rem; 
-            border-radius: 8px; 
+
+        .avg-item {
+            text-align: center;
+            background: var(--bg-light);
+            padding: 0.4rem;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-        .avg-label { 
-            font-size: 0.7rem; 
-            color: var(--text-light); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
+
+        .avg-label {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             font-weight: 700;
             line-height: 1;
         }
-        .avg-val { 
-            font-size: 1.1rem; 
-            font-weight: 800; 
-            line-height: 1; 
+
+        .avg-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            line-height: 1;
             margin-bottom: 4px;
         }
 
@@ -409,14 +422,45 @@
             flex-shrink: 0;
         }
 
-        .stat-icon.primary { background: var(--light-green); color: var(--forest-green); }
-        .stat-icon.info { background: #e0f7fa; color: #00acc1; }
-        .stat-icon.warning { background: #fff8e1; color: #ffc107; }
+        .stat-icon.primary {
+            background: var(--light-green);
+            color: var(--forest-green);
+        }
 
-        .stat-content { flex-grow: 1; min-width: 0; }
-        .stat-label { font-size: 0.85rem; color: var(--text-light); font-weight: 600; margin-bottom: 0.25rem; }
-        .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--text-dark); line-height: 1.2; }
-        .stat-hint { font-size: 0.75rem; color: #9aa0ac; margin-top: 0.25rem; }
+        .stat-icon.info {
+            background: #e0f7fa;
+            color: #00acc1;
+        }
+
+        .stat-icon.warning {
+            background: #fff8e1;
+            color: #ffc107;
+        }
+
+        .stat-content {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .stat-hint {
+            font-size: 0.75rem;
+            color: #9aa0ac;
+            margin-top: 0.25rem;
+        }
 
         /* Risk Level Badges */
         .badge-risk {
@@ -432,32 +476,42 @@
         }
 
         .badge-risk.very-high {
-            background-color: #7f1d1d; /* text-red-900 */
+            background-color: #7f1d1d;
+            /* text-red-900 */
             color: #fef2f2;
             border: 1px solid #991b1b;
         }
 
         .badge-risk.high {
-            background-color: #fee2e2; /* text-red-100 */
-            color: #b91c1c; /* text-red-700 */
+            background-color: #fee2e2;
+            /* text-red-100 */
+            color: #b91c1c;
+            /* text-red-700 */
             border: 1px solid #fecaca;
         }
 
         .badge-risk.moderate {
-            background-color: #fff7ed; /* text-orange-50 */
-            color: #c2410c; /* text-orange-700 */
+            background-color: #fff7ed;
+            /* text-orange-50 */
+            color: #c2410c;
+            /* text-orange-700 */
             border: 1px solid #ffedd5;
         }
 
         .badge-risk.low-moderate {
-            background-color: #fefce8; /* text-yellow-50 */
-            color: #a16207; /* text-yellow-700 */
+            background-color: #fefce8;
+            /* text-yellow-50 */
+            color: #a16207;
+            /* text-yellow-700 */
             border: 1px solid #fef9c3;
         }
 
-        .badge-risk.normal, .badge-risk.low {
-            background-color: #f0fdf4; /* text-green-50 */
-            color: #15803d; /* text-green-700 */
+        .badge-risk.normal,
+        .badge-risk.low {
+            background-color: #f0fdf4;
+            /* text-green-50 */
+            color: #15803d;
+            /* text-green-700 */
             border: 1px solid #dcfce7;
         }
 
@@ -471,11 +525,11 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none" 
+            <button id="counselorSidebarToggle" class="d-md-none"
                 style="position: fixed; top: 10px; left: 10px; z-index: 1050; border: none; background: var(--forest-green); color: white; padding: 5px 10px; border-radius: 5px;">
                 <i class="bi bi-list"></i>
             </button>
-            
+
             <!-- Sidebar -->
             @include('counselor.sidebar')
 
@@ -512,12 +566,14 @@
                                 <div class="stat-content">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="stat-label mb-0">Year Distribution</div>
-                                        <div class="stat-icon info" style="width: 32px; height: 32px; font-size: 1rem;"><i class="bi bi-mortarboard"></i></div>
+                                        <div class="stat-icon info" style="width: 32px; height: 32px; font-size: 1rem;"><i
+                                                class="bi bi-mortarboard"></i></div>
                                     </div>
                                     <div class="averages-grid" style="grid-template-columns: repeat(4, 1fr);">
                                         @foreach([1, 2, 3, 4] as $yl)
                                             <div class="avg-item">
-                                                <div class="avg-val" style="font-size: 1.1rem; color: var(--forest-green);">{{ $yearStats[$yl] ?? 0 }}</div>
+                                                <div class="avg-val" style="font-size: 1.1rem; color: var(--forest-green);">
+                                                    {{ $yearStats[$yl] ?? 0 }}</div>
                                                 <div class="avg-label">{{ $yl }}</div>
                                             </div>
                                         @endforeach
@@ -530,7 +586,8 @@
                                 <div class="stat-content">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="stat-label mb-0">Sex Ratio</div>
-                                        <div class="stat-icon warning" style="width: 32px; height: 32px; font-size: 1rem;"><i class="bi bi-gender-ambiguous"></i></div>
+                                        <div class="stat-icon warning" style="width: 32px; height: 32px; font-size: 1rem;">
+                                            <i class="bi bi-gender-ambiguous"></i></div>
                                     </div>
                                     <div class="averages-grid">
                                         <div class="avg-item">
@@ -538,7 +595,8 @@
                                             <div class="avg-label">Male</div>
                                         </div>
                                         <div class="avg-item">
-                                            <div class="avg-val" style="color: #d63384;">{{ $sexStats['female'] ?? 0 }}</div>
+                                            <div class="avg-val" style="color: #d63384;">{{ $sexStats['female'] ?? 0 }}
+                                            </div>
                                             <div class="avg-label">Female</div>
                                         </div>
                                         @php $otherTotal = ($sexStats['other'] ?? 0) + ($sexStats['non-binary'] ?? 0) + ($sexStats['prefer_not_to_say'] ?? 0); @endphp
@@ -558,8 +616,9 @@
                             <form action="{{ route('counselor.students.index') }}" method="GET" class="row g-2">
                                 <div class="col-md-3">
                                     <div class="search-box position-relative">
-                                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                                        <input type="text" name="search" class="filter-control ps-5" 
+                                        <i
+                                            class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                        <input type="text" name="search" class="filter-control ps-5"
                                             placeholder="Search name, ID, or email..." value="{{ request('search') }}">
                                     </div>
                                 </div>
@@ -567,7 +626,8 @@
                                     <select name="college" class="filter-select w-100">
                                         <option value="">All Colleges</option>
                                         @foreach($colleges as $college)
-                                            <option value="{{ $college }}" {{ request('college') == $college ? 'selected' : '' }}>{{ $college }}</option>
+                                            <option value="{{ $college }}" {{ request('college') == $college ? 'selected' : '' }}>
+                                                {{ $college }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -575,7 +635,8 @@
                                     <select name="year_level" class="filter-select w-100">
                                         <option value="">Year Levels</option>
                                         @foreach($yearLevels as $yl)
-                                            <option value="{{ $yl }}" {{ request('year_level') == $yl ? 'selected' : '' }}>{{ $yl }}</option>
+                                            <option value="{{ $yl }}" {{ request('year_level') == $yl ? 'selected' : '' }}>
+                                                {{ $yl }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -583,14 +644,16 @@
                                     <select name="sex" class="filter-select w-100">
                                         <option value="">All Sexes</option>
                                         <option value="male" {{ request('sex') == 'male' ? 'selected' : '' }}>Male</option>
-                                        <option value="female" {{ request('sex') == 'female' ? 'selected' : '' }}>Female</option>
+                                        <option value="female" {{ request('sex') == 'female' ? 'selected' : '' }}>Female
+                                        </option>
                                         <option value="other" {{ request('sex') == 'other' ? 'selected' : '' }}>Other</option>
                                     </select>
                                 </div>
                                 <div class="col-md-1">
                                     <select name="per_page" class="filter-select w-100 ps-2 pe-4">
                                         @foreach([10, 20, 30, 50, 100] as $count)
-                                            <option value="{{ $count }}" {{ request('per_page') == $count ? 'selected' : '' }}>{{ $count }}</option>
+                                            <option value="{{ $count }}" {{ request('per_page') == $count ? 'selected' : '' }}>
+                                                {{ $count }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -612,7 +675,8 @@
                             <div class="d-flex align-items-center gap-3">
                                 <span class="selected-badge"><span id="selectedCount">0</span> selected</span>
                                 <div class="v-divider"></div>
-                                <button type="button" id="bulkMessageBtn" class="bulk-btn" style="background: var(--light-green); color: var(--forest-green);">
+                                <button type="button" id="bulkMessageBtn" class="bulk-btn"
+                                    style="background: var(--light-green); color: var(--forest-green);">
                                     <i class="bi bi-chat-dots-fill me-2"></i>Bulk Message
                                 </button>
                                 <button type="button" id="bulkExportBtn" class="bulk-btn bulk-btn-delete">
@@ -643,11 +707,16 @@
                                                     <label for="selectAll"></label>
                                                 </div>
                                             </th>
-                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px;">Student Info</th>
-                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px;">College & Level</th>
-                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px; width: 120px;">Sessions</th>
-                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px; width: 120px;">Risk Level</th>
-                                            <th class="pe-4 py-3 text-end text-secondary text-uppercase small font-weight-bold" style="letter-spacing: 0.5px; width: 120px;">Actions</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px;">Student Info</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px;">College & Level</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px; width: 120px;">Sessions</th>
+                                            <th class="py-3 text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px; width: 120px;">Risk Level</th>
+                                            <th class="pe-4 py-3 text-end text-secondary text-uppercase small font-weight-bold"
+                                                style="letter-spacing: 0.5px; width: 120px;">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -661,7 +730,8 @@
                                             <tr>
                                                 <td class="ps-4">
                                                     <div class="custom-checkbox">
-                                                        <input type="checkbox" class="item-checkbox" id="check-{{ $student->id }}" value="{{ $student->id }}">
+                                                        <input type="checkbox" class="item-checkbox"
+                                                            id="check-{{ $student->id }}" value="{{ $student->id }}">
                                                         <label for="check-{{ $student->id }}"></label>
                                                     </div>
                                                 </td>
@@ -670,23 +740,29 @@
                                                         <img src="{{ $student->avatar_url }}" class="user-avatar" alt="">
                                                         <div class="user-details">
                                                             <h6>{{ $student->name }}</h6>
-                                                            <span>{{ $student->student_id ?? 'No ID' }} • {{ $student->email }}</span>
+                                                            <span>{{ $student->student_id ?? 'No ID' }} •
+                                                                {{ $student->email }}</span>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex flex-column">
-                                                        <span class="fw-bold text-dark" style="font-size: 0.85rem;">{{ $student->college ?? 'No College' }}</span>
-                                                        <span class="text-muted small">{{ $student->year_level ?? 'Unspecified' }} Level</span>
+                                                        <span class="fw-bold text-dark"
+                                                            style="font-size: 0.85rem;">{{ $student->college ?? 'No College' }}</span>
+                                                        <span
+                                                            class="text-muted small">{{ $student->year_level ?? 'Unspecified' }}
+                                                            Level</span>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <div class="text-center px-2 py-1 bg-light rounded" title="Total Sessions">
+                                                        <div class="text-center px-2 py-1 bg-light rounded"
+                                                            title="Total Sessions">
                                                             <div class="fw-bold text-dark lh-1">{{ $totalApps }}</div>
                                                             <div class="text-muted" style="font-size: 0.6rem;">TOTAL</div>
                                                         </div>
-                                                        <div class="text-center px-2 py-1 rounded" style="background: var(--light-green);" title="Completed Sessions">
+                                                        <div class="text-center px-2 py-1 rounded"
+                                                            style="background: var(--light-green);" title="Completed Sessions">
                                                             <div class="fw-bold text-success lh-1">{{ $completedApps }}</div>
                                                             <div class="text-muted" style="font-size: 0.6rem;">DONE</div>
                                                         </div>
@@ -709,11 +785,11 @@
                                                 </td>
                                                 <td class="pe-4 text-end">
                                                     <div class="actions-cell justify-content-end">
-                                                        <a href="{{ route('counselor.students.show', $student->id) }}" 
+                                                        <a href="{{ route('counselor.students.show', $student->id) }}"
                                                             class="btn-action view" title="View Profile">
                                                             <i class="bi bi-person-badge-fill"></i>
                                                         </a>
-                                                        <a href="{{ route('chat.index', $student->id) }}" 
+                                                        <a href="{{ route('chat.index', $student->id) }}"
                                                             class="btn-action chat" style="color: #0d6efd;" title="Chat">
                                                             <i class="bi bi-chat-dots-fill"></i>
                                                         </a>
@@ -727,7 +803,8 @@
                                                     <div class="empty-state">
                                                         <i class="bi bi-people"></i>
                                                         <h5 class="mb-2 fw-bold">No Students Found</h5>
-                                                        <p class="mb-0 text-muted">Try adjusting your filters or search terms.</p>
+                                                        <p class="mb-0 text-muted">Try adjusting your filters or search terms.
+                                                        </p>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -735,7 +812,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            
+
                             <!-- Pagination -->
                             <div class="pagination-wrap">
                                 {{ $students->links('vendor.pagination.premium') }}
@@ -746,9 +823,9 @@
             </div>
         </div>
     </div>
-                </div>
-            </div>
-        </div>
+    </div>
+    </div>
+    </div>
 
     </div>
     <script>

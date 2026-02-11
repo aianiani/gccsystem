@@ -254,6 +254,110 @@
         .bulk-action-bar.visible {
             transform: translateX(-50%) translateY(0);
         }
+
+        /* Premium Lightbox Modal */
+        .lightbox-modal .modal-content {
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .lightbox-modal .modal-dialog {
+            max-width: 90vw;
+            margin: 1.75rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 3.5rem);
+            transition: all 0.3s ease;
+        }
+
+        .lightbox-modal .image-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background-color: transparent;
+            line-height: 0;
+            max-width: 100%;
+        }
+
+        .lightbox-modal img {
+            max-height: 85vh;
+            max-width: 100%;
+            width: auto;
+            border-radius: 16px;
+            display: block;
+        }
+
+        .lightbox-modal iframe {
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 80vw;
+            height: 80vh;
+            background: white;
+        }
+
+        .lightbox-modal .close-btn-floating {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1060;
+            font-size: 1.2rem;
+        }
+
+        .lightbox-modal .close-btn-floating:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(90deg) scale(1.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .lightbox-modal .download-btn-floating {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            padding: 10px 24px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 500;
+            text-decoration: none;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1060;
+            opacity: 0;
+            font-size: 0.95rem;
+        }
+
+        .lightbox-modal .image-container:hover .download-btn-floating {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .lightbox-modal .download-btn-floating:hover {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a1a;
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
     </style>
 
     <div class="main-dashboard-inner home-zoom">
@@ -385,12 +489,7 @@
                     <i class="bi bi-clock me-2"></i>Pending ({{ $pendingRegistrations->total() }})
                 </button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button"
-                    role="tab">
-                    <i class="bi bi-check-circle me-2"></i>Approved ({{ $approvedRegistrations->total() }})
-                </button>
-            </li>
+
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button"
                     role="tab">
@@ -479,13 +578,20 @@
                                                 @endif
                                             </div>
                                             <div class="text-muted small">
-                                                <span class="fw-medium text-dark">{{ $user->student_id ?? 'N/A' }}</span>
-                                                <span class="mx-2 text-muted">&bull;</span>
-                                                <span class="text-truncate" style="max-width: 200px;"
-                                                    title="{{ $user->course }}">{{ $user->course ?? 'N/A' }}</span>
-                                                <span class="mx-2 text-muted">&bull;</span>
-                                                <span class="text-truncate" style="max-width: 200px;"
-                                                    title="{{ $user->college }}">{{ $user->college ?? 'N/A' }}</span>
+                                                @if($user->role === 'student')
+                                                    <span class="fw-medium text-dark">{{ $user->student_id ?? 'N/A' }}</span>
+                                                    <span class="mx-2 text-muted">&bull;</span>
+                                                    <span class="text-truncate" style="max-width: 200px;"
+                                                        title="{{ $user->course }}">{{ $user->course ?? 'N/A' }}</span>
+                                                    <span class="mx-2 text-muted">&bull;</span>
+                                                    <span class="text-truncate" style="max-width: 200px;"
+                                                        title="{{ $user->college }}">{{ $user->college ?? 'N/A' }}</span>
+                                                @else
+                                                    <span
+                                                        class="badge bg-info bg-opacity-10 text-info border border-info fw-normal">{{ ucfirst($user->role) }}</span>
+                                                    <span class="mx-2 text-muted">&bull;</span>
+                                                    <span class="text-muted">{{ $user->email }}</span>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -557,40 +663,43 @@
 
 
 
-                <!-- COR File Preview Modal -->
+                <!-- Premium COR File Preview Modal -->
                 @foreach($pendingRegistrations as $user)
                     @if($user->cor_file)
-                        <div class="modal fade" id="corPreviewModal{{ $user->id }}" tabindex="-1">
-                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal fade lightbox-modal" id="corPreviewModal{{ $user->id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title"><i class="bi bi-file-earmark-pdf me-2"></i>COR File -
-                                            {{ $user->name }}
-                                        </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body p-0">
-                                        @php
-                                            $extension = pathinfo($user->cor_file, PATHINFO_EXTENSION);
-                                        @endphp
+                                    <div class="modal-body text-center p-0">
+                                        <div class="image-container">
+                                            <button type="button" class="close-btn-floating" data-bs-dismiss="modal"
+                                                aria-label="Close">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
 
-                                        @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
-                                            <div class="p-3 text-center bg-light">
-                                                <img src="{{ asset('storage/cor_files/' . $user->cor_file) }}"
-                                                    class="img-fluid rounded shadow-sm" style="max-height: 70vh; object-fit: contain;"
-                                                    alt="COR File">
+                                            @php
+                                                $extension = pathinfo($user->cor_file, PATHINFO_EXTENSION);
+                                            @endphp
+
+                                            @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                                <img src="{{ asset('storage/cor_files/' . $user->cor_file) }}" alt="COR File">
+                                                <a href="{{ asset('storage/cor_files/' . $user->cor_file) }}" download
+                                                    class="download-btn-floating">
+                                                    <i class="bi bi-download"></i> Download
+                                                </a>
+                                            @else
+                                                <iframe src="{{ asset('storage/cor_files/' . $user->cor_file) }}"></iframe>
+                                                <a href="{{ asset('storage/cor_files/' . $user->cor_file) }}" target="_blank"
+                                                    class="download-btn-floating">
+                                                    <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                                                </a>
+                                            @endif
+                                        </div>
+                                        @if(!in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                            <div class="mt-3 text-center">
+                                                <button type="button" class="btn btn-sm btn-light rounded-pill border px-3"
+                                                    data-bs-dismiss="modal">Close Preview</button>
                                             </div>
-                                        @else
-                                            <iframe src="{{ asset('storage/cor_files/' . $user->cor_file) }}"
-                                                style="width: 100%; height: 70vh; border: none;"></iframe>
                                         @endif
-                                    </div>
-                                    <div class="modal-footer">
-                                        <a href="{{ asset('storage/cor_files/' . $user->cor_file) }}" target="_blank"
-                                            class="btn btn-primary">
-                                            <i class="bi bi-download me-1"></i>Open in New Tab
-                                        </a>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>
@@ -599,105 +708,7 @@
                 @endforeach
             </div>
 
-            <!-- Approved Registrations -->
 
-            <div class="tab-pane fade" id="approved" role="tabpanel">
-                @if($approvedRegistrations->count() > 0)
-                    <div class="d-flex justify-content-between align-items-center mb-3 px-2">
-                        <div class="text-muted small">
-                            Showing {{ $approvedRegistrations->firstItem() }}-{{ $approvedRegistrations->lastItem() }} of
-                            {{ $approvedRegistrations->total() }}
-                        </div>
-                    </div>
-
-
-                    @foreach($approvedRegistrations as $user)
-                        <div class="registration-item p-4">
-                            <div class="d-flex align-items-center gap-4">
-                                <!-- Avatar -->
-                                <div class="position-relative">
-                                    @if($user->avatar)
-                                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="rounded-circle shadow-sm"
-                                            style="width: 48px; height: 48px; object-fit: cover;">
-                                    @else
-                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center shadow-sm"
-                                            style="width: 48px; height: 48px;">
-                                            <span class="fw-bold text-success">{{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}</span>
-                                        </div>
-                                    @endif
-                                </div>
-
-                                <!-- Details -->
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <h6 class="mb-0 fw-bold text-dark fs-6">{{ $user->name ?? 'N/A' }}</h6>
-                                            <span
-                                                class="badge bg-success bg-opacity-10 text-success border border-success fw-normal py-0 px-2"
-                                                style="font-size: 0.75rem;">Approved</span>
-                                        </div>
-                                        <small class="text-muted"><i
-                                                class="bi bi-calendar-check me-1"></i>{{ $user->approved_at ? $user->approved_at->format('M d, h:i A') : 'N/A' }}</small>
-                                    </div>
-                                    <div class="mb-1 text-muted small">
-                                        {{ $user->email ?? 'N/A' }}
-                                    </div>
-                                    <div class="text-muted small">
-                                        @if($user->approvedBy)
-                                            <span class="text-muted">Approved by {{ $user->approvedBy->name }}</span>
-                                        @endif
-                                        @if($user->registration_notes)
-                                            <span class="border-start ps-3 ms-3 text-truncate d-inline-block align-bottom"
-                                                style="max-width: 300px;" title="{{ $user->registration_notes }}">
-                                                <i class="bi bi-sticky me-1"></i>{{ $user->registration_notes }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <!-- Actions -->
-                                <div class="border-start ps-4">
-                                    <a href="{{ route('admin.registration-approvals.show', $user->id) }}"
-                                        class="btn btn-light btn-sm rounded-pill px-3 fw-bold border" title="View Details">
-                                        View
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-between align-items-center mt-4">
-                        <div class="d-flex align-items-center gap-2">
-                            <label class="text-muted small mb-0">Per page:</label>
-                            <select class="form-select form-select-sm rounded-3" style="width: auto;"
-                                onchange="changePerPage(this.value)">
-                                <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
-                                <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30</option>
-                                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
-                                <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
-                                <option value="1000" {{ request('per_page') == 1000 ? 'selected' : '' }}>1000</option>
-                            </select>
-                        </div>
-                        <div>
-                            {{ $approvedRegistrations->withQueryString()->links('vendor.pagination.premium-simple') }}
-                        </div>
-                    </div>
-
-                @else
-                    <div class="text-center py-5">
-                        <div class="mb-3">
-                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
-                                style="width: 80px; height: 80px;">
-                                <i class="bi bi-check-circle text-success fs-1"></i>
-                            </div>
-                        </div>
-                        <h4 class="fw-bold text-dark">No Approved Registrations</h4>
-                        <p class="text-muted">Approved student registrations will appear here.</p>
-                    </div>
-                @endif
-            </div>
 
             <!-- Rejected Registrations -->
             <div class="tab-pane fade" id="rejected" role="tabpanel">
@@ -1013,37 +1024,37 @@
 
                     if (verificationResults) {
                         verificationResults.innerHTML = `
-                                                                                                                                                                                                <div class="alert alert-success">
-                                                                                                                                                                                                    <h6><i class="bi bi-check-circle me-2"></i>Enrollment Verification Complete</h6>
-                                                                                                                                                                                                    <p class="mb-2"><strong>${data.total_matched}</strong> student(s) matched out of <strong>${data.total_enrollment}</strong> in enrollment file.</p>
-                                                                                                                                                                                                    <p class="mb-0 small">Matched students have been auto-selected and highlighted in green.</p>
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                                ${data.match_details && data.match_details.length > 0 ? `
-                                                                                                                                                                                                    <div class="mt-3">
-                                                                                                                                                                                                        <h6>Matched Students (showing first 50):</h6>
-                                                                                                                                                                                                        <div class="list-group" style="max-height: 400px; overflow-y: auto;">
-                                                                                                                                                                                                            ${data.match_details.slice(0, 50).map(student => `
-                                                                                                                                                                                                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                                                                                                                                                                                    <div>
-                                                                                                                                                                                                                        <strong>${student.name}</strong>
-                                                                                                                                                                                                                        <br><small class="text-muted">${student.student_id} • ${student.email}</small>
+                                                                                                                                                                                                            <div class="alert alert-success">
+                                                                                                                                                                                                                <h6><i class="bi bi-check-circle me-2"></i>Enrollment Verification Complete</h6>
+                                                                                                                                                                                                                <p class="mb-2"><strong>${data.total_matched}</strong> student(s) matched out of <strong>${data.total_enrollment}</strong> in enrollment file.</p>
+                                                                                                                                                                                                                <p class="mb-0 small">Matched students have been auto-selected and highlighted in green.</p>
+                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                            ${data.match_details && data.match_details.length > 0 ? `
+                                                                                                                                                                                                                <div class="mt-3">
+                                                                                                                                                                                                                    <h6>Matched Students (showing first 50):</h6>
+                                                                                                                                                                                                                    <div class="list-group" style="max-height: 400px; overflow-y: auto;">
+                                                                                                                                                                                                                        ${data.match_details.slice(0, 50).map(student => `
+                                                                                                                                                                                                                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                                                                                                                                                                                                <div>
+                                                                                                                                                                                                                                    <strong>${student.name}</strong>
+                                                                                                                                                                                                                                    <br><small class="text-muted">${student.student_id} • ${student.email}</small>
+                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                <span class="badge bg-success">${student.reasons}</span>
+                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                        `).join('')}
                                                                                                                                                                                                                     </div>
-                                                                                                                                                                                                                    <span class="badge bg-success">${student.reasons}</span>
                                                                                                                                                                                                                 </div>
-                                                                                                                                                                                                            `).join('')}
-                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                ` : ''}
-                                                                                                                                                                                            `;
+                                                                                                                                                                                                            ` : ''}
+                                                                                                                                                                                                        `;
                     }
 
                 } else {
                     if (verificationResults) {
                         verificationResults.innerHTML = `
-                                                                                                                                                                                                <div class="alert alert-danger">
-                                                                                                                                                                                                    <i class="bi bi-exclamation-triangle me-2"></i>${data.message}
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                            `;
+                                                                                                                                                                                                            <div class="alert alert-danger">
+                                                                                                                                                                                                                <i class="bi bi-exclamation-triangle me-2"></i>${data.message}
+                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                        `;
                     }
                 }
 
@@ -1054,10 +1065,10 @@
 
                 if (verificationResults) {
                     verificationResults.innerHTML = `
-                                                                                                                                                                                            <div class="alert alert-danger">
-                                                                                                                                                                                                <i class="bi bi-exclamation-triangle me-2"></i>${msg}
-                                                                                                                                                                                            </div>
-                                                                                                                                                                                        `;
+                                                                                                                                                                                                        <div class="alert alert-danger">
+                                                                                                                                                                                                            <i class="bi bi-exclamation-triangle me-2"></i>${msg}
+                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                    `;
                 }
             } finally {
                 // Reset button
@@ -1166,7 +1177,7 @@
                     confirmButtonColor: '#dc3545'
                 });
             @endif
-                                                                                                });
+                                                                                                            });
 
         function confirmAction(url, message) {
             Swal.fire({

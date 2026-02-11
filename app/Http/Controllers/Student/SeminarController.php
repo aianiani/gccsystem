@@ -49,6 +49,11 @@ class SeminarController extends Controller
             $seminar->is_unlocked = $attendance && ($attendance->status === 'unlocked' || $attendance->status === 'completed');
             $seminar->attendance_status = $attendance ? $attendance->status : null;
 
+            // Extra check: If status is 'attended', it is NOT unlocked.
+            if ($attendance && $attendance->status === 'attended') {
+                $seminar->is_unlocked = false;
+            }
+
             return $seminar;
         });
 

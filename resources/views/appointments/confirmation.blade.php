@@ -531,7 +531,20 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-
+                // Show success toast notification
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Appointment Submitted!',
+                    text: 'Your appointment has been successfully submitted and is pending counselor approval.',
+                    timer: 4000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end',
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'colored-toast'
+                    }
+                });
 
                 // Clear appointment form data from localStorage after successful booking
                 localStorage.removeItem('appointment_form_data');

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AssessmentCompletedMail;
+use App\Notifications\AssessmentCompletedNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class AssessmentController extends Controller
@@ -132,6 +135,12 @@ class AssessmentController extends Controller
             'risk_level' => $risk_level,
             'student_comment' => $comment,
         ]);
+
+        // Send email confirmation
+        Mail::to(auth()->user()->email)->send(new AssessmentCompletedMail(auth()->user(), $assessment));
+
+        // Send in-app notification
+        auth()->user()->notify(new AssessmentCompletedNotification(auth()->user(), $assessment));
 
         // Role-based redirect
         if (auth()->user()->role === 'student' && $request->input('context') === 'booking') {
@@ -298,6 +307,12 @@ class AssessmentController extends Controller
             'student_comment' => $comment,
         ]);
 
+        // Send email confirmation
+        Mail::to(auth()->user()->email)->send(new AssessmentCompletedMail(auth()->user(), $assessment));
+
+        // Send in-app notification
+        auth()->user()->notify(new AssessmentCompletedNotification(auth()->user(), $assessment));
+
         if (auth()->user()->role === 'student') {
             return redirect()->route('assessments.index')->with([
                 'success' => 'GRIT Scale completed successfully!'
@@ -392,6 +407,12 @@ class AssessmentController extends Controller
             'student_comment' => $request->input('student_comment'),
         ]);
 
+        // Send email confirmation
+        Mail::to(auth()->user()->email)->send(new AssessmentCompletedMail(auth()->user(), $assessment));
+
+        // Send in-app notification
+        auth()->user()->notify(new AssessmentCompletedNotification(auth()->user(), $assessment));
+
         if (auth()->user()->role === 'student') {
             return redirect()->route('assessments.index')->with([
                 'success' => 'NEO-FFI assessment completed successfully!'
@@ -457,6 +478,12 @@ class AssessmentController extends Controller
             'risk_level' => 'normal',
             'student_comment' => $request->input('student_comment'),
         ]);
+
+        // Send email confirmation
+        Mail::to(auth()->user()->email)->send(new AssessmentCompletedMail(auth()->user(), $assessment));
+
+        // Send in-app notification
+        auth()->user()->notify(new AssessmentCompletedNotification(auth()->user(), $assessment));
 
         if (auth()->user()->role === 'student') {
             return redirect()->route('assessments.index')->with([
@@ -603,51 +630,51 @@ class AssessmentController extends Controller
     public function getWviQuestions()
     {
         return [
-            'have to keep solving problems',
-            'help others',
-            'can get a raise',
-            'look forward to changes in your job',
-            'have freedom in your area',
-            'gain prestige in your field',
-            'need to have artistic ability',
-            'are one of the gang',
-            'know your job will last',
-            'can be the kind of person you would like to be',
-            'have a boss who gives you a fair deal',
-            'like the setting in which your work is done',
-            'get the feeling of having done a good day\'s work',
-            'have the authority over others',
-            'try out new ideas and suggestions',
-            'create something new',
-            'know by the results when you\'ve done a good job',
-            'have a boss who is reasonable',
-            'are sure of always having a job',
-            'add beauty to the world',
-            'make your own decisions',
-            'have pay increases that keep up with the cost of living',
-            'are mentally challenged',
-            'use leadership abilities',
-            'have adequate lounge, toilet and other facilities',
-            'have a way of life, while not on the job, that you like',
-            'form friendships with your fellow employees',
-            'know that others consider your work important',
-            'do not do the same thing all the time',
-            'feel you have helped another person',
-            'add to the well-being of other people',
-            'do many different things',
-            'are looked up to by others',
-            'have good connections with fellow workers',
-            'lead the kind of life you most enjoy',
-            'have a good place in which to work (quiet, calm, etc.)',
-            'plan and organize the work of others',
-            'need to be mentally alert',
-            'are paid enough to live very well',
-            'are your own boss',
-            'make attractive products',
-            'are sure of another job in the company if your present job ends',
-            'have a supervisor who is considerate',
-            'see the result of your efforts',
-            'contribute new ideas',
+            'Having a job where you must keep solving problems is…',
+            'Having a job where you help others is…',
+            'Having a job where you can get a raise is…',
+            'Having a job where you look forward to changes is…',
+            'Having a job where you have freedom in your work area is…',
+            'Having a job where you gain prestige in your field is…',
+            'Having a job where artistic ability is needed is…',
+            'Having a job where you feel part of the group is…',
+            'Having a job that you know will last is…',
+            'Having a job where you can be the kind of person you want to be is…',
+            'Having a boss who gives you a fair deal is…',
+            'Having a work setting that you enjoy is…',
+            'Having the feeling of doing a good day\'s work is…',
+            'Having authority over others at work is…',
+            'Having a job where you can try out new ideas is…',
+            'Having a job where you create something new is…',
+            'Knowing by the results when you have done a good job is…',
+            'Having a boss who is reasonable is…',
+            'Always being sure of having a job is…',
+            'Having a job that adds beauty to the world is…',
+            'Having a job where you can make your own decisions is…',
+            'Having pay increases that keep up with the cost of living is…',
+            'Having a job where you are mentally challenged is…',
+            'Having a job where you can use leadership abilities is…',
+            'Having adequate lounge, toilet, and other facilities at work is…',
+            'Having a way of life outside work that you enjoy is…',
+            'Having a job where you can form friendships with coworkers is…',
+            'Knowing that others consider your work important is…',
+            'Having a job where you do not do the same thing all the time is…',
+            'Having the feeling that you have helped another person is…',
+            'Having a job that adds to the well-being of other people is…',
+            'Having a job where you do many different things is…',
+            'Being looked up to by others because of your work is…',
+            'Having good connections with fellow workers is…',
+            'Having a job that allows you to lead the kind of life you most enjoy is…',
+            'Having a good place to work (quiet, calm, etc.) is…',
+            'Having a job where you plan and organize the work of others is…',
+            'Having a job where you must be mentally alert is…',
+            'Being paid enough to live very well is…',
+            'Having a job where you are your own boss is…',
+            'Having a job where you make attractive products is…',
+            'Being sure of another job in the company if your present job ends is…',
+            'Having a supervisor who is considerate is…',
+            'Being able to see the results of your efforts is…',
+            'Having a job where you contribute new ideas is…',
         ];
     }
 

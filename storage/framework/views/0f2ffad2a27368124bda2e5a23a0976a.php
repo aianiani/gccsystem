@@ -4563,6 +4563,7 @@
                                                             <option>3rd Year</option>
                                                             <option>4th Year</option>
                                                             <option>5th Year</option>
+                                                            <option>6th Year</option>
                                                         </select>
                                                     </div>
                                                     <div class="invalid-feedback"></div>
@@ -6543,109 +6544,7 @@
                 });
             }
 
-            // ========================================
-            // COLLEGE/COURSE MAPPING
-            // ========================================
-            const collegeToCourses = {
-                'College of Agriculture': [
-                    'BS in Agriculture - Agronomy',
-                    'BS in Agriculture - Agricultural Economics',
-                    'BS in Agriculture - Agricultural Education',
-                    'BS in Agriculture - Agricultural Extension',
-                    'BS in Agriculture - Animal Science',
-                    'BS in Agriculture - Entomology',
-                    'BS in Agriculture - Horticulture',
-                    'BS in Agriculture - Plant Pathology',
-                    'BS in Agriculture - Soil Science',
-                    'BS in Agribusiness Management (Crop Enterprise)',
-                    'BS in Agribusiness Management (Livestock Enterprise)',
-                    'BS in Development Communication'
-                ],
-                'College of Arts and Sciences': [
-                    'BA in English',
-                    'BA in History',
-                    'BA in Political Science',
-                    'BA in Psychology',
-                    'BA in Sociology',
-                    'BS in Biology',
-                    'BS in Chemistry',
-                    'BS in Mathematics',
-                    'BS in Physics'
-                ],
-                'College of Business and Management': [
-                    'BS in Accountancy (5 years)',
-                    'BS in Accounting Technology (4 years)',
-                    'Certificate in Accounting Technology (2 years)',
-                    'BSBA - Marketing Management',
-                    'BSBA - Financial Management',
-                    'BSBA - Operations Management',
-                    'BS in Office Administration',
-                    'BS in Entrepreneurship'
-                ],
-                'College of Education': [
-                    'BSEd - Biology',
-                    'BSEd - English',
-                    'BSEd - Filipino',
-                    'BSEd - General Science',
-                    'BSEd - Mathematics',
-                    'BSEd - Physical Education',
-                    'BSEd - Physics',
-                    'Bachelor of Physical Education (BPEd)'
-                ],
-                'College of Engineering': [
-                    'BS in Agricultural and Biosystems Engineering',
-                    'BS in Civil Engineering',
-                    'BS in Electrical Engineering',
-                    'BS in Information Technology',
-                    'BS in Mechanical Engineering'
-                ],
-                'College of Forestry and Environmental Sciences': [
-                    'BS in Environmental Science',
-                    'BS in Forestry'
-                ],
-                'College of Human Ecology': [
-                    'BS in Home Economics - Home Economics Education',
-                    'BS in Home Economics - Food Business Management (Food Service)',
-                    'BS in Home Economics - Food Business Management (Food Processing)',
-                    'BS in Food Technology',
-                    'BS in Nutrition and Dietetics',
-                    'BS in Hotel and Restaurant Management'
-                ],
-                'College of Nursing': [
-                    'BS in Nursing'
-                ],
-                'College of Veterinary Medicine': [
-                    'Doctor of Veterinary Medicine'
-                ],
-                'College of Information Sciences and Computing': [
-                    'BS in Information Technology'
-                ]
-            };
 
-            const collegeSelect = document.getElementById('collegeSelect');
-            const courseSelect = document.getElementById('courseSelect');
-
-            if (collegeSelect && courseSelect) {
-                // Populate colleges
-                Object.keys(collegeToCourses).forEach(college => {
-                    const option = document.createElement('option');
-                    option.value = college;
-                    option.textContent = college;
-                    collegeSelect.appendChild(option);
-                });
-
-                // Update courses when college changes
-                collegeSelect.addEventListener('change', function () {
-                    courseSelect.innerHTML = '<option value="" disabled selected>Course / Program *</option>';
-                    const courses = collegeToCourses[this.value] || [];
-                    courses.forEach(course => {
-                        const option = document.createElement('option');
-                        option.value = course;
-                        option.textContent = course;
-                        courseSelect.appendChild(option);
-                    });
-                });
-            }
 
             // ========================================
             // PASSWORD VISIBILITY TOGGLE

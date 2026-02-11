@@ -310,6 +310,85 @@
             background-color: var(--primary-green);
             border-color: var(--primary-green);
         }
+
+        /* Bulk Action Bar */
+        .bulk-action-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            z-index: 1050;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bulk-action-bar.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .bulk-selected-count {
+            font-weight: 700;
+            color: var(--primary-green);
+            font-size: 0.9rem;
+        }
+
+        .btn-action-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-approve {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .btn-approve:hover {
+            background: #15803d;
+            color: #fff;
+        }
+
+        .btn-reject {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+            color: #fff;
+        }
+
+        .btn-info-pill {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .btn-info-pill:hover {
+            background: #0284c7;
+            color: #fff;
+        }
+
+        .vr {
+            height: 24px;
+            width: 1px;
+            background: #e2e8f0;
+            opacity: 1;
+        }
     </style>
 
     <div class="main-dashboard-inner home-zoom">
@@ -440,33 +519,37 @@
                         function toggleAdvancedFilters() {
                             const target = document.getElementById('advancedFilters');
                             const btn = document.getElementById('advancedFiltersToggle');
-                                                                                                   if (target) {
-                                    if (target.classList.contains('d-none')) {
-                                        target.classList.remove('d-none');
-                                        if(btn) btn.setAttribute('aria-expanded', 'true');
-                                    } else {
-                                        target.classList.add('d-none');
-                                        if(btn) btn.setAttribute('aria-expanded', 'false');
-                                    }
+                            if (target) {
+                                if (target.classList.contains('d-none')) {
+                                    target.classList.remove('d-none');
+                                    if (btn) btn.setAttribute('aria-expanded', 'true');
+                                } else {
+                                    target.classList.add('d-none');
+                                    if (btn) btn.setAttribute('aria-expanded', 'false');
                                 }
                             }
-                        </script>
+                        }
+                    </script>
 
-                        <div class="col-12">
-                            <div class="{{ request()->anyFilled(['year_level', 'sex', 'date_from', 'date_to']) ? '' : 'd-none' }}"
-                                id="advancedFilters">
-                                <div class="row g-3 pt-2">
+                    <div class="col-12">
+                        <div class="{{ request()->anyFilled(['year_level', 'sex', 'date_from', 'date_to']) ? '' : 'd-none' }}"
+                            id="advancedFilters">
+                            <div class="row g-3 pt-2">
                                 <div class="col-md-2">
                                     <label class="filter-label">Year Level</label>
                                     <select class="filter-select" name="year_level" onchange="this.form.submit()">
                                         <option value="">All Years</option>
-                                        <option value="1st Year" {{ request('year_level') === '1st Year' ? 'selected' : '' }}>1st
+                                        <option value="1st Year" {{ request('year_level') === '1st Year' ? 'selected' : '' }}>
+                                            1st
                                             Year</option>
-                                        <option value="2nd Year" {{ request('year_level') === '2nd Year' ? 'selected' : '' }}>2nd
+                                        <option value="2nd Year" {{ request('year_level') === '2nd Year' ? 'selected' : '' }}>
+                                            2nd
                                             Year</option>
-                                        <option value="3rd Year" {{ request('year_level') === '3rd Year' ? 'selected' : '' }}>3rd
+                                        <option value="3rd Year" {{ request('year_level') === '3rd Year' ? 'selected' : '' }}>
+                                            3rd
                                             Year</option>
-                                        <option value="4th Year" {{ request('year_level') === '4th Year' ? 'selected' : '' }}>4th
+                                        <option value="4th Year" {{ request('year_level') === '4th Year' ? 'selected' : '' }}>
+                                            4th
                                             Year</option>
                                         <option value="Graduated" {{ request('year_level') === 'Graduated' ? 'selected' : '' }}>
                                             Graduated</option>
@@ -485,8 +568,8 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="filter-label">From Date</label>
-                                    <input type="date" class="filter-input" name="date_from" value="{{ request('date_from') }}"
-                                        onchange="this.form.submit()">
+                                    <input type="date" class="filter-input" name="date_from"
+                                        value="{{ request('date_from') }}" onchange="this.form.submit()">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="filter-label">To Date</label>
@@ -504,646 +587,603 @@
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
+            </form>
+        </div>
 
-            <!-- Content Card -->
-            <div class="content-card">
-                @if($users->count() > 0)
-                    <div class="table-responsive">
-                        <table class="premium-table">
-                            <thead>
+        <!-- Content Card -->
+        <div class="content-card">
+            @if($users->count() > 0)
+                <div class="table-responsive">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th class="ps-4" style="width: 40px;">
+                                    <input type="checkbox" class="form-check-input" id="selectAll">
+                                </th>
+                                <th>
+                                    <a href="?{{ http_build_query(array_merge(request()->except(['sort', 'direction']), ['sort' => 'name', 'direction' => request('sort') === 'name' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                                        class="text-decoration-none text-secondary d-flex align-items-center gap-1">
+                                        USER
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="?{{ http_build_query(array_merge(request()->except(['sort', 'direction']), ['sort' => 'email', 'direction' => request('sort') === 'email' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                                        class="text-decoration-none text-secondary d-flex align-items-center gap-1">
+                                        EMAIL
+                                    </a>
+                                </th>
+                                <th>ROLE</th>
+                                <th>STATUS</th>
+                                <th>JOINED</th>
+                                <th class="text-end pe-4">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($users as $user)
                                 <tr>
-                                    <th class="ps-4" style="width: 40px;">
-                                        <input type="checkbox" class="form-check-input" id="selectAll">
-                                    </th>
-                                    <th>
-                                        <a href="?{{ http_build_query(array_merge(request()->except(['sort', 'direction']), ['sort' => 'name', 'direction' => request('sort') === 'name' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
-                                            class="text-decoration-none text-secondary d-flex align-items-center gap-1">
-                                            USER
-                                        </a>
-                                    </th>
-                                    <th>
-                                        <a href="?{{ http_build_query(array_merge(request()->except(['sort', 'direction']), ['sort' => 'email', 'direction' => request('sort') === 'email' && request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
-                                            class="text-decoration-none text-secondary d-flex align-items-center gap-1">
-                                            EMAIL
-                                        </a>
-                                    </th>
-                                    <th>ROLE</th>
-                                    <th>STATUS</th>
-                                    <th>JOINED</th>
-                                    <th class="text-end pe-4">ACTIONS</th>
+                                    <td class="ps-4">
+                                        <input type="checkbox" class="form-check-input user-checkbox" value="{{ $user->id }}" {{ $user->id === auth()->id() ? 'disabled' : '' }}>
+                                    </td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <img src="{{ $user->avatar_url }}" alt="Avatar" class="user-avatar">
+                                            <div class="user-info">
+                                                <h6>
+                                                    {{ $user->name }}
+                                                    @if($user->id === auth()->id())
+                                                        <span class="user-me-badge">You</span>
+                                                    @endif
+                                                </h6>
+                                                <span>{{ $user->student_id ?? ucfirst($user->role) }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-muted small">{{ $user->email }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="premium-badge badge-role-{{ $user->role }}">
+                                            @if($user->role == 'admin') <i class="bi bi-shield-fill"></i>
+                                            @elseif($user->role == 'student') <i class="bi bi-person"></i>
+                                            @else <i class="bi bi-person-badge"></i> @endif
+                                            {{ ucfirst($user->role) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="premium-badge badge-status-{{ $user->isActive() ? 'active' : 'inactive' }}">
+                                            <i class="bi bi-circle-fill" style="font-size: 6px;"></i>
+                                            {{ $user->isActive() ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted small fw-medium">{{ $user->created_at->format('M d, Y') }}</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex justify-content-end gap-1">
+                                            <a href="{{ route('users.show', $user) }}" class="btn-action" data-bs-toggle="tooltip"
+                                                title="View Profile">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{{ route('users.edit', $user) }}" class="btn-action edit"
+                                                data-bs-toggle="tooltip" title="Edit User">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            @if($user->id !== auth()->id())
+                                                <form action="{{ route('users.toggle-status', $user) }}" method="POST" class="d-inline">
+                                                    @csrf @method('PATCH')
+                                                    <button type="submit" class="btn-action" data-bs-toggle="tooltip"
+                                                        title="{{ $user->isActive() ? 'Deactivate' : 'Activate' }}">
+                                                        <i
+                                                            class="bi bi-{{ $user->isActive() ? 'toggle-on text-success' : 'toggle-off text-muted' }} fs-5"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($users as $user)
-                                    <tr>
-                                        <td class="ps-4">
-                                            <input type="checkbox" class="form-check-input user-checkbox" value="{{ $user->id }}" {{ $user->id === auth()->id() ? 'disabled' : '' }}>
-                                        </td>
-                                        <td>
-                                            <div class="user-cell">
-                                                <img src="{{ $user->avatar_url }}" alt="Avatar" class="user-avatar">
-                                                <div class="user-info">
-                                                    <h6>
-                                                        {{ $user->name }}
-                                                        @if($user->id === auth()->id())
-                                                            <span class="user-me-badge">You</span>
-                                                        @endif
-                                                    </h6>
-                                                    <span>{{ $user->student_id ?? ucfirst($user->role) }}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="text-muted small">{{ $user->email }}</div>
-                                        </td>
-                                        <td>
-                                            <span class="premium-badge badge-role-{{ $user->role }}">
-                                                @if($user->role == 'admin') <i class="bi bi-shield-fill"></i>
-                                                @elseif($user->role == 'student') <i class="bi bi-person"></i>
-                                                @else <i class="bi bi-person-badge"></i> @endif
-                                                {{ ucfirst($user->role) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="premium-badge badge-status-{{ $user->isActive() ? 'active' : 'inactive' }}">
-                                                <i class="bi bi-circle-fill" style="font-size: 6px;"></i>
-                                                {{ $user->isActive() ? 'Active' : 'Inactive' }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="text-muted small fw-medium">{{ $user->created_at->format('M d, Y') }}</span>
-                                        </td>
-                                        <td class="text-end pe-4">
-                                            <div class="d-flex justify-content-end gap-1">
-                                                <a href="{{ route('users.show', $user) }}" class="btn-action" data-bs-toggle="tooltip"
-                                                    title="View Profile">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                                <a href="{{ route('users.edit', $user) }}" class="btn-action edit"
-                                                    data-bs-toggle="tooltip" title="Edit User">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                @if($user->id !== auth()->id())
-                                                    <form action="{{ route('users.toggle-status', $user) }}" method="POST" class="d-inline">
-                                                        @csrf @method('PATCH')
-                                                        <button type="submit" class="btn-action" data-bs-toggle="tooltip"
-                                                            title="{{ $user->isActive() ? 'Deactivate' : 'Activate' }}">
-                                                            <i
-                                                                class="bi bi-{{ $user->isActive() ? 'toggle-on text-success' : 'toggle-off text-muted' }} fs-5"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                    <div class="text-muted small">
+                        Showing <strong>{{ $users->firstItem() ?? 0 }}</strong> - <strong>{{ $users->lastItem() ?? 0 }}</strong>
+                        of <strong>{{ $users->total() }}</strong>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <select class="form-select form-select-sm" style="width: auto; border-radius: 6px;"
+                            onchange="changePerPage(this.value)">
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 / page</option>
+                            <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30 / page</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 / page</option>
+                            <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 / page</option>
+                            <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500 / page</option>
+                            <option value="1000" {{ request('per_page') == 1000 ? 'selected' : '' }}>1000 / page</option>
+                        </select>
+                        {{ $users->links('vendor.pagination.premium-simple') }}
+                    </div>
+                </div>
+
+                <script>
+                    function changePerPage(perPage) {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('per_page', perPage);
+                        url.searchParams.delete('page');
+                        window.location.href = url.toString();
+                    }
+                </script>
+
+            @else
+                <div class="empty-state py-5 text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-people text-muted opacity-25" style="font-size: 4rem;"></i>
+                    </div>
+                    <h5 class="fw-bold text-secondary">No users found</h5>
+                    <p class="text-muted mb-4">Try adjusting your filters or search terms.</p>
+                    <a href="{{ route('users.index') }}" class="btn btn-outline-secondary btn-sm">
+                        Clear Filters
+                    </a>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Bulk Action Bar (sticky) -->
+    <div class="bulk-action-bar" id="bulkActionBar">
+        <span class="bulk-selected-count" id="selectedCount">0 Selected</span>
+        <div class="vr"></div>
+
+        <button type="button" class="btn btn-approve btn-action-pill" onclick="submitBulkAction('activate')">
+            <i class="bi bi-check-lg"></i> Activate
+        </button>
+
+        <button type="button" class="btn btn-reject btn-action-pill" onclick="submitBulkAction('deactivate')">
+            <i class="bi bi-pause-fill"></i> Deactivate
+        </button>
+
+        <button type="button" class="btn btn-info-pill btn-action-pill" onclick="submitBulkAction('promote')">
+            <i class="bi bi-graph-up-arrow"></i> Promote
+        </button>
+
+        <button type="button" class="btn btn-reject btn-action-pill" data-bs-toggle="modal"
+            data-bs-target="#bulkDeleteModal">
+            <i class="bi bi-trash3-fill"></i> Delete
+        </button>
+    </div>
+
+    <!-- Hidden Forms for Bulk Actions -->
+    <form id="bulkActivateForm" method="POST" action="{{ route('users.bulk-activate') }}" style="display: none;">
+        @csrf
+        <div id="bulkActivateInputs"></div>
+    </form>
+
+    <form id="bulkDeactivateForm" method="POST" action="{{ route('users.bulk-deactivate') }}" style="display: none;">
+        @csrf
+        <div id="bulkDeactivateInputs"></div>
+    </form>
+
+    <form id="bulkPromoteForm" method="POST" action="{{ route('users.bulk-promote') }}" style="display: none;">
+        @csrf
+        <div id="bulkPromoteInputs"></div>
+    </form>
+
+    <form id="bulkDeleteForm" method="POST" action="{{ route('users.bulk-delete') }}" style="display: none;">
+        @csrf
+        <div id="bulkDeleteInputs"></div>
+    </form>
+
+
+
+    <!-- Bulk Delete Confirmation Modal -->
+    <div class="modal fade" id="bulkDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Bulk Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to permanently delete <strong><span id="deleteCount">0</span> user(s)</strong>?
+                    </p>
+                    <p class="text-danger mb-0"><i class="bi bi-exclamation-circle me-1"></i>This action cannot be undone!
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()">
+                        <i class="bi bi-trash me-1"></i>Delete Users
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Import Match Modal -->
+    <div class="modal fade" id="importDeleteModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-file-earmark-person me-2"></i>Match Users from File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Upload your student list</strong> (Excel or CSV). Matched users will be automatically
+                        selected in the list below so you can perform bulk actions on them.
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-between align-items-center p-3 border-top">
-                        <div class="text-muted small">
-                            Showing <strong>{{ $users->firstItem() ?? 0 }}</strong> - <strong>{{ $users->lastItem() ?? 0 }}</strong>
-                            of <strong>{{ $users->total() }}</strong>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <select class="form-select form-select-sm" style="width: auto; border-radius: 6px;"
-                                onchange="changePerPage(this.value)">
-                                <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 / page</option>
-                                <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30 / page</option>
-                                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 / page</option>
-                                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 / page</option>
-                                <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500 / page</option>
-                                <option value="1000" {{ request('per_page') == 1000 ? 'selected' : '' }}>1000 / page</option>
-                            </select>
-                            {{ $users->links('vendor.pagination.premium-simple') }}
-                        </div>
-                    </div>
-
-                    <script>
-                        function changePerPage(perPage) {
-                            const url = new URL(window.location.href);
-                            url.searchParams.set('per_page', perPage);
-                            url.searchParams.delete('page');
-                            window.location.href = url.toString();
-                        }
-                    </script>
-
-                @else
-                    <div class="empty-state py-5 text-center">
+                    <form id="importDeleteForm" enctype="multipart/form-data">
+                        @csrf
                         <div class="mb-3">
-                            <i class="bi bi-people text-muted opacity-25" style="font-size: 4rem;"></i>
-                        </div>
-                        <h5 class="fw-bold text-secondary">No users found</h5>
-                        <p class="text-muted mb-4">Try adjusting your filters or search terms.</p>
-                        <a href="{{ route('users.index') }}" class="btn btn-outline-secondary btn-sm">
-                            Clear Filters
-                        </a>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Bulk Action Bar (sticky) -->
-        <!-- Bulk Action Bar (sticky) -->
-        <div id="bulkActionBar" class="position-fixed bottom-0 start-50 translate-middle-x mb-4"
-            style="display: none; z-index: 1050;">
-            <div
-                class="d-flex align-items-center gap-3 bg-dark text-white p-2 px-3 rounded-pill shadow-lg border border-secondary bg-opacity-90 backdrop-blur">
-                <!-- Selection Count -->
-                <div class="d-flex align-items-center border-end border-secondary pe-3 me-1">
-                    <span class="fw-bold me-2 text-warning"><span id="selectedCount">0</span></span>
-                    <span class="text-white-50 small me-2 d-none d-sm-inline">Selected</span>
-                    <button type="button" class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none"
-                        onclick="clearSelection()" title="Clear Selection">
-                        <i class="bi bi-x-circle-fill hover-white transition-colors"></i>
-                    </button>
-                </div>
-
-                <!-- Actions -->
-                <div class="d-flex gap-2">
-                    <button type="button"
-                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-success"
-                        onclick="submitBulkAction('activate')" title="Activate Users" style="width: 32px; height: 32px;">
-                        <i class="bi bi-check-lg fs-6"></i>
-                    </button>
-
-                    <button type="button"
-                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-warning"
-                        onclick="submitBulkAction('deactivate')" title="Deactivate Users" style="width: 32px; height: 32px;">
-                        <i class="bi bi-pause-fill fs-6"></i>
-                    </button>
-
-                    <button type="button"
-                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-info"
-                        onclick="submitBulkAction('promote')" title="Promote Users" style="width: 32px; height: 32px;">
-                        <i class="bi bi-graph-up-arrow fs-6"></i>
-                    </button>
-
-                    <div class="vr bg-secondary opacity-50 mx-1"></div>
-
-                    <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 py-1 d-flex align-items-center gap-2"
-                        data-bs-toggle="modal" data-bs-target="#bulkDeleteModal">
-                        <i class="bi bi-trash3-fill"></i> <span class="small fw-semibold d-none d-sm-inline">Delete</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <style>
-            .backdrop-blur {
-                backdrop-filter: blur(8px);
-            }
-
-            .hover-white:hover {
-                color: #fff !important;
-            }
-
-            .hover-success:hover {
-                background-color: #198754;
-                border-color: #198754;
-                color: white;
-            }
-
-            .hover-warning:hover {
-                background-color: #ffc107;
-                border-color: #ffc107;
-                color: black;
-            }
-
-            .hover-info:hover {
-                background-color: #0dcaf0;
-                border-color: #0dcaf0;
-                color: black;
-            }
-        </style>
-
-        <!-- Hidden Forms for Bulk Actions -->
-        <form id="bulkActivateForm" method="POST" action="{{ route('users.bulk-activate') }}" style="display: none;">
-            @csrf
-            <div id="bulkActivateInputs"></div>
-        </form>
-
-        <form id="bulkDeactivateForm" method="POST" action="{{ route('users.bulk-deactivate') }}" style="display: none;">
-            @csrf
-            <div id="bulkDeactivateInputs"></div>
-        </form>
-
-        <form id="bulkPromoteForm" method="POST" action="{{ route('users.bulk-promote') }}" style="display: none;">
-            @csrf
-            <div id="bulkPromoteInputs"></div>
-        </form>
-
-        <form id="bulkDeleteForm" method="POST" action="{{ route('users.bulk-delete') }}" style="display: none;">
-            @csrf
-            <div id="bulkDeleteInputs"></div>
-        </form>
-
-
-
-        <!-- Bulk Delete Confirmation Modal -->
-        <div class="modal fade" id="bulkDeleteModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Bulk Delete</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to permanently delete <strong><span id="deleteCount">0</span> user(s)</strong>?
-                        </p>
-                        <p class="text-danger mb-0"><i class="bi bi-exclamation-circle me-1"></i>This action cannot be undone!
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()">
-                            <i class="bi bi-trash me-1"></i>Delete Users
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-        <!-- Import Match Modal -->
-        <div class="modal fade" id="importDeleteModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-file-earmark-person me-2"></i>Match Users from File</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <strong>Upload your student list</strong> (Excel or CSV). Matched users will be automatically
-                            selected in the list below so you can perform bulk actions on them.
-                        </div>
-
-                        <form id="importDeleteForm" enctype="multipart/form-data">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="import_file" class="form-label">Upload Student List (Excel/CSV)</label>
-                                <input type="file" class="form-control" id="import_file" name="import_file"
-                                    accept=".xlsx,.xls,.csv" required>
-                                <div class="form-text">
-                                    File must contain a <strong>Student ID</strong> column. You may also include
-                                    <strong>Name</strong> and <strong>Email</strong> columns to help you identify users.
-                                </div>
+                            <label for="import_file" class="form-label">Upload Student List (Excel/CSV)</label>
+                            <input type="file" class="form-control" id="import_file" name="import_file"
+                                accept=".xlsx,.xls,.csv" required>
+                            <div class="form-text">
+                                File must contain a <strong>Student ID</strong> column. You may also include
+                                <strong>Name</strong> and <strong>Email</strong> columns to help you identify users.
                             </div>
-                        </form>
-                        <div id="importError" class="alert alert-danger d-none mt-2"></div>
+                        </div>
+                    </form>
+                    <div id="importError" class="alert alert-danger d-none mt-2"></div>
 
-                        <!-- Results Area -->
-                        <div id="verificationResults" class="mt-3"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="verifyImport(this)">
-                            <i class="bi bi-search me-1"></i>Process File
-                        </button>
-                    </div>
+                    <!-- Results Area -->
+                    <div id="verificationResults" class="mt-3"></div>
                 </div>
-            </div>
-        </div>
-
-
-
-        <!-- Bulk Action Bar (sticky) -->
-        <div id="bulkActionBar" class="position-fixed bottom-0 start-50 translate-middle-x mb-4"
-            style="display: none; z-index: 1050;">
-            <div
-                class="d-flex align-items-center gap-3 bg-dark text-white p-2 px-3 rounded-pill shadow-lg border border-secondary bg-opacity-90 backdrop-blur">
-                <!-- Selection Count -->
-                <div class="d-flex align-items-center border-end border-secondary pe-3 me-1">
-                    <span class="fw-bold me-2 text-warning"><span id="selectedCount">0</span></span>
-                    <span class="text-white-50 small me-2 d-none d-sm-inline">Selected</span>
-                    <button type="button" class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none"
-                        onclick="clearSelection()" title="Clear Selection">
-                        <i class="bi bi-x-circle-fill hover-white transition-colors"></i>
-                    </button>
-                </div>
-
-                <!-- Actions -->
-                <div class="d-flex gap-2">
-                    <button type="button"
-                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-success"
-                        onclick="submitBulkAction('activate')" title="Activate Users" style="width: 32px; height: 32px;">
-                        <i class="bi bi-check-lg fs-6"></i>
-                    </button>
-
-                    <button type="button"
-                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-warning"
-                        onclick="submitBulkAction('deactivate')" title="Deactivate Users" style="width: 32px; height: 32px;">
-                        <i class="bi bi-pause-fill fs-6"></i>
-                    </button>
-
-                    <button type="button"
-                        class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-info"
-                        onclick="submitBulkAction('promote')" title="Promote Users" style="width: 32px; height: 32px;">
-                        <i class="bi bi-graph-up-arrow fs-6"></i>
-                    </button>
-
-                    <div class="vr bg-secondary opacity-50 mx-1"></div>
-
-                    <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 py-1 d-flex align-items-center gap-2"
-                        data-bs-toggle="modal" data-bs-target="#bulkDeleteModal">
-                        <i class="bi bi-trash3-fill"></i> <span class="small fw-semibold d-none d-sm-inline">Delete</span>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="verifyImport(this)">
+                        <i class="bi bi-search me-1"></i>Process File
                     </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <style>
-            .backdrop-blur {
-                backdrop-filter: blur(8px);
-            }
 
-            .hover-white:hover {
-                color: #fff !important;
-            }
 
-            .hover-success:hover {
-                background-color: #198754;
-                border-color: #198754;
-                color: white;
-            }
+    <!-- Bulk Action Bar (sticky) -->
+    <div id="bulkActionBar" class="position-fixed bottom-0 start-50 translate-middle-x mb-4"
+        style="display: none; z-index: 1050;">
+        <div
+            class="d-flex align-items-center gap-3 bg-dark text-white p-2 px-3 rounded-pill shadow-lg border border-secondary bg-opacity-90 backdrop-blur">
+            <!-- Selection Count -->
+            <div class="d-flex align-items-center border-end border-secondary pe-3 me-1">
+                <span class="fw-bold me-2 text-warning"><span id="selectedCount">0</span></span>
+                <span class="text-white-50 small me-2 d-none d-sm-inline">Selected</span>
+                <button type="button" class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none"
+                    onclick="clearSelection()" title="Clear Selection">
+                    <i class="bi bi-x-circle-fill hover-white transition-colors"></i>
+                </button>
+            </div>
 
-            .hover-warning:hover {
-                background-color: #ffc107;
-                border-color: #ffc107;
-                color: black;
-            }
+            <!-- Actions -->
+            <div class="d-flex gap-2">
+                <button type="button"
+                    class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-success"
+                    onclick="submitBulkAction('activate')" title="Activate Users" style="width: 32px; height: 32px;">
+                    <i class="bi bi-check-lg fs-6"></i>
+                </button>
 
-            .hover-info:hover {
-                background-color: #0dcaf0;
-                border-color: #0dcaf0;
-                color: black;
-            }
-        </style>
+                <button type="button"
+                    class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-warning"
+                    onclick="submitBulkAction('deactivate')" title="Deactivate Users" style="width: 32px; height: 32px;">
+                    <i class="bi bi-pause-fill fs-6"></i>
+                </button>
 
-        <!-- Hidden Forms for Bulk Actions -->
-        <form id="bulkActivateForm" method="POST" action="{{ route('users.bulk-activate') }}" style="display: none;">
-            @csrf
-            @method('PATCH')
-            <div id="bulkActivateInputs"></div>
-        </form>
+                <button type="button"
+                    class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center border-0 hover-info"
+                    onclick="submitBulkAction('promote')" title="Promote Users" style="width: 32px; height: 32px;">
+                    <i class="bi bi-graph-up-arrow fs-6"></i>
+                </button>
 
-        <form id="bulkDeactivateForm" method="POST" action="{{ route('users.bulk-deactivate') }}" style="display: none;">
-            @csrf
-            @method('PATCH')
-            <div id="bulkDeactivateInputs"></div>
-        </form>
+                <div class="vr bg-secondary opacity-50 mx-1"></div>
 
-        <form id="bulkPromoteForm" method="POST" action="{{ route('users.bulk-promote') }}" style="display: none;">
-            @csrf
-            @method('PATCH')
-            <div id="bulkPromoteInputs"></div>
-        </form>
+                <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 py-1 d-flex align-items-center gap-2"
+                    data-bs-toggle="modal" data-bs-target="#bulkDeleteModal">
+                    <i class="bi bi-trash3-fill"></i> <span class="small fw-semibold d-none d-sm-inline">Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
-        <form id="bulkDeleteForm" method="POST" action="{{ route('users.bulk-delete') }}" style="display: none;">
-            @csrf
-            @method('DELETE')
-            <div id="bulkDeleteInputs"></div>
-        </form>
+    <style>
+        .backdrop-blur {
+            backdrop-filter: blur(8px);
+        }
 
-        <!-- Bulk Delete Confirmation Modal -->
-        <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirm Bulk Delete</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete <span id="deleteCount" class="fw-bold"></span> selected users?
-                        This action cannot be undone.
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()">Delete</button>
-                    </div>
+        .hover-white:hover {
+            color: #fff !important;
+        }
+
+        .hover-success:hover {
+            background-color: #198754;
+            border-color: #198754;
+            color: white;
+        }
+
+        .hover-warning:hover {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: black;
+        }
+
+        .hover-info:hover {
+            background-color: #0dcaf0;
+            border-color: #0dcaf0;
+            color: black;
+        }
+    </style>
+
+    <!-- Hidden Forms for Bulk Actions -->
+    <form id="bulkActivateForm" method="POST" action="{{ route('users.bulk-activate') }}" style="display: none;">
+        @csrf
+        @method('PATCH')
+        <div id="bulkActivateInputs"></div>
+    </form>
+
+    <form id="bulkDeactivateForm" method="POST" action="{{ route('users.bulk-deactivate') }}" style="display: none;">
+        @csrf
+        @method('PATCH')
+        <div id="bulkDeactivateInputs"></div>
+    </form>
+
+    <form id="bulkPromoteForm" method="POST" action="{{ route('users.bulk-promote') }}" style="display: none;">
+        @csrf
+        @method('PATCH')
+        <div id="bulkPromoteInputs"></div>
+    </form>
+
+    <form id="bulkDeleteForm" method="POST" action="{{ route('users.bulk-delete') }}" style="display: none;">
+        @csrf
+        @method('DELETE')
+        <div id="bulkDeleteInputs"></div>
+    </form>
+
+    <!-- Bulk Delete Confirmation Modal -->
+    <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Bulk Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete <span id="deleteCount" class="fw-bold"></span> selected users?
+                    This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()">Delete</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <script>
-            console.log('Users Page Scripts Loading...');
+    <script>
+        console.log('Users Page Scripts Loading...');
 
-            // Global selection manager
-            window.SelectionManager = {
-                storageKey: 'selected_user_ids',
-                selectedIds: new Set(),
-                init: function () {
-                    this.load();
-                    this.sync();
-                    this.update();
-                    this.bind();
-                },
-                load: function () {
-                    try {
-                        let saved = sessionStorage.getItem(this.storageKey);
-                        if (saved) {
-                            let arr = JSON.parse(saved);
-                            this.selectedIds = new Set(arr.map(String));
-                        }
-                    } catch (e) { console.error('Storage Load Error', e); }
-                },
-                save: function () {
-                    try {
-                        sessionStorage.setItem(this.storageKey, JSON.stringify(Array.from(this.selectedIds)));
-                    } catch (e) { console.error('Storage Save Error', e); }
-                },
-                sync: function () {
-                    document.querySelectorAll('.user-checkbox').forEach(cb => {
-                        cb.checked = this.selectedIds.has(cb.value);
-                    });
-                    let all = document.getElementById('selectAll');
-                    if (all) {
-                        let pageCbs = document.querySelectorAll('.user-checkbox:not(:disabled)');
-                        all.checked = pageCbs.length > 0 && Array.from(pageCbs).every(c => c.checked);
+        // Global selection manager
+        window.SelectionManager = {
+            storageKey: 'selected_user_ids',
+            selectedIds: new Set(),
+            init: function () {
+                this.load();
+                this.sync();
+                this.update();
+                this.bind();
+            },
+            load: function () {
+                try {
+                    let saved = sessionStorage.getItem(this.storageKey);
+                    if (saved) {
+                        let arr = JSON.parse(saved);
+                        this.selectedIds = new Set(arr.map(String));
                     }
-                },
-                update: function () {
-                    let count = this.selectedIds.size;
-                    ['selectedCount', 'deleteCount'].forEach(id => {
-                        let el = document.getElementById(id);
-                        if (el) el.textContent = count;
-                    });
-                    let bar = document.getElementById('bulkActionBar');
-                    if (bar) bar.style.display = count > 0 ? 'block' : 'none';
-                },
-                add: function (id) { this.selectedIds.add(String(id)); this.save(); this.update(); },
-                remove: function (id) { this.selectedIds.delete(String(id)); this.save(); this.update(); },
-                addAll: function (ids) { ids.forEach(id => this.selectedIds.add(String(id))); this.save(); this.sync(); this.update(); },
-                clear: function () { this.selectedIds.clear(); this.save(); this.sync(); this.update(); },
-                bind: function () {
-                    document.addEventListener('change', (e) => {
-                        if (e.target.classList.contains('user-checkbox')) {
-                            if (e.target.checked) this.add(e.target.value);
-                            else this.remove(e.target.value);
-                            this.sync();
-                        }
-                    });
-                    let all = document.getElementById('selectAll');
-                    if (all) {
-                        all.addEventListener('change', (e) => {
-                            document.querySelectorAll('.user-checkbox:not(:disabled)').forEach(cb => {
-                                cb.checked = e.target.checked;
-                                if (e.target.checked) this.selectedIds.add(cb.value);
-                                else this.selectedIds.delete(cb.value);
-                            });
-                            this.save(); this.update();
+                } catch (e) { console.error('Storage Load Error', e); }
+            },
+            save: function () {
+                try {
+                    sessionStorage.setItem(this.storageKey, JSON.stringify(Array.from(this.selectedIds)));
+                } catch (e) { console.error('Storage Save Error', e); }
+            },
+            sync: function () {
+                document.querySelectorAll('.user-checkbox').forEach(cb => {
+                    cb.checked = this.selectedIds.has(cb.value);
+                });
+                let all = document.getElementById('selectAll');
+                if (all) {
+                    let pageCbs = document.querySelectorAll('.user-checkbox:not(:disabled)');
+                    all.checked = pageCbs.length > 0 && Array.from(pageCbs).every(c => c.checked);
+                }
+            },
+            update: function () {
+                let count = this.selectedIds.size;
+                ['selectedCount', 'deleteCount'].forEach(id => {
+                    let el = document.getElementById(id);
+                    if (el) el.textContent = count;
+                });
+                let bar = document.getElementById('bulkActionBar');
+                if (bar) {
+                    if (count > 0) {
+                        bar.classList.add('visible');
+                    } else {
+                        bar.classList.remove('visible');
+                    }
+                }
+            },
+            add: function (id) { this.selectedIds.add(String(id)); this.save(); this.update(); },
+            remove: function (id) { this.selectedIds.delete(String(id)); this.save(); this.update(); },
+            addAll: function (ids) { ids.forEach(id => this.selectedIds.add(String(id))); this.save(); this.sync(); this.update(); },
+            clear: function () { this.selectedIds.clear(); this.save(); this.sync(); this.update(); },
+            bind: function () {
+                document.addEventListener('change', (e) => {
+                    if (e.target.classList.contains('user-checkbox')) {
+                        if (e.target.checked) this.add(e.target.value);
+                        else this.remove(e.target.value);
+                        this.sync();
+                    }
+                });
+                let all = document.getElementById('selectAll');
+                if (all) {
+                    all.addEventListener('change', (e) => {
+                        document.querySelectorAll('.user-checkbox:not(:disabled)').forEach(cb => {
+                            cb.checked = e.target.checked;
+                            if (e.target.checked) this.selectedIds.add(cb.value);
+                            else this.selectedIds.delete(cb.value);
                         });
+                        this.save(); this.update();
+                    });
+                }
+            }
+        };
+
+        window.clearSelection = function () { window.SelectionManager.clear(); };
+
+        window.submitBulkAction = function (action) {
+            let ids = Array.from(window.SelectionManager.selectedIds);
+            if (ids.length === 0) {
+                Swal.fire('Error', 'Please select at least one user', 'error');
+                return;
+            }
+            let formId, inputContainerId;
+            switch (action) {
+                case 'activate': formId = 'bulkActivateForm'; inputContainerId = 'bulkActivateInputs'; break;
+                case 'deactivate': formId = 'bulkDeactivateForm'; inputContainerId = 'bulkDeactivateInputs'; break;
+                case 'promote': formId = 'bulkPromoteForm'; inputContainerId = 'bulkPromoteInputs'; break;
+            }
+            let form = document.getElementById(formId);
+            let container = document.getElementById(inputContainerId);
+            if (form && container) {
+                container.innerHTML = '';
+                ids.forEach(id => {
+                    let input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'user_ids[]';
+                    input.value = id;
+                    container.appendChild(input);
+                });
+                form.submit();
+                window.SelectionManager.clear();
+            }
+        };
+
+        window.confirmBulkDelete = function () {
+            let ids = Array.from(window.SelectionManager.selectedIds);
+            if (ids.length === 0) {
+                Swal.fire('Error', 'Please select at least one user', 'error');
+                return;
+            }
+            let form = document.getElementById('bulkDeleteForm');
+            let container = document.getElementById('bulkDeleteInputs');
+            if (form && container) {
+                container.innerHTML = '';
+                ids.forEach(id => {
+                    let input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'user_ids[]';
+                    input.value = id;
+                    container.appendChild(input);
+                });
+                form.submit();
+                window.SelectionManager.clear();
+            }
+        };
+
+        window.verifyImport = function (btn) {
+            console.log('Button clicked:', btn);
+            // alert('DEBUG: verifyImport function called successfully.');
+
+            let form = document.getElementById('importDeleteForm');
+            let fileInput = document.getElementById('import_file');
+            let results = document.getElementById('verificationResults');
+            let errDiv = document.getElementById('importError');
+
+            if (!form || !fileInput) {
+                alert('Error: Form or File Input not found in the page.');
+                return;
+            }
+
+            if (!fileInput.files.length) {
+                alert('Please select a file first.');
+                fileInput.focus();
+                return;
+            }
+
+            let originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+            let formData = new FormData(form);
+            let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            fetch('{{ route("users.verify-import-delete") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                }
+            })
+                .then(async response => {
+                    const contentType = response.headers.get("content-type");
+                    if (!response.ok) {
+                        // Start by trying to parse JSON error (e.g. valid 422 validation error)
+                        try {
+                            const errorData = await response.json();
+                            if (errorData.message) {
+                                throw new Error(errorData.message);
+                            }
+                        } catch (ignore) { }
+
+                        // If not JSON, try text
+                        const text = await response.text();
+                        let errorMsg = 'Server Error: ' + response.status;
+                        if (text) {
+                            let match = text.match(/<title>(.*?)<\/title>/i);
+                            if (match) errorMsg += ' - ' + match[1];
+                            else errorMsg += ' - ' + text.substring(0, 100);
+                        }
+                        throw new Error(errorMsg);
                     }
-                }
-            };
-
-            window.clearSelection = function () { window.SelectionManager.clear(); };
-
-            window.submitBulkAction = function (action) {
-                let ids = Array.from(window.SelectionManager.selectedIds);
-                if (ids.length === 0) {
-                    Swal.fire('Error', 'Please select at least one user', 'error');
-                    return;
-                }
-                let formId, inputContainerId;
-                switch (action) {
-                    case 'activate': formId = 'bulkActivateForm'; inputContainerId = 'bulkActivateInputs'; break;
-                    case 'deactivate': formId = 'bulkDeactivateForm'; inputContainerId = 'bulkDeactivateInputs'; break;
-                    case 'promote': formId = 'bulkPromoteForm'; inputContainerId = 'bulkPromoteInputs'; break;
-                }
-                let form = document.getElementById(formId);
-                let container = document.getElementById(inputContainerId);
-                if (form && container) {
-                    container.innerHTML = '';
-                    ids.forEach(id => {
-                        let input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'user_ids[]';
-                        input.value = id;
-                        container.appendChild(input);
-                    });
-                    form.submit();
-                }
-            };
-
-            window.confirmBulkDelete = function () {
-                let ids = Array.from(window.SelectionManager.selectedIds);
-                if (ids.length === 0) {
-                    Swal.fire('Error', 'Please select at least one user', 'error');
-                    return;
-                }
-                let form = document.getElementById('bulkDeleteForm');
-                let container = document.getElementById('bulkDeleteInputs');
-                if (form && container) {
-                    container.innerHTML = '';
-                    ids.forEach(id => {
-                        let input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'user_ids[]';
-                        input.value = id;
-                        container.appendChild(input);
-                    });
-                    form.submit();
-                }
-            };
-
-            window.verifyImport = function (btn) {
-                console.log('Button clicked:', btn);
-                // alert('DEBUG: verifyImport function called successfully.');
-
-                let form = document.getElementById('importDeleteForm');
-                let fileInput = document.getElementById('import_file');
-                let results = document.getElementById('verificationResults');
-                let errDiv = document.getElementById('importError');
-
-                if (!form || !fileInput) {
-                    alert('Error: Form or File Input not found in the page.');
-                    return;
-                }
-
-                if (!fileInput.files.length) {
-                    alert('Please select a file first.');
-                    fileInput.focus();
-                    return;
-                }
-
-                let originalHtml = btn.innerHTML;
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-
-                let formData = new FormData(form);
-                let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-                fetch('{{ route("users.verify-import-delete") }}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': token,
-                        'Accept': 'application/json'
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        return response.json();
+                    } else {
+                        // Got success status but not JSON?
+                        const text = await response.text();
+                        throw new Error("Expected JSON but got: " + text.substring(0, 100));
                     }
                 })
-                    .then(async response => {
-                        const contentType = response.headers.get("content-type");
-                        if (!response.ok) {
-                            // Start by trying to parse JSON error (e.g. valid 422 validation error)
-                            try {
-                                const errorData = await response.json();
-                                if (errorData.message) {
-                                    throw new Error(errorData.message);
-                                }
-                            } catch (ignore) { }
-
-                            // If not JSON, try text
-                            const text = await response.text();
-                            let errorMsg = 'Server Error: ' + response.status;
-                            if (text) {
-                                let match = text.match(/<title>(.*?)<\/title>/i);
-                                if (match) errorMsg += ' - ' + match[1];
-                                else errorMsg += ' - ' + text.substring(0, 100);
-                            }
-                            throw new Error(errorMsg);
-                        }
-                        if (contentType && contentType.indexOf("application/json") !== -1) {
-                            return response.json();
+                .then(data => {
+                    if (data.success) {
+                        if (data.matched_ids && data.matched_ids.length > 0) {
+                            window.SelectionManager.addAll(data.matched_ids);
+                            results.innerHTML = '<div class="alert alert-success mt-3"><h6>Success!</h6><p>Matched <strong>' + data.count + '</strong> users.</p></div>';
                         } else {
-                            // Got success status but not JSON?
-                            const text = await response.text();
-                            throw new Error("Expected JSON but got: " + text.substring(0, 100));
+                            results.innerHTML = '<div class="alert alert-warning mt-3"><h6>No matches found.</h6></div>';
                         }
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            if (data.matched_ids && data.matched_ids.length > 0) {
-                                window.SelectionManager.addAll(data.matched_ids);
-                                results.innerHTML = '<div class="alert alert-success mt-3"><h6>Success!</h6><p>Matched <strong>' + data.count + '</strong> users.</p></div>';
-                            } else {
-                                results.innerHTML = '<div class="alert alert-warning mt-3"><h6>No matches found.</h6></div>';
-                            }
-                        } else {
-                            alert('Error: ' + (data.message || 'Verification failed.'));
-                        }
-                    })
-                    .catch(e => {
-                        console.error('Fetch Error:', e);
-                        // Clean up the error message for display
-                        let msg = e.message.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-                        alert('System Error: ' + msg);
-                    })
-                    .finally(() => {
-                        btn.disabled = false;
-                        btn.innerHTML = originalHtml;
-                    });
-            };
+                    } else {
+                        alert('Error: ' + (data.message || 'Verification failed.'));
+                    }
+                })
+                .catch(e => {
+                    console.error('Fetch Error:', e);
+                    // Clean up the error message for display
+                    let msg = e.message.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                    alert('System Error: ' + msg);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                });
+        };
 
-            document.addEventListener('DOMContentLoaded', () => {
-                window.SelectionManager.init();
-            });
-        </script>
+        document.addEventListener('DOMContentLoaded', () => {
+            window.SelectionManager.init();
+        });
+    </script>
 @endsection

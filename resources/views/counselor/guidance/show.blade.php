@@ -529,11 +529,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for ($year = 1; $year <= 4; $year++)
+                                    @for ($year = 1; $year <= 6; $year++)
                                         <tr class="transition-colors hover:bg-gray-50 {{ $student->year_level == $year ? 'bg-green-50/50' : '' }}">
                                             <td class="font-bold text-gray-700 py-3">
                                                 @php
-                                                    $suffixes = [1 => 'st', 2 => 'nd', 3 => 'rd', 4 => 'th'];
+                                                    $suffixes = [1 => 'st', 2 => 'nd', 3 => 'rd', 4 => 'th', 5 => 'th', 6 => 'th'];
                                                     $seminarMap = ['New Student Orientation Program', 'IDREAMS', '10C', 'LEADS', 'IMAGE'];
                                                     $seminarStyles = [
                                                         'IDREAMS' => 'rgba(13, 202, 240, 0.05)',
@@ -567,19 +567,35 @@
                                                     style="{{ $isActiveYear ? '--cell-bg: ' . $seminarStyles[$seminar] : '' }}">
                                                     <div class="d-flex flex-column align-items-center justify-content-center gap-1">
                                                         @if($isActiveYear)
-                                                            <div class="form-check d-flex justify-content-center m-0">
-                                                                <input type="checkbox" 
-                                                                       class="attendance-checkbox checkbox-custom form-check-input shadow-sm"
-                                                                       style="width: 1.25rem; height: 1.25rem; border-color: #adb5bd;"
-                                                                       data-year="{{ $year }}"
-                                                                       data-seminar="{{ $seminar }}"
-                                                                       {{ $attendance ? 'checked' : '' }}>
+                                                            <div class="d-flex flex-column align-items-center gap-2">
+                                                                <!-- Checkbox for Toggling Attendance (Attended/Not Attended) -->
+                                                                <div class="form-check d-flex justify-content-center m-0">
+                                                                    <input type="checkbox" 
+                                                                           class="attendance-checkbox checkbox-custom form-check-input shadow-sm"
+                                                                           style="width: 1.25rem; height: 1.25rem; border-color: #adb5bd;"
+                                                                           data-year="{{ $year }}"
+                                                                           data-seminar="{{ $seminar }}"
+                                                                           {{ $attendance ? 'checked' : '' }}>
+                                                                </div>
+
+                                                                @if($attendance)
+                                                                    <!-- Badge Display -->
+                                                                    @if($status === 'completed')
+                                                                        <span class="status-badge status-badge-completed">Completed</span>
+                                                                    @elseif($status === 'unlocked')
+                                                                        <span class="status-badge bg-info text-white">Unlocked</span>
+                                                                    @else
+                                                                         <!-- Attended but Locked -->
+                                                                        <span class="status-badge status-badge-attended" title="Locked - Student cannot evaluate yet">Attended</span>
+                                                                        <!-- Unlock Button -->
+                                                                        <button type="button" class="btn btn-xs btn-outline-success p-0 px-2 rounded-pill mt-1" 
+                                                                                style="font-size: 0.65rem; font-weight: bold;"
+                                                                                onclick="unlockEvaluation('{{ $year }}', '{{ $seminar }}')">
+                                                                            <i class="bi bi-unlock-fill"></i> Unlock
+                                                                        </button>
+                                                                    @endif
+                                                                @endif
                                                             </div>
-                                                            @if($attendance)
-                                                                <span class="status-badge {{ $status === 'completed' ? 'status-badge-completed' : 'status-badge-attended' }}">
-                                                                    {{ $status === 'completed' ? 'Completed' : 'Attended' }}
-                                                                </span>
-                                                            @endif
                                                         @else
                                                             <div class="opacity-10 text-gray-300">
                                                                 <i class="bi bi-dash-lg" style="font-size: 1.25rem;"></i>
@@ -955,29 +971,53 @@
                         year_level: year,
                         seminar_name: seminarName,
                         attended: attended,
-                        seminar_schedule_id: scheduleId
+                        seminar_schedule_id: scheduleId,
+                        // By default, checkbox toggles 'attended' (locked) status
+                        // If we want to unlock, we use the unlockEvaluation function
+                        status: attended ? 'attended' : null 
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        if (currentCheckbox) {
-                            currentCheckbox.checked = attended;
-                        } else {
-                             const cb = document.querySelector(`.attendance-checkbox[data-year="${year}"][data-seminar="${seminarName}"]`);
-                             if(cb) cb.checked = attended;
-                        }
+                       window.location.reload(); // Reload to update badges/buttons correctly
                     } else {
                         alert('Failed to update attendance');
-                        if (currentCheckbox) currentCheckbox.checked = !attended;
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('An error occurred');
-                    if (currentCheckbox) currentCheckbox.checked = !attended;
                 });
             }
+
+            // Expose to window for onclick
+            window.unlockEvaluation = function(year, seminarName) {
+                if(!confirm('Unlock evaluation for ' + seminarName + '? The student will be notified.')) return;
+
+                fetch(`{{ route('counselor.guidance.update', $student) }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        year_level: year,
+                        seminar_name: seminarName,
+                        attended: true,
+                        status: 'unlocked'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Failed to unlock');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            };
         });
     </script>
 @endsection

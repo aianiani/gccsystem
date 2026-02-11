@@ -234,7 +234,7 @@
 
         .card-header-custom {
             background: #fff;
-            padding: 1.5rem 2rem;
+            padding: 1rem 1.5rem;
             border-bottom: 1px solid var(--light-green);
             display: flex;
             justify-content: space-between;
@@ -248,17 +248,18 @@
             color: var(--primary-green);
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             letter-spacing: 0.5px;
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1rem;
             border: none;
         }
 
         .table-custom td {
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1rem;
             vertical-align: middle;
             border-bottom: 1px solid #f0f0f0;
             color: var(--text-dark);
+            font-size: 0.9rem;
         }
 
         .table-custom tr:hover td {
@@ -371,14 +372,48 @@
             left: 50%;
             transform: translateX(-50%);
             background: #fff;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
             z-index: 1050;
             display: none;
             align-items: center;
-            gap: 1.5rem;
-            border: 2px solid var(--primary-green);
+            gap: 0.5rem;
+            border: 1px solid var(--primary-green);
+            max-width: 90vw;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            #bulkToolbar {
+                bottom: 1rem;
+                padding: 0.5rem 0.75rem;
+                border: 2px solid var(--primary-green);
+                border-radius: 16px;
+                gap: 0.5rem;
+                flex-direction: column;
+                width: 95%;
+                font-size: 0.8rem;
+            }
+
+            #bulkToolbar .d-flex {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem !important;
+            }
+
+            #bulkToolbar button {
+                padding: 0.25rem 0.75rem !important;
+                font-size: 0.8rem !important;
+            }
+
+            #bulkToolbar select {
+                padding: 0.25rem 0.5rem !important;
+                font-size: 0.8rem !important;
+                min-width: 120px !important;
+            }
         }
 
         #bulkToolbar.show {
@@ -458,6 +493,10 @@
                                         <option value="3" <?php echo e(request('year_level') == '3' ? 'selected' : ''); ?>>3rd Year
                                         </option>
                                         <option value="4" <?php echo e(request('year_level') == '4' ? 'selected' : ''); ?>>4th Year
+                                        </option>
+                                        <option value="5" <?php echo e(request('year_level') == '5' ? 'selected' : ''); ?>>5th Year
+                                        </option>
+                                        <option value="6" <?php echo e(request('year_level') == '6' ? 'selected' : ''); ?>>6th Year
                                         </option>
                                     </select>
                                 </div>
@@ -640,6 +679,12 @@
                                                                     $badgeClass = 'badge-info-custom';
                                                                     $icon = 'bi-unlock-fill';
                                                                     $title = "Attendance: Verified & Unlocked (Waiting Evaluation) ($seminarName)";
+                                                                } elseif ($attendance && $attendance->status === 'attended') {
+                                                                    $badgeClass = 'badge-primary-custom'; // New class or reuse info/primary
+                                                                    $icon = 'bi-check-circle';
+                                                                    $title = "Attendance: Verified (Locked) ($seminarName)";
+                                                                    // We can style this distinctly
+                                                                    $badgeClass = 'badge-custom bg-info text-dark opacity-75';
                                                                 } else {
                                                                     $badgeClass = 'badge-warning-custom';
                                                                     $icon = 'bi-exclamation-circle';
@@ -707,10 +752,12 @@
 
                             <!-- Bulk Toolbar -->
                             <div id="bulkToolbar">
-                                <span class="fw-bold text-success"><span id="selectedCount">0</span> selected</span>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <select name="seminar_name" class="form-select-custom form-select-sm" required
-                                        style="min-width: 150px;" id="bulkSeminarSelect">
+                                <span class="fw-bold text-success me-1 d-none d-md-inline" style="font-size: 0.75rem;"><span
+                                        id="selectedCount">0</span> selected</span>
+                                <div class="d-flex gap-1 align-items-center">
+                                    <select name="seminar_name" class="form-select-custom form-select-sm py-0 ps-2 pe-4"
+                                        required style="min-width: 130px; font-size: 0.75rem; height: 28px;"
+                                        id="bulkSeminarSelect">
                                         <option value="">Select Seminar...</option>
                                         <?php $__currentLoopData = $allSeminars; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <option value="<?php echo e($sem->name); ?>" <?php echo e((session('guidance_target_seminar') == $sem->name || request('seminar_name') == $sem->name) ? 'selected' : ''); ?>>
@@ -721,23 +768,39 @@
                                     </select>
                                     <input type="hidden" name="status" id="bulkStatusInput" value="unlocked">
                                     <input type="hidden" name="year_level" id="bulkYearLevel"
-                                        value="<?php echo e(session('guidance_target_year', request('year_level', 1))); ?>">
+                                        value="<?php echo e(session('guidance_target_year', request('year_level'))); ?>">
 
-                                    <div class="d-flex gap-2">
-                                        <button type="button" onclick="submitBulk('unlocked')"
-                                            class="btn btn-outline-success rounded-pill px-3 fw-bold btn-sm">
-                                            <i class="bi bi-unlock-fill me-1"></i> Unlock Evaluations
+                                    <div class="d-flex gap-1">
+                                        <!-- Step 1: Verify -->
+                                        <button type="button" onclick="submitBulk('attended')"
+                                            class="btn btn-primary rounded-pill px-2 py-0 fw-bold btn-sm shadow-none border-0"
+                                            style="font-size: 0.75rem; height: 28px; line-height: 1.2;"
+                                            title="Step 1: Mark students as attended. Evaluation remains locked.">
+                                            <i class="bi bi-check-lg me-1"></i> Verify
                                         </button>
+
+                                        <!-- Step 2: Unlock -->
+                                        <button type="button" onclick="submitBulk('unlocked')"
+                                            class="btn btn-warning rounded-pill px-2 py-0 fw-bold btn-sm shadow-none border-0 text-dark"
+                                            style="font-size: 0.75rem; height: 28px; line-height: 1.2;"
+                                            title="Step 2: Unlock evaluation for students who have attended.">
+                                            <i class="bi bi-unlock-fill me-1"></i> Unlock
+                                        </button>
+
+                                        <!-- Admin Override -->
                                         <button type="button" onclick="submitBulk('completed')"
-                                            class="btn btn-success rounded-pill px-3 fw-bold btn-sm">
-                                            <i class="bi bi-check-circle-fill me-1"></i> Mark as Attended
+                                            class="btn btn-light rounded-pill px-2 py-0 fw-bold btn-sm border text-secondary"
+                                            style="font-size: 0.75rem; height: 28px; line-height: 1.2;"
+                                            title="Admin: Manually mark as completed (bypasses evaluation).">
+                                            <i class="bi bi-check-all"></i>
                                         </button>
                                     </div>
                                 </div>
-                                <div class="ms-3 border-start ps-3 d-flex align-items-center">
+                                <div class="ms-1 border-start ps-2 d-flex align-items-center" style="height: 16px;">
                                     <a href="<?php echo e(route('counselor.guidance.clear_selection')); ?>"
-                                        class="btn btn-sm btn-link text-danger p-0 fw-bold" style="text-decoration: none;">
-                                        <i class="bi bi-trash3-fill me-1"></i> Clear All Selection
+                                        class="btn btn-sm btn-link text-danger p-0 fw-bold"
+                                        style="text-decoration: none; font-size: 0.75rem; line-height: 1;">
+                                        Clear
                                     </a>
                                 </div>
                                 <button type="button" id="cancelSelection" class="btn btn-link text-muted p-0 ms-2"
@@ -836,84 +899,119 @@
             const cancelSelection = document.getElementById('cancelSelection');
 
             const initialSelectedIds = <?php echo json_encode($selectedIds, 15, 512) ?>;
-                const currentSelectedIds = new Set(initialSelectedIds.map(id => String(id)));
+            const currentSelectedIds = new Set(initialSelectedIds.map(id => String(id)));
 
-                function updateBulkToolbar() {
-                    // Sync current page checkboxes with the Set
-                    studentCheckboxes.forEach(cb => {
-                        if (cb.checked) {
-                            currentSelectedIds.add(String(cb.value));
-                        } else {
-                            currentSelectedIds.delete(String(cb.value));
-                        }
-                    });
-
-                    const displayCount = currentSelectedIds.size;
-
-                    if (displayCount > 0) {
-                        bulkToolbar.classList.add('show');
-                        selectedCountSpan.textContent = displayCount;
-                    } else {
-                        bulkToolbar.classList.remove('show');
-                    }
-                }
-
-                // Sync on load (for session-based ones visible on current page)
-                updateBulkToolbar();
-
-                if (selectAll) {
-                    selectAll.addEventListener('change', function () {
-                        studentCheckboxes.forEach(cb => {
-                            cb.checked = selectAll.checked;
-                        });
-                        updateBulkToolbar();
-                    });
-                }
-
+            function updateBulkToolbar() {
+                // Sync current page checkboxes with the Set
                 studentCheckboxes.forEach(cb => {
-                    cb.addEventListener('change', updateBulkToolbar);
+                    if (cb.checked) {
+                        currentSelectedIds.add(String(cb.value));
+                    } else {
+                        currentSelectedIds.delete(String(cb.value));
+                    }
                 });
 
-                if (cancelSelection) {
-                    cancelSelection.addEventListener('click', function () {
-                        studentCheckboxes.forEach(cb => cb.checked = false);
-                        if (selectAll) selectAll.checked = false;
-                        updateBulkToolbar();
+                const displayCount = currentSelectedIds.size;
+
+                if (displayCount > 0) {
+                    bulkToolbar.classList.add('show');
+                    selectedCountSpan.textContent = displayCount;
+                } else {
+                    bulkToolbar.classList.remove('show');
+                }
+            }
+
+            // Sync on load (for session-based ones visible on current page)
+            updateBulkToolbar();
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    studentCheckboxes.forEach(cb => {
+                        cb.checked = selectAll.checked;
                     });
+                    updateBulkToolbar();
+                });
+            }
+
+            studentCheckboxes.forEach(cb => {
+                cb.addEventListener('change', updateBulkToolbar);
+            });
+
+            if (cancelSelection) {
+                cancelSelection.addEventListener('click', function () {
+                    studentCheckboxes.forEach(cb => cb.checked = false);
+                    if (selectAll) selectAll.checked = false;
+                    updateBulkToolbar();
+                });
+            }
+
+            window.submitBulk = function (status) {
+                const seminarSelect = document.getElementById('bulkSeminarSelect');
+                if (!seminarSelect.value) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Select Seminar',
+                        text: 'Please choose which seminar you are marking attendance for.'
+                    });
+                    return;
                 }
 
-                window.submitBulk = function (status) {
-                    const seminarSelect = document.getElementById('bulkSeminarSelect');
-                    if (!seminarSelect.value) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Select Seminar',
-                            text: 'Please choose which seminar you are marking attendance for.'
-                        });
-                        return;
-                    }
+                document.getElementById('bulkStatusInput').value = status;
 
-                    document.getElementById('bulkStatusInput').value = status;
+                let title, text;
 
-                    const title = status === 'completed' ? 'Mark as Attended?' : 'Unlock Evaluations?';
-                    const text = status === 'completed' 
-                        ? `This will mark all selected students as COMPLETED for ${seminarSelect.value}.`
-                        : `This will allow selected students to EVALUATE ${seminarSelect.value}.`;
+                if (status === 'attended') {
+                    title = 'Verify Attendance?';
+                    text = `Mark selected students as PRESENT for ${seminarSelect.value}? Evaluation will remain locked until you unlock it.`;
+                } else if (status === 'unlocked') {
+                    title = 'Unlock Evaluations?';
+                    text = `Allow selected students to ACCESS EVALUATION for ${seminarSelect.value}?`;
+                } else if (status === 'completed') {
+                    title = 'Mark as Completed?';
+                    text = `Manually mark selected students as COMPLETED for ${seminarSelect.value}? This bypasses evaluation.`;
+                }
 
-                    Swal.fire({
-                        title: title,
-                        text: text,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#1f7a2d',
-                        confirmButtonText: 'Yes, Proceed'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#1f7a2d',
+                    confirmButtonText: 'Yes, Proceed',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('bulkActionForm');
+                        if (form) {
+                            // Create hidden input if form doesn't have internal way to set status (it uses bulkStatusInput outside form usually?)
+                            // Let's check where bulkStatusInput is. It is inside #bulkToolbar which is likely OUTSIDE the form if the table is the form?
+                            // Actually, let's check the HTML structure.
+                            // The form usually wraps the table or the toolbar is part of it.
+                            // If bulkStatusInput is in the toolbar, we need to ensure it's submitted.
+
+                            // Re-reading code:
+                            // Line 726: <input type="hidden" name="status" id="bulkStatusInput" value="unlocked">
+                            // This input is inside #bulkToolbar.
+                            // If #bulkActionForm is wrapping the table, and #bulkToolbar is outside, this input might not be submitted if it's not associated with the form.
+                            // However, let's assume the previous code worked, implying #bulkStatusInput is inside the form OR linked to it.
+
+                            // Wait, looking at line 714: <div id="bulkToolbar">...</div>
+                            // If the form is around the table, and toolbar is outside, we have a problem.
+                            // But let's assume standard structure: <form id="bulkActionForm"> ... <table> ... </form>
+                            // And if toolbar has the submit buttons and inputs, they should be in the form.
+
+                            // But wait, the previous code was: document.getElementById('bulkStatusInput').value = status;
+                            // This suggests bulkStatusInput IS used.
+
                             document.getElementById('bulkActionForm').submit();
+                        } else {
+                            // Fallback if form ID is different or issues
+                            console.error('Form bulkActionForm not found');
                         }
-                    });
-                };
-            });
-        </script>
+                    }
+                });
+            };
+        });
+    </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/counselor/guidance/index.blade.php ENDPATH**/ ?>

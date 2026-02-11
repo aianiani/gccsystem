@@ -145,11 +145,26 @@ class GuidanceController extends Controller
         $attendances = SeminarAttendance::where('user_id', $student->id)->get();
 
         $attendanceMatrix = [];
+        // Map seminars to their target year level for display
+        $seminarYearMap = [
+            'New Student Orientation Program' => 1,
+            'IDREAMS' => 1,
+            '10C' => 2,
+            'LEADS' => 3,
+            'IMAGE' => 4,
+            // Add other seminars if any
+        ];
+
         foreach ($attendances as $attendance) {
-            $attendanceMatrix[$attendance->year_level][$attendance->seminar_name] = [
-                'attended' => true,
-                'schedule_id' => $attendance->seminar_schedule_id,
+            // Determine the correct year level for this seminar
+            // Use mapped year if available, otherwise fallback to stored year_level
+            $displayYear = $seminarYearMap[$attendance->seminar_name] ?? $attendance->year_level;
+
+            $attendanceMatrix[$displayYear][$attendance->seminar_name] = [
+                'attended' => true, // Still needed?
+                'schedule_id' => $attendance->seminar_schedule_id ?? null,
                 'status' => $attendance->status,
+                'attended_at' => $attendance->attended_at,
             ];
         }
 
@@ -172,6 +187,7 @@ class GuidanceController extends Controller
             'year_level' => 'required|integer|min:1|max:4',
             'attended' => 'required|boolean',
             'seminar_schedule_id' => 'nullable|exists:seminar_schedules,id',
+            'status' => 'nullable|string|in:attended,unlocked,completed',
         ]);
 
         if ($request->attended) {
@@ -181,23 +197,27 @@ class GuidanceController extends Controller
                 'year_level' => $request->year_level,
             ])->first();
 
-            if (!$attendance || $attendance->status !== 'completed') {
-                $status = $attendance ? $attendance->status : 'unlocked';
+            // Default status is 'attended' (Locked) for new records.
+            // If explicit status is provided, use it.
+            // If record exists, preserve current status unless explicit status provided.
+            $defaultStatus = $attendance ? $attendance->status : 'attended';
+            $status = $request->input('status', $defaultStatus);
 
-                SeminarAttendance::updateOrCreate(
-                    [
-                        'user_id' => $student->id,
-                        'seminar_name' => $request->seminar_name,
-                        'year_level' => $request->year_level,
-                    ],
-                    [
-                        'attended_at' => now(),
-                        'seminar_schedule_id' => $request->seminar_schedule_id,
-                        'status' => 'unlocked', // Force to unlocked for student to evaluate
-                    ]
-                );
+            SeminarAttendance::updateOrCreate(
+                [
+                    'user_id' => $student->id,
+                    'seminar_name' => $request->seminar_name,
+                    'year_level' => $request->year_level,
+                ],
+                [
+                    'attended_at' => now(),
+                    'seminar_schedule_id' => $request->seminar_schedule_id,
+                    'status' => $status,
+                ]
+            );
 
-                // Send notification
+            // Only notify if status is explicitly becoming 'unlocked'
+            if ($status === 'unlocked' && (!$attendance || $attendance->status !== 'unlocked')) {
                 $student->notify(new \App\Notifications\SeminarUnlocked($request->seminar_name));
             }
         } else {

@@ -54,12 +54,12 @@ class MessageController extends Controller
     {
         $request->validate([
             'message' => 'nullable|string|max:2000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ], [
             'message.max' => 'Message cannot exceed 2000 characters.',
             'image.image' => 'The file must be an image.',
             'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif.',
-            'image.max' => 'The image may not be greater than 2MB.',
+            'image.max' => 'The image may not be greater than 10MB.',
         ]);
 
         $otherUser = User::findOrFail($userId);

@@ -267,6 +267,43 @@ unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="mb-4">
+                                        <label class="form-label">Nature of Problem</label>
+                                        
+                                        <select name="nature_of_problem" class="form-control">
+                                            <?php $__currentLoopData = ['Academic', 'Family', 'Personal / Emotional', 'Social', 'Psychological', 'Other']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($option); ?>" <?php echo e(old('nature_of_problem', $appointment->nature_of_problem ?? '') == $option ? 'selected' : ''); ?>>
+                                                    <?php echo e($option); ?></option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label">Appointment Type</label>
+                                        <select name="appointment_type" id="appointment_type" class="form-control"
+                                            onchange="toggleReferralFields()">
+                                            <?php $__currentLoopData = ['Walk-in', 'Called-in', 'Referral']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($type); ?>" <?php echo e(old('appointment_type', $appointment->appointment_type ?? '') == $type ? 'selected' : ''); ?>>
+                                                    <?php echo e($type); ?></option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </select>
+                                    </div>
+
+                                    <div id="referral_fields"
+                                        style="display: <?php echo e(old('appointment_type', $appointment->appointment_type ?? '') === 'Referral' ? 'block' : 'none'); ?>;">
+                                        <div class="mb-4">
+                                            <label class="form-label">Referrer Name</label>
+                                            <input type="text" name="referrer_name" class="form-control"
+                                                value="<?php echo e(old('referrer_name', $appointment->referrer_name ?? '')); ?>"
+                                                placeholder="e.g. Prof. Cruz">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label">Reason for Referral</label>
+                                            <textarea name="referral_reason" class="form-control"
+                                                rows="2"><?php echo e(old('referral_reason', $appointment->referral_reason ?? '')); ?></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
                                         <label for="notes" class="form-label">Notes</label>
                                         <textarea name="notes" id="notes" class="form-control" rows="4"
                                             placeholder="Add any notes about this rescheduling..."><?php echo e(old('notes', $appointment->notes)); ?></textarea>
@@ -299,5 +336,18 @@ unset($__errorArgs, $__bag); ?>
             </div>
         </div>
     </div>
+    </div>
+
+    <script>
+        function toggleReferralFields() {
+            const type = document.getElementById('appointment_type').value;
+            const fields = document.getElementById('referral_fields');
+            if (type === 'Referral') {
+                fields.style.display = 'block';
+            } else {
+                fields.style.display = 'none';
+            }
+        }
+    </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\LENOVO\Laravel Projects\gccsystem\resources\views/counselor/appointments/edit.blade.php ENDPATH**/ ?>

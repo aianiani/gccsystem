@@ -76,19 +76,16 @@ class RegistrationApprovalController extends Controller
         $perPage = $request->get('per_page', 15);
         $perPage = in_array($perPage, [15, 30, 50, 100]) ? $perPage : 15;
 
-        $pendingQuery = User::where('role', 'student')
-            ->where('registration_status', 'pending')
+        $pendingQuery = User::where('registration_status', 'pending')
             ->with(['approvedBy'])
             ->select('users.*')
             ->selectSub(function ($query) {
                 $query->selectRaw('COUNT(*)')
                     ->from('users as u2')
                     ->whereColumn('u2.id', '!=', 'users.id')
-                    ->where('u2.role', 'student')
                     ->where(function ($q) {
                         $q->whereColumn('u2.email', 'users.email')
-                            ->orWhereRaw('u2.name LIKE CONCAT("%", users.name, "%")')
-                            ->orWhereRaw('(users.student_id IS NOT NULL AND u2.student_id = users.student_id)');
+                            ->orWhereRaw('u2.name LIKE CONCAT("%", users.name, "%")');
                     });
             }, 'duplicate_count');
 
@@ -102,8 +99,7 @@ class RegistrationApprovalController extends Controller
         }
 
         // OPTIMIZED: Approved registrations
-        $approvedQuery = User::where('role', 'student')
-            ->where('registration_status', 'approved')
+        $approvedQuery = User::where('registration_status', 'approved')
             ->with(['approvedBy']);
 
         $applyFilters($approvedQuery);
@@ -111,8 +107,7 @@ class RegistrationApprovalController extends Controller
         $approvedRegistrations = $approvedQuery->paginate($perPage, ['*'], 'approved_page')->withQueryString();
 
         // OPTIMIZED: Rejected registrations
-        $rejectedQuery = User::where('role', 'student')
-            ->where('registration_status', 'rejected')
+        $rejectedQuery = User::where('registration_status', 'rejected')
             ->with(['approvedBy']);
 
         $applyFilters($rejectedQuery);
@@ -121,16 +116,14 @@ class RegistrationApprovalController extends Controller
 
         // OPTIMIZED: Cache filter options for 1 hour to avoid repeated queries
         $colleges = \Cache::remember('registration_approvals_colleges', 3600, function () {
-            return User::where('role', 'student')
-                ->whereNotNull('college')
+            return User::whereNotNull('college')
                 ->distinct()
                 ->orderBy('college')
                 ->pluck('college');
         });
 
         $courses = \Cache::remember('registration_approvals_courses', 3600, function () {
-            return User::where('role', 'student')
-                ->whereNotNull('course')
+            return User::whereNotNull('course')
                 ->distinct()
                 ->orderBy('course')
                 ->pluck('course');
@@ -150,9 +143,8 @@ class RegistrationApprovalController extends Controller
      */
     public function show(User $user)
     {
-        if ($user->role !== 'student') {
-            return redirect()->back()->with('error', 'Only student registrations can be reviewed.');
-        }
+        // Removed role check to allow viewing any pending user
+        // if ($user->role !== 'student') { ... }
 
         return view('admin.registration-approvals.show', compact('user'));
     }
@@ -162,9 +154,8 @@ class RegistrationApprovalController extends Controller
      */
     public function approve(Request $request, User $user)
     {
-        if ($user->role !== 'student') {
-            return redirect()->back()->with('error', 'Only student registrations can be approved.');
-        }
+        // Removed role check to allow approving any user
+        // if ($user->role !== 'student') { ... }
 
         if ($user->registration_status !== 'pending') {
             return redirect()->back()->with('error', 'This registration is not pending approval.');
@@ -202,9 +193,8 @@ class RegistrationApprovalController extends Controller
      */
     public function reject(Request $request, User $user)
     {
-        if ($user->role !== 'student') {
-            return redirect()->back()->with('error', 'Only student registrations can be rejected.');
-        }
+        // Removed role check to allow rejecting any user
+        // if ($user->role !== 'student') { ... }
 
         if ($user->registration_status !== 'pending') {
             return redirect()->back()->with('error', 'This registration is not pending approval.');
@@ -373,8 +363,7 @@ class RegistrationApprovalController extends Controller
             }
 
             // Match against pending registrations
-            $pendingStudents = User::where('role', 'student')
-                ->where('registration_status', 'pending')
+            $pendingStudents = User::where('registration_status', 'pending')
                 ->get();
 
             $matchedIds = [];
@@ -461,15 +450,13 @@ class RegistrationApprovalController extends Controller
     public function statistics()
     {
         $stats = [
-            'total_pending' => User::where('role', 'student')->where('registration_status', 'pending')->count(),
-            'total_approved' => User::where('role', 'student')->where('registration_status', 'approved')->count(),
-            'total_rejected' => User::where('role', 'student')->where('registration_status', 'rejected')->count(),
-            'pending_today' => User::where('role', 'student')
-                ->where('registration_status', 'pending')
+            'total_pending' => User::where('registration_status', 'pending')->count(),
+            'total_approved' => User::where('registration_status', 'approved')->count(),
+            'total_rejected' => User::where('registration_status', 'rejected')->count(),
+            'pending_today' => User::where('registration_status', 'pending')
                 ->whereDate('created_at', today())
                 ->count(),
-            'approved_today' => User::where('role', 'student')
-                ->where('registration_status', 'approved')
+            'approved_today' => User::where('registration_status', 'approved')
                 ->whereDate('approved_at', today())
                 ->count(),
         ];

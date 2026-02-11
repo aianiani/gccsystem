@@ -1371,8 +1371,8 @@
             color: var(--white);
             font-weight: 600;
             text-align: center;
-            padding: 0.75rem 0;
-            font-size: 0.9rem;
+            padding: 0.5rem 0;
+            font-size: 0.85rem;
         }
 
         .calendar-days {
@@ -1391,9 +1391,9 @@
             border: 1px solid var(--gray-100);
             transition: all 0.3s ease;
             position: relative;
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             font-weight: 500;
-            min-height: 55px;
+            min-height: 20px;
         }
 
         .calendar-day:hover:not(.disabled) {
@@ -1450,35 +1450,72 @@
 
         .time-slots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 0.75rem;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
         }
 
         .time-slot {
-            padding: 1rem;
-            border: 1px solid var(--gray-100);
+            padding: 1.25rem 1rem;
+            border: 2px solid #e9ecef;
             border-radius: 12px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background: var(--white);
-            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #2c5016;
+            line-height: 1.5;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .time-slot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(31, 122, 45, 0.05) 0%, rgba(31, 122, 45, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .time-slot:hover {
             border-color: var(--forest-green);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(31, 122, 45, 0.15);
+        }
+
+        .time-slot:hover::before {
+            opacity: 1;
         }
 
         .time-slot.selected {
-            background: var(--forest-green);
+            background: linear-gradient(135deg, var(--forest-green) 0%, #1f7a2d 100%);
             color: var(--white);
             border-color: var(--forest-green);
+            box-shadow: 0 4px 16px rgba(31, 122, 45, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .time-slot.selected::before {
+            opacity: 0;
         }
 
         .time-slot.disabled {
             background: #f8f9fa;
-            color: #ccc;
+            color: #adb5bd;
             cursor: not-allowed;
+            border-color: #e9ecef;
+            opacity: 0.6;
+        }
+
+        .time-slot.disabled:hover {
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         /* Summary Styles */
@@ -1637,12 +1674,26 @@
             .time-slot:hover,
             .counselor-card:hover {
                 transform: none !important;
-                box-shadow: none !important;
+            }
+
+            .time-slot:hover {
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
             }
 
             .calendar-day.available:hover {
                 background: var(--yellow-maize-light);
                 color: var(--text-dark);
+            }
+
+            /* Time slot responsive adjustments */
+            .time-slots-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 0.75rem;
+            }
+
+            .time-slot {
+                padding: 1rem 0.75rem;
+                font-size: 0.875rem;
             }
 
             /* Aggressive whitespace reduction for mobile */
@@ -2002,852 +2053,852 @@
                 saveFormData(); // Save progress when step changes
                 updateButtons();
                 updateActionButtonsForStep(step); // Call the new function here
-        // Reload calendar if on step 3 and counselor is selected
-                        if(currentStep === 3 && selectedCounselor) {
-                        loadAvailableDates(true); // Preserve existing selection if any
-                    }
-                }
-
-                function updateButtons() {
-                    const backBtn = document.getElementById('backButton');
-                    const nextBtn = document.getElementById('nextButton');
-
-                    if (backBtn) {
-                        backBtn.style.display = currentStep === 1 ? 'none' : 'flex';
-                        backBtn.disabled = false;
-                        backBtn.style.pointerEvents = 'auto';
-                    }
-
-                    if (nextBtn) {
-                        // Always ensure Next button is visible and on the right
-                        nextBtn.style.display = 'flex';
-                        nextBtn.style.visibility = 'visible';
-                        nextBtn.style.marginLeft = 'auto';
-                        nextBtn.disabled = false;
-                        nextBtn.style.pointerEvents = 'auto';
-                        nextBtn.style.cursor = 'pointer';
-                        // Show visual feedback if can't proceed
-                        if (!canProceed()) {
-                            nextBtn.style.opacity = '0.6';
-                        } else {
-                            nextBtn.style.opacity = '1';
-                        }
-                    }
-                }
-
-                function canProceed() {
-                    switch (currentStep) {
-                        case 1:
-                            // Check guardian 1 fields
-                            const guardian1Name = document.querySelector('input[name="guardian1_name"]')?.value;
-                            const guardian1Relationship = document.querySelector('select[name="guardian1_relationship"]')?.value;
-                            const guardian1Contact = document.querySelector('input[name="guardian1_contact"]')?.value;
-
-                            console.log('Step 1 validation:', {
-                                guardian1Name,
-                                guardian1Relationship,
-                                guardian1Contact
-                            });
-
-                            if (!guardian1Name || !guardian1Relationship || !guardian1Contact) {
-                                console.log('Missing guardian 1 info');
-                                return false;
-                            }
-
-                            // Check nature of problem
-                            const natureOfProblem = document.querySelector('input[name="nature_of_problem"]:checked')?.value;
-                            console.log('Nature of problem:', natureOfProblem);
-
-                            if (!natureOfProblem) {
-                                console.log('Missing nature of problem');
-                                return false;
-                            }
-                            if (natureOfProblem === 'Other') {
-                                const otherSpecify = document.querySelector('[name="nature_of_problem_other"]')?.value;
-                                if (!otherSpecify || otherSpecify.trim() === '') {
-                                    console.log('Missing nature of problem other');
-                                    return false;
-                                }
-                            }
-
-                            // Check appointment type
-                            const appointmentType = document.querySelector('input[name="appointment_type"]:checked')?.value;
-                            console.log('Appointment type:', appointmentType);
-
-                            if (!appointmentType) {
-                                console.log('Missing appointment type');
-                                return false;
-                            }
-                            if (appointmentType === 'Referral') {
-                                const referralReason = document.querySelector('[name="referral_reason"]')?.value;
-                                const referrerName = document.querySelector('[name="referrer_name"]')?.value;
-                                if (!referralReason || referralReason.trim() === '') {
-                                    console.log('Missing referral reason');
-                                    return false;
-                                }
-                                if (!referrerName || referrerName.trim() === '') {
-                                    console.log('Missing referrer name');
-                                    return false;
-                                }
-                            }
-
-                            console.log('Step 1 validation passed!');
-                            return true;
-                        case 2: return selectedCounselor !== null;
-                        case 3: return selectedDate !== null && selectedTime !== null;
-                        case 4: return true;
-                        default: return false;
-                    }
-                }
-
-                // Counselor selection
-                console.log('Setting up counselor selection...');
-                const counselorCards = document.querySelectorAll('.counselor-card');
-                console.log('Found counselor cards:', counselorCards.length);
-
-                counselorCards.forEach((card, index) => {
-                    console.log(`Setting up card ${index}:`, card);
-
-                    card.addEventListener('click', function (e) {
-                        console.log('Counselor card clicked!');
-
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        // Remove selection from all cards
-                        document.querySelectorAll('.counselor-card').forEach(c => {
-                            c.classList.remove('selected');
-                        });
-
-                        // Select this card
-                        this.classList.add('selected');
-
-                        // Store counselor data
-                        selectedCounselor = {
-                            id: this.dataset.counselorId,
-                            name: this.querySelector('h4').textContent
-                        };
-
-                        console.log('Selected counselor:', selectedCounselor);
-
-                        // Update counselor info immediately
-                        updateCounselorInfo();
-
-                        // Update hidden field
-                        syncHiddenFields();
-                        updateButtons();
-                    });
-                });
-
-                function syncHiddenFields() {
-                    const counselorField = document.getElementById('selectedCounselorId');
-                    const scheduledAtField = document.getElementById('scheduled_at');
-
-                    if (counselorField && selectedCounselor) {
-                        counselorField.value = selectedCounselor.id;
-                    }
-                    if (scheduledAtField && selectedTime) {
-                        scheduledAtField.value = selectedTime;
-                    }
-                }
-
-                // Navigation buttons
-                const backButton = document.getElementById('backButton');
-                const nextButton = document.getElementById('nextButton');
-
-                if (backButton) {
-                    backButton.addEventListener('click', function () {
-                        console.log('Back button clicked');
-                        if (currentStep > 1) {
-                            showStep(currentStep - 1);
-                        }
-                    });
-                }
-
-                if (nextButton) {
-                    nextButton.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Next button clicked, current step:', currentStep);
-
-                        if (!canProceed()) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Incomplete Form',
-                                text: 'Please complete all required fields before proceeding.',
-                                confirmButtonColor: '#1f7a2d'
-                            });
-                            return false;
-                        }
-
-                        if (currentStep === 2 && selectedCounselor) {
-                            // Load available dates when moving from counselor selection to date selection
-                            loadAvailableDates();
-                        }
-
-                        if (currentStep === 3 && selectedTime) {
-                            // Update summary when moving to confirmation
-                            updateSummary();
-                        }
-
-                        if (currentStep < 4) {
-                            showStep(currentStep + 1);
-                        } else if (currentStep === 4) {
-                            // Ensure scheduled_at is set
-                            const scheduledAtField = document.getElementById('scheduled_at');
-                            if (!scheduledAtField.value && selectedTime) {
-                                scheduledAtField.value = selectedTime;
-                            }
-
-                            if (!scheduledAtField.value) {
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Missing Information',
-                                    text: 'Please select a date and time for your appointment.',
-                                    confirmButtonColor: '#1f7a2d'
-                                });
-                                return false;
-                            }
-
-                            // Show the confirmation modal instead of direct submit
-                            const confirmModal = new bootstrap.Modal(document.getElementById('appointmentConfirmModal'));
-
-                            // Populate modal fields
-                            document.getElementById('modalCounselor').textContent = selectedCounselor ? selectedCounselor.name : 'Not selected';
-                            document.getElementById('modalDate').textContent = selectedDate ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not selected';
-
-                            if (selectedSlot) {
-                                const slotStart = new Date(selectedSlot.start + (selectedSlot.start.endsWith('+08:00') ? '' : '+08:00'));
-                                const slotEnd = new Date(selectedSlot.end + (selectedSlot.end.endsWith('+08:00') ? '' : '+08:00'));
-                                const startTimeStr = slotStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Manila' });
-                                const endTimeStr = slotEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Manila' });
-                                document.getElementById('modalTime').textContent = `${startTimeStr} - ${endTimeStr}`;
-                            }
-
-                            const appointmentTypeRadio = document.querySelector('input[name="appointment_type"]:checked');
-                            document.getElementById('modalType').textContent = appointmentTypeRadio ? appointmentTypeRadio.value : 'Not selected';
-                            document.getElementById('modalNotes').textContent = document.getElementById('appointmentNotes').value || 'No notes';
-
-                            confirmModal.show();
-                        }
-                        return false;
-                    });
-                }
-
-                // Edit appointment
-                const editAppointmentBtn = document.getElementById('editAppointment');
-                if (editAppointmentBtn) {
-                    editAppointmentBtn.addEventListener('click', function () {
-                        console.log('Edit button clicked');
-                        showStep(1);
-                        // Reset selections
-                        selectedCounselor = null;
-                        selectedDate = null;
-                        selectedTime = null;
-                        selectedSlot = null; // Reset selectedSlot
-                        document.querySelectorAll('.counselor-card').forEach(c => {
-                            c.classList.remove('selected');
-                        });
-                        updateButtons();
-                    });
-                }
-
-                // Load available dates for selected counselor
-                function loadAvailableDates(preserveSelection = false) {
-                    if (!selectedCounselor) {
-                        console.log('No counselor selected, skipping date loading');
-                        return;
-                    }
-
-                    console.log('Loading available dates for counselor:', selectedCounselor.id);
-
-                    // Hide time slots when counselor/available dates change
-                    const timeSlotsWrapper = document.getElementById('timeSlotsWrapper');
-                    if (timeSlotsWrapper && !preserveSelection) {
-                        timeSlotsWrapper.style.display = 'none';
-                    }
-                    if (!preserveSelection) {
-                        // Only reset if NOT preserving (i.e. user explicitly clicked a counselor)
-                        selectedDate = null;
-                        selectedTime = null;
-                        selectedSlot = null;
-                    }
-
-                    fetch(`/appointments/available-slots/${selectedCounselor.id}`)
-                        .then(res => res.json())
-                        .then(slots => {
-                            console.log('Received slots:', slots);
-                            // Extract unique dates from slots
-                            const availableDates = [...new Set(slots.map(slot =>
-                                slot.start.split('T')[0]
-                            ))].sort();
-
-                            console.log('Available dates:', availableDates);
-                            renderCalendar(availableDates);
-                        })
-                        .catch((error) => {
-                            console.error('Error loading available dates:', error);
-                            renderCalendar([]);
-                        });
-                }
-
-                // Global variables for calendar navigation
-                let currentCalendarDate = new Date();
-                let availableDates = [];
-
-                // Initialize calendar navigation
-                function initializeCalendarNavigation() {
-                    const prevBtn = document.getElementById('prevMonth');
-                    const nextBtn = document.getElementById('nextMonth');
-
-                    if (prevBtn) {
-                        prevBtn.addEventListener('click', () => {
-                            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-                            renderCalendar(availableDates);
-                        });
-                    }
-
-                    if (nextBtn) {
-                        nextBtn.addEventListener('click', () => {
-                            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-                            renderCalendar(availableDates);
-                        });
-                    }
-                }
-
-                // Dynamic calendar rendering
-                function renderCalendar(dates) {
-                    const calendarDays = document.getElementById('calendarDays');
-                    if (!calendarDays) {
-                        console.log('Calendar days element not found');
-                        return;
-                    }
-
-                    // Store available dates globally
-                    availableDates = dates || [];
-
-                    const currentMonth = currentCalendarDate.getMonth();
-                    const currentYear = currentCalendarDate.getFullYear();
-                    const today = new Date();
-
-                    // Update month display
-                    const monthElement = document.getElementById('currentMonth');
-                    if (monthElement) {
-                        monthElement.textContent = currentCalendarDate.toLocaleDateString('en-US', {
-                            month: 'long',
-                            year: 'numeric'
-                        });
-                    }
-
-                    // Clear calendar
-                    calendarDays.innerHTML = '';
-
-                    // Get first day of month and number of days
-                    const firstDay = new Date(currentYear, currentMonth, 1);
-                    const lastDay = new Date(currentYear, currentMonth + 1, 0);
-                    const startDate = new Date(firstDay);
-                    startDate.setDate(startDate.getDate() - firstDay.getDay());
-
-                    // Generate calendar days
-                    for (let i = 0; i < 42; i++) {
-                        const date = new Date(startDate);
-                        date.setDate(startDate.getDate() + i);
-
-                        const dayElement = document.createElement('div');
-                        dayElement.className = 'calendar-day';
-                        dayElement.textContent = date.getDate();
-
-                        // Check if date is in current month
-                        if (date.getMonth() !== currentMonth) {
-                            dayElement.classList.add('disabled');
-                        } else if (date >= today) {
-                            // Check if date is available (use local date, not UTC)
-                            const dateStr = date.toLocaleDateString('en-CA'); // Returns YYYY-MM-DD format
-                            if (availableDates.includes(dateStr)) {
-                                dayElement.classList.add('available');
-                                dayElement.addEventListener('click', () => selectDate(date));
-                            } else {
-                                dayElement.classList.add('disabled');
-                            }
-                        } else {
-                            // Past dates
-                            dayElement.classList.add('disabled');
-                        }
-
-                        // Highlight selected date
-                        if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
-                            dayElement.classList.add('selected');
-                        }
-
-                        calendarDays.appendChild(dayElement);
-                    }
-                }
-
-                function selectDate(date) {
-                    console.log('Date selected:', date);
-                    selectedDate = date;
-
-                    // Update visual selection
-                    document.querySelectorAll('.calendar-day').forEach(day => {
-                        day.classList.remove('selected');
-                    });
-                    // Use the passed event or currentTarget if possible, otherwise find the element
-                    if (window.event && window.event.currentTarget) {
-                        window.event.currentTarget.classList.add('selected');
-                    }
-
-                    // Update counselor name in time selection step
-                    updateCounselorInfo();
-
-                    // Show time slots in the same step
-                    const timeSlotsWrapper = document.getElementById('timeSlotsWrapper');
-                    if (timeSlotsWrapper) {
-                        timeSlotsWrapper.style.display = 'block';
-                        // Scroll to time slots
-                        timeSlotsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-
-                    loadTimeSlots();
-                    saveFormData();
-                    updateButtons();
-                }
-
-                // Load time slots for selected date
-                function loadTimeSlots() {
-                    if (!selectedCounselor || !selectedDate) {
-                        console.log('Missing counselor or date');
-                        return;
-                    }
-
-                    console.log('Loading time slots for date:', selectedDate);
-
-                    const loading = document.getElementById('timeSlotsLoading');
-                    const grid = document.getElementById('timeSlotsGrid');
-
-                    if (loading) loading.style.display = 'block';
-                    if (grid) grid.innerHTML = '';
-
-                    // Format date for API (use local date, not UTC)
-                    const dateStr = selectedDate.toLocaleDateString('en-CA'); // Returns YYYY-MM-DD format
-
-                    fetch(`/appointments/available-slots/${selectedCounselor.id}`)
-                        .then(res => res.json())
-                        .then(slots => {
-                            if (loading) loading.style.display = 'none';
-
-                            console.log('All slots received:', slots);
-                            console.log('Looking for date:', dateStr);
-
-                            const daySlots = slots.filter(slot => {
-                                const slotDate = slot.start.split('T')[0];
-                                console.log('Checking slot:', slot, 'date part:', slotDate, 'matches:', slotDate === dateStr);
-                                return slotDate === dateStr;
-                            });
-
-                            console.log('Filtered time slots for date:', daySlots);
-
-                            if (!grid) return;
-
-                            if (daySlots.length === 0) {
-                                grid.innerHTML = '<div class="text-center text-muted">No available slots for this date</div>';
-                                return;
-                            }
-
-                            // Sort slots by time
-                            daySlots.sort();
-
-                            daySlots.forEach(slot => {
-                                const timeSlot = document.createElement('div');
-                                timeSlot.className = 'time-slot';
-                                if (slot.booked) {
-                                    timeSlot.classList.add('disabled');
-                                }
-                                // Parse the availability slot start and end times
-                                const startDate = new Date(slot.start.replace('T', ' '));
-                                const endDate = new Date(slot.end.replace('T', ' '));
-                                const startTimeStr = startDate.toLocaleTimeString('en-US', {
-                                    hour: 'numeric',
-                                    minute: '2-digit',
-                                    hour12: true,
-                                    timeZone: 'Asia/Manila' // Use Philippine timezone
-                                });
-                                const endTimeStr = endDate.toLocaleTimeString('en-US', {
-                                    hour: 'numeric',
-                                    minute: '2-digit',
-                                    hour12: true,
-                                    timeZone: 'Asia/Manila' // Use Philippine timezone
-                                });
-                                timeSlot.textContent = `${startTimeStr} - ${endTimeStr}`;
-
-                                // Highlight if this is the restored selected slot
-                                if (selectedSlot && selectedSlot.start === slot.start) {
-                                    timeSlot.classList.add('selected');
-                                }
-
-                                if (!slot.booked) {
-                                    timeSlot.addEventListener('click', () => selectTimeSlot(timeSlot, slot));
-                                }
-                                grid.appendChild(timeSlot);
-                            });
-                        })
-                        .catch((error) => {
-                            console.error('Error loading time slots:', error);
-                            if (loading) loading.style.display = 'none';
-                            if (grid) grid.innerHTML = '<div class="text-center text-danger">Error loading time slots</div>';
-                        });
-                }
-
-                function selectTimeSlot(element, slot) {
-                    console.log('Time slot selected:', slot);
-
-                    document.querySelectorAll('.time-slot').forEach(el => {
-                        el.classList.remove('selected');
-                    });
-                    element.classList.add('selected');
-                    // Save the full slot object
-                    selectedSlot = slot;
-                    // For form submission, use slot.start (with timezone)
-                    let slotWithTZ = slot.start;
-                    if (!slotWithTZ.endsWith('+08:00') && !slotWithTZ.includes('+')) {
-                        slotWithTZ = slotWithTZ + '+08:00';
-                    }
-                    selectedTime = slotWithTZ;
-
-                    // Update the hidden fields for form submission
-                    syncHiddenFields();
-
-                    saveFormData();
-                    updateButtons();
-                }
-
-                // Update counselor info in time selection step
-                function updateCounselorInfo() {
-                    if (selectedCounselor) {
-                        const selectedCounselorName = document.getElementById('selectedCounselorName');
-                        if (selectedCounselorName) {
-                            selectedCounselorName.textContent = selectedCounselor.name;
-                        }
-                    }
-
-                    if (selectedDate) {
-                        const selectedDateElement = document.getElementById('selectedDate');
-                        if (selectedDateElement) {
-                            selectedDateElement.textContent =
-                                `- ${selectedDate.toLocaleDateString('en-US', {
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                })}`;
-                        }
-                    }
-                }
-
-                // Update summary with selected data
-                function updateSummary() {
-                    // Update date
-                    if (selectedDate) {
-                        const summaryDate = document.getElementById('summaryDate');
-                        if (summaryDate) {
-                            summaryDate.textContent = selectedDate.toLocaleDateString('en-US', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            });
-                        }
-                    }
-
-                    if (selectedSlot) {
-                        const summaryTime = document.getElementById('summaryTime');
-                        if (summaryTime) {
-                            // Parse as Asia/Manila time
-                            const slotStart = new Date(selectedSlot.start + (selectedSlot.start.endsWith('+08:00') ? '' : '+08:00'));
-                            const slotEnd = new Date(selectedSlot.end + (selectedSlot.end.endsWith('+08:00') ? '' : '+08:00'));
-                            const startTimeStr = slotStart.toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true,
-                                timeZone: 'Asia/Manila'
-                            });
-                            const endTimeStr = slotEnd.toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true,
-                                timeZone: 'Asia/Manila'
-                            });
-                            summaryTime.textContent = `${startTimeStr} - ${endTimeStr}`;
-                        }
-                    }
-
-                    if (selectedCounselor) {
-                        const summaryCounselor = document.getElementById('summaryCounselor');
-                        const selectedCounselorName = document.getElementById('selectedCounselorName');
-                        if (summaryCounselor) summaryCounselor.textContent = selectedCounselor.name;
-                        if (selectedCounselorName) selectedCounselorName.textContent = selectedCounselor.name;
-                    }
-
-                    if (selectedDate) {
-                        const selectedDateElement = document.getElementById('selectedDate');
-                        if (selectedDateElement) {
-                            selectedDateElement.textContent =
-                                `- ${selectedDate.toLocaleDateString('en-US', {
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                })}`;
-                        }
-                    }
-
-                    // Update nature of problem
-                    const natureOfProblemRadio = document.querySelector('input[name="nature_of_problem"]:checked');
-                    const summaryNatureOfProblem = document.getElementById('summaryNatureOfProblem');
-                    if (summaryNatureOfProblem) {
-                        if (natureOfProblemRadio) {
-                            let natureOfProblem = natureOfProblemRadio.value;
-                            // If "Other" is selected, append the specified text
-                            if (natureOfProblem === 'Other') {
-                                const otherSpecify = document.querySelector('[name="nature_of_problem_other"]')?.value;
-                                if (otherSpecify && otherSpecify.trim() !== '') {
-                                    natureOfProblem = `Other: ${otherSpecify}`;
-                                }
-                            }
-                            summaryNatureOfProblem.textContent = natureOfProblem;
-                        } else {
-                            summaryNatureOfProblem.textContent = 'Not selected';
-                        }
-                    }
-
-                    // Update Appointment Type
-                    const appointmentTypeRadio = document.querySelector('input[name="appointment_type"]:checked');
-                    const summaryAppointmentType = document.getElementById('summaryAppointmentType');
-                    const summaryReferralReasonContainer = document.getElementById('summaryReferralReasonContainer');
-                    const summaryReferralReason = document.getElementById('summaryReferralReason');
-
-                    if (summaryAppointmentType) {
-                        if (appointmentTypeRadio) {
-                            summaryAppointmentType.textContent = appointmentTypeRadio.value;
-
-                            if (appointmentTypeRadio.value === 'Referral') {
-                                if (summaryReferralReasonContainer) summaryReferralReasonContainer.style.display = 'flex';
-                                const referralReasonText = document.querySelector('[name="referral_reason"]')?.value;
-                                const referrerNameText = document.querySelector('[name="referrer_name"]')?.value;
-                                if (summaryReferralReason) {
-                                    summaryReferralReason.innerHTML = (referralReasonText || 'Not provided') +
-                                        (referrerNameText ? `<br><small class="text-muted">Referred by: ${referrerNameText}</small>` : '');
-                                }
-                            } else {
-                                if (summaryReferralReasonContainer) summaryReferralReasonContainer.style.display = 'none';
-                            }
-                        } else {
-                            summaryAppointmentType.textContent = 'Not selected';
-                            if (summaryReferralReasonContainer) summaryReferralReasonContainer.style.display = 'none';
-                        }
-                    }
-
-                    // Update Guardian 1 information
-                    const guardian1Name = document.querySelector('input[name="guardian1_name"]')?.value;
-                    const guardian1Relationship = document.querySelector('select[name="guardian1_relationship"]')?.value;
-                    const guardian1Contact = document.querySelector('input[name="guardian1_contact"]')?.value;
-                    const guardian1RelationshipOther = document.querySelector('input[name="guardian1_relationship_other"]')?.value;
-                    const summaryGuardian1 = document.getElementById('summaryGuardian1');
-
-                    if (summaryGuardian1) {
-                        if (guardian1Name && guardian1Relationship && guardian1Contact) {
-                            let relationship = guardian1Relationship;
-                            // If relationship is "Other", use the specified text
-                            if (guardian1Relationship === 'Other' && guardian1RelationshipOther && guardian1RelationshipOther.trim() !== '') {
-                                relationship = guardian1RelationshipOther;
-                            }
-                            summaryGuardian1.textContent = `${guardian1Name} (${relationship}) - ${guardian1Contact}`;
-                        } else {
-                            summaryGuardian1.textContent = 'Not provided';
-                        }
-                    }
-                }
-
-                // Initialize
-                updateButtons();
-                initializeCalendarNavigation();
-
-                // Make sure buttons are clickable
-                const nextBtnInit = document.getElementById('nextButton');
-                const backBtnInit = document.getElementById('backButton');
-                if (nextBtnInit) {
-                    nextBtnInit.style.pointerEvents = 'auto';
-                    nextBtnInit.style.cursor = 'pointer';
-                    nextBtnInit.removeAttribute('disabled');
-                }
-                if (backBtnInit) {
-                    backBtnInit.style.pointerEvents = 'auto';
-                    backBtnInit.style.cursor = 'pointer';
-                }
-
-                console.log('Appointment scheduler initialized');
-                console.log('Next button:', nextBtnInit);
-                console.log('Back button:', backBtnInit);
-            });
-
-            // Replace Next button with Submit on last step
-            function updateActionButtonsForStep(step) {
-                var nextBtn = document.getElementById('nextButton');
-                if (!nextBtn) return;
-
-                if (step === 4) {
-                    nextBtn.innerHTML = '<span id="nextButtonText">Submit</span><i class="bi bi-check-circle ms-2" id="nextButtonIcon"></i>';
-                } else {
-                    nextBtn.innerHTML = '<span id="nextButtonText">Next</span><i class="bi bi-arrow-right" id="nextButtonIcon"></i>';
+                // Reload calendar if on step 3 and counselor is selected
+                if (currentStep === 3 && selectedCounselor) {
+                    loadAvailableDates(true); // Preserve existing selection if any
                 }
             }
 
-            // Add event listener for modal confirmation
-            // Remove success modal logic, redirect to dashboard on success
+            function updateButtons() {
+                const backBtn = document.getElementById('backButton');
+                const nextBtn = document.getElementById('nextButton');
 
-            document.addEventListener('DOMContentLoaded', function () {
-                // Only prevent form submission if it's not the final step
-                const appointmentForm = document.getElementById('appointmentBookingForm');
-                if (appointmentForm) {
-                    appointmentForm.addEventListener('submit', function (event) {
-                        // Only prevent if we're not on the final step
-                        const currentStepNav = parseInt(document.querySelector('.nav-step.active')?.dataset.step || '1');
-                        if (currentStepNav < 4) {
-                            event.preventDefault();
-                            return false;
-                        }
-                    });
+                if (backBtn) {
+                    backBtn.style.display = currentStep === 1 ? 'none' : 'flex';
+                    backBtn.disabled = false;
+                    backBtn.style.pointerEvents = 'auto';
                 }
 
-                var confirmBtn = document.getElementById('confirmSubmitAppointment');
-                if (confirmBtn) {
-                    confirmBtn.addEventListener('click', function (event) {
-                        event.preventDefault();
+                if (nextBtn) {
+                    // Always ensure Next button is visible and on the right
+                    nextBtn.style.display = 'flex';
+                    nextBtn.style.visibility = 'visible';
+                    nextBtn.style.marginLeft = 'auto';
+                    nextBtn.disabled = false;
+                    nextBtn.style.pointerEvents = 'auto';
+                    nextBtn.style.cursor = 'pointer';
+                    // Show visual feedback if can't proceed
+                    if (!canProceed()) {
+                        nextBtn.style.opacity = '0.6';
+                    } else {
+                        nextBtn.style.opacity = '1';
+                    }
+                }
+            }
 
-                        // Show loading state on the confirm button
-                        confirmBtn.disabled = true;
-                        confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+            function canProceed() {
+                switch (currentStep) {
+                    case 1:
+                        // Check guardian 1 fields
+                        const guardian1Name = document.querySelector('input[name="guardian1_name"]')?.value;
+                        const guardian1Relationship = document.querySelector('select[name="guardian1_relationship"]')?.value;
+                        const guardian1Contact = document.querySelector('input[name="guardian1_contact"]')?.value;
 
-                        // Update hidden field one last time
+                        console.log('Step 1 validation:', {
+                            guardian1Name,
+                            guardian1Relationship,
+                            guardian1Contact
+                        });
+
+                        if (!guardian1Name || !guardian1Relationship || !guardian1Contact) {
+                            console.log('Missing guardian 1 info');
+                            return false;
+                        }
+
+                        // Check nature of problem
+                        const natureOfProblem = document.querySelector('input[name="nature_of_problem"]:checked')?.value;
+                        console.log('Nature of problem:', natureOfProblem);
+
+                        if (!natureOfProblem) {
+                            console.log('Missing nature of problem');
+                            return false;
+                        }
+                        if (natureOfProblem === 'Other') {
+                            const otherSpecify = document.querySelector('[name="nature_of_problem_other"]')?.value;
+                            if (!otherSpecify || otherSpecify.trim() === '') {
+                                console.log('Missing nature of problem other');
+                                return false;
+                            }
+                        }
+
+                        // Check appointment type
+                        const appointmentType = document.querySelector('input[name="appointment_type"]:checked')?.value;
+                        console.log('Appointment type:', appointmentType);
+
+                        if (!appointmentType) {
+                            console.log('Missing appointment type');
+                            return false;
+                        }
+                        if (appointmentType === 'Referral') {
+                            const referralReason = document.querySelector('[name="referral_reason"]')?.value;
+                            const referrerName = document.querySelector('[name="referrer_name"]')?.value;
+                            if (!referralReason || referralReason.trim() === '') {
+                                console.log('Missing referral reason');
+                                return false;
+                            }
+                            if (!referrerName || referrerName.trim() === '') {
+                                console.log('Missing referrer name');
+                                return false;
+                            }
+                        }
+
+                        console.log('Step 1 validation passed!');
+                        return true;
+                    case 2: return selectedCounselor !== null;
+                    case 3: return selectedDate !== null && selectedTime !== null;
+                    case 4: return true;
+                    default: return false;
+                }
+            }
+
+            // Counselor selection
+            console.log('Setting up counselor selection...');
+            const counselorCards = document.querySelectorAll('.counselor-card');
+            console.log('Found counselor cards:', counselorCards.length);
+
+            counselorCards.forEach((card, index) => {
+                console.log(`Setting up card ${index}:`, card);
+
+                card.addEventListener('click', function (e) {
+                    console.log('Counselor card clicked!');
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Remove selection from all cards
+                    document.querySelectorAll('.counselor-card').forEach(c => {
+                        c.classList.remove('selected');
+                    });
+
+                    // Select this card
+                    this.classList.add('selected');
+
+                    // Store counselor data
+                    selectedCounselor = {
+                        id: this.dataset.counselorId,
+                        name: this.querySelector('h4').textContent
+                    };
+
+                    console.log('Selected counselor:', selectedCounselor);
+
+                    // Update counselor info immediately
+                    updateCounselorInfo();
+
+                    // Update hidden field
+                    syncHiddenFields();
+                    updateButtons();
+                });
+            });
+
+            function syncHiddenFields() {
+                const counselorField = document.getElementById('selectedCounselorId');
+                const scheduledAtField = document.getElementById('scheduled_at');
+
+                if (counselorField && selectedCounselor) {
+                    counselorField.value = selectedCounselor.id;
+                }
+                if (scheduledAtField && selectedTime) {
+                    scheduledAtField.value = selectedTime;
+                }
+            }
+
+            // Navigation buttons
+            const backButton = document.getElementById('backButton');
+            const nextButton = document.getElementById('nextButton');
+
+            if (backButton) {
+                backButton.addEventListener('click', function () {
+                    console.log('Back button clicked');
+                    if (currentStep > 1) {
+                        showStep(currentStep - 1);
+                    }
+                });
+            }
+
+            if (nextButton) {
+                nextButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Next button clicked, current step:', currentStep);
+
+                    if (!canProceed()) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Incomplete Form',
+                            text: 'Please complete all required fields before proceeding.',
+                            confirmButtonColor: '#1f7a2d'
+                        });
+                        return false;
+                    }
+
+                    if (currentStep === 2 && selectedCounselor) {
+                        // Load available dates when moving from counselor selection to date selection
+                        loadAvailableDates();
+                    }
+
+                    if (currentStep === 3 && selectedTime) {
+                        // Update summary when moving to confirmation
+                        updateSummary();
+                    }
+
+                    if (currentStep < 4) {
+                        showStep(currentStep + 1);
+                    } else if (currentStep === 4) {
+                        // Ensure scheduled_at is set
                         const scheduledAtField = document.getElementById('scheduled_at');
                         if (!scheduledAtField.value && selectedTime) {
                             scheduledAtField.value = selectedTime;
                         }
 
-                        // Clear local storage BEFORE submitting effectively
-                        if (typeof STORAGE_KEY !== 'undefined') {
-                            localStorage.removeItem(STORAGE_KEY);
+                        if (!scheduledAtField.value) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Missing Information',
+                                text: 'Please select a date and time for your appointment.',
+                                confirmButtonColor: '#1f7a2d'
+                            });
+                            return false;
                         }
 
-                        // Submit the ACTUAL form
-                        document.getElementById('appointmentBookingForm').submit();
-                    });
-                }
+                        // Show the confirmation modal instead of direct submit
+                        const confirmModal = new bootstrap.Modal(document.getElementById('appointmentConfirmModal'));
 
-                // Consolidated listeners for conditional fields
-                // Nature of Problem "Other" field
-                const problemRadios = document.querySelectorAll('input[name="nature_of_problem"]');
-                const problemOtherField = document.getElementById('problem_other_specify');
-                const natureOfProblemOther = document.getElementById('nature_of_problem_other');
+                        // Populate modal fields
+                        document.getElementById('modalCounselor').textContent = selectedCounselor ? selectedCounselor.name : 'Not selected';
+                        document.getElementById('modalDate').textContent = selectedDate ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not selected';
 
-                problemRadios.forEach(radio => {
-                    radio.addEventListener('change', function () {
-                        if (this.value === 'Other') {
-                            if (problemOtherField) problemOtherField.style.display = 'block';
-                            if (natureOfProblemOther) natureOfProblemOther.setAttribute('required', 'required');
-                        } else {
-                            if (problemOtherField) problemOtherField.style.display = 'none';
-                            if (natureOfProblemOther) {
-                                natureOfProblemOther.removeAttribute('required');
-                                natureOfProblemOther.value = '';
-                            }
+                        if (selectedSlot) {
+                            const slotStart = new Date(selectedSlot.start + (selectedSlot.start.endsWith('+08:00') ? '' : '+08:00'));
+                            const slotEnd = new Date(selectedSlot.end + (selectedSlot.end.endsWith('+08:00') ? '' : '+08:00'));
+                            const startTimeStr = slotStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Manila' });
+                            const endTimeStr = slotEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Manila' });
+                            document.getElementById('modalTime').textContent = `${startTimeStr} - ${endTimeStr}`;
                         }
-                    });
+
+                        const appointmentTypeRadio = document.querySelector('input[name="appointment_type"]:checked');
+                        document.getElementById('modalType').textContent = appointmentTypeRadio ? appointmentTypeRadio.value : 'Not selected';
+                        document.getElementById('modalNotes').textContent = document.getElementById('appointmentNotes').value || 'No notes';
+
+                        confirmModal.show();
+                    }
+                    return false;
                 });
+            }
 
-                // Guardian Relationship "Other" fields
-                const guardian1Relationship = document.getElementById('guardian1_relationship');
-                const guardian1Other = document.getElementById('guardian1_relationship_other');
-                if (guardian1Relationship) {
-                    guardian1Relationship.addEventListener('change', function () {
-                        if (this.value === 'Other') {
-                            if (guardian1Other) {
-                                guardian1Other.style.display = 'block';
-                                guardian1Other.setAttribute('required', 'required');
-                            }
-                        } else {
-                            if (guardian1Other) {
-                                guardian1Other.style.display = 'none';
-                                guardian1Other.removeAttribute('required');
-                                guardian1Other.value = '';
-                            }
-                        }
+            // Edit appointment
+            const editAppointmentBtn = document.getElementById('editAppointment');
+            if (editAppointmentBtn) {
+                editAppointmentBtn.addEventListener('click', function () {
+                    console.log('Edit button clicked');
+                    showStep(1);
+                    // Reset selections
+                    selectedCounselor = null;
+                    selectedDate = null;
+                    selectedTime = null;
+                    selectedSlot = null; // Reset selectedSlot
+                    document.querySelectorAll('.counselor-card').forEach(c => {
+                        c.classList.remove('selected');
                     });
-                }
-
-                const guardian2Relationship = document.getElementById('guardian2_relationship');
-                const guardian2Other = document.getElementById('guardian2_relationship_other');
-                if (guardian2Relationship) {
-                    guardian2Relationship.addEventListener('change', function () {
-                        if (this.value === 'Other') {
-                            if (guardian2Other) guardian2Other.style.display = 'block';
-                        } else {
-                            if (guardian2Other) {
-                                guardian2Other.style.display = 'none';
-                                guardian2Other.value = '';
-                            }
-                        }
-                    });
-                }
-
-                // Appointment Type "Referral" field
-                const typeRadios = document.querySelectorAll('input[name="appointment_type"]');
-                const referralReasonContainer = document.getElementById('referral_reason_container');
-                const referralReason = document.getElementById('referral_reason');
-                const referrerName = document.getElementById('referrer_name');
-
-                typeRadios.forEach(radio => {
-                    radio.addEventListener('change', function () {
-                        if (this.value === 'Referral') {
-                            if (referralReasonContainer) referralReasonContainer.style.display = 'block';
-                            if (referralReason) referralReason.setAttribute('required', 'required');
-                            if (referrerName) referrerName.setAttribute('required', 'required');
-                        } else {
-                            if (referralReasonContainer) referralReasonContainer.style.display = 'none';
-                            if (referralReason) {
-                                referralReason.removeAttribute('required');
-                                referralReason.value = '';
-                            }
-                            const referrerName = document.getElementById('referrer_name');
-                            if (referrerName) {
-                                referrerName.removeAttribute('required');
-                                referrerName.value = '';
-                            }
-                        }
-                    });
+                    updateButtons();
                 });
+            }
 
-                // Sidebar toggle for mobile
-                const sidebar = document.querySelector('.custom-sidebar');
-                const toggleBtn = document.getElementById('studentSidebarToggle');
-                if (toggleBtn && sidebar) {
-                    toggleBtn.addEventListener('click', function () {
-                        if (window.innerWidth < 768) {
-                            sidebar.classList.toggle('show');
-                        }
+            // Load available dates for selected counselor
+            function loadAvailableDates(preserveSelection = false) {
+                if (!selectedCounselor) {
+                    console.log('No counselor selected, skipping date loading');
+                    return;
+                }
+
+                console.log('Loading available dates for counselor:', selectedCounselor.id);
+
+                // Hide time slots when counselor/available dates change
+                const timeSlotsWrapper = document.getElementById('timeSlotsWrapper');
+                if (timeSlotsWrapper && !preserveSelection) {
+                    timeSlotsWrapper.style.display = 'none';
+                }
+                if (!preserveSelection) {
+                    // Only reset if NOT preserving (i.e. user explicitly clicked a counselor)
+                    selectedDate = null;
+                    selectedTime = null;
+                    selectedSlot = null;
+                }
+
+                fetch(`/appointments/available-slots/${selectedCounselor.id}`)
+                    .then(res => res.json())
+                    .then(slots => {
+                        console.log('Received slots:', slots);
+                        // Extract unique dates from slots
+                        const availableDates = [...new Set(slots.map(slot =>
+                            slot.start.split('T')[0]
+                        ))].sort();
+
+                        console.log('Available dates:', availableDates);
+                        renderCalendar(availableDates);
+                    })
+                    .catch((error) => {
+                        console.error('Error loading available dates:', error);
+                        renderCalendar([]);
                     });
-                    document.addEventListener('click', function (e) {
-                        if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                            const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                            if (!clickInside) sidebar.classList.remove('show');
-                        }
+            }
+
+            // Global variables for calendar navigation
+            let currentCalendarDate = new Date();
+            let availableDates = [];
+
+            // Initialize calendar navigation
+            function initializeCalendarNavigation() {
+                const prevBtn = document.getElementById('prevMonth');
+                const nextBtn = document.getElementById('nextMonth');
+
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                        renderCalendar(availableDates);
                     });
                 }
+
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                        renderCalendar(availableDates);
+                    });
+                }
+            }
+
+            // Dynamic calendar rendering
+            function renderCalendar(dates) {
+                const calendarDays = document.getElementById('calendarDays');
+                if (!calendarDays) {
+                    console.log('Calendar days element not found');
+                    return;
+                }
+
+                // Store available dates globally
+                availableDates = dates || [];
+
+                const currentMonth = currentCalendarDate.getMonth();
+                const currentYear = currentCalendarDate.getFullYear();
+                const today = new Date();
+
+                // Update month display
+                const monthElement = document.getElementById('currentMonth');
+                if (monthElement) {
+                    monthElement.textContent = currentCalendarDate.toLocaleDateString('en-US', {
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                }
+
+                // Clear calendar
+                calendarDays.innerHTML = '';
+
+                // Get first day of month and number of days
+                const firstDay = new Date(currentYear, currentMonth, 1);
+                const lastDay = new Date(currentYear, currentMonth + 1, 0);
+                const startDate = new Date(firstDay);
+                startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+                // Generate calendar days
+                for (let i = 0; i < 42; i++) {
+                    const date = new Date(startDate);
+                    date.setDate(startDate.getDate() + i);
+
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = date.getDate();
+
+                    // Check if date is in current month
+                    if (date.getMonth() !== currentMonth) {
+                        dayElement.classList.add('disabled');
+                    } else if (date >= today) {
+                        // Check if date is available (use local date, not UTC)
+                        const dateStr = date.toLocaleDateString('en-CA'); // Returns YYYY-MM-DD format
+                        if (availableDates.includes(dateStr)) {
+                            dayElement.classList.add('available');
+                            dayElement.addEventListener('click', () => selectDate(date));
+                        } else {
+                            dayElement.classList.add('disabled');
+                        }
+                    } else {
+                        // Past dates
+                        dayElement.classList.add('disabled');
+                    }
+
+                    // Highlight selected date
+                    if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
+                        dayElement.classList.add('selected');
+                    }
+
+                    calendarDays.appendChild(dayElement);
+                }
+            }
+
+            function selectDate(date) {
+                console.log('Date selected:', date);
+                selectedDate = date;
+
+                // Update visual selection
+                document.querySelectorAll('.calendar-day').forEach(day => {
+                    day.classList.remove('selected');
+                });
+                // Use the passed event or currentTarget if possible, otherwise find the element
+                if (window.event && window.event.currentTarget) {
+                    window.event.currentTarget.classList.add('selected');
+                }
+
+                // Update counselor name in time selection step
+                updateCounselorInfo();
+
+                // Show time slots in the same step
+                const timeSlotsWrapper = document.getElementById('timeSlotsWrapper');
+                if (timeSlotsWrapper) {
+                    timeSlotsWrapper.style.display = 'block';
+                    // Scroll to time slots
+                    timeSlotsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+
+                loadTimeSlots();
+                saveFormData();
+                updateButtons();
+            }
+
+            // Load time slots for selected date
+            function loadTimeSlots() {
+                if (!selectedCounselor || !selectedDate) {
+                    console.log('Missing counselor or date');
+                    return;
+                }
+
+                console.log('Loading time slots for date:', selectedDate);
+
+                const loading = document.getElementById('timeSlotsLoading');
+                const grid = document.getElementById('timeSlotsGrid');
+
+                if (loading) loading.style.display = 'block';
+                if (grid) grid.innerHTML = '';
+
+                // Format date for API (use local date, not UTC)
+                const dateStr = selectedDate.toLocaleDateString('en-CA'); // Returns YYYY-MM-DD format
+
+                fetch(`/appointments/available-slots/${selectedCounselor.id}`)
+                    .then(res => res.json())
+                    .then(slots => {
+                        if (loading) loading.style.display = 'none';
+
+                        console.log('All slots received:', slots);
+                        console.log('Looking for date:', dateStr);
+
+                        const daySlots = slots.filter(slot => {
+                            const slotDate = slot.start.split('T')[0];
+                            console.log('Checking slot:', slot, 'date part:', slotDate, 'matches:', slotDate === dateStr);
+                            return slotDate === dateStr;
+                        });
+
+                        console.log('Filtered time slots for date:', daySlots);
+
+                        if (!grid) return;
+
+                        if (daySlots.length === 0) {
+                            grid.innerHTML = '<div class="text-center text-muted">No available slots for this date</div>';
+                            return;
+                        }
+
+                        // Sort slots by time
+                        daySlots.sort();
+
+                        daySlots.forEach(slot => {
+                            const timeSlot = document.createElement('div');
+                            timeSlot.className = 'time-slot';
+                            if (slot.booked) {
+                                timeSlot.classList.add('disabled');
+                            }
+                            // Parse the availability slot start and end times
+                            const startDate = new Date(slot.start.replace('T', ' '));
+                            const endDate = new Date(slot.end.replace('T', ' '));
+                            const startTimeStr = startDate.toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true,
+                                timeZone: 'Asia/Manila' // Use Philippine timezone
+                            });
+                            const endTimeStr = endDate.toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true,
+                                timeZone: 'Asia/Manila' // Use Philippine timezone
+                            });
+                            timeSlot.textContent = `${startTimeStr} - ${endTimeStr}`;
+
+                            // Highlight if this is the restored selected slot
+                            if (selectedSlot && selectedSlot.start === slot.start) {
+                                timeSlot.classList.add('selected');
+                            }
+
+                            if (!slot.booked) {
+                                timeSlot.addEventListener('click', () => selectTimeSlot(timeSlot, slot));
+                            }
+                            grid.appendChild(timeSlot);
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('Error loading time slots:', error);
+                        if (loading) loading.style.display = 'none';
+                        if (grid) grid.innerHTML = '<div class="text-center text-danger">Error loading time slots</div>';
+                    });
+            }
+
+            function selectTimeSlot(element, slot) {
+                console.log('Time slot selected:', slot);
+
+                document.querySelectorAll('.time-slot').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                element.classList.add('selected');
+                // Save the full slot object
+                selectedSlot = slot;
+                // For form submission, use slot.start (with timezone)
+                let slotWithTZ = slot.start;
+                if (!slotWithTZ.endsWith('+08:00') && !slotWithTZ.includes('+')) {
+                    slotWithTZ = slotWithTZ + '+08:00';
+                }
+                selectedTime = slotWithTZ;
+
+                // Update the hidden fields for form submission
+                syncHiddenFields();
+
+                saveFormData();
+                updateButtons();
+            }
+
+            // Update counselor info in time selection step
+            function updateCounselorInfo() {
+                if (selectedCounselor) {
+                    const selectedCounselorName = document.getElementById('selectedCounselorName');
+                    if (selectedCounselorName) {
+                        selectedCounselorName.textContent = selectedCounselor.name;
+                    }
+                }
+
+                if (selectedDate) {
+                    const selectedDateElement = document.getElementById('selectedDate');
+                    if (selectedDateElement) {
+                        selectedDateElement.textContent =
+                            `- ${selectedDate.toLocaleDateString('en-US', {
+                                month: 'long',
+                                day: 'numeric',
+                                year: 'numeric'
+                            })}`;
+                    }
+                }
+            }
+
+            // Update summary with selected data
+            function updateSummary() {
+                // Update date
+                if (selectedDate) {
+                    const summaryDate = document.getElementById('summaryDate');
+                    if (summaryDate) {
+                        summaryDate.textContent = selectedDate.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    }
+                }
+
+                if (selectedSlot) {
+                    const summaryTime = document.getElementById('summaryTime');
+                    if (summaryTime) {
+                        // Parse as Asia/Manila time
+                        const slotStart = new Date(selectedSlot.start + (selectedSlot.start.endsWith('+08:00') ? '' : '+08:00'));
+                        const slotEnd = new Date(selectedSlot.end + (selectedSlot.end.endsWith('+08:00') ? '' : '+08:00'));
+                        const startTimeStr = slotStart.toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true,
+                            timeZone: 'Asia/Manila'
+                        });
+                        const endTimeStr = slotEnd.toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true,
+                            timeZone: 'Asia/Manila'
+                        });
+                        summaryTime.textContent = `${startTimeStr} - ${endTimeStr}`;
+                    }
+                }
+
+                if (selectedCounselor) {
+                    const summaryCounselor = document.getElementById('summaryCounselor');
+                    const selectedCounselorName = document.getElementById('selectedCounselorName');
+                    if (summaryCounselor) summaryCounselor.textContent = selectedCounselor.name;
+                    if (selectedCounselorName) selectedCounselorName.textContent = selectedCounselor.name;
+                }
+
+                if (selectedDate) {
+                    const selectedDateElement = document.getElementById('selectedDate');
+                    if (selectedDateElement) {
+                        selectedDateElement.textContent =
+                            `- ${selectedDate.toLocaleDateString('en-US', {
+                                month: 'long',
+                                day: 'numeric',
+                                year: 'numeric'
+                            })}`;
+                    }
+                }
+
+                // Update nature of problem
+                const natureOfProblemRadio = document.querySelector('input[name="nature_of_problem"]:checked');
+                const summaryNatureOfProblem = document.getElementById('summaryNatureOfProblem');
+                if (summaryNatureOfProblem) {
+                    if (natureOfProblemRadio) {
+                        let natureOfProblem = natureOfProblemRadio.value;
+                        // If "Other" is selected, append the specified text
+                        if (natureOfProblem === 'Other') {
+                            const otherSpecify = document.querySelector('[name="nature_of_problem_other"]')?.value;
+                            if (otherSpecify && otherSpecify.trim() !== '') {
+                                natureOfProblem = `Other: ${otherSpecify}`;
+                            }
+                        }
+                        summaryNatureOfProblem.textContent = natureOfProblem;
+                    } else {
+                        summaryNatureOfProblem.textContent = 'Not selected';
+                    }
+                }
+
+                // Update Appointment Type
+                const appointmentTypeRadio = document.querySelector('input[name="appointment_type"]:checked');
+                const summaryAppointmentType = document.getElementById('summaryAppointmentType');
+                const summaryReferralReasonContainer = document.getElementById('summaryReferralReasonContainer');
+                const summaryReferralReason = document.getElementById('summaryReferralReason');
+
+                if (summaryAppointmentType) {
+                    if (appointmentTypeRadio) {
+                        summaryAppointmentType.textContent = appointmentTypeRadio.value;
+
+                        if (appointmentTypeRadio.value === 'Referral') {
+                            if (summaryReferralReasonContainer) summaryReferralReasonContainer.style.display = 'flex';
+                            const referralReasonText = document.querySelector('[name="referral_reason"]')?.value;
+                            const referrerNameText = document.querySelector('[name="referrer_name"]')?.value;
+                            if (summaryReferralReason) {
+                                summaryReferralReason.innerHTML = (referralReasonText || 'Not provided') +
+                                    (referrerNameText ? `<br><small class="text-muted">Referred by: ${referrerNameText}</small>` : '');
+                            }
+                        } else {
+                            if (summaryReferralReasonContainer) summaryReferralReasonContainer.style.display = 'none';
+                        }
+                    } else {
+                        summaryAppointmentType.textContent = 'Not selected';
+                        if (summaryReferralReasonContainer) summaryReferralReasonContainer.style.display = 'none';
+                    }
+                }
+
+                // Update Guardian 1 information
+                const guardian1Name = document.querySelector('input[name="guardian1_name"]')?.value;
+                const guardian1Relationship = document.querySelector('select[name="guardian1_relationship"]')?.value;
+                const guardian1Contact = document.querySelector('input[name="guardian1_contact"]')?.value;
+                const guardian1RelationshipOther = document.querySelector('input[name="guardian1_relationship_other"]')?.value;
+                const summaryGuardian1 = document.getElementById('summaryGuardian1');
+
+                if (summaryGuardian1) {
+                    if (guardian1Name && guardian1Relationship && guardian1Contact) {
+                        let relationship = guardian1Relationship;
+                        // If relationship is "Other", use the specified text
+                        if (guardian1Relationship === 'Other' && guardian1RelationshipOther && guardian1RelationshipOther.trim() !== '') {
+                            relationship = guardian1RelationshipOther;
+                        }
+                        summaryGuardian1.textContent = `${guardian1Name} (${relationship}) - ${guardian1Contact}`;
+                    } else {
+                        summaryGuardian1.textContent = 'Not provided';
+                    }
+                }
+            }
+
+            // Initialize
+            updateButtons();
+            initializeCalendarNavigation();
+
+            // Make sure buttons are clickable
+            const nextBtnInit = document.getElementById('nextButton');
+            const backBtnInit = document.getElementById('backButton');
+            if (nextBtnInit) {
+                nextBtnInit.style.pointerEvents = 'auto';
+                nextBtnInit.style.cursor = 'pointer';
+                nextBtnInit.removeAttribute('disabled');
+            }
+            if (backBtnInit) {
+                backBtnInit.style.pointerEvents = 'auto';
+                backBtnInit.style.cursor = 'pointer';
+            }
+
+            console.log('Appointment scheduler initialized');
+            console.log('Next button:', nextBtnInit);
+            console.log('Back button:', backBtnInit);
+        });
+
+        // Replace Next button with Submit on last step
+        function updateActionButtonsForStep(step) {
+            var nextBtn = document.getElementById('nextButton');
+            if (!nextBtn) return;
+
+            if (step === 4) {
+                nextBtn.innerHTML = '<span id="nextButtonText">Submit</span><i class="bi bi-check-circle ms-2" id="nextButtonIcon"></i>';
+            } else {
+                nextBtn.innerHTML = '<span id="nextButtonText">Next</span><i class="bi bi-arrow-right" id="nextButtonIcon"></i>';
+            }
+        }
+
+        // Add event listener for modal confirmation
+        // Remove success modal logic, redirect to dashboard on success
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Only prevent form submission if it's not the final step
+            const appointmentForm = document.getElementById('appointmentBookingForm');
+            if (appointmentForm) {
+                appointmentForm.addEventListener('submit', function (event) {
+                    // Only prevent if we're not on the final step
+                    const currentStepNav = parseInt(document.querySelector('.nav-step.active')?.dataset.step || '1');
+                    if (currentStepNav < 4) {
+                        event.preventDefault();
+                        return false;
+                    }
+                });
+            }
+
+            var confirmBtn = document.getElementById('confirmSubmitAppointment');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    // Show loading state on the confirm button
+                    confirmBtn.disabled = true;
+                    confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+
+                    // Update hidden field one last time
+                    const scheduledAtField = document.getElementById('scheduled_at');
+                    if (!scheduledAtField.value && selectedTime) {
+                        scheduledAtField.value = selectedTime;
+                    }
+
+                    // Clear local storage BEFORE submitting effectively
+                    if (typeof STORAGE_KEY !== 'undefined') {
+                        localStorage.removeItem(STORAGE_KEY);
+                    }
+
+                    // Submit the ACTUAL form
+                    document.getElementById('appointmentBookingForm').submit();
+                });
+            }
+
+            // Consolidated listeners for conditional fields
+            // Nature of Problem "Other" field
+            const problemRadios = document.querySelectorAll('input[name="nature_of_problem"]');
+            const problemOtherField = document.getElementById('problem_other_specify');
+            const natureOfProblemOther = document.getElementById('nature_of_problem_other');
+
+            problemRadios.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    if (this.value === 'Other') {
+                        if (problemOtherField) problemOtherField.style.display = 'block';
+                        if (natureOfProblemOther) natureOfProblemOther.setAttribute('required', 'required');
+                    } else {
+                        if (problemOtherField) problemOtherField.style.display = 'none';
+                        if (natureOfProblemOther) {
+                            natureOfProblemOther.removeAttribute('required');
+                            natureOfProblemOther.value = '';
+                        }
+                    }
+                });
             });
-        </script>
-        </div>
-        </div>
-        </div>
-        </div>
+
+            // Guardian Relationship "Other" fields
+            const guardian1Relationship = document.getElementById('guardian1_relationship');
+            const guardian1Other = document.getElementById('guardian1_relationship_other');
+            if (guardian1Relationship) {
+                guardian1Relationship.addEventListener('change', function () {
+                    if (this.value === 'Other') {
+                        if (guardian1Other) {
+                            guardian1Other.style.display = 'block';
+                            guardian1Other.setAttribute('required', 'required');
+                        }
+                    } else {
+                        if (guardian1Other) {
+                            guardian1Other.style.display = 'none';
+                            guardian1Other.removeAttribute('required');
+                            guardian1Other.value = '';
+                        }
+                    }
+                });
+            }
+
+            const guardian2Relationship = document.getElementById('guardian2_relationship');
+            const guardian2Other = document.getElementById('guardian2_relationship_other');
+            if (guardian2Relationship) {
+                guardian2Relationship.addEventListener('change', function () {
+                    if (this.value === 'Other') {
+                        if (guardian2Other) guardian2Other.style.display = 'block';
+                    } else {
+                        if (guardian2Other) {
+                            guardian2Other.style.display = 'none';
+                            guardian2Other.value = '';
+                        }
+                    }
+                });
+            }
+
+            // Appointment Type "Referral" field
+            const typeRadios = document.querySelectorAll('input[name="appointment_type"]');
+            const referralReasonContainer = document.getElementById('referral_reason_container');
+            const referralReason = document.getElementById('referral_reason');
+            const referrerName = document.getElementById('referrer_name');
+
+            typeRadios.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    if (this.value === 'Referral') {
+                        if (referralReasonContainer) referralReasonContainer.style.display = 'block';
+                        if (referralReason) referralReason.setAttribute('required', 'required');
+                        if (referrerName) referrerName.setAttribute('required', 'required');
+                    } else {
+                        if (referralReasonContainer) referralReasonContainer.style.display = 'none';
+                        if (referralReason) {
+                            referralReason.removeAttribute('required');
+                            referralReason.value = '';
+                        }
+                        const referrerName = document.getElementById('referrer_name');
+                        if (referrerName) {
+                            referrerName.removeAttribute('required');
+                            referrerName.value = '';
+                        }
+                    }
+                });
+            });
+
+            // Sidebar toggle for mobile
+            const sidebar = document.querySelector('.custom-sidebar');
+            const toggleBtn = document.getElementById('studentSidebarToggle');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function () {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                        if (!clickInside) sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+    </div>
+    </div>
+    </div>
+    </div>
 
 
-        <!-- SweetAlert2 CDN -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection

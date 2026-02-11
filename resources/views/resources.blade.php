@@ -23,7 +23,6 @@
         html,
         body {
             overflow-x: hidden;
-            max-width: 100vw;
         }
 
         *,
@@ -34,7 +33,17 @@
 
         .d-flex {
             width: 100%;
-            max-width: 100vw;
+        }
+
+        /* Compensation for zoom: 0.75 */
+        .home-zoom {
+            width: 133.333%;
+        }
+
+        @media (max-width: 767.98px) {
+            .home-zoom {
+                width: 100%;
+            }
         }
 
         /* Sidebar Styles */
@@ -628,59 +637,38 @@
         }
     </style>
 
-    <div class="d-flex">
-        <!-- Mobile Sidebar Toggle -->
-        <button id="studentSidebarToggle" class="d-lg-none">
-            <i class="bi bi-list"></i>
-        </button>
+    <div class="home-zoom">
+        <div class="d-flex">
+            <!-- Mobile Sidebar Toggle -->
+            <button id="studentSidebarToggle" class="d-lg-none">
+                <i class="bi bi-list"></i>
+            </button>
 
-        <!-- Sidebar -->
-        @include('student.sidebar')
+            <!-- Sidebar -->
+            @include('student.sidebar')
 
-        <!-- Main Content -->
-        <div class="main-dashboard-content flex-grow-1">
-            <!-- Hero Header -->
-            <div class="resources-hero">
-                <h1><i class="bi bi-collection-play me-2"></i>Student Resources</h1>
-                <p>Access mental health materials, orientation videos, and guidance resources to support your journey.
-                </p>
-                <div class="search-box">
-                    <i class="bi bi-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search resources...">
+            <!-- Main Content -->
+            <div class="main-dashboard-content flex-grow-1">
+                <!-- Hero Header -->
+                <div class="resources-hero">
+                    <h1><i class="bi bi-collection-play me-2"></i>Student Resources</h1>
+                    <p>Access mental health materials, orientation videos, and guidance resources to support your journey.
+                    </p>
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search resources...">
+                    </div>
                 </div>
-            </div>
 
-            <!-- Category Tabs -->
-            <div class="category-tabs">
-                <button class="category-tab active" data-category="all">
-                    <i class="bi bi-grid-3x3-gap"></i>
-                    All
-                    <span class="count">{{ $resources->flatten()->count() }}</span>
-                </button>
-                @foreach ($resources as $category => $items)
-                    <button class="category-tab" data-category="{{ Str::slug($category) }}">
-                        @if ($category == 'Mental Health')
-                            <i class="bi bi-heart-pulse"></i>
-                        @elseif($category == 'Orientation')
-                            <i class="bi bi-compass"></i>
-                        @elseif($category == 'Academic Support')
-                            <i class="bi bi-book"></i>
-                        @elseif($category == 'Career Guidance')
-                            <i class="bi bi-briefcase"></i>
-                        @else
-                            <i class="bi bi-folder"></i>
-                        @endif
-                        {{ $category }}
-                        <span class="count">{{ $items->count() }}</span>
+                <!-- Category Tabs -->
+                <div class="category-tabs">
+                    <button class="category-tab active" data-category="all">
+                        <i class="bi bi-grid-3x3-gap"></i>
+                        All
+                        <span class="count">{{ $resources->flatten()->count() }}</span>
                     </button>
-                @endforeach
-            </div>
-
-            <!-- Resources Content -->
-            @forelse($resources as $category => $items)
-                <div class="category-section" data-category="{{ Str::slug($category) }}">
-                    <div class="category-section-header">
-                        <h2>
+                    @foreach ($resources as $category => $items)
+                        <button class="category-tab" data-category="{{ Str::slug($category) }}">
                             @if ($category == 'Mental Health')
                                 <i class="bi bi-heart-pulse"></i>
                             @elseif($category == 'Orientation')
@@ -693,127 +681,152 @@
                                 <i class="bi bi-folder"></i>
                             @endif
                             {{ $category }}
-                        </h2>
-                        <div class="section-line"></div>
-                        <span class="count-badge">{{ $items->count() }} resources</span>
-                    </div>
-
-                    <div class="resources-grid">
-                        @foreach ($items as $resource)
-                            <div class="resource-card" data-title="{{ strtolower($resource->title) }}"
-                                data-description="{{ strtolower($resource->description) }}">
-                                <div class="card-thumbnail">
-                                    <span class="type-badge {{ $resource->type }}">{{ ucfirst($resource->type) }}</span>
-
-                                    @if ($resource->type == 'video')
-                                        @php
-                                            // Extract YouTube video ID for thumbnail
-                                            preg_match(
-                                                '/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/',
-                                                $resource->content,
-                                                $matches,
-                                            );
-                                            $videoId = $matches[1] ?? null;
-                                        @endphp
-                                        @if ($videoId)
-                                            <img src="https://img.youtube.com/vi/{{ $videoId }}/mqdefault.jpg" alt="{{ $resource->title }}">
-                                        @elseif($resource->file_path && str_starts_with($resource->file_type ?? '', 'video/'))
-                                            <div class="thumbnail-icon">
-                                                <i class="bi bi-film"></i>
-                                            </div>
-                                        @else
-                                            <div class="thumbnail-icon">
-                                                <i class="bi bi-play-circle"></i>
-                                            </div>
-                                        @endif
-                                        <div class="play-overlay">
-                                            <i class="bi bi-play-circle-fill"></i>
-                                        </div>
-                                    @elseif($resource->type == 'image')
-                                        @if ($resource->file_path)
-                                            <img src="{{ asset('storage/' . $resource->file_path) }}" alt="{{ $resource->title }}">
-                                        @else
-                                            <div class="thumbnail-icon">
-                                                <i class="bi bi-image"></i>
-                                            </div>
-                                        @endif
-                                    @elseif($resource->type == 'file')
-                                        <div class="thumbnail-icon">
-                                            @if (str_contains($resource->file_type ?? '', 'pdf'))
-                                                <i class="bi bi-file-earmark-pdf"></i>
-                                            @elseif(str_contains($resource->file_type ?? '', 'word') || str_contains($resource->file_name ?? '', '.doc'))
-                                                <i class="bi bi-file-earmark-word"></i>
-                                            @elseif(str_contains($resource->file_type ?? '', 'presentation') || str_contains($resource->file_name ?? '', '.ppt'))
-                                                <i class="bi bi-file-earmark-ppt"></i>
-                                            @else
-                                                <i class="bi bi-file-earmark"></i>
-                                            @endif
-                                        </div>
-                                    @else
-                                        <div class="thumbnail-icon">
-                                            <i class="bi bi-link-45deg"></i>
-                                        </div>
-                                    @endif
-                                </div>
-
-                                <div class="card-content">
-                                    <div class="card-category">{{ $category }}</div>
-                                    <h3 class="card-title">{{ $resource->title }}</h3>
-                                    <p class="card-description">
-                                        {{ $resource->description ?? 'No description available.' }}
-                                    </p>
-
-                                    <div class="card-footer">
-                                        <div class="card-meta">
-                                            @if ($resource->file_size)
-                                                <i class="bi bi-hdd"></i>
-                                                {{ number_format($resource->file_size / (1024 * 1024), 1) }} MB
-                                            @else
-                                                <i class="bi bi-calendar3"></i>
-                                                {{ $resource->created_at->format('M d, Y') }}
-                                            @endif
-                                        </div>
-
-                                        @if ($resource->file_path)
-                                            <a href="{{ asset('storage/' . $resource->file_path) }}" target="_blank" class="view-btn"
-                                                @if ($resource->type == 'file') download @endif>
-                                                @if ($resource->type == 'video')
-                                                    <i class="bi bi-play-fill"></i> Watch
-                                                @elseif($resource->type == 'image')
-                                                    <i class="bi bi-eye"></i> View
-                                                @else
-                                                    <i class="bi bi-download"></i> Download
-                                                @endif
-                                            </a>
-                                        @else
-                                            <a href="{{ $resource->content }}" target="_blank" class="view-btn">
-                                                @if ($resource->type == 'video')
-                                                    <i class="bi bi-play-fill"></i> Watch
-                                                @else
-                                                    <i class="bi bi-box-arrow-up-right"></i> Open
-                                                @endif
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+                            <span class="count">{{ $items->count() }}</span>
+                        </button>
+                    @endforeach
                 </div>
-            @empty
+
+                <!-- Resources Content -->
+                @forelse($resources as $category => $items)
+                        <div class="category-section" data-category="{{ Str::slug($category) }}">
+                            <div class="category-section-header">
+                                <h2>
+                                    @if ($category == 'Mental Health')
+                                        <i class="bi bi-heart-pulse"></i>
+                                    @elseif($category == 'Orientation')
+                                        <i class="bi bi-compass"></i>
+                                    @elseif($category == 'Academic Support')
+                                        <i class="bi bi-book"></i>
+                                    @elseif($category == 'Career Guidance')
+                                        <i class="bi bi-briefcase"></i>
+                                    @else
+                                        <i class="bi bi-folder"></i>
+                                    @endif
+                                    {{ $category }}
+                                </h2>
+                                <div class="section-line"></div>
+                                <span class="count-badge">{{ $items->count() }} resources</span>
+                            </div>
+
+                            <div class="resources-grid">
+                                @foreach ($items as $resource)
+                                        <div class="resource-card" data-title="{{ strtolower($resource->title) }}"
+                                            data-description="{{ strtolower($resource->description) }}">
+                                            <div class="card-thumbnail">
+                                                <span class="type-badge {{ $resource->type }}">{{ ucfirst($resource->type) }}</span>
+
+                                                @if ($resource->type == 'video')
+                                                    @php
+                                                        // Extract YouTube video ID for thumbnail
+                                                        preg_match(
+                                                            '/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/',
+                                                            $resource->content,
+                                                            $matches,
+                                                        );
+                                                        $videoId = $matches[1] ?? null;
+                                                    @endphp
+                                                    @if ($videoId)
+                                                        <img src="https://img.youtube.com/vi/{{ $videoId }}/mqdefault.jpg"
+                                                            alt="{{ $resource->title }}">
+                                                    @elseif($resource->file_path && str_starts_with($resource->file_type ?? '', 'video/'))
+                                                        <div class="thumbnail-icon">
+                                                            <i class="bi bi-film"></i>
+                                                        </div>
+                                                    @else
+                                                        <div class="thumbnail-icon">
+                                                            <i class="bi bi-play-circle"></i>
+                                                        </div>
+                                                    @endif
+                                                    <div class="play-overlay">
+                                                        <i class="bi bi-play-circle-fill"></i>
+                                                    </div>
+                                                @elseif($resource->type == 'image')
+                                                    @if ($resource->file_path)
+                                                        <img src="{{ asset('storage/' . $resource->file_path) }}" alt="{{ $resource->title }}">
+                                                    @else
+                                                        <div class="thumbnail-icon">
+                                                            <i class="bi bi-image"></i>
+                                                        </div>
+                                                    @endif
+                                                @elseif($resource->type == 'file')
+                                                    <div class="thumbnail-icon">
+                                                        @if (str_contains($resource->file_type ?? '', 'pdf'))
+                                                            <i class="bi bi-file-earmark-pdf"></i>
+                                                        @elseif(str_contains($resource->file_type ?? '', 'word') || str_contains($resource->file_name ?? '', '.doc'))
+                                                            <i class="bi bi-file-earmark-word"></i>
+                                                        @elseif(str_contains($resource->file_type ?? '', 'presentation') || str_contains($resource->file_name ?? '', '.ppt'))
+                                                            <i class="bi bi-file-earmark-ppt"></i>
+                                                        @else
+                                                            <i class="bi bi-file-earmark"></i>
+                                                        @endif
+                                                    </div>
+                                                @else
+                                                    <div class="thumbnail-icon">
+                                                        <i class="bi bi-link-45deg"></i>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="card-content">
+                                                <div class="card-category">{{ $category }}</div>
+                                                <h3 class="card-title">{{ $resource->title }}</h3>
+                                                <p class="card-description">
+                                                    {{ $resource->description ?? 'No description available.' }}
+                                                </p>
+
+                                                <div class="card-footer">
+                                                    <div class="card-meta">
+                                                        @if ($resource->file_size)
+                                                            <i class="bi bi-hdd"></i>
+                                                            {{ number_format($resource->file_size / (1024 * 1024), 1) }} MB
+                                                        @else
+                                                            <i class="bi bi-calendar3"></i>
+                                                            {{ $resource->created_at->format('M d, Y') }}
+                                                        @endif
+                                                    </div>
+
+                                                    @if ($resource->file_path)
+                                                        <a href="{{ asset('storage/' . $resource->file_path) }}" target="_blank"
+                                                            class="view-btn" @if ($resource->type == 'file') download @endif>
+                                                            @if ($resource->type == 'video')
+                                                                <i class="bi bi-play-fill"></i> Watch
+                                                            @elseif($resource->type == 'image')
+                                                                <i class="bi bi-eye"></i> View
+                                                            @else
+                                                                <i class="bi bi-download"></i> Download
+                                                            @endif
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ $resource->content }}" target="_blank" class="view-btn">
+                                                            @if ($resource->type == 'video')
+                                                                <i class="bi bi-play-fill"></i> Watch
+                                                            @else
+                                                                <i class="bi bi-box-arrow-up-right"></i> Open
+                                                            @endif
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                        </div>
+                    </div>
+                @empty
                 <div class="empty-state">
                     <div class="empty-icon">
                         <i class="bi bi-collection"></i>
                     </div>
-                    <h3>No Resources Available</h3>
-                    <p>Check back later for new educational materials and resources.</p>
+                    <h3>No Resources Found</h3>
+                    <p>We couldn't find any resources matching your search or category filter.</p>
                 </div>
             @endforelse
         </div>
     </div>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Sidebar toggle
             const sidebar = document.getElementById('studentSidebar');
             const toggleBtn = document.getElementById('studentSidebarToggle');
@@ -821,7 +834,7 @@
             let isToggling = false;
 
             if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function(e) {
+                toggleBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     isToggling = true;
@@ -831,14 +844,14 @@
             }
 
             if (closeBtn && sidebar) {
-                closeBtn.addEventListener('click', function(e) {
+                closeBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     sidebar.classList.remove('show');
                 });
             }
 
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 if (isToggling) return;
                 if (window.innerWidth < 992 && sidebar && sidebar.classList.contains('show')) {
                     const clickInside = sidebar.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target));

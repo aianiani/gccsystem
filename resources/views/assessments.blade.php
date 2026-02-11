@@ -209,6 +209,63 @@
             }
         }
 
+        /* Responsive design for assessments */
+        @media (max-width: 767.98px) {
+            .assessment-form-container {
+                padding: 0 0.5rem;
+            }
+
+            .form-card {
+                border-radius: 16px;
+            }
+
+            .form-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .form-header h3 {
+                font-size: 1.4rem;
+            }
+
+            .question-item {
+                padding: 1.25rem 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .question-item p.fw-bold {
+                font-size: 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .question-number {
+                margin-bottom: 0.5rem;
+            }
+
+            .option-radio {
+                padding: 0.85rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            .option-radio input[type="radio"] {
+                transform: scale(1.2);
+            }
+
+            .option-radio:has(input[type="radio"]:checked)::after {
+                font-size: 1.25rem;
+                right: 1rem;
+            }
+
+            .btn-success {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .btn-secondary {
+                padding: 0.75rem 1.25rem;
+            }
+        }
+
         .assessment-header {
             color: #2d5016;
             font-weight: 700;
@@ -335,51 +392,271 @@
         .assessment-form-container {
             display: none;
             /* hidden by default */
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
+            padding: 0 1rem;
         }
 
         .form-card {
-            background: #f8f9fa;
-            border-radius: 18px;
-            box-shadow: 0 4px 24px rgba(44, 80, 22, 0.08);
+            background: linear-gradient(135deg, #ffffff 0%, #f8fdf9 100%);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(44, 80, 22, 0.12);
             overflow: hidden;
+            border: 1px solid rgba(31, 122, 45, 0.1);
         }
 
         .form-header {
             position: sticky;
             top: 0;
             z-index: 10;
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-dark) 100%);
+            padding: 2rem 1.5rem;
+            border-bottom: 3px solid var(--yellow-maize);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header h3 {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 8px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--yellow-maize);
+            border-radius: 10px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(255, 203, 5, 0.5);
+        }
+
+        .progress-text {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-weight: 600;
         }
 
         .question-item {
             background: #fff;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .question-item:hover {
+            border-color: rgba(31, 122, 45, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .question-item.answered {
+            border-color: rgba(31, 122, 45, 0.3);
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9f1 100%);
+        }
+
+        /* One-question-at-a-time display */
+        .question-item {
+            display: none;
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        .question-item.active {
+            display: block;
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+        }
+
+        /* Navigation controls */
+        .question-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-dark) 100%);
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(31, 122, 45, 0.2);
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(31, 122, 45, 0.3);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .question-counter {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
+
+        .question-item p.fw-bold {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-dark) 100%);
+            color: #fff;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            min-width: 2.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(31, 122, 45, 0.3);
+        }
+
+        /* Enhanced radio button options */
         .option-radio {
             display: flex;
             align-items: center;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            border-radius: 12px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #e0e0e0;
+            background: #fafafa;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-radio::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(31, 122, 45, 0.05) 0%, rgba(31, 122, 45, 0.1) 100%);
+            transition: width 0.3s ease;
         }
 
         .option-radio:hover {
-            background: #f1f8e9;
+            background: linear-gradient(135deg, #f0f9f1 0%, #e8f5e9 100%);
+            border-color: var(--forest-green);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(31, 122, 45, 0.15);
         }
 
-        .option-radio input {
-            margin-right: 10px;
-            transform: scale(1.2);
+        .option-radio:hover::before {
+            width: 100%;
+        }
+
+        .option-radio input[type="radio"] {
+            display: none;
+        }
+
+        .option-radio input[type="radio"]:checked+span,
+        .option-radio:has(input[type="radio"]:checked) {
+            font-weight: 600;
+        }
+
+        .option-radio:has(input[type="radio"]:checked) {
+            background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-light) 100%);
+            border-color: var(--forest-green-dark);
+            color: #fff !important;
+            box-shadow: 0 6px 20px rgba(31, 122, 45, 0.3);
+            transform: scale(1.02);
+        }
+
+        .option-radio:has(input[type="radio"]:checked) * {
+            color: #fff !important;
+        }
+
+        .option-radio:has(input[type="radio"]:checked)::after {
+            content: '✓';
+            position: absolute;
+            right: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--yellow-maize);
+            font-weight: 700;
+            animation: checkmark 0.3s ease;
+        }
+
+        @keyframes checkmark {
+            0% {
+                transform: translateY(-50%) scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: translateY(-50%) scale(1.2);
+            }
+
+            100% {
+                transform: translateY(-50%) scale(1);
+                opacity: 1;
+            }
         }
 
         /* Locked Card Styling */
@@ -425,6 +702,35 @@
             font-weight: 700;
             z-index: 6;
             padding: 0 10px;
+        }
+
+        /* Submit button styling */
+        .btn-success {
+            background: linear-gradient(135deg, var(--forest-green) 0%, var(--forest-green-dark) 100%);
+            border: none;
+            padding: 0.85rem 2.5rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(31, 122, 45, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(31, 122, 45, 0.4);
+            background: linear-gradient(135deg, var(--forest-green-dark) 0%, var(--forest-green) 100%);
+        }
+
+        .btn-secondary {
+            padding: 0.85rem 2rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
         }
     </style>
 
@@ -523,8 +829,13 @@
                         <form method="POST" action="{{ route('assessments.grit.submit') }}" class="form-card">
                             @csrf
                             <div class="form-header text-center">
-                                <h3>GRIT Scale</h3>
-                                <p class="text-muted mb-0">Please respond to the following statements truthfully.</p>
+                                <h3><i class="bi bi-lightning-charge"></i> GRIT Scale</h3>
+                                <p class="mb-0">Please respond to the following statements truthfully.</p>
+                                <div class="progress-container">
+                                    <div class="progress-bar-fill" id="grit-progress-bar" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-text" id="grit-progress-text">0% Complete
+                                    (0/{{ count($grit_questions) }})</div>
                             </div>
                             <div class="p-4">
                                 @foreach($grit_questions as $idx => $q)
@@ -548,6 +859,19 @@
                                     </div>
                                 @endforeach
 
+                                <!-- Question Navigation -->
+                                <div class="question-navigation" id="grit-navigation">
+                                    <button type="button" class="nav-btn" id="grit-prev-btn"
+                                        onclick="previousQuestion('grit')">
+                                        <i class="bi bi-arrow-left me-2"></i> Previous
+                                    </button>
+                                    <div class="question-counter" id="grit-counter">Question 1 of
+                                        {{ count($grit_questions) }}</div>
+                                    <button type="button" class="nav-btn" id="grit-next-btn" onclick="nextQuestion('grit')">
+                                        Next <i class="bi bi-arrow-right ms-2"></i>
+                                    </button>
+                                </div>
+
                                 <label class="form-label mt-3">Comments (Optional)</label>
                                 <textarea class="form-control mb-4" name="student_comment" rows="2"></textarea>
 
@@ -565,8 +889,13 @@
                         <form method="POST" action="{{ route('assessments.neo.submit') }}" class="form-card">
                             @csrf
                             <div class="form-header text-center">
-                                <h3>NEO Personality Inventory</h3>
-                                <p class="text-muted mb-0">Rate how accurately each statement describes you.</p>
+                                <h3><i class="bi bi-person-lines-fill"></i> NEO Personality Inventory</h3>
+                                <p class="mb-0">Rate how accurately each statement describes you.</p>
+                                <div class="progress-container">
+                                    <div class="progress-bar-fill" id="neo-progress-bar" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-text" id="neo-progress-text">0% Complete
+                                    (0/{{ count($neo_questions) }})</div>
                             </div>
                             <div class="p-4">
                                 @foreach($neo_questions as $idx => $q)
@@ -597,6 +926,17 @@
                                     </div>
                                 @endforeach
 
+                                <!-- Question Navigation -->
+                                <div class="question-navigation" id="neo-navigation">
+                                    <button type="button" class="nav-btn" id="neo-prev-btn" onclick="previousQuestion('neo')">
+                                        <i class="bi bi-arrow-left me-2"></i> Previous
+                                    </button>
+                                    <div class="question-counter" id="neo-counter">Question 1 of {{ count($neo_questions) }}</div>
+                                    <button type="button" class="nav-btn" id="neo-next-btn" onclick="nextQuestion('neo')">
+                                        Next <i class="bi bi-arrow-right ms-2"></i>
+                                    </button>
+                                </div>
+
                                 <label class="form-label mt-3">Comments (Optional)</label>
                                 <textarea class="form-control mb-4" name="student_comment" rows="2"></textarea>
 
@@ -614,8 +954,13 @@
                         <form method="POST" action="{{ route('assessments.wvi.submit') }}" class="form-card">
                             @csrf
                             <div class="form-header text-center">
-                                <h3>Work Values Inventory (WVI)</h3>
-                                <p class="text-muted mb-0">How important are these values to you in your career?</p>
+                                <h3><i class="bi bi-briefcase"></i> Work Values Inventory (WVI)</h3>
+                                <p class="mb-0">How important are these values to you in your career?</p>
+                                <div class="progress-container">
+                                    <div class="progress-bar-fill" id="wvi-progress-bar" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-text" id="wvi-progress-text">0% Complete
+                                    (0/{{ count($wvi_questions) }})</div>
                             </div>
                             <div class="p-4">
                                 @foreach($wvi_questions as $idx => $q)
@@ -643,6 +988,17 @@
                                         </div>
                                     </div>
                                 @endforeach
+
+                                <!-- Question Navigation -->
+                                <div class="question-navigation" id="wvi-navigation">
+                                    <button type="button" class="nav-btn" id="wvi-prev-btn" onclick="previousQuestion('wvi')">
+                                        <i class="bi bi-arrow-left me-2"></i> Previous
+                                    </button>
+                                    <div class="question-counter" id="wvi-counter">Question 1 of {{ count($wvi_questions) }}</div>
+                                    <button type="button" class="nav-btn" id="wvi-next-btn" onclick="nextQuestion('wvi')">
+                                        Next <i class="bi bi-arrow-right ms-2"></i>
+                                    </button>
+                                </div>
 
                                 <label class="form-label mt-3">Comments (Optional)</label>
                                 <textarea class="form-control mb-4" name="student_comment" rows="2"></textarea>
@@ -708,12 +1064,12 @@
             Swal.fire({
                 title: 'Start ' + info.title + '?',
                 html: `
-                                <div class="mb-3">
-                                    <i class="bi ${info.icon}" style="font-size: 3rem; color: #2d9a36;"></i>
-                                </div>
-                                <p>You are about to start the <strong>${info.title}</strong>.</p>
-                                <p class="text-muted"><i class="bi bi-clock-history mr-1"></i> Estimated time: <strong>${info.time}</strong></p>
-                            `,
+                                                <div class="mb-3">
+                                                    <i class="bi ${info.icon}" style="font-size: 3rem; color: #2d9a36;"></i>
+                                                </div>
+                                                <p>You are about to start the <strong>${info.title}</strong>.</p>
+                                                <p class="text-muted"><i class="bi bi-clock-history mr-1"></i> Estimated time: <strong>${info.time}</strong></p>
+                                            `,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#2d9a36',
@@ -754,12 +1110,12 @@
                     Swal.fire({
                         title: 'Start DASS-42 Assessment?',
                         html: `
-                                        <div class="mb-3">
-                                            <i class="bi bi-activity" style="font-size: 3rem; color: #2d9a36;"></i>
-                                        </div>
-                                        <p>You are about to start the <strong>DASS-42</strong> (Depression, Anxiety, and Stress Scale).</p>
-                                        <p class="text-muted"><i class="bi bi-clock-history mr-1"></i> Estimated time: <strong>5-10 minutes</strong></p>
-                                    `,
+                                                        <div class="mb-3">
+                                                            <i class="bi bi-activity" style="font-size: 3rem; color: #2d9a36;"></i>
+                                                        </div>
+                                                        <p>You are about to start the <strong>DASS-42</strong> (Depression, Anxiety, and Stress Scale).</p>
+                                                        <p class="text-muted"><i class="bi bi-clock-history mr-1"></i> Estimated time: <strong>5-10 minutes</strong></p>
+                                                    `,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#2d9a36',
@@ -783,6 +1139,177 @@
                 });
             }
         });
+
+        // Progress tracking for assessments
+        function initializeProgressTracking(formId, progressBarId, progressTextId, totalQuestions) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+
+            const progressBar = document.getElementById(progressBarId);
+            const progressText = document.getElementById(progressTextId);
+            const questionItems = form.querySelectorAll('.question-item');
+
+            // Add question numbering badges
+            questionItems.forEach((item, index) => {
+                const questionText = item.querySelector('p.fw-bold');
+                if (questionText && !questionText.querySelector('.question-number')) {
+                    const textContent = questionText.textContent.trim();
+                    const questionNumber = document.createElement('span');
+                    questionNumber.className = 'question-number';
+                    questionNumber.textContent = index + 1;
+                    questionText.innerHTML = '';
+                    questionText.appendChild(questionNumber);
+                    questionText.appendChild(document.createTextNode(' ' + textContent.replace(/^\d+\.\s*/, '')));
+                }
+            });
+
+            // Track progress
+            const radioInputs = form.querySelectorAll('input[type="radio"]');
+            radioInputs.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    // Mark question as answered
+                    const questionItem = this.closest('.question-item');
+                    if (questionItem) {
+                        questionItem.classList.add('answered');
+                    }
+
+                    // Calculate progress
+                    const answeredQuestions = form.querySelectorAll('.question-item.answered').length;
+                    const percentage = Math.round((answeredQuestions / totalQuestions) * 100);
+
+                    // Update progress bar
+                    progressBar.style.width = percentage + '%';
+                    progressText.textContent = `${percentage}% Complete (${answeredQuestions}/${totalQuestions})`;
+                });
+            });
+        }
+
+        // Initialize progress tracking when forms are shown
+        document.addEventListener('DOMContentLoaded', function () {
+            // We'll initialize when the form is opened
+            const originalOpenAssessment = window.openAssessment;
+            window.openAssessment = function (type) {
+                originalOpenAssessment(type);
+
+                // Initialize progress tracking and one-question-at-a-time after form is shown
+                setTimeout(() => {
+                    if (type === 'grit') {
+                        const totalQuestions = document.querySelectorAll('#grit-form-container .question-item').length;
+                        initializeProgressTracking('grit-form-container', 'grit-progress-bar', 'grit-progress-text', totalQuestions);
+                        initializeOneQuestionFlow('grit', totalQuestions);
+                    } else if (type === 'neo') {
+                        const totalQuestions = document.querySelectorAll('#neo-form-container .question-item').length;
+                        initializeProgressTracking('neo-form-container', 'neo-progress-bar', 'neo-progress-text', totalQuestions);
+                        initializeOneQuestionFlow('neo', totalQuestions);
+                    } else if (type === 'wvi') {
+                        const totalQuestions = document.querySelectorAll('#wvi-form-container .question-item').length;
+                        initializeProgressTracking('wvi-form-container', 'wvi-progress-bar', 'wvi-progress-text', totalQuestions);
+                        initializeOneQuestionFlow('wvi', totalQuestions);
+                    }
+                }, 1600);
+            };
+        });
+
+        // One-question-at-a-time functionality
+        const assessmentState = {
+            grit: { currentIndex: 0, totalQuestions: 0 },
+            neo: { currentIndex: 0, totalQuestions: 0 },
+            wvi: { currentIndex: 0, totalQuestions: 0 }
+        };
+
+        function initializeOneQuestionFlow(type, totalQuestions) {
+            assessmentState[type].totalQuestions = totalQuestions;
+            assessmentState[type].currentIndex = 0;
+
+            const form = document.getElementById(`${type}-form-container`);
+            const questions = form.querySelectorAll('.question-item');
+
+            // Show first question
+            if (questions.length > 0) {
+                questions[0].classList.add('active');
+            }
+
+            // Update navigation buttons
+            updateNavigationButtons(type);
+
+            // Add auto-advance on answer selection
+            questions.forEach((question, index) => {
+                const radioInputs = question.querySelectorAll('input[type="radio"]');
+                radioInputs.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        // Mark as answered
+                        question.classList.add('answered');
+
+                        // Auto-advance after short delay
+                        setTimeout(() => {
+                            if (index < totalQuestions - 1) {
+                                nextQuestion(type);
+                            }
+                        }, 300);
+                    });
+                });
+            });
+        }
+
+        function showQuestion(type, index) {
+            const form = document.getElementById(`${type}-form-container`);
+            const questions = form.querySelectorAll('.question-item');
+
+            // Hide all questions
+            questions.forEach(q => {
+                q.classList.remove('active');
+            });
+
+            // Show target question
+            if (questions[index]) {
+                questions[index].classList.add('active');
+                assessmentState[type].currentIndex = index;
+
+                // Update counter
+                const counter = document.getElementById(`${type}-counter`);
+                if (counter) {
+                    counter.textContent = `Question ${index + 1} of ${assessmentState[type].totalQuestions}`;
+                }
+
+                // Update navigation buttons
+                updateNavigationButtons(type);
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextQuestion(type) {
+            const currentIndex = assessmentState[type].currentIndex;
+            const totalQuestions = assessmentState[type].totalQuestions;
+
+            if (currentIndex < totalQuestions - 1) {
+                showQuestion(type, currentIndex + 1);
+            }
+        }
+
+        function previousQuestion(type) {
+            const currentIndex = assessmentState[type].currentIndex;
+
+            if (currentIndex > 0) {
+                showQuestion(type, currentIndex - 1);
+            }
+        }
+
+        function updateNavigationButtons(type) {
+            const prevBtn = document.getElementById(`${type}-prev-btn`);
+            const nextBtn = document.getElementById(`${type}-next-btn`);
+            const currentIndex = assessmentState[type].currentIndex;
+            const totalQuestions = assessmentState[type].totalQuestions;
+
+            if (prevBtn) {
+                prevBtn.disabled = currentIndex === 0;
+            }
+
+            if (nextBtn) {
+                nextBtn.disabled = currentIndex === totalQuestions - 1;
+            }
+        }
 
         function closeAssessment() {
             document.querySelectorAll('.assessment-form-container').forEach(el => el.style.display = 'none');

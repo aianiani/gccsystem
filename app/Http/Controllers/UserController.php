@@ -155,6 +155,8 @@ class UserController extends Controller
             'is_active' => true,
         ]);
 
+        $user->sendEmailVerificationNotification();
+
         // Log activity
         UserActivity::log(auth()->id(), 'create_user', "Created user: {$user->name}", [
             'user_id' => $user->id,
@@ -193,7 +195,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|in:admin,student,counselor',
             'is_active' => 'nullable|boolean',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
         if ($validator->fails()) {
@@ -633,7 +635,7 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
         if (!$request->hasFile('avatar')) {

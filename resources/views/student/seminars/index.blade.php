@@ -262,9 +262,21 @@
                                                     <i class="bi bi-check-circle-fill me-1"></i> Completed
                                                 </span>
                                             @else
-                                                <span class="seminar-status status-pending">
-                                                    <i class="bi bi-hourglass-split me-1"></i> Pending
-                                                </span>
+                                                @if($seminar->attendance_status === 'attended')
+                                                    <span
+                                                        class="seminar-status bg-info bg-opacity-10 text-info border border-info border-opacity-25">
+                                                        <i class="bi bi-check-circle me-1"></i> Verified
+                                                    </span>
+                                                @elseif($seminar->attendance_status === 'unlocked')
+                                                    <span
+                                                        class="seminar-status bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                                                        <i class="bi bi-unlock-fill me-1"></i> Unlocked
+                                                    </span>
+                                                @else
+                                                    <span class="seminar-status status-pending">
+                                                        <i class="bi bi-hourglass-split me-1"></i> Pending
+                                                    </span>
+                                                @endif
                                             @endif
                                             <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center"
                                                 style="width: 40px; height: 40px; border: 1px solid {{ $style['color'] }}40;">
@@ -288,6 +300,17 @@
                                                     class="btn btn-evaluate">
                                                     <i class="bi bi-pencil-square me-2"></i> Evaluate Now
                                                 </a>
+                                            @elseif($seminar->attendance_status === 'attended')
+                                                <button class="btn w-100" disabled
+                                                    style="background: #e7f1ff; color: #0d6efd; border: 1px solid #b6d4fe;">
+                                                    <i class="bi bi-shield-lock-fill me-2"></i> Evaluation Locked
+                                                </button>
+                                                <div class="text-center mt-2">
+                                                    <small class="text-primary" style="font-size: 0.75rem;">
+                                                        <i class="bi bi-info-circle me-1"></i> Attendance verified. Please wait for
+                                                        counselor to unlock.
+                                                    </small>
+                                                </div>
                                             @else
                                                 <button class="btn btn-completed w-100" disabled
                                                     style="background: #f8f9fa; color: #adb5bd;">
