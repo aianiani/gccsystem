@@ -107,7 +107,7 @@
         </div>
         <div style="text-align: center; color: #666;">
             <strong>Appointment Summary</strong><br>
-            @if(isset($appointment->session_number))
+            @if(isset($appointment->session_number) && !in_array($appointment->status, ['declined', 'cancelled']))
                 Session #{{ $appointment->session_number }}<br>
             @endif
             Generated on: {{ now()->format('F d, Y h:i A') }}
@@ -127,7 +127,7 @@
             </tr>
             <tr>
                 <td>Status:</td>
-                <td><span class="badge badge-warning">{{ ucfirst($appointment->status) }}</span></td>
+                <td><span class="badge badge-warning">{{ $appointment->status === 'accepted' ? 'Approved' : ucfirst($appointment->status) }}</span></td>
             </tr>
             @if($appointment->notes)
                 <tr>

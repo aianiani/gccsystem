@@ -154,7 +154,7 @@
                                 <div><i class="bi bi-clock me-1"></i>{{ $appointment->scheduled_at->format('g:i A') }} –
                                     {{ $appointment->scheduled_at->copy()->addMinutes(30)->format('g:i A') }}</div>
                                 <div class="mt-1"><span
-                                        class="badge bg-{{ $appointment->status === 'completed' ? 'success' : ($appointment->status === 'pending' ? 'warning text-dark' : 'primary') }}">{{ ucfirst($appointment->status) }}</span>
+                                        class="badge bg-{{ $appointment->status === 'completed' ? 'success' : ($appointment->status === 'pending' ? 'warning text-dark' : 'primary') }}">{{ $appointment->status === 'accepted' ? 'Approved' : ucfirst($appointment->status) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -162,6 +162,7 @@
                             @php
                                 $studentId = $appointment->student_id;
                                 $appointments = \App\Models\Appointment::where('student_id', $studentId)
+                                    ->whereNotIn('status', ['declined', 'cancelled'])
                                     ->orderBy('scheduled_at')
                                     ->pluck('id')
                                     ->toArray();

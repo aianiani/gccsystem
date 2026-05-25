@@ -27,7 +27,7 @@ class AppointmentDeclinedNotification extends Notification implements ShouldQueu
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', 'broadcast'];
     }
 
     /**

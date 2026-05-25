@@ -14,9 +14,7 @@
         }
 
         /* Force sidebar to use the local forest-green variable */
-        .custom-sidebar {
-            background: var(--forest-green) !important;
-        }
+        
 
         /* Match dashboard zoom */
         .home-zoom {
@@ -253,9 +251,7 @@
         <div class="home-zoom">
             <div class="d-flex">
                 <!-- Mobile Sidebar Toggle -->
-                <button id="counselorSidebarToggle" class="d-md-none">
-                    <i class="bi bi-list"></i>
-                </button>
+                
                 <!-- Sidebar -->
                 <?php echo $__env->make('counselor.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 

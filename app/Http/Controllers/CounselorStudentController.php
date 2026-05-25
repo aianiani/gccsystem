@@ -15,6 +15,7 @@ class CounselorStudentController extends Controller
     {
         $query = User::where('role', 'student');
 
+
         // Filter by college
         if ($request->filled('college')) {
             $query->where('college', 'like', '%' . $request->college . '%');
@@ -114,10 +115,10 @@ class CounselorStudentController extends Controller
             abort(404);
         }
 
+
         $assessments = $student->assessments()->latest()->get();
         $appointments = $student->appointments()
-            ->where('counselor_id', auth()->id())
-            ->with('sessionNotes')
+            ->with(['sessionNotes', 'counselor'])
             ->latest()
             ->get();
 

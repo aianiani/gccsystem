@@ -686,7 +686,7 @@
             new Chart(document.getElementById('statusChart').getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: statusKeys.map(k => k.charAt(0).toUpperCase() + k.slice(1).replace('_', ' ')),
+                    labels: statusKeys.map(k => k === 'accepted' ? 'Approved' : k.charAt(0).toUpperCase() + k.slice(1).replace('_', ' ')),
                     datasets: [{
                         data: statusValues,
                         backgroundColor: statusBg,

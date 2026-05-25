@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Notifications\AppointmentAcceptedNotification;
+use App\Notifications\AppointmentApprovedNotification;
 use Illuminate\Support\Facades\Log;
 
 class AppointmentController extends Controller
@@ -149,6 +149,7 @@ class AppointmentController extends Controller
         // Calculate session number for this appointment
         $sessionNumber = Appointment::where('counselor_id', $appointment->counselor_id)
             ->where('student_id', $appointment->student_id)
+            ->whereNotIn('status', ['declined', 'cancelled'])
             ->where(function ($q) use ($appointment) {
                 $q->where('scheduled_at', '<', $appointment->scheduled_at)
                     ->orWhere(function ($q2) use ($appointment) {
@@ -315,6 +316,9 @@ class AppointmentController extends Controller
         $appointment = Appointment::where('counselor_id', auth()->id())->findOrFail($id);
         $appointment->status = 'completed';
         $appointment->save();
+        
+        // Also mark existing session notes as completed
+        $appointment->sessionNotes()->update(['session_status' => 'completed']);
         // Notify the student
         $student = $appointment->student;
         if ($student) {
@@ -351,7 +355,7 @@ class AppointmentController extends Controller
         // Notify the student
         $student = $appointment->student;
         if ($student) {
-            $student->notify(new AppointmentAcceptedNotification($appointment));
+            $student->notify(new AppointmentApprovedNotification($appointment));
         }
         return redirect()->back()->with('success', 'Appointment approved.');
     }
@@ -423,6 +427,7 @@ class AppointmentController extends Controller
         $appointment = Appointment::where('counselor_id', auth()->id())->findOrFail($id);
         $request->validate([
             'scheduled_at' => 'required|date|after:now',
+            'reschedule_reason' => 'required|string|max:1000',
             'notes' => 'nullable|string',
             'referral_reason' => 'nullable|string|max:500',
             'referrer_name' => 'nullable|string|max:255',
@@ -430,6 +435,7 @@ class AppointmentController extends Controller
         // Store the old scheduled_at before updating
         $appointment->previous_scheduled_at = $appointment->scheduled_at;
         $appointment->scheduled_at = \Carbon\Carbon::parse($request->scheduled_at)->timezone('Asia/Manila')->format('Y-m-d H:i:s');
+        $appointment->reschedule_reason = $request->reschedule_reason;
         $appointment->notes = $request->notes;
         // Only update these if provided (e.g. from existing values or if UI allows editing)
         if ($request->has('referral_reason'))
@@ -496,7 +502,7 @@ class AppointmentController extends Controller
 
             // Notify student
             if ($appointment->student) {
-                $appointment->student->notify(new \App\Notifications\AppointmentAcceptedNotification($appointment));
+                $appointment->student->notify(new \App\Notifications\AppointmentApprovedNotification($appointment));
             }
         }
 

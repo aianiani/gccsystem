@@ -54,54 +54,16 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2rem 1rem 1rem 1rem;
-            border-bottom: 1px solid #4a7c59;
-        }
+        
 
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.5rem 0.5rem 0 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        
 
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-            position: relative;
-        }
+        
 
         .custom-sidebar .sidebar-link.active,
-        .custom-sidebar .sidebar-link:hover {
-            background: #4a7c59;
-            color: #f4d03f;
-        }
+        
 
         .custom-sidebar .sidebar-link .bi {
             font-size: 1.1rem;
@@ -127,81 +89,32 @@
             color: #fff;
         }
 
-        @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
-
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
+        
 
         @media (max-width: 767.98px) {
 
             /* Off-canvas behavior on mobile */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.2s ease;
-                flex-direction: column;
-                padding: 0;
-            }
+            
 
             .custom-sidebar.show {
                 transform: translateX(0);
             }
 
-            .custom-sidebar .sidebar-logo {
-                display: block;
-            }
+            
 
-            .custom-sidebar .sidebar-nav {
-                flex-direction: column;
-                gap: 0.25rem;
-                padding: 1rem 0.5rem 1rem 0.5rem;
-            }
+            
 
-            .custom-sidebar .sidebar-link {
-                justify-content: flex-start;
-                padding: 0.6rem 0.75rem;
-                font-size: 1rem;
-            }
+            
 
             .main-dashboard-content {
                 margin-left: 0;
             }
 
             /* Toggle button */
-            #counselorSidebarToggle {
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1100;
-                background: var(--forest-green);
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 0.5rem 0.75rem;
-                box-shadow: var(--shadow-sm);
-            }
+            
         }
 
-        .privacy-blur {
-            filter: blur(5px);
-            transition: filter 0.3s ease;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .privacy-blur:hover {
-            filter: blur(0);
-        }
+        /* Privacy Blur Removed */
 
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
@@ -1075,350 +988,12 @@
         }
     </style>
 
-    <!-- Notification Bell Dropdown at Top Right -->
-    <style>
-        .notification-bell {
-            background: white !important;
-            border: none !important;
-            outline: none !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-            position: relative;
-            transition: all 0.3s ease !important;
-            width: 60px !important;
-            height: 60px !important;
-            border-radius: 50% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 0 !important;
-            min-width: 60px !important;
-        }
-
-        .notification-bell:hover {
-            background: var(--yellow-maize);
-            box-shadow: 0 6px 20px rgba(255, 203, 5, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .notification-bell .bi-bell {
-            color: var(--forest-green);
-            font-size: 1.7rem;
-            transition: all 0.3s ease;
-        }
-
-        .notification-bell:hover .bi-bell {
-            color: var(--forest-green);
-            transform: scale(1.1);
-        }
-
-        .notification-bell.pulse {
-            animation: bell-shake 0.5s ease-in-out infinite;
-        }
-
-        @keyframes bell-shake {
-
-            0%,
-            100% {
-                transform: rotate(0deg);
-            }
-
-            25% {
-                transform: rotate(-10deg);
-            }
-
-            75% {
-                transform: rotate(10deg);
-            }
-        }
-
-        .notification-bell-badge {
-            background: var(--danger);
-            color: white;
-            font-weight: bold;
-            font-size: 0.75rem;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
-            padding: 0.2em 0.5em;
-            border-radius: 999px;
-            top: -4px;
-            right: -4px;
-        }
-
-        .notification-dropdown-menu {
-            width: 700px;
-            max-width: 95vw;
-            max-height: 500px;
-            overflow-y: auto;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            border: none;
-            padding: 0;
-            margin-top: 0.75rem;
-            background: white;
-            overflow: hidden;
-            z-index: 9999 !important;
-            position: absolute !important;
-            right: 0;
-            top: 70px;
-            list-style: none;
-        }
-
-        .notification-dropdown-header {
-            background: linear-gradient(135deg, var(--forest-green), var(--forest-green-light));
-            color: white;
-            font-weight: 700;
-            padding: 1.25rem 1.5rem;
-            font-size: 1.1rem;
-            border-bottom: none;
-            font-family: inherit;
-        }
-
-        .notification-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1.25rem 1.5rem;
-            font-size: 0.95rem;
-            background: white;
-            transition: background 0.2s;
-            border-bottom: 1px solid #f0f0f0;
-            font-family: inherit;
-            position: relative;
-        }
-
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-
-        .notification-item:hover {
-            background: #f8f9fa;
-        }
-
-        .notification-item .notification-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .notification-item .notification-icon i {
-            color: #1976d2;
-            font-size: 1.1rem;
-        }
-
-        .notification-item .notification-content {
-            flex: 1;
-            line-height: 1.5;
-            color: #333;
-        }
-
-        .notification-item .notification-content strong {
-            color: var(--forest-green);
-            font-weight: 600;
-        }
-
-        .notification-item .notification-actions {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 0.5rem !important;
-            align-items: center !important;
-        }
-
-        .notification-item .btn-view {
-            background: var(--forest-green);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            transition: all 0.2s;
-            padding: 0;
-        }
-
-        .notification-item .btn-view:hover {
-            background: var(--forest-green-light);
-            transform: scale(1.1);
-        }
-
-        .notification-item .btn-link {
-            color: #dc3545;
-            font-size: 1rem;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            transition: all 0.2s;
-            background: none;
-            border: none;
-            border-radius: 50%;
-        }
-
-        .notification-item .btn-link:hover {
-            color: #c82333;
-            background: rgba(220, 53, 69, 0.1);
-            transform: scale(1.1);
-        }
-
-        .notification-empty {
-            padding: 2.5rem 1.5rem;
-            color: #999;
-            text-align: center;
-            font-size: 0.95rem;
-            font-family: inherit;
-        }
-
-        .notification-empty i {
-            font-size: 2.5rem;
-            color: #ddd;
-            margin-bottom: 0.75rem;
-            display: block;
-        }
-
-        @media (max-width: 500px) {
-            .notification-dropdown-menu {
-                min-width: 90vw;
-                padding: 0.25rem 0;
-            }
-
-            .notification-dropdown-header {
-                font-size: 1rem;
-                padding: 0.7rem 1rem;
-            }
-
-            .notification-item,
-            .notification-empty {
-                padding: 0.7rem 1rem;
-            }
-        }
-    </style>
-    <?php
-        $unreadCount = auth()->user()->unreadNotifications()->count();
-        // Show ALL notifications (both read and unread) - most recent 10
-        $recentNotifications = auth()->user()->notifications()->latest()->take(10)->get();
-    ?>
-    <div class="dropdown me-3" style="position: fixed; top: 1rem; right: 1.5rem; z-index: 9999;">
-        <button class="btn notification-bell position-relative p-0<?php echo e($unreadCount > 0 ? ' pulse' : ''); ?>" type="button"
-            id="notificationDropdown" onclick="toggleNotificationDropdown()">
-            <i class="bi bi-bell"></i>
-            <?php if($unreadCount > 0): ?>
-                <span class="position-absolute top-0 start-100 translate-middle badge notification-bell-badge">
-                    <?php echo e($unreadCount); ?>
-
-                </span>
-            <?php endif; ?>
-        </button>
-        <ul class="notification-dropdown-menu" id="notificationMenu" style="display: none;">
-            <li class="notification-dropdown-header">Notifications</li>
-            <?php $__empty_1 = true; $__currentLoopData = $recentNotifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <li class="notification-item">
-                    <div class="notification-icon">
-                        <?php if(isset($notification->data['appointment_id'])): ?>
-                            <i class="bi bi-calendar-check"></i>
-                        <?php else: ?>
-                            <i class="bi bi-info-circle"></i>
-                        <?php endif; ?>
-                    </div>
-                    <div class="notification-content">
-                        <?php echo e($notification->data['message'] ?? 'You have a new notification.'); ?>
-
-                        <?php if(is_null($notification->read_at)): ?>
-                            <span class="badge bg-primary ms-2" style="font-size: 0.7rem;">New</span>
-                        <?php endif; ?>
-                        <div class="text-muted small mt-1">
-                            <?php echo e($notification->created_at->diffForHumans()); ?>
-
-                        </div>
-                    </div>
-                    <div class="notification-actions">
-                        <?php if(isset($notification->data['url'])): ?>
-                            <a href="<?php echo e($notification->data['url']); ?>" class="btn-view" title="View Details">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        <?php elseif(isset($notification->data['appointment_id'])): ?>
-                            <a href="<?php echo e(route('counselor.appointments.show', $notification->data['appointment_id'])); ?>"
-                                class="btn-view" title="View Details">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        <?php else: ?>
-                            <a href="<?php echo e(route('counselor.appointments.index')); ?>" class="btn-view" title="View Appointments">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        <?php endif; ?>
-                        <form method="POST" action="<?php echo e(route('notifications.markAsRead', $notification->id)); ?>" class="d-inline"
-                            style="margin: 0;">
-                            <?php echo csrf_field(); ?>
-                            <button type="submit" class="btn btn-link" title="Dismiss">
-                                <i class="bi bi-x-circle"></i>
-                            </button>
-                        </form>
-                    </div>
-                </li>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <li class="notification-empty">
-                    <i class="bi bi-bell-slash"></i>
-                    <div>No new notifications</div>
-                </li>
-            <?php endif; ?>
-        </ul>
-    </div>
-
-    </style>
-
-    <script>
-        // Custom dr    opdown toggle function (Bootstrap dropdown wasn't wor                              king)
-        function toggleNotificationDropdown() {
-            const menu = document.getElementById('notificationMenu');
-            if (menu) {
-                if (menu.style.display === 'none' || menu.style.display === '') {
-                    menu.style.display = 'block';
-                    console.log('Dropdown opened');
-                } else {
-                    menu.style.display = 'none';
-                    console.log('Dropdown closed');
-                }
-            } else {
-                console.error('Notification menu not found!');
-            }
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function (event) {
-            const bell = document.getElementById('notificationDropdown');
-            const menu = document.getElementById('notificationMenu');
-
-            if (bell && menu && !bell.contains(event.target) && !menu.contains(event.target)) {
-                menu.style.display = 'none';
-            }
-        });
-
-        // Shake notification bell only once on page load if there are unread notifications
-        document.addEventListener('DOMContentLoaded', function () {
-            const notificationBell = document.getElementById('notificationDropdown');
-            if (notificationBell && notificationBell.classList.contains('pulse')) {
-                // Shake for 2 seconds then remove the pulse class
-                setTimeout(function () {
-                    notificationBell.classList.remove('pulse');
-                }, 2000);
-            }
-        });
-    </script>
+    
 
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
+            
             <!-- Sidebar -->
             <?php echo $__env->make('counselor.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
@@ -1551,7 +1126,7 @@
                                                         <?php echo e($appt->scheduled_at->format('h:i A')); ?>
 
                                                     </div>
-                                                    <div class="agenda-name privacy-blur" title="Hover to reveal name">
+                                                    <div class="agenda-name">
                                                         <?php echo e($appt->student->name); ?>
 
                                                     </div>
@@ -1708,7 +1283,7 @@
                                                                                                     </div>
                                                                                                     <div class="tooltip-row">
                                                                                                         <span class="tooltip-label">Student:</span>
-                                                                                                        <span class="tooltip-value privacy-blur" title="Hover to reveal">${props.studentName}</span>
+                                                                                                        <span class="tooltip-value">${props.studentName}</span>
                                                                                                     </div>
                                                                                                     <div class="tooltip-row">
                                                                                                         <span class="tooltip-label">Date:</span>
@@ -1851,7 +1426,7 @@
                                                                                                             <span class="risk-indicator risk-<?php echo e($riskLevel); ?>"></span>
                                                                                                         </div>
                                                                                                         <div>
-                                                                                                            <h6 class="mb-0 fw-semibold privacy-blur" style="color: var(--forest-green);" title="Hover to reveal name">
+                                                                                                            <h6 class="mb-0 fw-semibold" style="color: var(--forest-green);">
                                                                                                                 <?php echo e($student->name); ?>
 
                                                                                                             </h6>
@@ -1976,27 +1551,6 @@
                                                                         tooltipTriggerList.forEach(function (tooltipTriggerEl) {
                                                                             new bootstrap.Tooltip(tooltipTriggerEl);
                                                                         });
-                                                                        // Sidebar toggle for mobile
-                                                                        const sidebar = document.querySelector('.custom-sidebar');
-                                                                        const toggleBtn = document.getElementById('counselorSidebarToggle');
-                                                                        if (toggleBtn && sidebar) {
-                                                                            toggleBtn.addEventListener('click', function() {
-                                                                                if (window.innerWidth < 768) {
-                                                                                    sidebar.classList.toggle('show');
-                                                                                }
-                                                                            });
-                                                                            document.addEventListener('click', function(e) {
-                                                                                if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                                                                    const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                                                                                    if (!clickInside) sidebar.classList.remove('show');
-                                                                                }
-                                                                            });
-                                                                            document.addEventListener('keydown', function(e) {
-                                                                                if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                                                                                    sidebar.classList.remove('show');
-                                                                                }
-                                                                            });
-                                                                        }
                                                                     });
                                                                 </script>
 <?php $__env->stopSection(); ?>

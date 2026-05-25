@@ -75,6 +75,7 @@ class CounselorDashboardController extends Controller
             // to ensure sequential numbering even if some were declined/cancelled.
             $sessionNumber = Appointment::where('counselor_id', $appointment->counselor_id)
                 ->where('student_id', $appointment->student_id)
+                ->whereNotIn('status', ['declined', 'cancelled'])
                 ->where(function ($q) use ($appointment) {
                     $q->where('scheduled_at', '<', $appointment->scheduled_at)
                         ->orWhere(function ($q2) use ($appointment) {
@@ -119,6 +120,7 @@ class CounselorDashboardController extends Controller
         // Calculate session number for this appointment (regardless of status)
         $sessionNumber = Appointment::where('counselor_id', $appointment->counselor_id)
             ->where('student_id', $appointment->student_id)
+            ->whereNotIn('status', ['declined', 'cancelled'])
             ->where(function ($q) use ($appointment) {
                 $q->where('scheduled_at', '<', $appointment->scheduled_at)
                     ->orWhere(function ($q2) use ($appointment) {
@@ -235,7 +237,7 @@ class CounselorDashboardController extends Controller
         /*
         $appointments = Appointment::whereIn('id', $ids)->get();
         foreach($appointments as $app) {
-             if ($app->student) $app->student->notify(new AppointmentAcceptedNotification($app));
+             if ($app->student) $app->student->notify(new \App\Notifications\AppointmentApprovedNotification($app));
         }
         */
 

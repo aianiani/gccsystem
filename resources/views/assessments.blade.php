@@ -38,28 +38,9 @@
             }
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        
 
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.05);
-        }
+        
 
         .custom-sidebar .sidebar-logo h3 {
             font-family: 'Outfit', sans-serif;
@@ -74,41 +55,13 @@
             font-size: 0.8rem !important;
         }
 
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.25rem 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        
 
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1.1rem;
-            padding: 0.9rem 1.25rem;
-            border-radius: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            margin: 0.1rem 0;
-        }
+        
 
-        .custom-sidebar .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            transform: translateX(5px);
-        }
+        
 
-        .custom-sidebar .sidebar-link.active {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            color: #f4d03f;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
+        
 
         .custom-sidebar .sidebar-link.active::before {
             content: '';
@@ -167,9 +120,7 @@
         }
 
         @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
+            
 
             .main-dashboard-content {
                 margin-left: 200px;
@@ -177,10 +128,7 @@
         }
 
         @media (max-width: 991.98px) {
-            .custom-sidebar {
-                transform: translateX(-100%);
-                width: 240px;
-            }
+            
 
             .custom-sidebar.show {
                 transform: translateX(0);
@@ -765,13 +713,17 @@
                             @if($userYear !== 1)
                                 <div class="lock-overlay"><i class="bi bi-lock-fill lock-icon-big"></i></div>
                                 <div class="locked-notice">Available for 1st Year Students only</div>
+                            @elseif(isset($completed_assessments) && in_array('GRIT Scale', $completed_assessments))
+                                <div class="position-absolute" style="top: 10px; left: 10px; color: var(--forest-green);">
+                                    <i class="bi bi-check-circle-fill fs-5" title="Completed" data-bs-toggle="tooltip"></i>
+                                </div>
                             @endif
                             <span class="year-badge badge-1st">1st Year</span>
                             <div class="assessment-icon"><i class="bi bi-lightning-charge"></i></div>
                             <div class="assessment-title">GRIT Scale</div>
                             <div class="assessment-desc">Measure your passion and perseverance for long-term goals.</div>
                             <button class="assessment-btn" {{ $userYear !== 1 ? 'disabled' : '' }}
-                                onclick="openAssessment('grit')">{{ $userYear !== 1 ? 'LOCKED' : 'START GRIT TEST' }}</button>
+                                onclick="openAssessment('grit')">{{ $userYear !== 1 ? 'LOCKED' : ((isset($completed_assessments) && in_array('GRIT Scale', $completed_assessments)) ? 'RETAKE TEST' : 'START GRIT TEST') }}</button>
                         </div>
 
                         <!-- 2nd Year: DASS-42 -->
@@ -779,6 +731,10 @@
                             @if($userYear !== 2)
                                 <div class="lock-overlay"><i class="bi bi-lock-fill lock-icon-big"></i></div>
                                 <div class="locked-notice">Available for 2nd Year Students only</div>
+                            @elseif(isset($completed_assessments) && in_array('DASS-42', $completed_assessments))
+                                <div class="position-absolute" style="top: 10px; left: 10px; color: var(--forest-green);">
+                                    <i class="bi bi-check-circle-fill fs-5" title="Completed" data-bs-toggle="tooltip"></i>
+                                </div>
                             @endif
                             <span class="year-badge badge-2nd">2nd Year</span>
                             <div class="assessment-icon"><i class="bi bi-activity"></i></div>
@@ -786,7 +742,7 @@
                             <div class="assessment-desc">Depression, Anxiety, and Stress Scale assessment.</div>
                             @if($userYear === 2)
                                 <a href="{{ route('assessments.dass42') }}"
-                                    class="assessment-btn text-decoration-none text-center">START DASS-42</a>
+                                    class="assessment-btn text-decoration-none text-center">{{ (isset($completed_assessments) && in_array('DASS-42', $completed_assessments)) ? 'RETAKE DASS-42' : 'START DASS-42' }}</a>
                             @else
                                 <button class="assessment-btn" disabled>LOCKED</button>
                             @endif
@@ -797,13 +753,17 @@
                             @if($userYear !== 3)
                                 <div class="lock-overlay"><i class="bi bi-lock-fill lock-icon-big"></i></div>
                                 <div class="locked-notice">Available for 3rd Year Students only</div>
+                            @elseif(isset($completed_assessments) && in_array('Personality (NEO-FFI)', $completed_assessments))
+                                <div class="position-absolute" style="top: 10px; left: 10px; color: var(--forest-green);">
+                                    <i class="bi bi-check-circle-fill fs-5" title="Completed" data-bs-toggle="tooltip"></i>
+                                </div>
                             @endif
                             <span class="year-badge badge-3rd">3rd Year</span>
                             <div class="assessment-icon"><i class="bi bi-person-lines-fill"></i></div>
                             <div class="assessment-title">NEO Personality</div>
                             <div class="assessment-desc">Understand your personality traits (Big Five).</div>
                             <button class="assessment-btn" {{ $userYear !== 3 ? 'disabled' : '' }}
-                                onclick="openAssessment('neo')">{{ $userYear !== 3 ? 'LOCKED' : 'START NEO TEST' }}</button>
+                                onclick="openAssessment('neo')">{{ $userYear !== 3 ? 'LOCKED' : ((isset($completed_assessments) && in_array('Personality (NEO-FFI)', $completed_assessments)) ? 'RETAKE NEO TEST' : 'START NEO TEST') }}</button>
                         </div>
 
                         <!-- 4th Year: WVI -->
@@ -811,13 +771,17 @@
                             @if($userYear !== 4)
                                 <div class="lock-overlay"><i class="bi bi-lock-fill lock-icon-big"></i></div>
                                 <div class="locked-notice">Available for 4th Year Students only</div>
+                            @elseif(isset($completed_assessments) && in_array('Work Values Inventory', $completed_assessments))
+                                <div class="position-absolute" style="top: 10px; left: 10px; color: var(--forest-green);">
+                                    <i class="bi bi-check-circle-fill fs-5" title="Completed" data-bs-toggle="tooltip"></i>
+                                </div>
                             @endif
                             <span class="year-badge badge-4th">4th Year</span>
                             <div class="assessment-icon"><i class="bi bi-briefcase"></i></div>
                             <div class="assessment-title">Work Values</div>
                             <div class="assessment-desc">Identify what matters most to you in your career.</div>
                             <button class="assessment-btn" {{ $userYear !== 4 ? 'disabled' : '' }}
-                                onclick="openAssessment('wvi')">{{ $userYear !== 4 ? 'LOCKED' : 'START WVI TEST' }}</button>
+                                onclick="openAssessment('wvi')">{{ $userYear !== 4 ? 'LOCKED' : ((isset($completed_assessments) && in_array('Work Values Inventory', $completed_assessments)) ? 'RETAKE WVI TEST' : 'START WVI TEST') }}</button>
                         </div>
 
                     </div>

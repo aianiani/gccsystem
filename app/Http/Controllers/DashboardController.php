@@ -78,16 +78,25 @@ class DashboardController extends Controller
                     ->whereHas('assessments', function ($q) {
                         $q->whereIn('risk_level', ['high', 'very-high', 'moderate']);
                     })
-                    ->whereHas('appointments', function ($q) use ($counselorId) {
-                        $q->where('counselor_id', $counselorId);
-                    })
                     ->with([
                         'assessments' => function ($q) {
                             $q->latest();
                         }
                     ])
-                    ->take(5)
-                    ->get();
+                    ->get()
+                    ->sortBy(function ($student) {
+                        $latest = $student->assessments->first();
+                        $risk = $latest ? $latest->risk_level : 'low';
+                        $weights = [
+                            'very-high' => 0,
+                            'high' => 1,
+                            'moderate' => 2,
+                            'low' => 3,
+                            'normal' => 4,
+                        ];
+                        return $weights[$risk] ?? 5;
+                    })
+                    ->take(5);
 
                 $highRiskCasesCount = $priorityStudents->count();
 

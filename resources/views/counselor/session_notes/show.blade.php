@@ -45,21 +45,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
@@ -146,11 +132,7 @@
             border: 1px solid var(--gray-100) !important;
         }
 
-        @media (max-width: 991.98px) {
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
+        
 
         @media (max-width: 767.98px) {
             .main-dashboard-content {
@@ -227,7 +209,7 @@
                                     <div class="mb-2"><i class="bi bi-clock me-1"></i>
                                         {{ optional($appointment->scheduled_at)->format('g:i A') ?? '-' }}</div>
                                     <div><span
-                                            class="badge bg-light text-dark">{{ ucfirst($appointment->status ?? 'N/A') }}</span>
+                                            class="badge bg-light text-dark">{{ $appointment->status === 'accepted' ? 'Approved' : ucfirst($appointment->status ?? 'N/A') }}</span>
                                     </div>
                                 </div>
                             </div>

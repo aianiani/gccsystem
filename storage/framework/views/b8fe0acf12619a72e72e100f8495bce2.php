@@ -1,3 +1,38 @@
+<!-- Mobile Sidebar Toggle -->
+<button id="counselorSidebarToggle" class="d-md-none" style="position: fixed; top: 1.25rem; left: 1rem; z-index: 1050; background: var(--forest-green); color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+    <i class="bi bi-list"></i>
+</button>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sidebar = document.querySelector('.custom-sidebar');
+        const toggleBtn = document.getElementById('counselorSidebarToggle');
+
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                sidebar.classList.toggle('show');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function (e) {
+                if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                    const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
+                    if (!clickInside) {
+                        sidebar.classList.remove('show');
+                    }
+                }
+            });
+
+            // Close sidebar on Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        }
+    });
+</script>
 <div class="custom-sidebar">
     <div class="sidebar-logo mb-4">
         <img src="<?php echo e(asset('images/logo.jpg')); ?>" alt="CMU Logo"

@@ -196,6 +196,7 @@ class UserController extends Controller
             'role' => 'required|in:admin,student,counselor',
             'is_active' => 'nullable|boolean',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         if ($validator->fails()) {
@@ -220,6 +221,10 @@ class UserController extends Controller
             'is_active' => $request->has('is_active'),
         ];
 
+        if ($request->filled('password')) {
+            $updateData['password'] = Hash::make($request->password);
+        }
+
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
             if ($file->isValid()) {
@@ -239,7 +244,8 @@ class UserController extends Controller
         UserActivity::log(auth()->id(), 'update_user', "Updated user: {$user->name}", [
             'user_id' => $user->id,
             'old_data' => $oldData,
-            'new_data' => $user->toArray()
+            'new_data' => $user->toArray(),
+            'password_changed' => $request->filled('password')
         ]);
 
         $statusMessage = $user->is_active ? 'active' : 'inactive';
@@ -567,7 +573,6 @@ class UserController extends Controller
                 'specialization' => 'nullable|string|max:255',
                 'years_of_experience' => 'nullable|integer|min:0',
                 'education' => 'nullable|string|max:1000',
-                'passkey' => 'nullable|string|max:50',
             ]);
         }
 
@@ -594,8 +599,7 @@ class UserController extends Controller
                 'license_number',
                 'specialization',
                 'years_of_experience',
-                'education',
-                'passkey'
+                'education'
             ]));
         }
 

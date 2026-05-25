@@ -53,21 +53,7 @@
             background-color: var(--bg-light);
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
@@ -265,11 +251,7 @@
             color: #fff;
         }
 
-        @media (max-width: 991.98px) {
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
+        
 
         @media (max-width: 767.98px) {
             .main-dashboard-content {
@@ -278,46 +260,20 @@
             }
 
             /* Off-canvas behavior on mobile */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.2s ease;
-                flex-direction: column;
-                padding: 0;
-            }
+            
 
             .custom-sidebar.show {
                 transform: translateX(0);
             }
         }
 
-        /* Privacy Blur */
-        .privacy-blur {
-            filter: blur(8px);
-            user-select: none;
-            pointer-events: none;
-            transition: all 0.5s ease;
-        }
-
-        .privacy-revealed {
-            filter: blur(0);
-            user-select: auto;
-            pointer-events: auto;
-        }
+        /* Privacy Blur Removed */
     </style>
 
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none"
-                style="position: fixed; top: 1rem; left: 1rem; z-index: 1100; background: var(--forest-green); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 0.75rem;">
-                <i class="bi bi-list"></i>
-            </button>
+            
 
             <!-- Sidebar -->
             @include('counselor.sidebar')
@@ -338,8 +294,10 @@
                             </h1>
                             <div class="header-meta">
                                 Reference: <span
-                                    class="font-monospace text-white">{{ $appointment->reference_number }}</span> •
-                                Session #{{ $appointment->session_number }}
+                                    class="font-monospace text-white">{{ $appointment->reference_number }}</span>
+                                @if(!in_array($appointment->status, ['declined', 'cancelled']))
+                                    • Session #{{ $appointment->session_number }}
+                                @endif
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-3">
@@ -367,10 +325,6 @@
                                 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="fw-bold text-dark">Actions</div>
-                                        <button id="privacyToggleBtn" class="btn btn-sm btn-outline-secondary"
-                                            title="Toggle Privacy">
-                                            <i class="bi bi-eye-slash-fill" id="privacyIcon"></i> Toggle Details
-                                        </button>
                                     </div>
                                     <div class="d-flex gap-2">
                                         @if($appointment->status === 'pending')
@@ -434,7 +388,7 @@
                             <div class="row g-4">
                                 <!-- Schedule Information -->
                                 <div class="col-lg-6">
-                                    <div id="schedulePrivacyContainer" class="privacy-blur h-100">
+                                    <div id="schedulePrivacyContainer" class="h-100">
                                         <div class="content-card h-100">
                                             <div class="card-title-styled"><i class="bi bi-clock"></i> Schedule Information
                                             </div>
@@ -444,7 +398,7 @@
                                                     @php
                                                         $start = $appointment->scheduled_at;
                                                         $availability = \App\Models\Availability::where('user_id', $appointment->counselor_id)->where('start', $start)->first();
-                                                        $end = $availability ? \Carbon\Carbon::parse($availability->end) : $start->copy()->addMinutes(30);
+                                                        $end = $availability ? \Carbon\Carbon::parse($availability->end) : $start->copy()->addMinutes(60);
                                                     @endphp
                                                     <div class="info-value">
                                                         {{ $start->format('l, F j, Y') }}<br>
@@ -489,7 +443,7 @@
 
                                 <!-- Student Information -->
                                 <div class="col-lg-6">
-                                    <div id="studentPrivacyContainer" class="privacy-blur h-100">
+                                    <div id="studentPrivacyContainer" class="h-100">
                                         <div class="content-card h-100">
                                             <div class="student-profile-header mb-4">
                                                 <img src="{{ $appointment->student->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($appointment->student->name) }}"
@@ -549,7 +503,7 @@
 
                             <div class="content-card mb-4">
                                 <div class="card-title-styled"><i class="bi bi-shield-check"></i> Guardian</div>
-                                <div id="guardianPrivacyContainer" class="privacy-blur">
+                                <div id="guardianPrivacyContainer">
                                     <div class="info-group">
                                         <div class="info-label">Primary Guardian</div>
                                         <div class="info-value">{{ $appointment->guardian1_name ?? 'N/A' }}</div>
@@ -572,7 +526,7 @@
 
                             <!-- Assessment Data -->
                             @if(!empty($latestAssessment))
-                                <div id="assessmentPrivacyContainer" class="privacy-blur mb-4">
+                                <div id="assessmentPrivacyContainer" class="mb-4">
                                     <div class="content-card">
                                         <div class="card-title-styled"><i class="bi bi-bar-chart-fill"></i> Latest Assessment
                                             Data
@@ -657,7 +611,7 @@
                             @endif
 
                             <!-- Notes Section (Prominent) -->
-                            <div id="notesPrivacyContainer" class="privacy-blur mb-4">
+                            <div id="notesPrivacyContainer" class="mb-4">
                                 <div class="content-card notes-card">
                                     <div class="card-title-styled">
                                         <i class="bi bi-sticky-fill"></i> Student Notes / Concerns
@@ -726,28 +680,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar toggle logic matching student directory
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('counselorSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function (e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        sidebar.classList.remove('show');
-                    }
-                });
-            }
-
             // Confirmation Logic
             const confirmModalEl = document.getElementById('confirmModal');
             let bsConfirmModal = new bootstrap.Modal(confirmModalEl);
@@ -775,105 +707,7 @@
             });
 
 
-            // Privacy Toggle Logic
-            const privacyBtn = document.getElementById('privacyToggleBtn');
-            const privacyIcon = document.getElementById('privacyIcon');
-            const studentContainer = document.getElementById('studentPrivacyContainer');
-            const guardianContainer = document.getElementById('guardianPrivacyContainer');
-            const assessmentContainer = document.getElementById('assessmentPrivacyContainer');
-            const scheduleContainer = document.getElementById('schedulePrivacyContainer');
-            const notesContainer = document.getElementById('notesPrivacyContainer');
-            let isRevealed = false;
-
-            if (privacyBtn) {
-                privacyBtn.addEventListener('click', function () {
-                    if (!isRevealed) {
-                        Swal.fire({
-                            title: 'Enter Passkey',
-                            input: 'password',
-                            inputLabel: 'To view student details, please enter the passkey:',
-                            inputPlaceholder: 'Enter passkey',
-                            showCancelButton: true,
-                            confirmButtonText: 'Reveal',
-                            confirmButtonColor: '#1f7a2d',
-                            cancelButtonColor: '#6c757d',
-                            preConfirm: (passkey) => {
-                                if (!passkey) {
-                                    Swal.showValidationMessage('Please enter a passkey');
-                                }
-                                return passkey;
-                            }
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Default fallback passkey if not set in profile
-                                const userPasskey = '{{ auth()->user()->passkey ?? "GCC2026" }}';
-
-                                if (result.value === userPasskey) {
-                                    isRevealed = true;
-                                    studentContainer.classList.remove('privacy-blur');
-                                    studentContainer.classList.add('privacy-revealed');
-                                    guardianContainer.classList.remove('privacy-blur');
-                                    guardianContainer.classList.add('privacy-revealed');
-                                    if (assessmentContainer) {
-                                        assessmentContainer.classList.remove('privacy-blur');
-                                        assessmentContainer.classList.add('privacy-revealed');
-                                    }
-                                    if (scheduleContainer) {
-                                        scheduleContainer.classList.remove('privacy-blur');
-                                        scheduleContainer.classList.add('privacy-revealed');
-                                    }
-                                    if (notesContainer) {
-                                        notesContainer.classList.remove('privacy-blur');
-                                        notesContainer.classList.add('privacy-revealed');
-                                    }
-                                    privacyIcon.classList.remove('bi-eye-slash-fill');
-                                    privacyIcon.classList.add('bi-eye-fill');
-                                    privacyBtn.classList.remove('btn-light');
-                                    privacyBtn.classList.add('btn-warning');
-
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Access Granted',
-                                        text: 'Student details revealed.',
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Access Denied',
-                                        text: 'Incorrect passkey.',
-                                        confirmButtonColor: '#dc3545'
-                                    });
-                                }
-                            }
-                        });
-                    } else {
-                        // Re-hide
-                        isRevealed = false;
-                        studentContainer.classList.add('privacy-blur');
-                        studentContainer.classList.remove('privacy-revealed');
-                        guardianContainer.classList.add('privacy-blur');
-                        guardianContainer.classList.remove('privacy-revealed');
-                        if (assessmentContainer) {
-                            assessmentContainer.classList.add('privacy-blur');
-                            assessmentContainer.classList.remove('privacy-revealed');
-                        }
-                        if (scheduleContainer) {
-                            scheduleContainer.classList.add('privacy-blur');
-                            scheduleContainer.classList.remove('privacy-revealed');
-                        }
-                        if (notesContainer) {
-                            notesContainer.classList.add('privacy-blur');
-                            notesContainer.classList.remove('privacy-revealed');
-                        }
-                        privacyIcon.classList.add('bi-eye-slash-fill');
-                        privacyIcon.classList.remove('bi-eye-fill');
-                        privacyBtn.classList.add('btn-light');
-                        privacyBtn.classList.remove('btn-warning');
-                    }
-                });
-            }
+            // Privacy Toggle Logic Removed
         });
     </script>
 

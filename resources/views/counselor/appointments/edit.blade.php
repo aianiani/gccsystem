@@ -296,9 +296,18 @@
                                     </div>
 
                                     <div class="mb-4">
-                                        <label for="notes" class="form-label">Notes</label>
+                                        <label for="reschedule_reason" class="form-label">Reason for Rescheduling</label>
+                                        <textarea name="reschedule_reason" id="reschedule_reason" class="form-control" rows="3" 
+                                            placeholder="Please provide a reason for rescheduling this appointment... (This will be visible to the student)" required>{{ old('reschedule_reason', $appointment->reschedule_reason) }}</textarea>
+                                        @error('reschedule_reason')
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="notes" class="form-label">Internal Notes</label>
                                         <textarea name="notes" id="notes" class="form-control" rows="4"
-                                            placeholder="Add any notes about this rescheduling...">{{ old('notes', $appointment->notes) }}</textarea>
+                                            placeholder="Add any internal notes about this rescheduling...">{{ old('notes', $appointment->notes) }}</textarea>
                                         @error('notes')
                                             <div class="text-danger small mt-1">{{ $message }}</div>
                                         @enderror

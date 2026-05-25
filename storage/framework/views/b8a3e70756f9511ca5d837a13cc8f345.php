@@ -394,7 +394,8 @@
 
             /* Enhanced toggle button for mobile */
             #studentSidebarToggle,
-            #adminSidebarToggle {
+            #adminSidebarToggle,
+            #counselorSidebarToggle {
                 position: fixed !important;
                 top: 1.25rem !important;
                 left: 1rem !important;
@@ -414,7 +415,8 @@
             }
 
             #studentSidebarToggle:active,
-            #adminSidebarToggle:active {
+            #adminSidebarToggle:active,
+            #counselorSidebarToggle:active {
                 transform: scale(0.9) !important;
             }
         }
@@ -573,7 +575,12 @@
     </style>
 </head>
 
-<body>
+<body class="antialiased">
+    <?php if(auth()->guard()->check()): ?>
+        <?php if(!auth()->user()->isCounselor()): ?>
+            <?php echo $__env->make('partials.notification_bell', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <?php endif; ?>
+    <?php endif; ?>
 
     <?php if(auth()->guard()->check()): ?>
         <?php if(auth()->user()->isAdmin()): ?>
@@ -766,6 +773,9 @@
             </script>
         <?php else: ?>
             <main class="fade-in">
+                <?php if(auth()->check() && auth()->user()->isCounselor()): ?>
+                    <?php echo $__env->make('partials.counselor_navbar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                <?php endif; ?>
                 <?php if (! empty(trim($__env->yieldContent('full_width')))): ?>
                     <?php echo $__env->yieldContent('content'); ?>
                 <?php else: ?>

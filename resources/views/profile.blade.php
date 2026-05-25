@@ -19,9 +19,7 @@
                 margin-left: 0 !important;
             }
 
-            .custom-sidebar {
-                transform: translateX(-100%);
-            }
+            
 
             .custom-sidebar.show {
                 transform: translateX(0) !important;
@@ -102,12 +100,7 @@
         }
 
         /* Ensure sidebar links are styled if not inherited */
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.05);
-        }
+        
 
         .custom-sidebar .sidebar-logo h3 {
             font-family: 'Segoe UI', sans-serif;
@@ -116,41 +109,13 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.25rem 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        
 
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1.1rem;
-            padding: 0.9rem 1.25rem;
-            border-radius: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            margin: 0.1rem 0;
-        }
+        
 
-        .custom-sidebar .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            transform: translateX(5px);
-        }
+        
 
-        .custom-sidebar .sidebar-link.active {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            color: #f4d03f;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
+        
 
         .custom-sidebar .sidebar-link .bi {
             font-size: 1.25rem;

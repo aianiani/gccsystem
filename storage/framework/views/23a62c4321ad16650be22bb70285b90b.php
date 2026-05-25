@@ -14,9 +14,7 @@
         }
 
         /* Force sidebar to use the local forest-green variable */
-        .custom-sidebar {
-            background: var(--forest-green) !important;
-        }
+        
 
         /* Match dashboard zoom */
         .home-zoom {

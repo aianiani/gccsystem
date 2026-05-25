@@ -256,12 +256,48 @@
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                                    <button type="button" class="btn btn-primary btn-lg px-4" id="edit-user-btn">
-                                        <i class="bi bi-check-lg me-2"></i>Save Changes
-                                    </button>
+                        <div class="edit-user-card mb-4">
+                            <div class="card-header bg-warning bg-opacity-10 text-dark">
+                                <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Security Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-warning py-2 mb-4 border-0 bg-warning bg-opacity-10 text-dark" style="font-size: 0.85rem;">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    Leave password fields blank if you do not wish to change the user's password.
+                                </div>
+
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label for="password" class="form-label">New Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted"><i class="bi bi-key"></i></span>
+                                            <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                                                id="password" name="password" autocomplete="new-password">
+                                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                        @error('password')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="password_confirmation" class="form-label">Confirm New Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted"><i class="bi bi-key-fill"></i></span>
+                                            <input type="password" class="form-control" 
+                                                id="password_confirmation" name="password_confirmation" autocomplete="new-password">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mb-5">
+                            <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm" id="edit-user-btn">
+                                <i class="bi bi-check-lg me-2"></i>Save All Changes
+                            </button>
                         </div>
                     </div>
 
@@ -326,6 +362,22 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const password = document.getElementById('password');
+            const passwordConfirm = document.getElementById('password_confirmation');
+            const icon = this.querySelector('i');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                passwordConfirm.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                password.type = 'password';
+                passwordConfirm.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        });
 
         document.getElementById('edit-user-btn').addEventListener('click', function (e) {
             e.preventDefault();

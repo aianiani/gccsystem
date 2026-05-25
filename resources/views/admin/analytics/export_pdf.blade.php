@@ -132,7 +132,7 @@
         <tbody>
             @foreach($appointmentStatus as $status => $count)
                 <tr>
-                    <td class="text-left">{{ ucfirst($status) }}</td>
+                    <td class="text-left">{{ $status === 'accepted' ? 'Approved' : ucfirst($status) }}</td>
                     <td>{{ $count }}</td>
                 </tr>
             @endforeach

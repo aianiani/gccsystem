@@ -56,54 +56,16 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2rem 1rem 1rem 1rem;
-            border-bottom: 1px solid #4a7c59;
-        }
+        
 
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.5rem 0.5rem 0 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        
 
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-            position: relative;
-        }
+        
 
         .custom-sidebar .sidebar-link.active,
-        .custom-sidebar .sidebar-link:hover {
-            background: #4a7c59;
-            color: #f4d03f;
-        }
+        
 
         .custom-sidebar .sidebar-link .bi {
             font-size: 1.1rem;
@@ -129,69 +91,29 @@
             color: #fff;
         }
 
-        @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
-
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
+        
 
         @media (max-width: 767.98px) {
 
             /* Off-canvas behavior on mobile */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.2s ease;
-                flex-direction: column;
-                padding: 0;
-            }
+            
 
             .custom-sidebar.show {
                 transform: translateX(0);
             }
 
-            .custom-sidebar .sidebar-logo {
-                display: block;
-            }
+            
 
-            .custom-sidebar .sidebar-nav {
-                flex-direction: column;
-                gap: 0.25rem;
-                padding: 1rem 0.5rem 1rem 0.5rem;
-            }
+            
 
-            .custom-sidebar .sidebar-link {
-                justify-content: flex-start;
-                padding: 0.6rem 0.75rem;
-                font-size: 1rem;
-            }
+            
 
             .main-dashboard-content {
                 margin-left: 0;
             }
 
             /* Toggle button */
-            #counselorSidebarToggle {
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1100;
-                background: var(--forest-green);
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 0.5rem 0.75rem;
-                box-shadow: var(--shadow-sm);
-            }
+            
         }
 
         .main-dashboard-content {
@@ -257,9 +179,7 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
+            
 
             <!-- Sidebar -->
             @include('counselor.sidebar')
@@ -418,11 +338,14 @@
                                             <div>
                                                 <div class="font-semibold text-gray-800">{{ $appointment->appointment_type }}
                                                 </div>
+                                                <div class="text-xs text-primary-green font-medium">
+                                                    with {{ $appointment->counselor ? $appointment->counselor->name : 'Unassigned' }}
+                                                </div>
                                                 <div class="text-sm text-gray-500">
                                                     {{ $appointment->scheduled_at ? $appointment->scheduled_at->format('M d, Y \a\t h:i A') : 'Date not set' }}</div>
                                                 <div class="text-xs mt-1">
                                                     <span
-                                                        class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{{ ucfirst($appointment->status) }}</span>
+                                                        class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{{ $appointment->status === 'accepted' ? 'Approved' : ucfirst($appointment->status) }}</span>
                                                 </div>
                                             </div>
                                             <a href="{{ route('counselor.appointments.show', $appointment->id) }}"
@@ -442,21 +365,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar toggle for mobile
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('counselorSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function (e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
+            });
             }
         });
     </script>

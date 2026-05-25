@@ -108,7 +108,7 @@
         </div>
         <div style="text-align: center; color: #666;">
             <strong>Appointment Summary</strong><br>
-            <?php if(isset($appointment->session_number)): ?>
+            <?php if(isset($appointment->session_number) && !in_array($appointment->status, ['declined', 'cancelled'])): ?>
                 Session #<?php echo e($appointment->session_number); ?><br>
             <?php endif; ?>
             Generated on: <?php echo e(now()->format('F d, Y h:i A')); ?>
@@ -129,7 +129,7 @@
             </tr>
             <tr>
                 <td>Status:</td>
-                <td><span class="badge badge-warning"><?php echo e(ucfirst($appointment->status)); ?></span></td>
+                <td><span class="badge badge-warning"><?php echo e($appointment->status === 'accepted' ? 'Approved' : ucfirst($appointment->status)); ?></span></td>
             </tr>
             <?php if($appointment->notes): ?>
                 <tr>

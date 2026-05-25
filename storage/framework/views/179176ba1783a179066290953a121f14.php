@@ -39,21 +39,7 @@
                         }
 
                         /* Sidebar and content layout */
-                        .custom-sidebar {
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            bottom: 0;
-                            width: 240px;
-                            background: var(--forest-green);
-                            color: #fff;
-                            z-index: 1040;
-                            display: flex;
-                            flex-direction: column;
-                            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-                            overflow-y: auto;
-                            padding-bottom: 1rem;
-                        }
+                        
 
                         .main-dashboard-content {
                             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
@@ -148,7 +134,7 @@
                                 <?php echo e(optional($appointment->scheduled_at)->format('F j, Y') ?? '-'); ?></div>
                             <div class="mb-2"><i class="bi bi-clock me-1"></i>
                                 <?php echo e(optional($appointment->scheduled_at)->format('g:i A') ?? '-'); ?></div>
-                            <div><span class="badge bg-light text-dark"><?php echo e(ucfirst($appointment->status ?? 'N/A')); ?></span>
+                            <div><span class="badge bg-light text-dark"><?php echo e($appointment->status === 'accepted' ? 'Approved' : ucfirst($appointment->status ?? 'N/A')); ?></span>
                             </div>
                         </div>
                     </div>

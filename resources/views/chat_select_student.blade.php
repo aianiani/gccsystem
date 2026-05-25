@@ -51,21 +51,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
@@ -79,6 +65,10 @@
             .main-dashboard-content {
                 margin-left: 0;
                 padding: 1rem 0.75rem !important;
+            }
+
+            .main-dashboard-inner {
+                padding-top: 3rem;
             }
         }
 
@@ -378,25 +368,20 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
+            
             <!-- Sidebar -->
             @include('counselor.sidebar')
 
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
                 <div class="main-dashboard-inner">
-                    <div class="welcome-card">
-                        <div>
-                            <div class="welcome-date">{{ now()->format('F j, Y') }}</div>
-                            <div class="welcome-text">Choose a Student to Chat With</div>
-                            <div style="font-size: 0.9rem; margin-top: 0.5rem;">Select a student to start a conversation and
-                                provide support</div>
-                        </div>
-                        <div class="welcome-avatar">
-                            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
-                                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    <div class="welcome-card" style="padding: 1rem 1.25rem; min-height: auto; border-radius: 12px;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0;">
+                            <i class="bi bi-chat-dots" style="font-size: 1.4rem; color: var(--yellow-maize); flex-shrink: 0;"></i>
+                            <div style="min-width: 0;">
+                                <div style="font-size: 1.1rem; font-weight: 700; line-height: 1.2;">Student Chat</div>
+                                <div style="font-size: 0.8rem; opacity: 0.75;">{{ now()->format('F j, Y') }}</div>
+                            </div>
                         </div>
                     </div>
 

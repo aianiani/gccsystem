@@ -423,9 +423,7 @@
                   class="form-control">{{ old('case_notes', $assessment->case_notes ?? '') }}</textarea>
               </div>
               <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary btn-sm">Save Notes</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse"
-                  data-bs-target="#counselorNotes-{{ $assessment->id }}">Private Notes</button>
+                <button type="submit" class="btn btn-primary btn-sm">Save Note</button>
               </div>
             </form>
           </div>

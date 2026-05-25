@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('full_width', true)
+
 @push('scripts')
     <script>
         // Force cache refresh
@@ -60,28 +62,9 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.05);
-        }
+        
 
         .custom-sidebar .sidebar-logo h3 {
             font-family: 'Outfit', sans-serif;
@@ -96,41 +79,13 @@
             font-size: 0.8rem !important;
         }
 
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.25rem 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        
 
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1.1rem;
-            padding: 0.9rem 1.25rem;
-            border-radius: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            margin: 0.1rem 0;
-        }
+        
 
-        .custom-sidebar .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            transform: translateX(5px);
-        }
+        
 
-        .custom-sidebar .sidebar-link.active {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            color: #f4d03f;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
+        
 
         .custom-sidebar .sidebar-link.active::before {
             content: '';
@@ -182,9 +137,7 @@
         }
 
         @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
+            
 
             .main-dashboard-content {
                 margin-left: 200px;
@@ -196,19 +149,7 @@
         @media (max-width: 991.98px) {
 
             /* Off-canvas behavior on mobile */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                flex-direction: column;
-                padding: 0;
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
-            }
+            
 
             .custom-sidebar.show {
                 transform: translateX(0);
@@ -238,17 +179,19 @@
         }
 
         .main-dashboard-content {
-            background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
+            background: #f0f2f5;
             min-height: 100vh;
-            padding: 1rem 1.5rem;
-            margin-left: 240px;
+            padding: 1.5rem;
+            margin-left: 280px;
             transition: all 0.3s ease;
         }
 
         @media (max-width: 768px) {
             .main-dashboard-content {
-                margin-left: 0;
-                padding: 1rem 0.75rem !important;
+                margin-left: 0 !important;
+                padding: 0 !important;
+                min-height: 100vh;
+                background: #f0f2f5;
             }
         }
 
@@ -257,14 +200,80 @@
             max-width: 100%;
             margin: 0 auto;
         }
+
+        @media (max-width: 767.98px) {
+            /* Kill ALL spacing from every wrapper so chat fills the viewport */
+            html, body {
+                height: 100% !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            body {
+                min-height: 0 !important;
+                background: #f0f2f5 !important;
+            }
+
+            main.fade-in {
+                padding: 0 !important;
+                margin: 0 !important;
+                min-height: 0 !important;
+                height: 100vh !important;
+                height: 100dvh !important;
+                overflow: hidden !important;
+            }
+
+            .home-zoom {
+                zoom: 1 !important;
+                transform: none !important;
+                height: 100% !important;
+                overflow: hidden !important;
+            }
+
+            .home-zoom > .d-flex {
+                height: 100% !important;
+            }
+
+            .main-dashboard-inner {
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100% !important;
+            }
+
+            .main-dashboard-inner > .container-fluid {
+                height: 100% !important;
+            }
+
+            .main-dashboard-inner .row.g-0 {
+                height: 100% !important;
+            }
+
+            .main-dashboard-inner .col-12 {
+                height: 100% !important;
+            }
+
+            /* Hide notification bell on chat page for mobile */
+            .notification-bell-container {
+                display: none !important;
+            }
+
+            /* Hide hamburger toggle — use back button in chat header instead */
+            #counselorSidebarToggle,
+            #studentSidebarToggle {
+                display: none !important;
+            }
+        }
     </style>
 
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="studentSidebarToggle" class="d-lg-none">
-                <i class="bi bi-list"></i>
-            </button>
+            @if(auth()->check() && !auth()->user()->isCounselor())
+                <button id="studentSidebarToggle" class="d-lg-none">
+                    <i class="bi bi-list"></i>
+                </button>
+            @endif
             <!-- Sidebar -->
             @if(auth()->check() && auth()->user()->isCounselor())
                 @include('counselor.sidebar')
@@ -333,11 +342,14 @@
                                         <div class="col-md-8 col-lg-9 chat-main">
                                             <div class="chat-header">
                                                 <div class="d-flex align-items-center">
+                                                    <a href="javascript:history.back()" class="btn-back-chat d-md-none me-2" title="Back">
+                                                        <i class="bi bi-arrow-left"></i>
+                                                    </a>
                                                     <img src="{{ $otherUser->avatar_url }}" class="rounded-circle me-3"
                                                         style="width: 40px; height: 40px; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                                                    <div>
-                                                        <h6 class="mb-0 font-weight-bold">{{ $otherUser->name }}</h6>
-                                                        <small class="text-muted">{{ $otherUser->email }}</small>
+                                                    <div style="min-width: 0;">
+                                                        <h6 class="mb-0 font-weight-bold text-truncate">{{ $otherUser->name }}</h6>
+                                                        <small class="text-muted d-none d-sm-inline">{{ $otherUser->email }}</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -454,34 +466,130 @@
         /* Chat Layout */
         .chat-card {
             border: none;
-            box-shadow: var(--shadow-md);
-            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border-radius: 20px;
             overflow: hidden;
-            height: calc(100vh - 100px);
+            height: calc(100vh - 120px);
             min-height: 600px;
+            background: white;
         }
 
         @media (max-width: 768px) {
             .chat-card {
-                height: calc(100vh - 80px);
-                min-height: 500px;
+                height: 100% !important;
+                min-height: 0;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                overflow: visible !important;
+            }
+
+            .main-dashboard-content {
+                height: 100% !important;
+                padding: 0 !important;
+                margin-left: 0 !important;
+                min-height: 0 !important;
             }
 
             .inbox-sidebar {
                 display: none !important;
-                /* simple mobile chat: show conversation only if active */
             }
 
             .chat-input-wrapper {
-                padding: 0.75rem 0.5rem !important;
+                padding: 0.5rem 0.75rem !important;
+                padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px)) !important;
+                box-sizing: border-box !important;
             }
 
             .chat-main {
-                width: 100%;
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: 0 0 100% !important;
+                box-sizing: border-box !important;
+                overflow: visible !important;
             }
 
             .message-bubble {
-                max-width: 85%;
+                max-width: 78%;
+            }
+
+            .messages-area {
+                padding: 0.5rem 0.75rem;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+            }
+
+            .chat-header {
+                padding: 0.6rem 0.75rem;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+
+            .chat-header img {
+                width: 36px !important;
+                height: 36px !important;
+                margin-right: 0.5rem !important;
+            }
+
+            .chat-header h6 {
+                font-size: 0.95rem;
+            }
+
+            .container-fluid {
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+
+            .chat-card .row,
+            .chat-card .row.g-0 {
+                overflow: visible !important;
+            }
+
+            .chat-card .col-12,
+            .chat-card .col-md-8,
+            .chat-card .col-lg-9 {
+                overflow: visible !important;
+            }
+
+            /* Override Bootstrap .card margin-bottom */
+            .card.chat-card {
+                margin-bottom: 0 !important;
+            }
+
+            /* Back button styling */
+            .btn-back-chat {
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                background: rgba(0, 0, 0, 0.05);
+                color: var(--forest-green);
+                border: none;
+                font-size: 1.1rem;
+                transition: background 0.2s;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .btn-back-chat:hover {
+                background: rgba(0, 0, 0, 0.1);
+                color: var(--forest-green);
+            }
+
+            /* Make send button slightly smaller */
+            .btn-send {
+                width: 38px;
+                height: 38px;
+            }
+
+            /* Compact input */
+            .chat-input {
+                padding: 8px 12px;
+                font-size: 0.95rem;
             }
         }
 

@@ -5,9 +5,7 @@
         /* Homepage theme variables (mapped into existing dashboard vars) */
         :root {
             --primary-green: #1f7a2d;
-            /* Homepage forest green */
             --primary-green-2: #13601f;
-            /* darker stop */
             --accent-green: #2e7d32;
             --light-green: #eaf5ea;
             --accent-orange: #FFCB05;
@@ -16,7 +14,6 @@
             --bg-light: #f6fbf6;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 
-            /* Map dashboard-specific names to homepage palette for compatibility */
             --forest-green: var(--primary-green);
             --forest-green-dark: var(--primary-green-2);
             --forest-green-light: var(--accent-green);
@@ -56,54 +53,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
-
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2rem 1rem 1rem 1rem;
-            border-bottom: 1px solid #4a7c59;
-        }
-
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.5rem 0.5rem 0 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-            position: relative;
-        }
-
         .custom-sidebar .sidebar-link.active,
-        .custom-sidebar .sidebar-link:hover {
-            background: #4a7c59;
-            color: #f4d03f;
-        }
 
         .custom-sidebar .sidebar-link .bi {
             font-size: 1.1rem;
@@ -129,68 +79,13 @@
             color: #fff;
         }
 
-        @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
-
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
-
         @media (max-width: 767.98px) {
-
-            /* Off-canvas behavior on mobile */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.2s ease;
-                flex-direction: column;
-                padding: 0;
-            }
-
             .custom-sidebar.show {
                 transform: translateX(0);
             }
 
-            .custom-sidebar .sidebar-logo {
-                display: block;
-            }
-
-            .custom-sidebar .sidebar-nav {
-                flex-direction: column;
-                gap: 0.25rem;
-                padding: 1rem 0.5rem 1rem 0.5rem;
-            }
-
-            .custom-sidebar .sidebar-link {
-                justify-content: flex-start;
-                padding: 0.6rem 0.75rem;
-                font-size: 1rem;
-            }
-
             .main-dashboard-content {
                 margin-left: 0;
-            }
-
-            /* Toggle button */
-            #counselorSidebarToggle {
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1100;
-                background: var(--forest-green);
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 0.5rem 0.75rem;
-                box-shadow: var(--shadow-sm);
             }
         }
 
@@ -202,13 +97,12 @@
             transition: margin-left 0.2s;
         }
 
-        /* Constrain inner content and center it within the available area */
         .main-dashboard-inner {
             max-width: 100%;
             margin: 0 auto;
         }
 
-        /* Custom Styles for Guidance Module */
+        /* Page Header */
         .page-header {
             background: var(--hero-gradient);
             border-radius: 16px;
@@ -218,6 +112,20 @@
             color: #fff;
         }
 
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+            color: #fff;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin: 0.25rem 0 0;
+        }
+
+        /* Content Card */
         .content-card {
             background: #fff;
             border-radius: 16px;
@@ -229,19 +137,39 @@
 
         .card-header-custom {
             background: #fff;
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 1.5rem;
             border-bottom: 1px solid var(--light-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
+        .card-header-custom h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+
+        /* Buttons */
         .btn-primary-custom {
             background: var(--primary-green);
             border: none;
             color: #fff;
-            padding: 0.5rem 1.25rem;
+            padding: 0.55rem 1.5rem;
             border-radius: 8px;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.9rem;
             transition: all 0.2s;
             box-shadow: 0 2px 5px rgba(31, 122, 45, 0.3);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .btn-primary-custom:hover {
@@ -263,6 +191,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .btn-secondary-custom:hover {
@@ -271,12 +200,33 @@
             color: var(--primary-green);
         }
 
+        /* Form controls */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label-custom {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.5rem;
+        }
+
         .form-control-custom,
         .form-select-custom {
+            display: block;
+            width: 100%;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            background: #fff;
             transition: all 0.2s;
+            box-sizing: border-box;
         }
 
         .form-control-custom:focus,
@@ -285,14 +235,32 @@
             box-shadow: 0 0 0 3px rgba(31, 122, 45, 0.1);
             outline: none;
         }
+
+        textarea.form-control-custom {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-grid-full {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 767.98px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
 
             <!-- Sidebar -->
             @include('counselor.sidebar')
@@ -300,48 +268,61 @@
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
                 <div class="main-dashboard-inner">
-                    <div class="mb-6">
+                    <!-- Back Button -->
+                    <div style="margin-bottom: 1.5rem;">
                         <a href="{{ route('counselor.seminars.index') }}" class="btn-secondary-custom">
                             <i class="bi bi-arrow-left"></i> Back to Seminars
                         </a>
                     </div>
 
+                    <!-- Page Header -->
+                    <div class="page-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="page-title">Create New Seminar</h2>
+                            <p class="page-subtitle">Define a new seminar for your guidance program</p>
+                        </div>
+                        <div class="d-none d-md-block">
+                            <i class="bi bi-plus-circle" style="font-size: 3rem; opacity: 0.2;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Create Seminar Form -->
                     <div class="content-card">
                         <div class="card-header-custom">
-                            <h3 class="text-lg font-bold text-gray-800 m-0">Create New Seminar</h3>
+                            <h3><i class="bi bi-info-circle me-2" style="color: var(--primary-green);"></i>Seminar Details</h3>
                         </div>
-                        <div class="p-6">
+                        <div class="card-body-custom">
                             <form action="{{ route('counselor.seminars.store') }}" method="POST">
                                 @csrf
 
-                                <div class="mb-4">
-                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Seminar
-                                        Name</label>
-                                    <input type="text" name="name" id="name" class="form-control-custom w-full" required>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="name" class="form-label-custom">Seminar Name</label>
+                                        <input type="text" name="name" id="name" class="form-control-custom" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="target_year_level" class="form-label-custom">Target Year Level</label>
+                                        <select name="target_year_level" id="target_year_level" class="form-select-custom"
+                                            required>
+                                            <option value="1">1st Year</option>
+                                            <option value="2">2nd Year</option>
+                                            <option value="3">3rd Year</option>
+                                            <option value="4">4th Year</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group form-grid-full">
+                                        <label for="description" class="form-label-custom">Description</label>
+                                        <textarea name="description" id="description" rows="3"
+                                            class="form-control-custom"></textarea>
+                                    </div>
                                 </div>
 
-                                <div class="mb-4">
-                                    <label for="description"
-                                        class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                    <textarea name="description" id="description" rows="3"
-                                        class="form-control-custom w-full"></textarea>
-                                </div>
-
-                                <div class="mb-6">
-                                    <label for="target_year_level"
-                                        class="block text-sm font-medium text-gray-700 mb-2">Target Year
-                                        Level</label>
-                                    <select name="target_year_level" id="target_year_level"
-                                        class="form-select-custom w-full" required>
-                                        <option value="1">1st Year</option>
-                                        <option value="2">2nd Year</option>
-                                        <option value="3">3rd Year</option>
-                                        <option value="4">4th Year</option>
-                                    </select>
-                                </div>
-
-                                <div class="flex justify-end">
-                                    <button type="submit" class="btn-primary-custom">Create Seminar</button>
+                                <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                                    <button type="submit" class="btn-primary-custom">
+                                        <i class="bi bi-plus-lg"></i> Create Seminar
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -353,22 +334,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar toggle for mobile
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('counselorSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function (e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-            }
         });
     </script>
 @endsection

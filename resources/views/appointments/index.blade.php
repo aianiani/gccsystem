@@ -67,9 +67,7 @@
                 margin-left: 0 !important;
             }
 
-            .custom-sidebar {
-                transform: translateX(-100%);
-            }
+            
 
             .custom-sidebar.show {
                 transform: translateX(0) !important;
@@ -434,7 +432,7 @@
                                             <div class="card-body-styled">
                                                 <div class="time-badge">
                                                     <i class="bi bi-clock-history"></i>
-                                                    {{ $start->format('M d, Y') }} • {{ $start->format('g:i A') }}
+                                                    {{ $start->format('M d, Y') }} • {{ $start->format('g:i A') }} - {{ $start->copy()->addHour()->format('g:i A') }}
                                                 </div>
 
                                                 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -471,14 +469,19 @@
                                                                 <small class="text-primary fw-medium d-block">Session completed.</small>
                                                                 @if($appointment->sessionNotes->count() > 0)
                                                                     <a href="{{ route('appointments.completedWithNotes') }}"
-                                                                        class="text-primary small text-decoration-underline mt-1 d-block">View
-                                                                        Session Notes</a>
+                                                                        class="text-primary small text-decoration-underline mt-1 d-block">Provide a Feedback</a>
                                                                 @endif
                                                             </div>
                                                         </div>
                                                     @elseif($appointment->status === 'rescheduled_pending')
-                                                        <div class="mb-2">
-                                                            <small class="text-info fw-bold d-block mb-2">New time proposed:</small>
+                                                        <div class="mb-3">
+                                                            @if($appointment->reschedule_reason)
+                                                                <div class="reschedule-reason-box p-2 mb-2 rounded bg-info bg-opacity-10 border border-info border-opacity-25">
+                                                                    <small class="text-info d-block fw-bold mb-1"><i class="bi bi-info-circle-fill me-1"></i> Reason for Rescheduling:</small>
+                                                                    <p class="mb-0 small text-dark" style="word-break: break-word;">{{ $appointment->reschedule_reason }}</p>
+                                                                </div>
+                                                            @endif
+                                                            <small class="text-info fw-bold d-block mb-2">New time proposed: {{ $appointment->scheduled_at->format('M d, Y • g:i A') }}</small>
                                                             <div class="d-flex gap-2">
                                                                 <form
                                                                     action="{{ route('appointments.acceptReschedule', $appointment->id) }}"

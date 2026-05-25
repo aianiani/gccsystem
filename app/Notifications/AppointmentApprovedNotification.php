@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use App\Models\Appointment;
 
-class AppointmentAcceptedNotification extends Notification
+class AppointmentApprovedNotification extends Notification
 {
     use Queueable;
 
@@ -55,7 +55,7 @@ class AppointmentAcceptedNotification extends Notification
 
         $message = (new MailMessage)
             ->subject('Your Appointment Has Been Approved')
-            ->view('emails.appointments.accepted', compact('student', 'counselor', 'appointment'));
+            ->view('emails.appointments.approved', compact('student', 'counselor', 'appointment'));
 
         return $message;
     }

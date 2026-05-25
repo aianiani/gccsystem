@@ -50,21 +50,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
@@ -79,18 +65,9 @@
             margin: 0 auto;
         }
 
-        @media (max-width: 991.98px) {
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
+        
 
-        @media (max-width: 767.98px) {
-            .main-dashboard-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-        }
+        
 
         /* Page Header */
         .page-header {
@@ -475,9 +452,9 @@
         }
 
         .status-completed {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #93c5fd;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
         }
 
         .status-declined {
@@ -588,9 +565,7 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
+            
 
             <?php echo $__env->make('counselor.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
@@ -763,12 +738,16 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span class="session-badge">Session #<?php echo e($appointment->session_number); ?></span>
+                                                    <?php if(!in_array($appointment->status, ['declined', 'cancelled'])): ?>
+                                                        <span class="session-badge">Session #<?php echo e($appointment->session_number); ?></span>
+                                                    <?php else: ?>
+                                                        <span class="text-muted small">N/A</span>
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td>
                                                     <div class="date-cell">
                                                         <span class="date"><?php echo e($appointment->scheduled_at->format('M d, Y')); ?></span>
-                                                        <span class="time"><?php echo e($appointment->scheduled_at->format('g:i A')); ?></span>
+                                                        <span class="time"><?php echo e($appointment->scheduled_at->format('g:i A')); ?> - <?php echo e($appointment->scheduled_at->copy()->addHour()->format('g:i A')); ?></span>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -882,19 +861,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar toggle
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggle = document.getElementById('counselorSidebarToggle');
-            if (toggle && sidebar) {
-                toggle.addEventListener('click', () => sidebar.classList.toggle('show'));
-                document.addEventListener('click', (e) => {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show') &&
-                        !sidebar.contains(e.target) && !toggle.contains(e.target)) {
-                        sidebar.classList.remove('show');
-                    }
-                });
-            }
-
             // Bulk selection
             const selectAll = document.getElementById('selectAll');
             const checkboxes = document.querySelectorAll('.item-checkbox');

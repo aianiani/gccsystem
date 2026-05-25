@@ -44,7 +44,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'cor_file',
         'consent_agreed',
         'consent_agreed_at',
-        'passkey',
     ];
 
     /**

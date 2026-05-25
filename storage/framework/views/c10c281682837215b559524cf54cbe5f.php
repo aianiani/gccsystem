@@ -304,9 +304,25 @@ unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="mb-4">
-                                        <label for="notes" class="form-label">Notes</label>
+                                        <label for="reschedule_reason" class="form-label">Reason for Rescheduling</label>
+                                        <textarea name="reschedule_reason" id="reschedule_reason" class="form-control" rows="3" 
+                                            placeholder="Please provide a reason for rescheduling this appointment... (This will be visible to the student)" required><?php echo e(old('reschedule_reason', $appointment->reschedule_reason)); ?></textarea>
+                                        <?php $__errorArgs = ['reschedule_reason'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="text-danger small mt-1"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="notes" class="form-label">Internal Notes</label>
                                         <textarea name="notes" id="notes" class="form-control" rows="4"
-                                            placeholder="Add any notes about this rescheduling..."><?php echo e(old('notes', $appointment->notes)); ?></textarea>
+                                            placeholder="Add any internal notes about this rescheduling..."><?php echo e(old('notes', $appointment->notes)); ?></textarea>
                                         <?php $__errorArgs = ['notes'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :

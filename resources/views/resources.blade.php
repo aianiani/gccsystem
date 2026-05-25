@@ -31,42 +31,27 @@
             box-sizing: border-box;
         }
 
-        .d-flex {
-            width: 100%;
+        .home-zoom {
+            /* Inherits zoom from layouts/app.blade.php */
         }
 
-        /* Compensation for zoom: 0.75 */
-        .home-zoom {
-            width: 133.333%;
+        .d-flex {
+            width: 100%;
+            display: flex;
         }
 
         @media (max-width: 767.98px) {
             .home-zoom {
-                width: 100%;
+                zoom: 1 !important;
+                transform: none !important;
             }
         }
 
         /* Sidebar Styles */
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 280px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        
 
         @media (max-width: 991.98px) {
-            .custom-sidebar {
-                transform: translateX(-100%);
-            }
+            
 
             .custom-sidebar.show {
                 transform: translateX(0) !important;
@@ -96,16 +81,26 @@
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
             min-height: 100vh;
-            margin-left: 280px;
+            margin-left: 280px !important;
+            width: auto !important;
+            padding-bottom: 3rem;
+            position: relative;
             transition: margin-left 0.3s ease;
-            width: calc(100% - 280px);
-            overflow-x: hidden;
+        }
+
+        .main-dashboard-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
         @media (max-width: 991.98px) {
             .main-dashboard-content {
                 margin-left: 0 !important;
                 width: 100% !important;
+            }
+            .main-dashboard-inner {
+                padding: 1rem;
             }
         }
 
@@ -648,7 +643,8 @@
             @include('student.sidebar')
 
             <!-- Main Content -->
-            <div class="main-dashboard-content flex-grow-1">
+            <div class="main-dashboard-content flex-grow-1" id="mainContent">
+                <div class="main-dashboard-inner">
                 <!-- Hero Header -->
                 <div class="resources-hero">
                     <h1><i class="bi bi-collection-play me-2"></i>Student Resources</h1>
@@ -808,10 +804,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                 @endforeach
+                            </div>
                         </div>
-                    </div>
                 @empty
                 <div class="empty-state">
                     <div class="empty-icon">
@@ -820,9 +815,10 @@
                     <h3>No Resources Found</h3>
                     <p>We couldn't find any resources matching your search or category filter.</p>
                 </div>
-            @endforelse
+                @endforelse
+                </div>
+            </div>
         </div>
-    </div>
     </div>
 
     <script>

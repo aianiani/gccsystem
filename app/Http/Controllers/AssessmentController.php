@@ -13,11 +13,14 @@ class AssessmentController extends Controller
     // Show the assessments page for students
     public function index()
     {
+        $completedAssessments = auth()->user()->assessments()->pluck('type')->toArray();
+
         return view('assessments', [
             'dass42_questions' => $this->getDass42Questions(),
             'grit_questions' => $this->getGritQuestions(),
             'neo_questions' => $this->getNeoQuestions(),
             'wvi_questions' => $this->getWviQuestions(),
+            'completed_assessments' => $completedAssessments,
         ]);
     }
 
@@ -162,6 +165,13 @@ class AssessmentController extends Controller
 
         $query = \App\Models\Assessment::with('user')
             ->orderByDesc('created_at');
+
+        // Apply Counselor Restriction: Only see assessments of students they have an appointment with
+        if (auth()->user()->isCounselor() && !auth()->user()->isAdmin()) {
+            $query->whereHas('user.appointments', function ($q) {
+                $q->where('counselor_id', auth()->id());
+            });
+        }
 
         // Filter by Assessment Type
         if ($request->filled('type')) {
@@ -681,6 +691,18 @@ class AssessmentController extends Controller
     public function show($id)
     {
         $assessment = \App\Models\Assessment::with('user')->findOrFail($id);
+
+        // Authorize Access: Counselors can only view assessments of students they have an appointment with
+        if (auth()->user()->isCounselor() && !auth()->user()->isAdmin()) {
+            $hasAppointment = \App\Models\Appointment::where('student_id', $assessment->user_id)
+                ->where('counselor_id', auth()->id())
+                ->exists();
+            
+            if (!$hasAppointment) {
+                abort(403, 'You are not authorized to view this student\'s assessment details.');
+            }
+        }
+
         $scores = is_array($assessment->score) ? $assessment->score : json_decode($assessment->score, true);
 
         $score_interpretation = [];
@@ -706,6 +728,18 @@ class AssessmentController extends Controller
     public function saveNotes(Request $request, $id)
     {
         $assessment = \App\Models\Assessment::findOrFail($id);
+
+        // Authorize Access: Counselors can only save notes for students they have an appointment with
+        if (auth()->user()->isCounselor() && !auth()->user()->isAdmin()) {
+            $hasAppointment = \App\Models\Appointment::where('student_id', $assessment->user_id)
+                ->where('counselor_id', auth()->id())
+                ->exists();
+            
+            if (!$hasAppointment) {
+                abort(403, 'You are not authorized to manage this student\'s assessment.');
+            }
+        }
+
         $assessment->case_notes = $request->input('case_notes');
         $assessment->save();
 
@@ -716,6 +750,18 @@ class AssessmentController extends Controller
     public function exportPdf($id)
     {
         $assessment = \App\Models\Assessment::with('user')->findOrFail($id);
+
+        // Authorize Access: Counselors can only export assessments of students they have an appointment with
+        if (auth()->user()->isCounselor() && !auth()->user()->isAdmin()) {
+            $hasAppointment = \App\Models\Appointment::where('student_id', $assessment->user_id)
+                ->where('counselor_id', auth()->id())
+                ->exists();
+            
+            if (!$hasAppointment) {
+                abort(403, 'You are not authorized to export this student\'s assessment.');
+            }
+        }
+
         $scores = is_array($assessment->score) ? $assessment->score : json_decode($assessment->score, true);
 
         $score_interpretation = [];
@@ -758,11 +804,23 @@ class AssessmentController extends Controller
      */
     public function destroy($id)
     {
-        if (!auth()->user()->isCounselor()) {
+        if (!auth()->user()->isCounselor() && !auth()->user()->isAdmin()) {
             abort(403);
         }
 
         $assessment = \App\Models\Assessment::findOrFail($id);
+
+        // Authorize Access: Counselors can only delete assessments of students they have an appointment with
+        if (auth()->user()->isCounselor() && !auth()->user()->isAdmin()) {
+            $hasAppointment = \App\Models\Appointment::where('student_id', $assessment->user_id)
+                ->where('counselor_id', auth()->id())
+                ->exists();
+            
+            if (!$hasAppointment) {
+                abort(403, 'You are not authorized to delete this student\'s assessment.');
+            }
+        }
+
         $assessment->delete();
 
         return redirect()->back()->with('success', 'Assessment deleted successfully.');
@@ -773,7 +831,7 @@ class AssessmentController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
-        if (!auth()->user()->isCounselor()) {
+        if (!auth()->user()->isCounselor() && !auth()->user()->isAdmin()) {
             abort(403);
         }
 
@@ -783,7 +841,16 @@ class AssessmentController extends Controller
             return redirect()->back()->with('error', 'No assessments selected for deletion.');
         }
 
-        \App\Models\Assessment::whereIn('id', $ids)->delete();
+        $query = \App\Models\Assessment::whereIn('id', $ids);
+
+        // Authorize Access: Counselors can only delete assessments of students they have an appointment with
+        if (auth()->user()->isCounselor() && !auth()->user()->isAdmin()) {
+            $query->whereHas('user.appointments', function ($q) {
+                $q->where('counselor_id', auth()->id());
+            });
+        }
+
+        $query->delete();
 
         return redirect()->back()->with('success', 'Selected assessments deleted successfully.');
     }

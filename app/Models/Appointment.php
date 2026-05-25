@@ -13,6 +13,7 @@ class Appointment extends Model
         'previous_scheduled_at',
         'notes',
         'status',
+        'reschedule_reason',
         'guardian1_name',
         'guardian1_relationship',
         'guardian1_contact',

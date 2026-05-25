@@ -51,9 +51,11 @@ class SessionNoteController extends Controller
             return redirect()->back()->with('info', 'A session note for this appointment already exists.');
         }
 
-        // Session number = the order of this appointment for the student
+        // Session number = the order of this appointment for the student with this counselor
         $studentId = $appointment->student_id;
         $appointments = Appointment::where('student_id', $studentId)
+            ->where('counselor_id', $appointment->counselor_id)
+            ->whereNotIn('status', ['declined', 'cancelled'])
             ->orderBy('scheduled_at')
             ->pluck('id')
             ->toArray();
@@ -64,7 +66,7 @@ class SessionNoteController extends Controller
             'next_session' => 'nullable|date|after:now',
         ]);
 
-        $status = trim($request->note) !== '' ? SessionNote::STATUS_COMPLETED : SessionNote::STATUS_SCHEDULED;
+        $status = $appointment->status === 'completed' ? SessionNote::STATUS_COMPLETED : SessionNote::STATUS_SCHEDULED;
         $sessionNote = SessionNote::create([
             'appointment_id' => $appointment->id,
             'counselor_id' => auth()->id(),
@@ -74,7 +76,7 @@ class SessionNoteController extends Controller
             'session_status' => $status,
         ]);
 
-        return redirect()->route('counselor.session_notes.index')->with('success', 'Session note added successfully!');
+        return redirect()->route('counselor.session_notes.show', $sessionNote->id)->with('success', 'Session note added successfully!');
     }
 
     // List all session notes for the counselor
@@ -171,9 +173,15 @@ class SessionNoteController extends Controller
     // Mark a session note as completed
     public function complete($id)
     {
-        $note = SessionNote::where('counselor_id', auth()->id())->findOrFail($id);
+        $note = SessionNote::where('counselor_id', auth()->id())->with('appointment')->findOrFail($id);
         $note->update(['session_status' => SessionNote::STATUS_COMPLETED]);
-        return redirect()->back()->with('success', 'Session marked as completed.');
+        
+        // Also update the associated appointment status to completed
+        if ($note->appointment) {
+            $note->appointment->update(['status' => 'completed']);
+        }
+        
+        return redirect()->back()->with('success', 'Session and appointment marked as completed.');
     }
 
     // Show edit form for a session note (reschedule)
@@ -191,8 +199,6 @@ class SessionNoteController extends Controller
 
         if ($request->has('note')) {
             $data['note'] = $request->note;
-            // If note is filled, mark as completed
-            $data['session_status'] = trim($request->note) !== '' ? SessionNote::STATUS_COMPLETED : SessionNote::STATUS_SCHEDULED;
         }
 
         if ($request->has('next_session')) {
@@ -200,10 +206,6 @@ class SessionNoteController extends Controller
                 'next_session' => 'nullable|date|after:now',
             ]);
             $data['next_session'] = $request->next_session;
-            // If note is empty, keep as scheduled
-            if (empty($data['session_status'])) {
-                $data['session_status'] = SessionNote::STATUS_SCHEDULED;
-            }
         }
 
         if ($request->has('attendance')) {
@@ -216,7 +218,7 @@ class SessionNoteController extends Controller
         }
 
         $note->update($data);
-        return redirect()->route('counselor.session_notes.index')->with('success', 'Session note updated successfully!');
+        return redirect()->route('counselor.session_notes.show', $note->id)->with('success', 'Session note updated successfully!');
     }
 
     // Send reminder notification to student
@@ -232,13 +234,24 @@ class SessionNoteController extends Controller
     // Show session history timeline for a student
     public function timeline($studentId)
     {
+        // Authorize Access: Counselors can only view timelines for students they have an appointment with
+        if (auth()->user()->isCounselor() && !auth()->user()->isAdmin()) {
+            $hasAppointment = \App\Models\Appointment::where('student_id', $studentId)
+                ->where('counselor_id', auth()->id())
+                ->exists();
+            
+            if (!$hasAppointment) {
+                abort(403, 'You are not authorized to view this student\'s session timeline.');
+            }
+        }
+
         $sessionNotes = \App\Models\SessionNote::whereHas('appointment', function ($q) use ($studentId) {
             $q->where('student_id', $studentId);
         })
             ->with(['appointment.student'])
             ->orderBy('session_number')
             ->get();
-        $student = $sessionNotes->first() ? $sessionNotes->first()->appointment->student : null;
+        $student = $sessionNotes->first() ? $sessionNotes->first()->appointment->student : \App\Models\User::find($studentId);
         return view('counselor.session_notes.timeline', compact('sessionNotes', 'student'));
     }
 
@@ -263,11 +276,13 @@ class SessionNoteController extends Controller
             'counselor_id' => $note->counselor_id,
             'scheduled_at' => $note->next_session,
             'status' => 'pending',
-            'notes' => "Auto-created from session note #{$note->id}",
+            'notes' => null,
         ]);
-        // Session number = the order of this appointment for the student
+        // Session number = the order of this appointment for the student with this counselor
         $studentId = $note->appointment->student_id;
         $appointments = Appointment::where('student_id', $studentId)
+            ->where('counselor_id', $note->counselor_id)
+            ->whereNotIn('status', ['declined', 'cancelled'])
             ->orderBy('scheduled_at')
             ->pluck('id')
             ->toArray();
@@ -308,11 +323,18 @@ class SessionNoteController extends Controller
             'ids.*' => 'exists:session_notes,id'
         ]);
 
-        $updated = \App\Models\SessionNote::where('counselor_id', auth()->id())
+        $notes = \App\Models\SessionNote::where('counselor_id', auth()->id())
             ->whereIn('id', $request->ids)
             ->where('session_status', '!=', 'completed')
-            ->update(['session_status' => \App\Models\SessionNote::STATUS_COMPLETED]);
+            ->get();
 
-        return redirect()->back()->with('success', "$updated session note(s) marked as completed.");
+        foreach ($notes as $note) {
+            $note->update(['session_status' => \App\Models\SessionNote::STATUS_COMPLETED]);
+            if ($note->appointment) {
+                $note->appointment->update(['status' => 'completed']);
+            }
+        }
+
+        return redirect()->back()->with('success', $notes->count() . " session note(s) and associated appointments marked as completed.");
     }
 }

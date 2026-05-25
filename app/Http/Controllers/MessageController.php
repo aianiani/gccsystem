@@ -113,6 +113,9 @@ class MessageController extends Controller
             // Broadcast the message
             broadcast(new \App\Events\MessageSent($message))->toOthers();
 
+            // Notify the recipient
+            $otherUser->notify(new \App\Notifications\MessageReceivedNotification($message, $currentUser));
+
             // If AJAX, return JSON
             if ($request->ajax()) {
                 return response()->json([
@@ -179,16 +182,7 @@ class MessageController extends Controller
     public function selectStudent()
     {
         $currentUserId = Auth::id();
-        $students = \App\Models\User::where('role', 'student')
-            ->where(function ($query) use ($currentUserId) {
-                $query->whereHas('sentMessages', function ($q) use ($currentUserId) {
-                    $q->where('recipient_id', $currentUserId);
-                })
-                    ->orWhereHas('receivedMessages', function ($q) use ($currentUserId) {
-                        $q->where('sender_id', $currentUserId);
-                    });
-            })
-            ->get();
+        $students = \App\Models\User::where('role', 'student')->orderBy('name')->get();
 
         // Attach last message
         foreach ($students as $student) {

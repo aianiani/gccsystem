@@ -51,21 +51,7 @@
             background-color: var(--bg-light);
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
@@ -80,13 +66,9 @@
             margin: 0 auto;
         }
 
-        @media (max-width: 991.98px) {
-            .main-dashboard-content { margin-left: 200px; }
-        }
+        
 
-        @media (max-width: 767.98px) {
-            .main-dashboard-content { margin-left: 0; padding: 1rem; }
-        }
+        
 
         /* Page Header */
         .page-header {
@@ -504,9 +486,7 @@
                         <div class="bulk-bar" id="bulkBar">
                             <span class="count"><span id="selectedCount">0</span> selected</span>
                             <div class="vr bg-white opacity-25" style="height: 20px;"></div>
-                            <button type="button" id="bulkCompleteBtn" class="btn-bulk approve">
-                                <i class="bi bi-check-circle"></i> Mark Completed
-                            </button>
+                            {{-- Removed Mark Completed button as requested --}}
                             <button type="button" id="bulkDeleteBtn" class="btn-bulk delete">
                                 <i class="bi bi-trash3"></i> Delete Selected
                             </button>
@@ -602,12 +582,7 @@
                                                 <a href="{{ route('counselor.session_notes.edit', $note->id) }}" class="btn-action edit" title="Edit Note">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
-                                                <form action="{{ route('counselor.session_notes.complete', $note->id) }}" method="POST" class="d-inline">
-                                                    @csrf @method('PATCH')
-                                                    <button type="submit" class="btn-action complete" title="Mark Completed">
-                                                        <i class="bi bi-check-circle-fill"></i>
-                                                    </button>
-                                                </form>
+                                                {{-- Removed Mark Completed button as requested --}}
                                                 @endif
                                             </div>
                                         </td>

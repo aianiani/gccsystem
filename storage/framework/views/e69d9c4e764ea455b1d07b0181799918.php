@@ -1,13 +1,9 @@
-
-
 <?php $__env->startSection('content'); ?>
     <style>
         /* Homepage theme variables (mapped into existing dashboard vars) */
         :root {
             --primary-green: #1f7a2d;
-            /* Homepage forest green */
             --primary-green-2: #13601f;
-            /* darker stop */
             --accent-green: #2e7d32;
             --light-green: #eaf5ea;
             --accent-orange: #FFCB05;
@@ -16,7 +12,6 @@
             --bg-light: #f6fbf6;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 
-            /* Map dashboard-specific names to homepage palette for compatibility */
             --forest-green: var(--primary-green);
             --forest-green-dark: var(--primary-green-2);
             --forest-green-light: var(--accent-green);
@@ -56,54 +51,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
-
-        .custom-sidebar .sidebar-logo {
-            text-align: center;
-            padding: 2rem 1rem 1rem 1rem;
-            border-bottom: 1px solid #4a7c59;
-        }
-
-        .custom-sidebar .sidebar-nav {
-            flex: 1;
-            padding: 1.5rem 0.5rem 0 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .custom-sidebar .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-            position: relative;
-        }
-
         .custom-sidebar .sidebar-link.active,
-        .custom-sidebar .sidebar-link:hover {
-            background: #4a7c59;
-            color: #f4d03f;
-        }
 
         .custom-sidebar .sidebar-link .bi {
             font-size: 1.1rem;
@@ -129,68 +77,13 @@
             color: #fff;
         }
 
-        @media (max-width: 991.98px) {
-            .custom-sidebar {
-                width: 200px;
-            }
-
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
-
         @media (max-width: 767.98px) {
-
-            /* Off-canvas behavior on mobile */
-            .custom-sidebar {
-                position: fixed;
-                z-index: 1040;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.2s ease;
-                flex-direction: column;
-                padding: 0;
-            }
-
             .custom-sidebar.show {
                 transform: translateX(0);
             }
 
-            .custom-sidebar .sidebar-logo {
-                display: block;
-            }
-
-            .custom-sidebar .sidebar-nav {
-                flex-direction: column;
-                gap: 0.25rem;
-                padding: 1rem 0.5rem 1rem 0.5rem;
-            }
-
-            .custom-sidebar .sidebar-link {
-                justify-content: flex-start;
-                padding: 0.6rem 0.75rem;
-                font-size: 1rem;
-            }
-
             .main-dashboard-content {
                 margin-left: 0;
-            }
-
-            /* Toggle button */
-            #counselorSidebarToggle {
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1100;
-                background: var(--forest-green);
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 0.5rem 0.75rem;
-                box-shadow: var(--shadow-sm);
             }
         }
 
@@ -202,13 +95,12 @@
             transition: margin-left 0.2s;
         }
 
-        /* Constrain inner content and center it within the available area */
         .main-dashboard-inner {
             max-width: 100%;
             margin: 0 auto;
         }
 
-        /* Custom Styles for Guidance Module */
+        /* Page Header */
         .page-header {
             background: var(--hero-gradient);
             border-radius: 16px;
@@ -218,10 +110,20 @@
             color: #fff;
         }
 
-        .page-header h2 {
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
             color: #fff;
         }
 
+        .page-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin: 0.25rem 0 0;
+        }
+
+        /* Content Card */
         .content-card {
             background: #fff;
             border-radius: 16px;
@@ -233,24 +135,37 @@
 
         .card-header-custom {
             background: #fff;
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 1.5rem;
             border-bottom: 1px solid var(--light-green);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
+        .card-header-custom h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        /* Buttons */
         .btn-primary-custom {
             background: var(--primary-green);
             border: none;
             color: #fff;
-            padding: 0.5rem 1.25rem;
+            padding: 0.55rem 1.25rem;
             border-radius: 8px;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.9rem;
             transition: all 0.2s;
             box-shadow: 0 2px 5px rgba(31, 122, 45, 0.3);
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .btn-primary-custom:hover {
@@ -260,31 +175,230 @@
             color: #fff;
         }
 
+        /* Table */
+        .table-custom {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
         .table-custom th {
             background-color: var(--light-green);
             color: var(--primary-green);
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             letter-spacing: 0.5px;
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1rem;
             border: none;
         }
 
         .table-custom td {
-            padding: 1rem 1.5rem;
+            padding: 0.85rem 1rem;
             vertical-align: middle;
             border-bottom: 1px solid #f0f0f0;
             color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .table-custom tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        .table-custom tbody tr:hover td {
+            background-color: #fafdfa;
+        }
+
+        /* Seminar name cell */
+        .seminar-name {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .seminar-desc {
+            font-size: 0.82rem;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+
+        /* Year badge */
+        .year-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #e8f0fe;
+            color: #1a56db;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid #c6d8f7;
+        }
+
+        /* Progress bar */
+        .progress-wrapper {
+            min-width: 100px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .progress-info .count {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .progress-info .percent {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 7px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--hero-gradient);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* Schedule chips */
+        .schedule-chip {
+            display: inline-flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.78rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: border-color 0.2s;
+        }
+
+        .schedule-chip:hover {
+            border-color: var(--primary-green);
+        }
+
+        .schedule-chip .chip-date {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .schedule-chip .chip-meta {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-light);
+            font-size: 0.72rem;
+        }
+
+        .no-schedule-text {
+            color: #b0b0b0;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+
+        /* Action buttons */
+        .btn-action-edit {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: transparent;
+            border: 1px solid #e0a800;
+            color: #c48a00;
+            font-weight: 600;
+            font-size: 0.82rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-action-edit:hover {
+            background: #fff8e1;
+            border-color: #c48a00;
+            color: #a67200;
+        }
+
+        .btn-action-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: transparent;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            font-weight: 600;
+            font-size: 0.82rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action-delete:hover {
+            background: #fff5f5;
+            border-color: #c82333;
+            color: #c82333;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            color: #ccc;
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-state .empty-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .empty-state .empty-desc {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        /* Success alert */
+        .alert-success-custom {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
     </style>
 
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none">
-                <i class="bi bi-list"></i>
-            </button>
 
             <!-- Sidebar -->
             <?php echo $__env->make('counselor.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -292,10 +406,11 @@
             <!-- Main Content -->
             <div class="main-dashboard-content flex-grow-1">
                 <div class="main-dashboard-inner">
+                    <!-- Page Header -->
                     <div class="page-header d-flex justify-content-between align-items-center">
                         <div>
-                            <h2 class="text-2xl font-bold m-0">Seminar Management</h2>
-                            <p class="opacity-90 m-0 mt-1">Configure seminars and schedules</p>
+                            <h2 class="page-title">Seminar Management</h2>
+                            <p class="page-subtitle">Configure seminars and schedules</p>
                         </div>
                         <div class="d-none d-md-block">
                             <i class="bi bi-calendar-event" style="font-size: 3rem; opacity: 0.2;"></i>
@@ -303,98 +418,94 @@
                     </div>
 
                     <?php if(session('success')): ?>
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 alert alert-success"
-                            role="alert">
-                            <span class="block sm:inline"><?php echo e(session('success')); ?></span>
+                        <div class="alert-success-custom" role="alert">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span><?php echo e(session('success')); ?></span>
                         </div>
                     <?php endif; ?>
 
+                    <!-- Seminars Card -->
                     <div class="content-card">
                         <div class="card-header-custom">
-                            <h3 class="text-lg font-bold text-gray-800 m-0">All Seminars</h3>
+                            <h3>All Seminars</h3>
                             <a href="<?php echo e(route('counselor.seminars.create')); ?>" class="btn-primary-custom">
-                                <i class="bi bi-plus-lg mr-1"></i> Create New Seminar
+                                <i class="bi bi-plus-lg"></i> Create New Seminar
                             </a>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full table-custom">
+                        <div style="overflow-x: auto;">
+                            <table class="table-custom">
                                 <thead>
                                     <tr>
-                                        <th class="w-[20%]">Name</th>
-                                        <th class="w-[8%] text-center">Year</th>
-                                        <th class="w-[22%]">Participation</th>
-                                        <th class="w-[35%]">Schedules</th>
-                                        <th class="w-[15%] text-right">Actions</th>
+                                        <th style="width: 25%;">Name</th>
+                                        <th style="width: 8%; text-align: center;">Year</th>
+                                        <th style="width: 18%;">Participation</th>
+                                        <th style="width: 32%;">Schedules</th>
+                                        <th style="width: 17%; text-align: right;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php $__empty_1 = true; $__currentLoopData = $seminars; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $seminar): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                        <tr class="hover:bg-gray-50 transition-colors">
+                                        <tr>
                                             <td>
-                                                <div class="font-bold text-gray-900 text-base"><?php echo e($seminar->name); ?></div>
-                                                <div class="text-sm text-gray-500 mt-1">
+                                                <div class="seminar-name"><?php echo e($seminar->name); ?></div>
+                                                <div class="seminar-desc">
                                                     <?php echo e(Str::limit($seminar->description, 60)); ?>
 
                                                 </div>
                                             </td>
-                                            <td class="text-center">
-                                                <span
-                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 font-bold text-sm border border-blue-100">
+                                            <td style="text-align: center;">
+                                                <span class="year-badge">
                                                     <?php echo e($seminar->target_year_level); ?>
 
                                                 </span>
                                             </td>
-                                            <td class="align-middle px-4">
-                                                <div class="w-full">
-                                                    <div class="flex justify-between items-center mb-1">
-                                                        <span
-                                                            class="text-xs font-semibold text-gray-700"><?php echo e($seminar->stats['completed']); ?>/<?php echo e($seminar->stats['total']); ?></span>
-                                                        <span
-                                                            class="text-xs font-bold text-green-700"><?php echo e($seminar->stats['percentage']); ?>%</span>
+                                            <td>
+                                                <div class="progress-wrapper">
+                                                    <div class="progress-info">
+                                                        <span class="count"><?php echo e($seminar->stats['completed']); ?>/<?php echo e($seminar->stats['total']); ?></span>
+                                                        <span class="percent"><?php echo e($seminar->stats['percentage']); ?>%</span>
                                                     </div>
-                                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                                        <div class="bg-green-600 h-2 rounded-full transition-all duration-500"
+                                                    <div class="progress-track">
+                                                        <div class="progress-fill"
                                                             style="width: <?php echo e($seminar->stats['percentage']); ?>%"></div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="align-middle">
-                                                <div class="flex flex-wrap gap-2">
+                                            <td>
+                                                <div class="d-flex flex-wrap gap-2">
                                                     <?php $__empty_2 = true; $__currentLoopData = $seminar->schedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
-                                                        <div
-                                                            class="inline-flex flex-col bg-white border border-gray-200 rounded px-2 py-1 shadow-sm text-xs">
-                                                            <div class="font-semibold text-gray-800">
+                                                        <div class="schedule-chip">
+                                                            <span class="chip-date">
                                                                 <?php echo e($schedule->date->format('M d, Y')); ?>
 
-                                                            </div>
-                                                            <div class="flex items-center gap-1 text-gray-500">
+                                                            </span>
+                                                            <span class="chip-meta">
                                                                 <span><?php echo e($schedule->session_type); ?></span>
                                                                 <?php if($schedule->location): ?>
                                                                     <span>&bull;</span>
                                                                     <span><?php echo e($schedule->location); ?></span>
                                                                 <?php endif; ?>
-                                                            </div>
+                                                            </span>
                                                         </div>
                                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
-                                                        <span class="text-gray-400 italic text-sm">No schedules configured</span>
+                                                        <span class="no-schedule-text">No schedules configured</span>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
-                                            <td class="text-right whitespace-nowrap">
-                                                <div class="flex items-center justify-end gap-2">
+                                            <td style="text-align: right; white-space: nowrap;">
+                                                <div class="d-flex align-items-center justify-content-end gap-2">
                                                     <a href="<?php echo e(route('counselor.seminars.edit', $seminar)); ?>"
-                                                        class="text-amber-600 hover:text-amber-700 font-medium text-sm px-3 py-1.5 rounded hover:bg-amber-50 transition-colors">
-                                                        Edit
+                                                        class="btn-action-edit">
+                                                        <i class="bi bi-pencil-square"></i> Edit
                                                     </a>
                                                     <form action="<?php echo e(route('counselor.seminars.destroy', $seminar)); ?>"
-                                                        method="POST" class="inline-block delete-form"
+                                                        method="POST" class="d-inline delete-form"
                                                         data-confirm-message="Are you sure you want to delete this seminar?">
                                                         <?php echo csrf_field(); ?>
                                                         <?php echo method_field('DELETE'); ?>
-                                                        <button type="submit"
-                                                            class="text-red-600 hover:text-red-700 font-medium text-sm px-3 py-1.5 rounded hover:bg-red-50 transition-colors">
-                                                            Delete
+                                                        <button type="submit" class="btn-action-delete">
+                                                            <i class="bi bi-trash3"></i> Delete
                                                         </button>
                                                     </form>
                                                 </div>
@@ -402,12 +513,12 @@
                                         </tr>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                         <tr>
-                                            <td colspan="5" class="text-center py-12 text-gray-400">
-                                                <div class="mb-3">
-                                                    <i class="bi bi-calendar-x" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                                            <td colspan="5">
+                                                <div class="empty-state">
+                                                    <i class="bi bi-calendar-x"></i>
+                                                    <div class="empty-title">No seminars found</div>
+                                                    <div class="empty-desc">Get started by creating a new seminar.</div>
                                                 </div>
-                                                <p class="text-lg font-medium text-gray-500">No seminars found</p>
-                                                <p class="text-sm">Get started by creating a new seminar.</p>
                                             </td>
                                         </tr>
                                     <?php endif; ?>
@@ -422,22 +533,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar toggle for mobile
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('counselorSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
+            // Delete confirmation
+            document.querySelectorAll('.delete-form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    var message = form.getAttribute('data-confirm-message') || 'Are you sure?';
+                    if (!confirm(message)) {
+                        e.preventDefault();
                     }
                 });
-                document.addEventListener('click', function (e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-            }
+            });
         });
     </script>
 <?php $__env->stopSection(); ?>

@@ -57,21 +57,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
@@ -525,10 +511,7 @@
     <div class="home-zoom">
         <div class="d-flex">
             <!-- Mobile Sidebar Toggle -->
-            <button id="counselorSidebarToggle" class="d-md-none"
-                style="position: fixed; top: 10px; left: 10px; z-index: 1050; border: none; background: var(--forest-green); color: white; padding: 5px 10px; border-radius: 5px;">
-                <i class="bi bi-list"></i>
-            </button>
+            
 
             <!-- Sidebar -->
             <?php echo $__env->make('counselor.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -725,8 +708,8 @@
                                             <?php
                                                 $latestAssessment = $student->latestAssessment;
                                                 $riskLevel = $latestAssessment ? ($latestAssessment->risk_level ?? 'normal') : 'none';
-                                                $totalApps = \App\Models\Appointment::where('student_id', $student->id)->where('counselor_id', auth()->id())->count();
-                                                $completedApps = \App\Models\Appointment::where('student_id', $student->id)->where('counselor_id', auth()->id())->where('status', 'completed')->count();
+                                                $totalApps = \App\Models\Appointment::where('student_id', $student->id)->count();
+                                                $completedApps = \App\Models\Appointment::where('student_id', $student->id)->where('status', 'completed')->count();
                                             ?>
                                             <tr>
                                                 <td class="ps-4">
@@ -833,23 +816,6 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar toggle logic
-            const sidebar = document.querySelector('.custom-sidebar');
-            const toggleBtn = document.getElementById('counselorSidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', function () {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-                document.addEventListener('click', function (e) {
-                    if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
-                        const clickInside = sidebar.contains(e.target) || toggleBtn.contains(e.target);
-                        if (!clickInside) sidebar.classList.remove('show');
-                    }
-                });
-            }
-
             // Bulk actions logic
             const selectAll = document.getElementById('selectAll');
             const checkboxes = document.querySelectorAll('.item-checkbox');

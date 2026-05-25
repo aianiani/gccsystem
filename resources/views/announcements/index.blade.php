@@ -16,9 +16,7 @@
         }
 
         /* Force sidebar to use the local forest-green variable */
-        .custom-sidebar {
-            background: var(--forest-green) !important;
-        }
+        
 
         /* Match dashboard zoom */
         .home-zoom {
@@ -255,9 +253,7 @@
         <div class="home-zoom">
             <div class="d-flex">
                 <!-- Mobile Sidebar Toggle -->
-                <button id="counselorSidebarToggle" class="d-md-none">
-                    <i class="bi bi-list"></i>
-                </button>
+                
                 <!-- Sidebar -->
                 @include('counselor.sidebar')
 

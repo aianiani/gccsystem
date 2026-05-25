@@ -394,7 +394,8 @@
 
             /* Enhanced toggle button for mobile */
             #studentSidebarToggle,
-            #adminSidebarToggle {
+            #adminSidebarToggle,
+            #counselorSidebarToggle {
                 position: fixed !important;
                 top: 1.25rem !important;
                 left: 1rem !important;
@@ -414,7 +415,8 @@
             }
 
             #studentSidebarToggle:active,
-            #adminSidebarToggle:active {
+            #adminSidebarToggle:active,
+            #counselorSidebarToggle:active {
                 transform: scale(0.9) !important;
             }
         }
@@ -573,7 +575,12 @@
     </style>
 </head>
 
-<body>
+<body class="antialiased">
+    @auth
+        @if(!auth()->user()->isCounselor())
+            @include('partials.notification_bell')
+        @endif
+    @endauth
 
     @auth
         @if(auth()->user()->isAdmin())
@@ -766,6 +773,9 @@
             </script>
         @else
             <main class="fade-in">
+                @if(auth()->check() && auth()->user()->isCounselor())
+                    @include('partials.counselor_navbar')
+                @endif
                 @hasSection('full_width')
                     @yield('content')
                 @else

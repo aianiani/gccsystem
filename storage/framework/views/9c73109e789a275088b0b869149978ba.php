@@ -49,21 +49,7 @@
             background-color: var(--bg-light);
         }
 
-        .custom-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 240px;
-            background: var(--forest-green);
-            color: #fff;
-            z-index: 1040;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.08);
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
+        
 
         .main-dashboard-content {
             background: linear-gradient(180deg, #f6fbf6 0%, #ffffff 30%);
@@ -78,18 +64,9 @@
             margin: 0 auto;
         }
 
-        @media (max-width: 991.98px) {
-            .main-dashboard-content {
-                margin-left: 200px;
-            }
-        }
+        
 
-        @media (max-width: 767.98px) {
-            .main-dashboard-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-        }
+        
 
         /* Page Header */
         .page-header {
