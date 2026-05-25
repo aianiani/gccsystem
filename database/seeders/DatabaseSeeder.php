@@ -50,7 +50,9 @@ class DatabaseSeeder extends Seeder
             'approved_at' => now(),
         ]);
 
-        // Create additional test users
-        User::factory(5)->create();
+        // Create additional test users only in local environment
+        if (app()->environment('local')) {
+            User::factory(5)->create();
+        }
     }
 }
