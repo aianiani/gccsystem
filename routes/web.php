@@ -342,4 +342,15 @@ Route::get('/seed-database', function () {
     }
 });
 
+// Temporary route to disable 2FA for admin
+Route::get('/disable-2fa-admin', function () {
+    try {
+        \App\Models\User::where('email', 'aianmark1715@gmail.com')->update(['two_factor_enabled' => false]);
+        return '2FA successfully disabled for admin! Try logging in now.';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+
 
