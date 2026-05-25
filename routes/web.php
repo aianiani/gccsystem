@@ -332,3 +332,14 @@ Route::get('/debug/create-test-notification', function () {
     return 'Test notification created! Go check your notification bell.';
 });
 
+// Temporary route to seed the database on Render
+Route::get('/seed-database', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return 'Database seeded successfully! Output: <br><pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
+    } catch (\Exception $e) {
+        return 'Error seeding database: ' . $e->getMessage();
+    }
+});
+
+
