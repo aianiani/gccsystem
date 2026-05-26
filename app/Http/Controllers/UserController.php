@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::with('activities');
+        $query = User::query();
 
         // Apply filters
         $this->applyFilters($query, $request);

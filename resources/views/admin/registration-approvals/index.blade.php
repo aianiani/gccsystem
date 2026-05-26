@@ -255,6 +255,85 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* Cross-Page Verified Selection Banner */
+        .verified-selection-banner {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #86efac;
+            border-radius: 14px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            animation: bannerSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
+        }
+
+        @keyframes bannerSlideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .verified-selection-banner .banner-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .verified-selection-banner .banner-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #22c55e;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .verified-selection-banner .banner-text strong {
+            color: #15803d;
+            font-size: 0.95rem;
+        }
+
+        .verified-selection-banner .banner-text p {
+            margin: 0;
+            font-size: 0.82rem;
+            color: #4b5563;
+        }
+
+        .verified-selection-banner .btn-clear-selection {
+            background: #fff;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            border-radius: 50px;
+            padding: 0.4rem 1rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .verified-selection-banner .btn-clear-selection:hover {
+            background: #dc2626;
+            color: #fff;
+            border-color: #dc2626;
+        }
+
+        /* Verified Row Highlight */
+        .registration-item.verified-row {
+            border-left: 4px solid #22c55e !important;
+            background-color: #f0fdf4 !important;
+        }
+
+        .registration-item.verified-row:hover {
+            background-color: #dcfce7 !important;
+        }
+
         /* Premium Lightbox Modal */
         .lightbox-modal .modal-content {
             background-color: transparent;
@@ -502,6 +581,22 @@
         <div class="tab-content" id="approvalTabsContent">
             <!-- Pending Registrations -->
             <div class="tab-pane fade show active" id="pending" role="tabpanel">
+                <!-- Cross-Page Verified Selection Banner (dynamically shown by JS) -->
+                <div class="verified-selection-banner" id="verifiedSelectionBanner" style="display: none;">
+                    <div class="banner-info">
+                        <div class="banner-icon">
+                            <i class="bi bi-patch-check-fill"></i>
+                        </div>
+                        <div class="banner-text">
+                            <strong><span id="bannerTotalCount">0</span> verified student(s) selected across all pages</strong>
+                            <p><span id="bannerVisibleCount">0</span> visible on this page &bull; <span id="bannerHiddenCount">0</span> on other pages</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-clear-selection" onclick="clearVerifiedEnrollment()">
+                        <i class="bi bi-x-circle me-1"></i>Clear Selection
+                    </button>
+                </div>
+
                 <!-- Bulk Approve Form -->
                 <form id="bulkActionForm" method="POST" action="">
                     @csrf
@@ -818,17 +913,123 @@
         function changePerPage(perPage) {
             const url = new URL(window.location.href);
             url.searchParams.set('per_page', perPage);
-            url.searchParams.delete('pending_page'); // Reset to page 1
-            url.searchParams.delete('approved_page'); // Reset to page 1
-            url.searchParams.delete('rejected_page'); // Reset to page 1
+            url.searchParams.delete('pending_page');
+            url.searchParams.delete('approved_page');
+            url.searchParams.delete('rejected_page');
             window.location.href = url.toString();
         }
 
-        // Clear Verified Enrollment Function
+        // ─── Cross-Page Selection Persistence Helpers ───
+
+        /**
+         * Get the current set of verified enrollment IDs from sessionStorage.
+         * Returns an Array of integer IDs.
+         */
+        function getStoredVerifiedIds() {
+            try {
+                const raw = sessionStorage.getItem('verified_enrollment_ids');
+                return raw ? JSON.parse(raw).map(Number) : [];
+            } catch (_) {
+                return [];
+            }
+        }
+
+        /**
+         * Persist the given array of IDs back to sessionStorage.
+         */
+        function setStoredVerifiedIds(ids) {
+            sessionStorage.setItem('verified_enrollment_ids', JSON.stringify(ids));
+        }
+
+        /**
+         * Clear all verified enrollment state and reload.
+         */
         function clearVerifiedEnrollment() {
             sessionStorage.removeItem('verified_enrollment_ids');
+            // Remove highlights before reload for instant visual feedback
+            document.querySelectorAll('.registration-item.verified-row').forEach(el => {
+                el.classList.remove('verified-row');
+            });
+            document.querySelectorAll('.verified-badge').forEach(el => el.remove());
+            const banner = document.getElementById('verifiedSelectionBanner');
+            if (banner) banner.style.display = 'none';
             window.location.reload();
         }
+
+        /**
+         * Apply visual verified-row styling and badge to a registration-item card.
+         */
+        function applyVerifiedStyle(card) {
+            if (!card) return;
+            card.classList.add('verified-row');
+            // Add verified badge if not already present
+            if (!card.querySelector('.verified-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-success ms-2 verified-badge';
+                badge.innerHTML = '<i class="bi bi-patch-check-fill me-1"></i>Verified';
+                const nameEl = card.querySelector('h6.fw-bold');
+                if (nameEl) nameEl.insertAdjacentElement('afterend', badge);
+            }
+        }
+
+        /**
+         * Remove visual verified-row styling and badge from a card.
+         */
+        function removeVerifiedStyle(card) {
+            if (!card) return;
+            card.classList.remove('verified-row');
+            const badge = card.querySelector('.verified-badge');
+            if (badge) badge.remove();
+        }
+
+        /**
+         * Update the floating selection banner with current counts.
+         */
+        function updateVerifiedBanner() {
+            const storedIds = getStoredVerifiedIds();
+            const banner = document.getElementById('verifiedSelectionBanner');
+            if (!banner) return;
+
+            if (storedIds.length === 0) {
+                banner.style.display = 'none';
+                return;
+            }
+
+            // Count how many of the stored IDs are visible on this page
+            let visibleCount = 0;
+            storedIds.forEach(id => {
+                const cb = document.querySelector(`input[name="user_ids[]"][value="${id}"]`);
+                if (cb) visibleCount++;
+            });
+            const hiddenCount = storedIds.length - visibleCount;
+
+            document.getElementById('bannerTotalCount').textContent = storedIds.length;
+            document.getElementById('bannerVisibleCount').textContent = visibleCount;
+            document.getElementById('bannerHiddenCount').textContent = hiddenCount;
+            banner.style.display = 'flex';
+        }
+
+        /**
+         * Restore selection state from sessionStorage on page load.
+         * Checks matching checkboxes, highlights rows, and shows the banner.
+         */
+        function restoreVerifiedSelection() {
+            const storedIds = getStoredVerifiedIds();
+            if (storedIds.length === 0) return;
+
+            storedIds.forEach(id => {
+                const cb = document.querySelector(`input[name="user_ids[]"][value="${id}"]`);
+                if (cb) {
+                    cb.checked = true;
+                    applyVerifiedStyle(cb.closest('.registration-item'));
+                }
+            });
+
+            updateVerifiedBanner();
+            if (typeof updateActionBar === 'function') updateActionBar();
+        }
+
+        // ─── Core DOMContentLoaded: Checkbox & Action Bar Logic ───
 
         document.addEventListener('DOMContentLoaded', function () {
             const selectAll = document.getElementById('selectAllPending');
@@ -836,44 +1037,148 @@
             const actionBar = document.getElementById('bulkActionBar');
             const selectedCountSpan = document.querySelector('.bulk-selected-count');
 
+            /**
+             * Update the floating bulk-action bar count.
+             * Counts BOTH visible checked checkboxes AND hidden (other-page) IDs.
+             */
             window.updateActionBar = function () {
-                const selected = document.querySelectorAll('.user-select-checkbox:checked').length;
-                selectedCountSpan.textContent = selected;
-                if (selected > 0) {
+                const storedIds = getStoredVerifiedIds();
+                const visibleChecked = document.querySelectorAll('.user-select-checkbox:checked');
+
+                // Build a Set of all selected IDs: stored + visible-checked
+                const allSelectedSet = new Set(storedIds);
+                visibleChecked.forEach(cb => allSelectedSet.add(Number(cb.value)));
+
+                // Remove any stored IDs whose visible checkbox is now unchecked
+                checkboxes.forEach(cb => {
+                    if (!cb.checked) allSelectedSet.delete(Number(cb.value));
+                });
+
+                const totalSelected = allSelectedSet.size;
+                selectedCountSpan.textContent = totalSelected + ' Selected';
+
+                if (totalSelected > 0) {
                     actionBar.classList.add('visible');
                 } else {
                     actionBar.classList.remove('visible');
                 }
             };
 
+            // ─── Select All checkbox ───
             if (selectAll) {
                 selectAll.addEventListener('change', function () {
+                    const storedIds = getStoredVerifiedIds();
+                    const storedSet = new Set(storedIds);
+
                     checkboxes.forEach(cb => {
                         cb.checked = this.checked;
+                        const id = Number(cb.value);
+                        if (this.checked) {
+                            storedSet.add(id);
+                            applyVerifiedStyle(cb.closest('.registration-item'));
+                        } else {
+                            storedSet.delete(id);
+                            removeVerifiedStyle(cb.closest('.registration-item'));
+                        }
                     });
+
+                    // Only persist if there was already a verified selection active
+                    if (storedIds.length > 0 || this.checked) {
+                        setStoredVerifiedIds([...storedSet]);
+                    }
                     updateActionBar();
+                    updateVerifiedBanner();
                 });
             }
 
+            // ─── Individual checkbox change ───
             checkboxes.forEach(cb => {
                 cb.addEventListener('change', function () {
+                    const storedIds = getStoredVerifiedIds();
+                    const id = Number(this.value);
+                    const storedSet = new Set(storedIds);
+
+                    if (this.checked) {
+                        storedSet.add(id);
+                        applyVerifiedStyle(this.closest('.registration-item'));
+                    } else {
+                        storedSet.delete(id);
+                        removeVerifiedStyle(this.closest('.registration-item'));
+                    }
+
+                    // Only persist if there was already a verified selection active
+                    if (storedIds.length > 0 || this.checked) {
+                        setStoredVerifiedIds([...storedSet]);
+                    }
+
                     updateActionBar();
-                    // Update select all state
+                    updateVerifiedBanner();
+
+                    // Update select-all state
                     if (selectAll) {
-                        const allChecked = document.querySelectorAll('.user-select-checkbox:checked').length === checkboxes.length;
-                        selectAll.checked = allChecked;
+                        selectAll.checked = document.querySelectorAll('.user-select-checkbox:checked').length === checkboxes.length;
                     }
                 });
             });
+
+            // ─── Restore verified state from previous page loads ───
+            restoreVerifiedSelection();
         });
+
+        // ─── Bulk Action Submission (Cross-Page Aware) ───
 
         function submitBulkAction(action) {
             const form = document.getElementById('bulkActionForm');
+
+            // Collect ALL selected IDs: stored (cross-page) merged with visible checked
+            const storedIds = getStoredVerifiedIds();
+            const visibleChecked = document.querySelectorAll('.user-select-checkbox:checked');
+            const allSelectedSet = new Set(storedIds);
+            visibleChecked.forEach(cb => allSelectedSet.add(Number(cb.value)));
+
+            // Remove any stored IDs whose visible checkbox is now unchecked
+            document.querySelectorAll('.user-select-checkbox').forEach(cb => {
+                if (!cb.checked) allSelectedSet.delete(Number(cb.value));
+            });
+
+            const allIds = [...allSelectedSet];
+            const count = allIds.length;
+
+            if (count === 0) {
+                Swal.fire({ icon: 'info', title: 'No Selection', text: 'Please select at least one student.', confirmButtonColor: '#1f7a2d' });
+                return;
+            }
+
+            /**
+             * Inject hidden inputs for ALL selected IDs into the form,
+             * removing any existing user_ids[] inputs first to avoid duplicates.
+             */
+            function injectHiddenIds() {
+                // Remove existing user_ids[] inputs (from visible checkboxes)
+                form.querySelectorAll('input[name="user_ids[]"]').forEach(el => {
+                    // Only remove the hidden ones we inject; keep the checkbox inputs
+                    if (el.type === 'hidden') el.remove();
+                });
+                // Uncheck all visible checkboxes so they don't duplicate
+                document.querySelectorAll('.user-select-checkbox').forEach(cb => cb.checked = false);
+
+                // Inject hidden inputs for every selected ID
+                allIds.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'user_ids[]';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+            }
+
             if (action === 'approve') {
-                const count = document.querySelectorAll('.user-select-checkbox:checked').length;
+                const hiddenCount = count - visibleChecked.length;
+                const extraText = hiddenCount > 0 ? `\n(${hiddenCount} student(s) are on other pages)` : '';
+
                 Swal.fire({
                     title: 'Approve Students?',
-                    text: `Are you sure you want to approve the ${count} selected student(s)?`,
+                    text: `Are you sure you want to approve ${count} selected student(s)?${extraText}`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#1f7a2d',
@@ -881,15 +1186,20 @@
                     confirmButtonText: 'Yes, Approve All'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        injectHiddenIds();
+                        // Clear sessionStorage on successful submission
+                        sessionStorage.removeItem('verified_enrollment_ids');
                         form.action = "{{ route('admin.registration-approvals.bulk-approve') }}";
                         form.submit();
                     }
                 });
             } else if (action === 'reject') {
-                const count = document.querySelectorAll('.user-select-checkbox:checked').length;
+                const hiddenCount = count - visibleChecked.length;
+                const extraText = hiddenCount > 0 ? ` (${hiddenCount} on other pages)` : '';
+
                 Swal.fire({
                     title: 'Reject Students',
-                    text: `Please provide a reason for rejecting the ${count} selected student(s):`,
+                    text: `Please provide a reason for rejecting ${count} selected student(s)${extraText}:`,
                     input: 'textarea',
                     inputPlaceholder: 'Reason for rejection...',
                     icon: 'warning',
@@ -905,7 +1215,10 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed && result.value) {
+                        injectHiddenIds();
                         document.getElementById('bulk_rejection_reason').value = result.value;
+                        // Clear sessionStorage on successful submission
+                        sessionStorage.removeItem('verified_enrollment_ids');
                         form.action = "{{ route('admin.registration-approvals.bulk-reject') }}";
                         form.submit();
                     }
@@ -913,7 +1226,8 @@
             }
         }
 
-        // Enrollment Verification File Upload
+        // ─── Enrollment Verification File Upload ───
+
         window.verifyEnrollment = async function (btn) {
             const verificationForm = document.getElementById('enrollmentVerificationForm');
             const fileInput = document.getElementById('enrollment_file');
@@ -983,7 +1297,7 @@
                     // Auto-select matched students
                     if (data.matched_ids) {
                         // Store matched IDs in sessionStorage for cross-page selection
-                        sessionStorage.setItem('verified_enrollment_ids', JSON.stringify(data.matched_ids));
+                        setStoredVerifiedIds(data.matched_ids);
 
                         // Check boxes for currently visible students
                         let visibleMatches = 0;
@@ -992,21 +1306,7 @@
                             if (checkbox) {
                                 checkbox.checked = true;
                                 visibleMatches++;
-                                // Add visual indicator
-                                const card = checkbox.closest('.registration-item');
-                                if (card) {
-                                    card.style.borderLeft = '4px solid #28a745';
-                                    card.style.backgroundColor = '#f8fff9';
-                                    // Add verified badge
-                                    const badge = document.createElement('span');
-                                    badge.className = 'badge bg-success ms-2 verified-badge';
-                                    badge.innerHTML = '<i class="bi bi-check-circle me-1"></i>Verified';
-                                    const statusArea = card.querySelector('.text-muted.small');
-                                    if (statusArea) {
-                                        const existingBadge = card.querySelector('.verified-badge');
-                                        if (!existingBadge) statusArea.insertAdjacentElement('afterend', badge);
-                                    }
-                                }
+                                applyVerifiedStyle(checkbox.closest('.registration-item'));
                             }
                         });
 
@@ -1017,17 +1317,18 @@
                         }
                     }
 
-                    // Update action bar visibility
+                    // Update action bar visibility and banner
                     if (typeof updateActionBar === 'function') {
                         updateActionBar();
                     }
+                    updateVerifiedBanner();
 
                     if (verificationResults) {
                         verificationResults.innerHTML = `
                                                                                                                                                                                                             <div class="alert alert-success">
                                                                                                                                                                                                                 <h6><i class="bi bi-check-circle me-2"></i>Enrollment Verification Complete</h6>
                                                                                                                                                                                                                 <p class="mb-2"><strong>${data.total_matched}</strong> student(s) matched out of <strong>${data.total_enrollment}</strong> in enrollment file.</p>
-                                                                                                                                                                                                                <p class="mb-0 small">Matched students have been auto-selected and highlighted in green.</p>
+                                                                                                                                                                                                                <p class="mb-0 small">Matched students have been auto-selected and highlighted in green. Navigate between pages — selections persist automatically.</p>
                                                                                                                                                                                                             </div>
                                                                                                                                                                                                             ${data.match_details && data.match_details.length > 0 ? `
                                                                                                                                                                                                                 <div class="mt-3">

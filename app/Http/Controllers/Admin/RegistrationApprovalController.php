@@ -85,7 +85,11 @@ class RegistrationApprovalController extends Controller
                     ->whereColumn('u2.id', '!=', 'users.id')
                     ->where(function ($q) {
                         $q->whereColumn('u2.email', 'users.email')
-                            ->orWhereRaw('u2.name LIKE CONCAT("%", users.name, "%")');
+                            ->orWhereColumn('u2.name', 'users.name')
+                            ->orWhere(function ($sub) {
+                                $sub->whereNotNull('users.student_id')
+                                    ->whereColumn('u2.student_id', 'users.student_id');
+                            });
                     });
             }, 'duplicate_count');
 
