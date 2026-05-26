@@ -393,7 +393,7 @@ Route::get('/test-smtp', function () {
                     ->subject('GCC System - Email Test');
         });
         $results['status'] = 'SUCCESS - Email sent! Check your inbox.';
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         $results['status'] = 'FAILED';
         $results['error'] = $e->getMessage();
         $results['error_class'] = get_class($e);

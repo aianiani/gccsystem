@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Log;
 
 class BrevoApiTransport extends AbstractTransport
 {
-    protected string $apiKey;
+    protected ?string $apiKey;
 
-    public function __construct(string $apiKey)
+    public function __construct(?string $apiKey)
     {
         parent::__construct();
         $this->apiKey = $apiKey;
@@ -20,6 +20,10 @@ class BrevoApiTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
+        if (empty($this->apiKey)) {
+            throw new \Exception('Brevo API key is not configured. Please set the BREVO_API_KEY environment variable.');
+        }
+
         $email = MessageConverter::toEmail($message->getOriginalMessage());
 
         $sender = $email->getFrom()[0] ?? null;

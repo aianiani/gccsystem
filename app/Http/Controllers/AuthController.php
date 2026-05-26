@@ -141,7 +141,7 @@ class AuthController extends Controller
                 try {
                     Mail::to($user->email)->send(new \App\Mail\TwoFactorCodeMail($code, $user->name));
                     $emailSent = true;
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     \Log::error('2FA email failed: ' . $e->getMessage());
                 }
                 // Log out the user for now, store user_id in session for 2FA
