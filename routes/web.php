@@ -362,23 +362,35 @@ Route::get('/enable-2fa-admin', function () {
     }
 });
 
-// Temporary route to test SMTP email delivery
+// Temporary route to test SMTP/API email delivery
 Route::get('/test-smtp', function () {
     $results = [];
+    $defaultMailer = config('mail.default');
+    $mailerConfig = config("mail.mailers.{$defaultMailer}", []);
+
     $results['mail_config'] = [
-        'mailer' => config('mail.default'),
-        'host' => config('mail.mailers.smtp.host'),
-        'port' => config('mail.mailers.smtp.port'),
-        'encryption' => config('mail.mailers.smtp.encryption'),
-        'username' => config('mail.mailers.smtp.username') ? 'SET (' . substr(config('mail.mailers.smtp.username'), 0, 5) . '...)' : 'NOT SET',
-        'password' => config('mail.mailers.smtp.password') ? 'SET (hidden)' : 'NOT SET',
+        'default_mailer' => $defaultMailer,
         'from_address' => config('mail.from.address'),
     ];
 
+    if ($defaultMailer === 'smtp') {
+        $results['mail_config'] += [
+            'host' => $mailerConfig['host'] ?? null,
+            'port' => $mailerConfig['port'] ?? null,
+            'encryption' => $mailerConfig['encryption'] ?? null,
+            'username' => isset($mailerConfig['username']) ? 'SET (' . substr($mailerConfig['username'], 0, 5) . '...)' : 'NOT SET',
+            'password' => isset($mailerConfig['password']) ? 'SET (hidden)' : 'NOT SET',
+        ];
+    } elseif ($defaultMailer === 'brevo') {
+        $results['mail_config'] += [
+            'key' => isset($mailerConfig['key']) && !empty($mailerConfig['key']) ? 'SET (' . substr($mailerConfig['key'], 0, 5) . '...)' : 'NOT SET',
+        ];
+    }
+
     try {
-        \Illuminate\Support\Facades\Mail::raw('This is a test email from GCC System on Render. If you received this, SMTP is working!', function ($message) {
+        \Illuminate\Support\Facades\Mail::raw('This is a test email from GCC System. If you received this, the custom Brevo API mailer is working!', function ($message) {
             $message->to(config('mail.from.address'))
-                    ->subject('GCC System - SMTP Test from Render');
+                    ->subject('GCC System - Email Test');
         });
         $results['status'] = 'SUCCESS - Email sent! Check your inbox.';
     } catch (\Exception $e) {
