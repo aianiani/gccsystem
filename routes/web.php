@@ -352,5 +352,43 @@ Route::get('/disable-2fa-admin', function () {
     }
 });
 
+// Temporary route to re-enable 2FA for admin
+Route::get('/enable-2fa-admin', function () {
+    try {
+        \App\Models\User::where('email', 'aianmark1715@gmail.com')->update(['two_factor_enabled' => true]);
+        return '2FA successfully re-enabled for admin!';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+// Temporary route to test SMTP email delivery
+Route::get('/test-smtp', function () {
+    $results = [];
+    $results['mail_config'] = [
+        'mailer' => config('mail.default'),
+        'host' => config('mail.mailers.smtp.host'),
+        'port' => config('mail.mailers.smtp.port'),
+        'encryption' => config('mail.mailers.smtp.encryption'),
+        'username' => config('mail.mailers.smtp.username') ? 'SET (' . substr(config('mail.mailers.smtp.username'), 0, 5) . '...)' : 'NOT SET',
+        'password' => config('mail.mailers.smtp.password') ? 'SET (hidden)' : 'NOT SET',
+        'from_address' => config('mail.from.address'),
+    ];
+
+    try {
+        \Illuminate\Support\Facades\Mail::raw('This is a test email from GCC System on Render. If you received this, SMTP is working!', function ($message) {
+            $message->to(config('mail.from.address'))
+                    ->subject('GCC System - SMTP Test from Render');
+        });
+        $results['status'] = 'SUCCESS - Email sent! Check your inbox.';
+    } catch (\Exception $e) {
+        $results['status'] = 'FAILED';
+        $results['error'] = $e->getMessage();
+        $results['error_class'] = get_class($e);
+    }
+
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+});
+
 
 

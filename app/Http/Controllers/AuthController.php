@@ -136,21 +136,31 @@ class AuthController extends Controller
                         'created_at' => now(),
                     ]
                 );
-                // Send code via email
-                Mail::to($user->email)->send(new \App\Mail\TwoFactorCodeMail($code, $user->name));
+                // Send code via email (wrapped in try/catch to prevent 502 on SMTP failure)
+                $emailSent = false;
+                try {
+                    Mail::to($user->email)->send(new \App\Mail\TwoFactorCodeMail($code, $user->name));
+                    $emailSent = true;
+                } catch (\Exception $e) {
+                    \Log::error('2FA email failed: ' . $e->getMessage());
+                }
                 // Log out the user for now, store user_id in session for 2FA
                 Auth::logout();
                 $request->session()->put('2fa:user:id', $user->id);
                 \App\Models\UserActivity::log($user->id, 'login_2fa', '2FA code sent to user email');
 
+                $message = $emailSent
+                    ? 'A 2FA code has been sent to your email.'
+                    : 'A 2FA code was generated but we had trouble sending the email. Please try again or contact support.';
+
                 if ($request->expectsJson()) {
                     return response()->json([
                         'status' => '2fa_required',
-                        'message' => 'A 2FA code has been sent to your email.',
+                        'message' => $message,
                     ], 200);
                 }
 
-                return redirect()->route('2fa.form')->with('info', 'A 2FA code has been sent to your email.');
+                return redirect()->route('2fa.form')->with('info', $message);
             }
 
             // Log login activity
