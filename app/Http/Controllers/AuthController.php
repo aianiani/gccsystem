@@ -207,7 +207,7 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // Build name from first_name, middle_name, last_name if provided, otherwise use name field
+        // Build name from first_name, middle_name, last_name, name_extension if provided, otherwise use name field
         $fullName = $request->name;
         if ($request->filled('first_name') && $request->filled('last_name')) {
             $nameParts = array_filter([
@@ -216,6 +216,9 @@ class AuthController extends Controller
                 $request->last_name
             ]);
             $fullName = implode(' ', $nameParts);
+            if ($request->filled('name_extension')) {
+                $fullName .= ' ' . $request->name_extension;
+            }
         }
 
         $validator = Validator::make($request->all(), [
@@ -223,6 +226,7 @@ class AuthController extends Controller
             'first_name' => 'required_without:name|string|max:255',
             'last_name' => 'required_without:name|string|max:255',
             'middle_name' => 'nullable|string|max:255',
+            'name_extension' => 'nullable|string|max:50',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'contact_number' => 'nullable|string|max:20',
