@@ -114,4 +114,25 @@ class SeminarController extends Controller
         $schedule->delete();
         return back()->with('success', 'Schedule deleted successfully.');
     }
+
+    public function printAttendance(SeminarSchedule $schedule)
+    {
+        $schedule->load(['seminar', 'attendances.user']);
+
+        $attendances = $schedule->attendances()
+            ->with('user')
+            ->get()
+            ->sortBy(fn($a) => $a->user->name ?? '');
+
+        $counselor = auth()->user();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+            'counselor.seminars.attendance-pdf',
+            compact('schedule', 'attendances', 'counselor')
+        )->setPaper('letter', 'portrait');
+
+        $filename = 'Attendance_' . str_replace(' ', '_', $schedule->seminar->name ?? 'Seminar') . '_' . $schedule->date . '.pdf';
+
+        return $pdf->stream($filename);
+    }
 }

@@ -486,6 +486,13 @@
                                                                     <span>{{ $schedule->location }}</span>
                                                                 @endif
                                                             </span>
+                                                            <a href="{{ route('counselor.seminars.schedules.attendance-pdf', $schedule) }}"
+                                                                target="_blank"
+                                                                class="mt-1 d-inline-flex align-items-center gap-1"
+                                                                style="font-size:0.7rem; color:#1f7a2d; text-decoration:none; font-weight:600;"
+                                                                title="Print Attendance Sheet">
+                                                                <i class="bi bi-printer-fill"></i> Print Attendance
+                                                            </a>
                                                         </div>
                                                     @empty
                                                         <span class="no-schedule-text">No schedules configured</span>

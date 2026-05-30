@@ -249,6 +249,7 @@ Route::prefix('counselor')->middleware(['auth', 'role:counselor'])->group(functi
     Route::resource('seminars', App\Http\Controllers\Counselor\SeminarController::class)->names('counselor.seminars');
     Route::post('seminars/{seminar}/schedules', [App\Http\Controllers\Counselor\SeminarController::class, 'storeSchedule'])->name('counselor.seminars.schedules.store');
     Route::delete('seminars/schedules/{schedule}', [App\Http\Controllers\Counselor\SeminarController::class, 'destroySchedule'])->name('counselor.seminars.schedules.destroy');
+    Route::get('seminars/schedules/{schedule}/attendance-pdf', [App\Http\Controllers\Counselor\SeminarController::class, 'printAttendance'])->name('counselor.seminars.schedules.attendance-pdf');
 
     // Reports
     Route::get('guidance/reports', [App\Http\Controllers\Counselor\GuidanceReportController::class, 'index'])->name('counselor.guidance.reports.index');
