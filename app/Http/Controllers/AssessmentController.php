@@ -75,7 +75,7 @@ class AssessmentController extends Controller
 
         \App\Models\Assessment::updateOrCreate(
             ['user_id' => auth()->id(), 'type' => $assessmentType, 'status' => 'draft'],
-            ['responses' => $request->answers, 'status' => 'draft']
+            ['responses' => $request->answers, 'risk_level' => 'draft', 'status' => 'draft']
         );
 
         return response()->json(['success' => true, 'message' => 'Draft saved.']);
