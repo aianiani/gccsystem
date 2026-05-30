@@ -4431,12 +4431,22 @@
                                                     <div class="invalid-feedback"></div>
                                                 </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                    <input type="text" name="middle_name" class="form-control"
-                                                        placeholder="Middle Name (Optional)" autocomplete="additional-name"
-                                                        id="middleNameInput">
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                        <input type="text" name="middle_name" class="form-control"
+                                                            placeholder="Middle Name (Optional)" autocomplete="additional-name"
+                                                            id="middleNameInput">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                                        <input type="text" name="name_extension" class="form-control"
+                                                            placeholder="Extension (e.g. Jr., Sr., III)" autocomplete="honorific-suffix"
+                                                            id="nameExtensionInput">
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
@@ -6116,6 +6126,7 @@
                 const formData = {
                     first_name: document.querySelector('[name="first_name"]')?.value || '',
                     middle_name: document.querySelector('[name="middle_name"]')?.value || '',
+                    name_extension: document.querySelector('[name="name_extension"]')?.value || '',
                     last_name: document.querySelector('[name="last_name"]')?.value || '',
                     gender: document.querySelector('[name="gender"]')?.value || '',
                     contact_number: document.querySelector('[name="contact_number"]')?.value || '',
