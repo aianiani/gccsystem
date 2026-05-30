@@ -500,6 +500,19 @@
                                                                 </form>
                                                             </div>
                                                         </div>
+                                                    @elseif($appointment->status === 'declined')
+                                                        <div class="d-flex gap-2">
+                                                            <i class="bi bi-x-circle-fill text-danger mt-1"></i>
+                                                            <div>
+                                                                <small class="text-danger fw-bold d-block">Your appointment was declined by the counselor.</small>
+                                                                @if($appointment->decline_reason)
+                                                                    <div class="mt-2 p-2 rounded bg-danger bg-opacity-10 border border-danger border-opacity-25">
+                                                                        <small class="text-danger d-block fw-semibold mb-1"><i class="bi bi-chat-left-text me-1"></i>Reason:</small>
+                                                                        <p class="mb-0 small text-dark" style="word-break: break-word;">{{ $appointment->decline_reason }}</p>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                        </div>
                                                     @elseif($appointment->notes)
                                                         <div class="d-flex gap-2">
                                                             <i class="bi bi-sticky text-muted mt-1"></i>
