@@ -435,6 +435,24 @@
                                                     <div class="info-value text-danger">{{ $appointment->decline_reason }}</div>
                                                 </div>
                                                 @endif
+                                                @if($appointment->transferred_from_counselor_id)
+                                                <div class="col-12 info-group">
+                                                    <div class="info-label" style="color:#0369a1;">
+                                                        <i class="bi bi-arrow-left-right me-1"></i>Transferred From
+                                                    </div>
+                                                    <div class="info-value" style="color:#0369a1;">
+                                                        {{ $appointment->transferredFromCounselor->name ?? 'Unknown counselor' }}
+                                                    </div>
+                                                </div>
+                                                @if($appointment->transfer_note)
+                                                <div class="col-12 info-group">
+                                                    <div class="info-label" style="color:#0369a1;">Transfer Note</div>
+                                                    <div class="info-value p-2 rounded" style="background:#e0f2fe; color:#0c4a6e; border-left: 3px solid #0284c7;">
+                                                        {{ $appointment->transfer_note }}
+                                                    </div>
+                                                </div>
+                                                @endif
+                                                @endif
                                             </div>
                                             @if($appointment->appointment_type === 'Referral')
                                                 <hr class="my-3 text-muted opacity-25">

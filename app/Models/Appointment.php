@@ -15,6 +15,8 @@ class Appointment extends Model
         'status',
         'reschedule_reason',
         'decline_reason',
+        'transfer_note',
+        'transferred_from_counselor_id',
         'guardian1_name',
         'guardian1_relationship',
         'guardian1_contact',
@@ -49,5 +51,10 @@ class Appointment extends Model
     public function sessionNotes()
     {
         return $this->hasMany(SessionNote::class);
+    }
+
+    public function transferredFromCounselor()
+    {
+        return $this->belongsTo(User::class, 'transferred_from_counselor_id');
     }
 }

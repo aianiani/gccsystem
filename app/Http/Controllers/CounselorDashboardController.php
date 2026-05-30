@@ -112,9 +112,9 @@ class CounselorDashboardController extends Controller
     {
         // Allow admins to view any appointment, counselors can only view their own
         if (auth()->user()->isAdmin()) {
-            $appointment = Appointment::with('student', 'counselor')->findOrFail($id);
+            $appointment = Appointment::with('student', 'counselor', 'transferredFromCounselor')->findOrFail($id);
         } else {
-            $appointment = Appointment::where('counselor_id', auth()->id())->with('student')->findOrFail($id);
+            $appointment = Appointment::where('counselor_id', auth()->id())->with('student', 'transferredFromCounselor')->findOrFail($id);
         }
 
         // Calculate session number for this appointment (regardless of status)

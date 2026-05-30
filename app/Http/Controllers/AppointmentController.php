@@ -60,7 +60,7 @@ class AppointmentController extends Controller
 
         // Default: student view
         $appointments = Appointment::where('student_id', $user->id)
-            ->with(['counselor', 'sessionNotes'])
+            ->with(['counselor', 'sessionNotes', 'transferredFromCounselor'])
             ->orderBy('scheduled_at', 'desc')
             ->get();
 
@@ -406,10 +406,9 @@ class AppointmentController extends Controller
         }
 
         $oldCounselor = auth()->user();
+        $appointment->transferred_from_counselor_id = $oldCounselor->id;
+        $appointment->transfer_note = $request->transfer_notes ?: null;
         $appointment->counselor_id = $newCounselor->id;
-        if ($request->transfer_notes) {
-            $appointment->notes = ($appointment->notes ? $appointment->notes . "\n\n" : '') . '[Transfer note] ' . $request->transfer_notes;
-        }
         $appointment->save();
 
         // Notify the new counselor

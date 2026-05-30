@@ -513,11 +513,20 @@
                                                                 @endif
                                                             </div>
                                                         </div>
+                                                    @elseif($appointment->transferred_from_counselor_id)
+                                                        <div class="d-flex gap-2">
+                                                            <i class="bi bi-arrow-left-right text-info mt-1"></i>
+                                                            <small class="text-info fw-medium">
+                                                                This appointment was transferred to
+                                                                <strong>{{ $appointment->counselor->name ?? 'a counselor' }}</strong>
+                                                                from
+                                                                <strong>{{ $appointment->transferredFromCounselor->name ?? 'previous counselor' }}</strong>.
+                                                            </small>
+                                                        </div>
                                                     @elseif($appointment->notes)
                                                         <div class="d-flex gap-2">
                                                             <i class="bi bi-sticky text-muted mt-1"></i>
-                                                            <small
-                                                                class="text-muted module-text">{{ Str::limit($appointment->notes, 80) }}</small>
+                                                            <small class="text-muted module-text">{{ Str::limit($appointment->notes, 80) }}</small>
                                                         </div>
                                                     @else
                                                         <small class="text-muted fst-italic">No additional notes.</small>
