@@ -14,6 +14,7 @@ class Appointment extends Model
         'notes',
         'status',
         'reschedule_reason',
+        'decline_reason',
         'guardian1_name',
         'guardian1_relationship',
         'guardian1_contact',
@@ -31,6 +32,7 @@ class Appointment extends Model
     protected $casts = [
         'scheduled_at' => 'datetime',
         'previous_scheduled_at' => 'datetime',
+        'nature_of_problem' => 'array',
     ];
 
     // Valid statuses: pending, accepted, declined, completed, cancelled, rescheduled_pending

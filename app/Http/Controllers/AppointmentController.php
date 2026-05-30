@@ -181,7 +181,8 @@ class AppointmentController extends Controller
             'guardian2_relationship' => 'nullable|string|max:255',
             'guardian2_contact' => 'nullable|string|max:20',
             'guardian2_relationship_other' => 'nullable|string|max:255',
-            'nature_of_problem' => 'required|in:Academic,Family,Personal / Emotional,Social,Psychological,Other',
+            'nature_of_problem' => 'required|array|min:1',
+            'nature_of_problem.*' => 'in:Academic,Family,Personal / Emotional,Social,Psychological,Other',
             'nature_of_problem_other' => 'nullable|string|max:500',
             'appointment_type' => 'required|in:Walk-in,Called-in,Referral',
             'referral_reason' => 'required_if:appointment_type,Referral|nullable|string|max:500',
@@ -249,7 +250,7 @@ class AppointmentController extends Controller
             'guardian2_name' => $request->guardian2_name,
             'guardian2_relationship' => $guardian2Relationship,
             'guardian2_contact' => $request->guardian2_contact,
-            'nature_of_problem' => $request->nature_of_problem,
+            'nature_of_problem' => json_encode($request->nature_of_problem),
             'nature_of_problem_other' => $request->nature_of_problem_other,
             'appointment_type' => $request->appointment_type,
             'referral_reason' => $request->referral_reason,
@@ -361,13 +362,17 @@ class AppointmentController extends Controller
     }
 
     // Decline an appointment
-    public function decline($id)
+    public function decline(Request $request, $id)
     {
         $appointment = Appointment::where('counselor_id', auth()->id())->findOrFail($id);
         if ($appointment->status !== 'pending') {
             return redirect()->back()->with('error', 'Only pending appointments can be declined.');
         }
+        $request->validate([
+            'decline_reason' => 'required|string|max:1000',
+        ]);
         $appointment->status = 'declined';
+        $appointment->decline_reason = $request->decline_reason;
         $appointment->save();
         // Notify the student
         $student = $appointment->student;

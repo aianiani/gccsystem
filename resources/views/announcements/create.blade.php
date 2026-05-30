@@ -250,13 +250,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="content" class="form-label">
+                        <label class="form-label">
                             <i class="bi bi-text-paragraph me-1"></i>Content <span class="text-danger">*</span>
                         </label>
-                        <textarea name="content" id="content" class="form-control @error('content') is-invalid @enderror"
-                            rows="8" placeholder="Enter announcement content..." required>{{ old('content') }}</textarea>
+                        {{-- Hidden input carries the HTML value to the server --}}
+                        <input type="hidden" name="content" id="content" value="{{ old('content') }}">
+                        <div id="quill-editor" style="min-height: 200px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.95rem;"></div>
                         @error('content')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -337,7 +338,7 @@
                         <a href="{{ route('announcements.index') }}" class="btn btn-secondary">
                             <i class="bi bi-x-circle me-1"></i>Cancel
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
                             <i class="bi bi-plus-circle me-1"></i>Create Announcement
                         </button>
                     </div>
@@ -345,4 +346,36 @@
             </div>
         </div>
     </div>
+
+    {{-- Quill WYSIWYG Editor --}}
+    <link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+    <script>
+        const quill = new Quill('#quill-editor', {
+            theme: 'snow',
+            placeholder: 'Write your announcement content here...',
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    [{ align: [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Pre-fill if old() value exists (e.g. validation failure)
+        const oldContent = document.getElementById('content').value;
+        if (oldContent) {
+            quill.clipboard.dangerouslyPasteHTML(oldContent);
+        }
+
+        // Sync Quill HTML to hidden input before form submit
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            document.getElementById('content').value = quill.root.innerHTML;
+        });
+    </script>
 @endsection

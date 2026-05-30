@@ -42,9 +42,10 @@
                 @error('title')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
             <div class="mb-3">
-                <label for="content" class="form-label">Content</label>
-                <textarea name="content" id="content" class="form-control" rows="5"
-                    required>{{ old('content', $announcement->content) }}</textarea>
+                <label class="form-label">Content <span class="text-danger">*</span></label>
+                {{-- Hidden input carries the HTML value to the server --}}
+                <input type="hidden" name="content" id="content" value="{{ old('content', $announcement->content) }}">
+                <div id="quill-editor" style="min-height: 200px; border-radius: 8px; border: 1px solid #dee2e6; font-size: 0.95rem;"></div>
                 @error('content')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
             <div class="mb-3">
@@ -196,8 +197,40 @@
                 }
             </script>
 
-            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Update</button>
             <a href="{{ route('announcements.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
+
+    {{-- Quill WYSIWYG Editor --}}
+    <link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+    <script>
+        const quill = new Quill('#quill-editor', {
+            theme: 'snow',
+            placeholder: 'Write your announcement content here...',
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    [{ align: [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Pre-fill with existing content
+        const existingContent = document.getElementById('content').value;
+        if (existingContent) {
+            quill.clipboard.dangerouslyPasteHTML(existingContent);
+        }
+
+        // Sync Quill HTML to hidden input before form submit
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            document.getElementById('content').value = quill.root.innerHTML;
+        });
+    </script>
 @endsection

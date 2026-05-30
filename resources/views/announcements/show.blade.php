@@ -127,7 +127,7 @@
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-4 p-lg-5 announcement-content-card">
                             <div class="mb-4 announcement-body-content">
-                                {!! nl2br(e($announcement->content)) !!}
+                                {!! $announcement->content !!}
                             </div>
                             @php
                                 $attachmentPath = $announcement->attachment ?? null;

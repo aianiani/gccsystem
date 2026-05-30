@@ -339,13 +339,10 @@
                                                 class="btn btn-warning btn-action text-dark">
                                                 <i class="bi bi-clock-history"></i> Reschedule
                                             </a>
-                                            <form method="POST"
-                                                action="{{ route('counselor.appointments.decline', $appointment->id) }}"
-                                                data-confirm="Decline this appointment?">
-                                                @csrf @method('PATCH')
-                                                <button class="btn btn-outline-danger btn-action"><i class="bi bi-x-lg"></i>
-                                                    Decline</button>
-                                            </form>
+                                            <button type="button" class="btn btn-outline-danger btn-action"
+                                                data-bs-toggle="modal" data-bs-target="#declineModal">
+                                                <i class="bi bi-x-lg"></i> Decline
+                                            </button>
                                         @elseif($appointment->status === 'accepted')
                                             <form method="POST"
                                                 action="{{ route('counselor.appointments.complete', $appointment->id) }}"
@@ -414,12 +411,22 @@
                                                 <div class="col-12 info-group">
                                                     <div class="info-label">Nature of Problem</div>
                                                     <div class="info-value">
-                                                        {{ $appointment->nature_of_problem ?? 'Not specified' }}
+                                                        @php
+                                                            $problems = is_array($appointment->nature_of_problem)
+                                                                ? $appointment->nature_of_problem
+                                                                : (json_decode($appointment->nature_of_problem, true) ?? [$appointment->nature_of_problem]);
+                                                        @endphp
+                                                        {{ implode(', ', array_filter((array)$problems)) ?: 'Not specified' }}
                                                         @if($appointment->nature_of_problem_other)
                                                             <div class="small text-muted">
                                                                 ({{ $appointment->nature_of_problem_other }})</div>
                                                         @endif
                                                     </div>
+                                                </div>
+                                                @if($appointment->status === 'declined' && $appointment->decline_reason)
+                                                <div class="col-12 info-group">
+                                                    <div class="info-label text-danger">Decline Reason</div>
+                                                    <div class="info-value text-danger">{{ $appointment->decline_reason }}</div>
                                                 </div>
                                             </div>
                                             @if($appointment->appointment_type === 'Referral')
@@ -710,5 +717,38 @@
             // Privacy Toggle Logic Removed
         });
     </script>
+
+    <!-- Decline Appointment Modal -->
+    <div class="modal fade" id="declineModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header border-0" style="background: #fef2f2; border-radius: 16px 16px 0 0; padding: 1.25rem 1.5rem;">
+                    <h5 class="modal-title fw-bold" style="color: #b91c1c;">
+                        <i class="bi bi-x-circle me-2"></i>Decline Appointment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{{ route('counselor.appointments.decline', $appointment->id) }}">
+                    @csrf @method('PATCH')
+                    <div class="modal-body" style="padding: 1.5rem;">
+                        <p class="text-muted mb-3">Please provide a reason for declining this appointment. The student will be notified.</p>
+                        <div class="mb-3">
+                            <label for="decline_reason" class="form-label fw-semibold">Reason for Declining <span class="text-danger">*</span></label>
+                            <textarea name="decline_reason" id="decline_reason" class="form-control" rows="4"
+                                placeholder="e.g. Slot conflict, student needs to be referred to another counselor, incomplete requirements..."
+                                required maxlength="1000"></textarea>
+                            <div class="form-text text-muted">Maximum 1000 characters.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0" style="padding: 1rem 1.5rem;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-x-lg me-1"></i>Decline Appointment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 @endsection

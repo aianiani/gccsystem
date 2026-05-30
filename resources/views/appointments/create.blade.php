@@ -588,39 +588,38 @@
                                 <!-- Nature of Problem Section -->
                                 <div class="mt-5">
                                     <h5 class="mb-3"><i class="bi bi-question-circle me-2"></i>Nature of the Problem</h5>
-                                    <p class="text-muted mb-3">Please select the nature of the problem you'd like to discuss
-                                    </p>
+                                    <p class="text-muted mb-3">Please check all that apply to the nature of the problem you'd like to discuss.</p>
                                     <div class="nature-problem-options">
                                         <div class="form-check-square">
-                                            <input class="form-check-input" type="radio" name="nature_of_problem"
-                                                id="problem_academic" value="Academic" required>
+                                            <input class="form-check-input nature-problem-checkbox" type="checkbox" name="nature_of_problem[]"
+                                                id="problem_academic" value="Academic">
                                             <label class="form-check-label" for="problem_academic">Academic</label>
                                         </div>
                                         <div class="form-check-square">
-                                            <input class="form-check-input" type="radio" name="nature_of_problem"
-                                                id="problem_family" value="Family" required>
+                                            <input class="form-check-input nature-problem-checkbox" type="checkbox" name="nature_of_problem[]"
+                                                id="problem_family" value="Family">
                                             <label class="form-check-label" for="problem_family">Family</label>
                                         </div>
                                         <div class="form-check-square">
-                                            <input class="form-check-input" type="radio" name="nature_of_problem"
-                                                id="problem_personal" value="Personal / Emotional" required>
+                                            <input class="form-check-input nature-problem-checkbox" type="checkbox" name="nature_of_problem[]"
+                                                id="problem_personal" value="Personal / Emotional">
                                             <label class="form-check-label" for="problem_personal">Personal /
                                                 Emotional</label>
                                         </div>
                                         <div class="form-check-square">
-                                            <input class="form-check-input" type="radio" name="nature_of_problem"
-                                                id="problem_social" value="Social" required>
+                                            <input class="form-check-input nature-problem-checkbox" type="checkbox" name="nature_of_problem[]"
+                                                id="problem_social" value="Social">
                                             <label class="form-check-label" for="problem_social">Social</label>
                                         </div>
                                         <div class="form-check-square">
-                                            <input class="form-check-input" type="radio" name="nature_of_problem"
-                                                id="problem_psychological" value="Psychological" required>
+                                            <input class="form-check-input nature-problem-checkbox" type="checkbox" name="nature_of_problem[]"
+                                                id="problem_psychological" value="Psychological">
                                             <label class="form-check-label"
                                                 for="problem_psychological">Psychological</label>
                                         </div>
                                         <div class="form-check-square">
-                                            <input class="form-check-input" type="radio" name="nature_of_problem"
-                                                id="problem_other" value="Other" required>
+                                            <input class="form-check-input nature-problem-checkbox" type="checkbox" name="nature_of_problem[]"
+                                                id="problem_other" value="Other">
                                             <label class="form-check-label" for="problem_other">Other (please
                                                 specify)</label>
                                         </div>
@@ -1833,7 +1832,7 @@
                     guardian2_relationship: document.querySelector('select[name="guardian2_relationship"]')?.value || '',
                     guardian2_contact: document.querySelector('input[name="guardian2_contact"]')?.value || '',
                     guardian2_relationship_other: document.querySelector('input[name="guardian2_relationship_other"]')?.value || '',
-                    nature_of_problem: document.querySelector('input[name="nature_of_problem"]:checked')?.value || '',
+                    nature_of_problem: Array.from(document.querySelectorAll('input[name="nature_of_problem[]"]:checked')).map(cb => cb.value),
                     nature_of_problem_other: document.querySelector('textarea[name="nature_of_problem_other"]')?.value || '',
                     appointment_type: document.querySelector('input[name="appointment_type"]:checked')?.value || '',
                     referral_reason: document.querySelector('textarea[name="referral_reason"]')?.value || '',
@@ -1872,10 +1871,12 @@
                     if (formData.guardian1_relationship) document.querySelector('select[name="guardian1_relationship"]').value = formData.guardian1_relationship;
                     if (formData.guardian2_relationship) document.querySelector('select[name="guardian2_relationship"]').value = formData.guardian2_relationship;
 
-                    // Restore radio buttons
-                    if (formData.nature_of_problem) {
-                        const radio = document.querySelector(`input[name="nature_of_problem"][value="${formData.nature_of_problem}"]`);
-                        if (radio) radio.checked = true;
+                    // Restore checkboxes
+                    if (formData.nature_of_problem && Array.isArray(formData.nature_of_problem)) {
+                        formData.nature_of_problem.forEach(val => {
+                            const cb = document.querySelector(`input[name="nature_of_problem[]"][value="${val}"]`);
+                            if (cb) cb.checked = true;
+                        });
                     }
                     if (formData.appointment_type) {
                         const radio = document.querySelector(`input[name="appointment_type"][value="${formData.appointment_type}"]`);
@@ -1892,7 +1893,7 @@
                     syncHiddenFields();
 
                     // Trigger change events to show conditional fields
-                    document.querySelectorAll('input[name="nature_of_problem"]:checked, input[name="appointment_type"]:checked, select[name="guardian1_relationship"], select[name="guardian2_relationship"]').forEach(el => {
+                    document.querySelectorAll('input[name="nature_of_problem[]"]:checked, input[name="appointment_type"]:checked, select[name="guardian1_relationship"], select[name="guardian2_relationship"]').forEach(el => {
                         el.dispatchEvent(new Event('change'));
                     });
 
@@ -2044,15 +2045,16 @@
                             return false;
                         }
 
-                        // Check nature of problem
-                        const natureOfProblem = document.querySelector('input[name="nature_of_problem"]:checked')?.value;
-                        console.log('Nature of problem:', natureOfProblem);
+                        // Check nature of problem (at least one checkbox selected)
+                        const checkedProblems = document.querySelectorAll('input[name="nature_of_problem[]"]:checked');
+                        console.log('Nature of problem checked:', checkedProblems.length);
 
-                        if (!natureOfProblem) {
+                        if (checkedProblems.length === 0) {
                             console.log('Missing nature of problem');
                             return false;
                         }
-                        if (natureOfProblem === 'Other') {
+                        const hasOther = Array.from(checkedProblems).some(cb => cb.value === 'Other');
+                        if (hasOther) {
                             const otherSpecify = document.querySelector('[name="nature_of_problem_other"]')?.value;
                             if (!otherSpecify || otherSpecify.trim() === '') {
                                 console.log('Missing nature of problem other');
@@ -2589,19 +2591,18 @@
                 }
 
                 // Update nature of problem
-                const natureOfProblemRadio = document.querySelector('input[name="nature_of_problem"]:checked');
+                const checkedProblemBoxes = document.querySelectorAll('input[name="nature_of_problem[]"]:checked');
                 const summaryNatureOfProblem = document.getElementById('summaryNatureOfProblem');
                 if (summaryNatureOfProblem) {
-                    if (natureOfProblemRadio) {
-                        let natureOfProblem = natureOfProblemRadio.value;
-                        // If "Other" is selected, append the specified text
-                        if (natureOfProblem === 'Other') {
-                            const otherSpecify = document.querySelector('[name="nature_of_problem_other"]')?.value;
-                            if (otherSpecify && otherSpecify.trim() !== '') {
-                                natureOfProblem = `Other: ${otherSpecify}`;
+                    if (checkedProblemBoxes.length > 0) {
+                        let labels = Array.from(checkedProblemBoxes).map(cb => {
+                            if (cb.value === 'Other') {
+                                const otherSpecify = document.querySelector('[name="nature_of_problem_other"]')?.value;
+                                return otherSpecify && otherSpecify.trim() !== '' ? `Other: ${otherSpecify}` : 'Other';
                             }
-                        }
-                        summaryNatureOfProblem.textContent = natureOfProblem;
+                            return cb.value;
+                        });
+                        summaryNatureOfProblem.textContent = labels.join(', ');
                     } else {
                         summaryNatureOfProblem.textContent = 'Not selected';
                     }
@@ -2733,13 +2734,14 @@
 
             // Consolidated listeners for conditional fields
             // Nature of Problem "Other" field
-            const problemRadios = document.querySelectorAll('input[name="nature_of_problem"]');
+            const problemCheckboxes = document.querySelectorAll('input[name="nature_of_problem[]"]');
             const problemOtherField = document.getElementById('problem_other_specify');
             const natureOfProblemOther = document.getElementById('nature_of_problem_other');
 
-            problemRadios.forEach(radio => {
-                radio.addEventListener('change', function () {
-                    if (this.value === 'Other') {
+            problemCheckboxes.forEach(cb => {
+                cb.addEventListener('change', function () {
+                    const otherChecked = document.getElementById('problem_other')?.checked;
+                    if (otherChecked) {
                         if (problemOtherField) problemOtherField.style.display = 'block';
                         if (natureOfProblemOther) natureOfProblemOther.setAttribute('required', 'required');
                     } else {
