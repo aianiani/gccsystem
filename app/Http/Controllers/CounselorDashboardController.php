@@ -186,7 +186,14 @@ class CounselorDashboardController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        return view('counselor.appointments.show', compact('appointment', 'latestAssessment', 'appointmentHistory'));
+        // Other active counselors for the transfer modal
+        $otherCounselors = \App\Models\User::where('role', 'counselor')
+            ->where('is_active', true)
+            ->where('id', '!=', $appointment->counselor_id)
+            ->orderBy('name')
+            ->get();
+
+        return view('counselor.appointments.show', compact('appointment', 'latestAssessment', 'appointmentHistory', 'otherCounselors'));
     }
 
     // Toggle counselor availability (AJAX)

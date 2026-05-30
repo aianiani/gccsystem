@@ -183,6 +183,8 @@
             box-shadow: 0 2px 8px rgba(44, 80, 22, 0.04);
         }
 
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         .dass42-form {
             background: #f8f9fa;
             border-radius: 18px;
@@ -599,8 +601,10 @@
                                 <button type="button" class="btn btn-outline-secondary" id="dass42-prev"
                                     style="visibility:hidden;">Previous</button>
                                 <button type="button" class="btn btn-outline-success" id="dass42-next">Next</button>
-                                <button type="submit" class="btn btn-success" id="dass42-submit"
-                                    style="display:none;">Submit Assessment</button>
+                                <div class="d-flex align-items-center gap-2" id="dass42-submit-group" style="display:none !important;">
+                                    <span id="autosave-indicator" class="text-muted small" style="font-size:0.8rem;"></span>
+                                    <button type="submit" class="btn btn-success" id="dass42-submit">Submit Assessment</button>
+                                </div>
                             </div>
 
                             <!-- Free-text comment removed as requested -->
@@ -642,10 +646,27 @@
             const prevBtn = document.getElementById('dass42-prev');
             const nextBtn = document.getElementById('dass42-next');
             const submitBtn = document.getElementById('dass42-submit');
+            const submitGroup = document.getElementById('dass42-submit-group');
             const summaryDiv = document.getElementById('dass42-summary');
             const questionWrapper = document.getElementById('dass42-question-wrapper');
             const radios = document.querySelectorAll('input[type="radio"]');
             const progressBar = document.getElementById('dass42-progress');
+
+            // Pre-fill from draft if it exists
+            @if(!empty($draft) && !empty($draft->responses))
+            const draftAnswers = @json($draft->responses);
+            Object.entries(draftAnswers).forEach(([key, value]) => {
+                // Keys are 1-indexed in draft, find radio with name answers[key-1] or answers[key]
+                const radio = document.querySelector(`input[name="answers[${parseInt(key)-1}]"][value="${value}"]`)
+                    || document.querySelector(`input[name="answers[${key}]"][value="${value}"]`);
+                if (radio) radio.checked = true;
+            });
+            // Show draft banner
+            const draftBanner = document.createElement('div');
+            draftBanner.className = 'alert alert-info alert-dismissible mb-3';
+            draftBanner.innerHTML = '<i class="bi bi-floppy me-1"></i><strong>Draft loaded.</strong> Your previous answers have been restored. You can continue where you left off. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            document.querySelector('.dass42-form').prepend(draftBanner);
+            @endif
 
             function showDass42Question(idx) {
                 questions.forEach((q, i) => {
@@ -653,7 +674,7 @@
                 });
                 prevBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
                 nextBtn.style.display = idx === totalQuestions - 1 ? 'none' : '';
-                submitBtn.style.display = idx === totalQuestions - 1 ? '' : 'none';
+                submitGroup.style.display = idx === totalQuestions - 1 ? 'flex' : 'none';
                 summaryDiv.style.display = 'none';
                 questionWrapper.style.display = '';
                 updateProgress();
@@ -667,6 +688,51 @@
             }
 
             prevBtn.onclick = () => { if (currentQuestion > 0) showDass42Question(--currentQuestion); };
+
+            // Auto-save draft on every answer change (debounced 1.5s)
+            const autosaveIndicator = document.getElementById('autosave-indicator');
+            let autosaveTimer;
+
+            function collectAnswers() {
+                const answers = {};
+                for (let i = 0; i < totalQuestions; i++) {
+                    const checked = document.querySelector('input[name="answers[' + i + ']"]:checked');
+                    if (checked) answers[i + 1] = parseInt(checked.value);
+                }
+                return answers;
+            }
+
+            function setIndicator(state) {
+                if (!autosaveIndicator) return;
+                const states = {
+                    saving: '<i class="bi bi-arrow-repeat me-1" style="animation:spin 1s linear infinite;display:inline-block;"></i>Saving...',
+                    saved:  '<i class="bi bi-check-circle-fill me-1 text-success"></i>Draft saved',
+                    error:  '<i class="bi bi-exclamation-circle me-1 text-danger"></i>Save failed',
+                };
+                autosaveIndicator.innerHTML = states[state] || '';
+            }
+
+            function autoSaveDraft() {
+                const answers = collectAnswers();
+                if (Object.keys(answers).length === 0) return;
+                setIndicator('saving');
+                fetch('{{ route("assessments.saveDraft", "dass42") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                    body: JSON.stringify({ answers })
+                })
+                .then(r => r.json())
+                .then(data => setIndicator(data.success ? 'saved' : 'error'))
+                .catch(() => setIndicator('error'));
+            }
+
+            radios.forEach(r => {
+                r.addEventListener('change', () => {
+                    clearTimeout(autosaveTimer);
+                    if (autosaveIndicator) autosaveIndicator.innerHTML = '<span class="text-muted" style="font-size:0.8rem;">Unsaved changes...</span>';
+                    autosaveTimer = setTimeout(autoSaveDraft, 1500);
+                });
+            });
             nextBtn.onclick = () => {
                 // Require answer before next
                 const checked = questions[currentQuestion].querySelector('input[type="radio"]:checked');

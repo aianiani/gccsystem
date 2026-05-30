@@ -302,6 +302,49 @@ class SessionNoteController extends Controller
         return redirect()->back()->with('success', 'Next appointment and session created successfully!');
     }
 
+    // AJAX: Search students who have appointments with this counselor
+    public function searchStudents(Request $request)
+    {
+        $q = $request->input('q', '');
+        $students = \App\Models\User::whereHas('appointments', function ($query) {
+                $query->where('counselor_id', auth()->id());
+            })
+            ->when($q, function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%$q%")
+                        ->orWhere('student_id', 'like', "%$q%")
+                        ->orWhere('email', 'like', "%$q%");
+                });
+            })
+            ->where('is_active', true)
+            ->select('id', 'name', 'student_id', 'email', 'college', 'course', 'year_level')
+            ->limit(15)
+            ->get()
+            ->map(function ($student) {
+                $appointments = \App\Models\Appointment::where('student_id', $student->id)
+                    ->where('counselor_id', auth()->id())
+                    ->whereIn('status', ['accepted', 'pending', 'completed'])
+                    ->orderByDesc('scheduled_at')
+                    ->get(['id', 'scheduled_at', 'status']);
+                return [
+                    'id' => $student->id,
+                    'name' => $student->name,
+                    'student_id' => $student->student_id,
+                    'email' => $student->email,
+                    'college' => $student->college,
+                    'course' => $student->course,
+                    'year_level' => $student->year_level,
+                    'appointments' => $appointments->map(fn($a) => [
+                        'id' => $a->id,
+                        'label' => \Carbon\Carbon::parse($a->scheduled_at)->format('M d, Y g:i A') . ' — ' . ucfirst($a->status),
+                        'create_url' => route('counselor.session_notes.create', $a->id),
+                    ]),
+                ];
+            });
+
+        return response()->json($students);
+    }
+
     public function bulkDestroy(Request $request)
     {
         $request->validate([

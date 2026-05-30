@@ -382,6 +382,47 @@ class AppointmentController extends Controller
         return redirect()->back()->with('success', 'Appointment declined.');
     }
 
+    // Transfer an appointment to another counselor
+    public function transfer(Request $request, $id)
+    {
+        $appointment = Appointment::where('counselor_id', auth()->id())->findOrFail($id);
+
+        if (!in_array($appointment->status, ['pending', 'accepted'])) {
+            return redirect()->back()->with('error', 'Only pending or approved appointments can be transferred.');
+        }
+
+        $request->validate([
+            'new_counselor_id' => 'required|exists:users,id',
+            'transfer_notes' => 'nullable|string|max:500',
+        ]);
+
+        $newCounselor = \App\Models\User::where('id', $request->new_counselor_id)
+            ->where('role', 'counselor')
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        if ($newCounselor->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Cannot transfer to yourself.');
+        }
+
+        $oldCounselor = auth()->user();
+        $appointment->counselor_id = $newCounselor->id;
+        if ($request->transfer_notes) {
+            $appointment->notes = ($appointment->notes ? $appointment->notes . "\n\n" : '') . '[Transfer note] ' . $request->transfer_notes;
+        }
+        $appointment->save();
+
+        // Notify the new counselor
+        $newCounselor->notify(new \App\Notifications\AppointmentTransferredNotification($appointment, $oldCounselor));
+
+        // Notify the student
+        if ($appointment->student) {
+            $appointment->student->notify(new \App\Notifications\AppointmentTransferredNotification($appointment, $oldCounselor));
+        }
+
+        return redirect()->route('counselor.appointments.index')->with('success', 'Appointment transferred to ' . $newCounselor->name . '.');
+    }
+
     // Accept a rescheduled appointment (student action)
     public function acceptReschedule($id)
     {

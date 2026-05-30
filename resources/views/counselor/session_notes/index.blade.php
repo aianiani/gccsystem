@@ -380,9 +380,15 @@
                             <h1 class="page-title">Session Notes</h1>
                             <p class="text-muted mb-0 mt-1">Detailed tracking of student guidance sessions</p>
                         </div>
-                        <a href="{{ route('counselor.appointments.index') }}" class="btn btn-outline-success btn-sm d-flex align-items-center gap-2">
-                             <i class="bi bi-calendar-check-fill"></i> Appointments List
-                        </a>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success btn-sm d-flex align-items-center gap-2"
+                                data-bs-toggle="modal" data-bs-target="#studentSearchModal">
+                                <i class="bi bi-search"></i> Search Student
+                            </button>
+                            <a href="{{ route('counselor.appointments.index') }}" class="btn btn-outline-success btn-sm d-flex align-items-center gap-2">
+                                <i class="bi bi-calendar-check-fill"></i> Appointments List
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Alert Messages -->
@@ -731,5 +737,86 @@
                 });
             }
         });
+    </script>
+
+    <!-- Student Search Modal -->
+    <div class="modal fade" id="studentSearchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header border-0" style="background: #f0fdf4; border-radius: 16px 16px 0 0; padding: 1.25rem 1.5rem;">
+                    <h5 class="modal-title fw-bold" style="color: #15803d;">
+                        <i class="bi bi-search me-2"></i>Search Student — New Session Note
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="studentSearchInput" class="form-control" placeholder="Type student name, ID, or email...">
+                    </div>
+                    <div id="studentSearchResults">
+                        <p class="text-muted text-center small py-3">Start typing to search for a student.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const input = document.getElementById('studentSearchInput');
+            const results = document.getElementById('studentSearchResults');
+            let debounceTimer;
+
+            input.addEventListener('input', function () {
+                clearTimeout(debounceTimer);
+                const q = this.value.trim();
+                if (q.length < 1) {
+                    results.innerHTML = '<p class="text-muted text-center small py-3">Start typing to search for a student.</p>';
+                    return;
+                }
+                results.innerHTML = '<p class="text-center text-muted py-3"><span class="spinner-border spinner-border-sm me-2"></span>Searching...</p>';
+                debounceTimer = setTimeout(() => {
+                    fetch(`{{ route('counselor.session_notes.searchStudents') }}?q=${encodeURIComponent(q)}`, {
+                        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                    })
+                    .then(r => r.json())
+                    .then(students => {
+                        if (!students.length) {
+                            results.innerHTML = '<p class="text-muted text-center small py-3">No students found with appointments under your name.</p>';
+                            return;
+                        }
+                        results.innerHTML = students.map(s => `
+                            <div class="border rounded-3 p-3 mb-2" style="background:#fafafa;">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="fw-bold">${s.name}</div>
+                                        <div class="text-muted small">${s.student_id ?? ''} &bull; ${s.college ?? ''} &bull; ${s.year_level ?? ''}</div>
+                                    </div>
+                                </div>
+                                ${s.appointments.length ? `
+                                <div class="mt-2">
+                                    <div class="small fw-semibold text-muted mb-1">Select Appointment:</div>
+                                    ${s.appointments.map(a => `
+                                        <a href="${a.create_url}" class="btn btn-sm btn-outline-success me-1 mb-1">
+                                            <i class="bi bi-journal-plus me-1"></i>${a.label}
+                                        </a>
+                                    `).join('')}
+                                </div>` : '<div class="text-muted small mt-1">No eligible appointments found.</div>'}
+                            </div>
+                        `).join('');
+                    })
+                    .catch(() => {
+                        results.innerHTML = '<p class="text-danger text-center small py-3">Error searching students. Please try again.</p>';
+                    });
+                }, 350);
+            });
+
+            // Clear search when modal closes
+            document.getElementById('studentSearchModal').addEventListener('hidden.bs.modal', function () {
+                input.value = '';
+                results.innerHTML = '<p class="text-muted text-center small py-3">Start typing to search for a student.</p>';
+            });
+        })();
     </script>
 @endsection

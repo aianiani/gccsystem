@@ -121,6 +121,8 @@ Route::middleware('auth')->group(function () {
         Route::post('assessments/grit', [App\Http\Controllers\AssessmentController::class, 'submitGrit'])->name('assessments.grit.submit');
         Route::post('assessments/neo', [App\Http\Controllers\AssessmentController::class, 'submitNeo'])->name('assessments.neo.submit');
         Route::post('assessments/wvi', [App\Http\Controllers\AssessmentController::class, 'submitWvi'])->name('assessments.wvi.submit');
+        // Draft save (AJAX)
+        Route::post('assessments/{type}/draft', [App\Http\Controllers\AssessmentController::class, 'saveDraft'])->name('assessments.saveDraft');
 
         // Seminar Evaluation Routes
         Route::get('seminars', [App\Http\Controllers\Student\SeminarController::class, 'index'])->name('student.seminars.index');
@@ -151,8 +153,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('counselor/appointments/{id}', [App\Http\Controllers\AppointmentController::class, 'update'])->name('counselor.appointments.update');
         Route::patch('counselor/appointments/{id}/accept', [App\Http\Controllers\AppointmentController::class, 'accept'])->name('counselor.appointments.accept');
         Route::patch('counselor/appointments/{id}/decline', [App\Http\Controllers\AppointmentController::class, 'decline'])->name('counselor.appointments.decline');
+        Route::patch('counselor/appointments/{id}/transfer', [App\Http\Controllers\AppointmentController::class, 'transfer'])->name('counselor.appointments.transfer');
         Route::delete('counselor/appointments/{id}', [App\Http\Controllers\AppointmentController::class, 'destroy'])->name('counselor.appointments.destroy');
         Route::get('counselor/session-notes', [App\Http\Controllers\SessionNoteController::class, 'index'])->name('counselor.session_notes.index');
+        Route::get('counselor/session-notes/search-students', [App\Http\Controllers\SessionNoteController::class, 'searchStudents'])->name('counselor.session_notes.searchStudents');
 
         // Bulk Actions (Move before wildcards to avoid collision)
         Route::delete('counselor/session-notes/bulk-delete', [App\Http\Controllers\SessionNoteController::class, 'bulkDestroy'])->name('counselor.session_notes.bulkDestroy');

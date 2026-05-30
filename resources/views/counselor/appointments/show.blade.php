@@ -339,6 +339,12 @@
                                                 class="btn btn-warning btn-action text-dark">
                                                 <i class="bi bi-clock-history"></i> Reschedule
                                             </a>
+                                            @if(isset($otherCounselors) && $otherCounselors->count())
+                                            <button type="button" class="btn btn-outline-info btn-action"
+                                                data-bs-toggle="modal" data-bs-target="#transferModal">
+                                                <i class="bi bi-arrow-left-right"></i> Transfer
+                                            </button>
+                                            @endif
                                             <button type="button" class="btn btn-outline-danger btn-action"
                                                 data-bs-toggle="modal" data-bs-target="#declineModal">
                                                 <i class="bi bi-x-lg"></i> Decline
@@ -718,6 +724,49 @@
             // Privacy Toggle Logic Removed
         });
     </script>
+
+    <!-- Transfer Appointment Modal -->
+    @if(isset($otherCounselors) && $otherCounselors->count())
+    <div class="modal fade" id="transferModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header border-0" style="background: #e0f2fe; border-radius: 16px 16px 0 0; padding: 1.25rem 1.5rem;">
+                    <h5 class="modal-title fw-bold" style="color: #0369a1;">
+                        <i class="bi bi-arrow-left-right me-2"></i>Transfer to Another Counselor
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{{ route('counselor.appointments.transfer', $appointment->id) }}">
+                    @csrf @method('PATCH')
+                    <div class="modal-body" style="padding: 1.5rem;">
+                        <p class="text-muted mb-3 small">The student will be notified about the counselor change.</p>
+                        <div class="mb-3">
+                            <label for="new_counselor_id" class="form-label fw-semibold">Transfer To <span class="text-danger">*</span></label>
+                            <select name="new_counselor_id" id="new_counselor_id" class="form-select" required>
+                                <option value="">— Select a counselor —</option>
+                                @foreach($otherCounselors as $counselor)
+                                    <option value="{{ $counselor->id }}">{{ $counselor->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="transfer_notes" class="form-label fw-semibold">Transfer Notes <span class="text-muted fw-normal">(Optional)</span></label>
+                            <textarea name="transfer_notes" id="transfer_notes" class="form-control" rows="3"
+                                placeholder="e.g. Specialty match, schedule conflict, student preference..."
+                                maxlength="500"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0" style="padding: 1rem 1.5rem;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="background:#0284c7; border:none;">
+                            <i class="bi bi-arrow-left-right me-1"></i>Transfer Appointment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Decline Appointment Modal -->
     <div class="modal fade" id="declineModal" tabindex="-1" aria-hidden="true">

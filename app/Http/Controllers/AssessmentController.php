@@ -46,10 +46,39 @@ class AssessmentController extends Controller
                 ->with('error', 'The DASS-42 assessment is only available for 2nd Year students.');
         }
 
+        // Load existing draft if any so the view can pre-fill answers
+        $draft = \App\Models\Assessment::where('user_id', $user->id)
+            ->where('type', 'DASS-42')
+            ->where('status', 'draft')
+            ->latest()
+            ->first();
+
         return view('assessments.dass42', [
             'dass42_questions' => $this->getDass42Questions(),
             'context' => $context,
+            'draft' => $draft,
         ]);
+    }
+
+    // Save assessment answers as a draft (AJAX)
+    public function saveDraft(Request $request, $type)
+    {
+        $typeMap = ['dass42' => 'DASS-42', 'grit' => 'GRIT', 'neo' => 'NEO', 'wvi' => 'WVI'];
+        $assessmentType = $typeMap[$type] ?? null;
+        if (!$assessmentType) {
+            return response()->json(['error' => 'Invalid assessment type.'], 422);
+        }
+
+        $request->validate([
+            'answers' => 'required|array',
+        ]);
+
+        \App\Models\Assessment::updateOrCreate(
+            ['user_id' => auth()->id(), 'type' => $assessmentType, 'status' => 'draft'],
+            ['responses' => $request->answers, 'status' => 'draft']
+        );
+
+        return response()->json(['success' => true, 'message' => 'Draft saved.']);
     }
 
     // Handle DASS-42 form submission
@@ -131,11 +160,19 @@ class AssessmentController extends Controller
         $scorePayload['anxiety'] = $anxiety;
         $scorePayload['stress'] = $stress;
 
+        // Remove any existing draft before creating final submission
+        \App\Models\Assessment::where('user_id', auth()->id())
+            ->where('type', 'DASS-42')
+            ->where('status', 'draft')
+            ->delete();
+
         $assessment = \App\Models\Assessment::create([
             'user_id' => auth()->id(),
             'type' => 'DASS-42',
-            'score' => $scorePayload, // Pass as array, model cast handles JSON encoding
+            'score' => $scorePayload,
+            'responses' => $answers_assoc,
             'risk_level' => $risk_level,
+            'status' => 'completed',
             'student_comment' => $comment,
         ]);
 

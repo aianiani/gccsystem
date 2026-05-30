@@ -17,10 +17,12 @@ class Assessment extends Model
         'notes',
         'status',
         'student_comment',
+        'responses',
     ];
 
     protected $casts = [
         'score' => 'json',
+        'responses' => 'json',
     ];
 
     // Relationship to User
