@@ -563,7 +563,9 @@
                             <div class="dass42-sticky-header">
                                 <h3 style="margin:0;">DASS-42 Assessment</h3>
                                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;">
-                                    <div id="dass42-counter" class="small text-muted" aria-live="polite">Question 1 of 42
+                                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                                        <span id="autosave-indicator" class="small" style="font-size:0.78rem;"></span>
+                                        <div id="dass42-counter" class="small text-muted" aria-live="polite">Question 1 of 42</div>
                                     </div>
                                     <div class="progress mb-0" style="width: 220px;">
                                         <div id="dass42-progress" class="progress-bar bg-success" role="progressbar"
@@ -601,10 +603,7 @@
                                 <button type="button" class="btn btn-outline-secondary" id="dass42-prev"
                                     style="visibility:hidden;">Previous</button>
                                 <button type="button" class="btn btn-outline-success" id="dass42-next">Next</button>
-                                <div class="d-flex align-items-center gap-2" id="dass42-submit-group" style="display:none !important;">
-                                    <span id="autosave-indicator" class="text-muted small" style="font-size:0.8rem;"></span>
-                                    <button type="submit" class="btn btn-success" id="dass42-submit">Submit Assessment</button>
-                                </div>
+                                <button type="submit" class="btn btn-success" id="dass42-submit" style="display:none;">Submit Assessment</button>
                             </div>
 
                             <!-- Free-text comment removed as requested -->
@@ -646,25 +645,29 @@
             const prevBtn = document.getElementById('dass42-prev');
             const nextBtn = document.getElementById('dass42-next');
             const submitBtn = document.getElementById('dass42-submit');
-            const submitGroup = document.getElementById('dass42-submit-group');
             const summaryDiv = document.getElementById('dass42-summary');
             const questionWrapper = document.getElementById('dass42-question-wrapper');
             const radios = document.querySelectorAll('input[type="radio"]');
             const progressBar = document.getElementById('dass42-progress');
 
-            // Pre-fill from draft if it exists
+            // Pre-fill from draft and jump to last answered question
             @if(!empty($draft) && !empty($draft->responses))
             const draftAnswers = @json($draft->responses);
+            let lastAnsweredIdx = 0;
             Object.entries(draftAnswers).forEach(([key, value]) => {
-                // Keys are 1-indexed in draft, find radio with name answers[key-1] or answers[key]
-                const radio = document.querySelector(`input[name="answers[${parseInt(key)-1}]"][value="${value}"]`)
-                    || document.querySelector(`input[name="answers[${key}]"][value="${value}"]`);
-                if (radio) radio.checked = true;
+                const zeroIdx = parseInt(key) - 1;
+                const radio = document.querySelector(`input[name="answers[${zeroIdx}]"][value="${value}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    if (zeroIdx > lastAnsweredIdx) lastAnsweredIdx = zeroIdx;
+                }
             });
+            // Jump to the question right after the last answered one
+            currentQuestion = Math.min(lastAnsweredIdx + 1, totalQuestions - 1);
             // Show draft banner
             const draftBanner = document.createElement('div');
             draftBanner.className = 'alert alert-info alert-dismissible mb-3';
-            draftBanner.innerHTML = '<i class="bi bi-floppy me-1"></i><strong>Draft loaded.</strong> Your previous answers have been restored. You can continue where you left off. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            draftBanner.innerHTML = '<i class="bi bi-floppy me-1"></i><strong>Draft loaded.</strong> Restored ' + Object.keys(draftAnswers).length + '/42 answers. Continuing from where you left off. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
             document.querySelector('.dass42-form').prepend(draftBanner);
             @endif
 
@@ -674,7 +677,7 @@
                 });
                 prevBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
                 nextBtn.style.display = idx === totalQuestions - 1 ? 'none' : '';
-                submitGroup.style.display = idx === totalQuestions - 1 ? 'flex' : 'none';
+                submitBtn.style.display = idx === totalQuestions - 1 ? '' : 'none';
                 summaryDiv.style.display = 'none';
                 questionWrapper.style.display = '';
                 updateProgress();
@@ -878,8 +881,8 @@
                 };
             }
 
-            // Show first question on load
-            showDass42Question(0);
+            // Show first question on load (or resume from draft position)
+            showDass42Question(currentQuestion);
         });
 
         // Sidebar toggle for mobile
