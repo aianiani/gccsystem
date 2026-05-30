@@ -938,7 +938,7 @@
 
         /* Tooltip Styling */
         .calendar-tooltip {
-            position: absolute;
+            position: fixed;
             z-index: 9999;
             background: white;
             border-radius: 12px;
@@ -1310,12 +1310,15 @@
                                                                                                 calendarTooltip.style.display = 'block';
                                                                                                 const tooltipRect = calendarTooltip.getBoundingClientRect();
 
-                                                                                                let top = rect.top + window.scrollY - tooltipRect.height - 10;
-                                                                                                let left = rect.left + window.scrollX + (rect.width / 2) - (tooltipRect.width / 2);
+                                                                                                // Use fixed positioning (viewport coords) — unaffected by page zoom or scroll
+                                                                                                let top = rect.top - tooltipRect.height - 10;
+                                                                                                let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
 
-                                                                                                if (top < window.scrollY) top = rect.bottom + window.scrollY + 10;
-                                                                                                if (left < 0) left = 10;
-                                                                                                if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width - 10;
+                                                                                                // Flip below the event if not enough room above
+                                                                                                if (top < 10) top = rect.bottom + 10;
+                                                                                                // Clamp horizontally within viewport
+                                                                                                if (left < 10) left = 10;
+                                                                                                if (left + tooltipRect.width > window.innerWidth - 10) left = window.innerWidth - tooltipRect.width - 10;
 
                                                                                                 calendarTooltip.style.top = top + 'px';
                                                                                                 calendarTooltip.style.left = left + 'px';

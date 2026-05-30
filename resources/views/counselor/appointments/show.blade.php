@@ -428,6 +428,7 @@
                                                     <div class="info-label text-danger">Decline Reason</div>
                                                     <div class="info-value text-danger">{{ $appointment->decline_reason }}</div>
                                                 </div>
+                                                @endif
                                             </div>
                                             @if($appointment->appointment_type === 'Referral')
                                                 <hr class="my-3 text-muted opacity-25">
